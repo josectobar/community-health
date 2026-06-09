@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRECEDE-PROCEED Interactive Model</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #fff; color: #222; font-size: 14px; line-height: 1.6; }
+  h2 { font-size: 16px; font-weight: bold; color: #1F3864; margin: 0 0 4px; }
+  .subtitle { font-size: 13px; color: #555; margin: 0 0 14px; }
+  svg { width: 100%; max-width: 680px; display: block; margin: 0 auto; }
+  .phase-box { cursor: pointer; }
+  .phase-box rect { transition: stroke-width 0.15s; }
+  .phase-box:hover rect { stroke-width: 3 !important; }
+  #detail {
+    display: none;
+    margin-top: 14px;
+    padding: 16px 18px;
+    border-radius: 10px;
+    border: 2px solid #ccc;
+    background: #fafafa;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  #detail h3 { margin: 0 0 8px; font-size: 15px; font-weight: bold; }
+  #detail p { margin: 0 0 8px; }
+  #detail ul { margin: 6px 0 8px; padding-left: 20px; }
+  #detail li { margin-bottom: 4px; font-size: 13px; }
+  .per-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
+  .per-card { border-radius: 8px; padding: 12px 14px; font-size: 13px; line-height: 1.55; border: 1.5px solid; }
+  .per-card .per-title { font-weight: bold; font-size: 13px; display: block; margin-bottom: 6px; }
+  .per-card .per-def { display: block; margin-bottom: 6px; }
+  .per-card .per-ex { display: block; font-style: italic; font-size: 12px; }
+  .hint { font-size: 12px; color: #666; text-align: center; margin: 4px 0 0; }
+  @media (max-width: 520px) { .per-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<h2>PRECEDE-PROCEED: An Interactive Guide</h2>
+<p class="subtitle">Click any phase to learn its purpose, key questions, and what it produces.</p>
+
+<svg viewBox="0 0 680 210" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arr" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L7,3 z" fill="#888"/>
+    </marker>
+  </defs>
+
+  <!-- PRECEDE box -->
+  <rect x="6" y="6" width="332" height="196" rx="10" fill="none" stroke="#85B7EB" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="172" y="21" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#185FA5">PRECEDE — diagnose &amp; plan</text>
+
+  <!-- PROCEED box -->
+  <rect x="344" y="6" width="330" height="196" rx="10" fill="none" stroke="#5DCAA5" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="509" y="21" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#0F6E56">PROCEED — implement &amp; evaluate</text>
+
+  <!-- P1 Social -->
+  <g class="phase-box" onclick="show('p1')">
+    <rect x="14" y="30" width="72" height="160" rx="6" fill="#E6F1FB" stroke="#85B7EB" stroke-width="1.5"/>
+    <text x="50" y="72" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#0C447C">Phase 1</text>
+    <text x="50" y="87" text-anchor="middle" font-family="Arial" font-size="10" fill="#185FA5">Social</text>
+    <text x="50" y="100" text-anchor="middle" font-family="Arial" font-size="10" fill="#185FA5">Assessment</text>
+    <text x="50" y="174" text-anchor="middle" font-family="Arial" font-size="9" fill="#185FA5">click to learn</text>
+  </g>
+
+  <!-- P2 Epidemiological -->
+  <g class="phase-box" onclick="show('p2')">
+    <rect x="92" y="30" width="72" height="160" rx="6" fill="#E6F1FB" stroke="#85B7EB" stroke-width="1.5"/>
+    <text x="128" y="72" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#0C447C">Phase 2</text>
+    <text x="128" y="87" text-anchor="middle" font-family="Arial" font-size="10" fill="#185FA5">Epidemio-</text>
+    <text x="128" y="100" text-anchor="middle" font-family="Arial" font-size="10" fill="#185FA5">logical</text>
+    <text x="128" y="174" text-anchor="middle" font-family="Arial" font-size="9" fill="#185FA5">click to learn</text>
+  </g>
+
+  <!-- P3 Behavioral -->
+  <g class="phase-box" onclick="show('p3')">
+    <rect x="170" y="30" width="72" height="160" rx="6" fill="#FAEEDA" stroke="#FAC775" stroke-width="1.5"/>
+    <text x="206" y="65" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#633806">Phase 3</text>
+    <text x="206" y="80" text-anchor="middle" font-family="Arial" font-size="10" fill="#854F0B">Behavioral</text>
+    <text x="206" y="93" text-anchor="middle" font-family="Arial" font-size="10" fill="#854F0B">&amp; Environ-</text>
+    <text x="206" y="106" text-anchor="middle" font-family="Arial" font-size="10" fill="#854F0B">mental</text>
+    <text x="206" y="174" text-anchor="middle" font-family="Arial" font-size="9" fill="#854F0B">click to learn</text>
+  </g>
+
+  <!-- P4 PER -->
+  <g class="phase-box" onclick="show('p4')">
+    <rect x="248" y="30" width="72" height="160" rx="6" fill="#FAECE7" stroke="#F0997B" stroke-width="1.5"/>
+    <text x="284" y="65" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#712B13">Phase 4</text>
+    <text x="284" y="80" text-anchor="middle" font-family="Arial" font-size="10" fill="#993C1D">Educational</text>
+    <text x="284" y="93" text-anchor="middle" font-family="Arial" font-size="10" fill="#993C1D">&amp; Ecological</text>
+    <text x="284" y="130" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold" fill="#993C1D">P·E·R</text>
+    <text x="284" y="174" text-anchor="middle" font-family="Arial" font-size="9" fill="#993C1D">click to learn</text>
+  </g>
+
+  <!-- arrows PRECEDE -->
+  <line x1="86" y1="110" x2="92" y2="110" stroke="#888" stroke-width="1.2" marker-end="url(#arr)"/>
+  <line x1="164" y1="110" x2="170" y2="110" stroke="#888" stroke-width="1.2" marker-end="url(#arr)"/>
+  <line x1="242" y1="110" x2="248" y2="110" stroke="#888" stroke-width="1.2" marker-end="url(#arr)"/>
+  <line x1="320" y1="110" x2="344" y2="110" stroke="#888" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+  <!-- P5 Implementation -->
+  <g class="phase-box" onclick="show('p5')">
+    <rect x="352" y="30" width="70" height="160" rx="6" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="1.5"/>
+    <text x="387" y="72" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#085041">Phase 5</text>
+    <text x="387" y="87" text-anchor="middle" font-family="Arial" font-size="10" fill="#0F6E56">Implement-</text>
+    <text x="387" y="100" text-anchor="middle" font-family="Arial" font-size="10" fill="#0F6E56">ation</text>
+    <text x="387" y="174" text-anchor="middle" font-family="Arial" font-size="9" fill="#0F6E56">click to learn</text>
+  </g>
+
+  <!-- P6 Process -->
+  <g class="phase-box" onclick="show('p6')">
+    <rect x="428" y="30" width="70" height="160" rx="6" fill="#EAF3DE" stroke="#97C459" stroke-width="1.5"/>
+    <text x="463" y="72" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#27500A">Phase 6</text>
+    <text x="463" y="87" text-anchor="middle" font-family="Arial" font-size="10" fill="#3B6D11">Process</text>
+    <text x="463" y="100" text-anchor="middle" font-family="Arial" font-size="10" fill="#3B6D11">Evaluation</text>
+    <text x="463" y="174" text-anchor="middle" font-family="Arial" font-size="9" fill="#3B6D11">click to learn</text>
+  </g>
+
+  <!-- P7 Impact -->
+  <g class="phase-box" onclick="show('p7')">
+    <rect x="504" y="30" width="70" height="160" rx="6" fill="#EEEDFE" stroke="#AFA9EC" stroke-width="1.5"/>
+    <text x="539" y="72" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#3C3489">Phase 7</text>
+    <text x="539" y="87" text-anchor="middle" font-family="Arial" font-size="10" fill="#534AB7">Impact</text>
+    <text x="539" y="100" text-anchor="middle" font-family="Arial" font-size="10" fill="#534AB7">Evaluation</text>
+    <text x="539" y="174" text-anchor="middle" font-family="Arial" font-size="9" fill="#534AB7">click to learn</text>
+  </g>
+
+  <!-- P8 Outcome -->
+  <g class="phase-box" onclick="show('p8')">
+    <rect x="580" y="30" width="70" height="160" rx="6" fill="#FBEAF0" stroke="#ED93B1" stroke-width="1.5"/>
+    <text x="615" y="72" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#4B1528">Phase 8</text>
+    <text x="615" y="87" text-anchor="middle" font-family="Arial" font-size="10" fill="#72243E">Outcome</text>
+    <text x="615" y="100" text-anchor="middle" font-family="Arial" font-size="10" fill="#72243E">Evaluation</text>
+    <text x="615" y="174" text-anchor="middle" font-family="Arial" font-size="9" fill="#72243E">click to learn</text>
+  </g>
+
+  <!-- arrows PROCEED -->
+  <line x1="422" y1="110" x2="428" y2="110" stroke="#888" stroke-width="1.2" marker-end="url(#arr)"/>
+  <line x1="498" y1="110" x2="504" y2="110" stroke="#888" stroke-width="1.2" marker-end="url(#arr)"/>
+  <line x1="574" y1="110" x2="580" y2="110" stroke="#888" stroke-width="1.2" marker-end="url(#arr)"/>
+</svg>
+
+<p class="hint">Click any phase box above to see its definition, key question, and what it produces.</p>
+
+<div id="detail"></div>
+
+<script>
+var data = {
+  p1: {
+    title: "Phase 1 — Social Assessment",
+    color: "#0C447C", border: "#85B7EB", bg: "#f0f7ff",
+    body: "<p><strong>Core question:</strong> What quality-of-life issues does the community experience? What matters most to the people we are trying to serve?</p><p>This is where every PRECEDE-PROCEED plan begins — not with data, but with the community's own voice. Planners use surveys, focus groups, town hall meetings, and interviews to understand what residents care about most.</p><p><strong>Why start here?</strong> Programs built around community priorities are far more likely to gain trust and participation. If people don't see the program as relevant to their lives, they will not engage with it.</p><p><strong>What this phase produces:</strong> A clear picture of the community's quality-of-life concerns, which then anchors everything that follows.</p>"
+  },
+  p2: {
+    title: "Phase 2 — Epidemiological Assessment",
+    color: "#0C447C", border: "#85B7EB", bg: "#f0f7ff",
+    body: "<p><strong>Core question:</strong> What is the specific health problem, and how widespread is it?</p><p>This phase layers data on top of the community concerns identified in Phase 1. Planners examine disease rates, hospital discharge records, mortality data, survey results, and health statistics to confirm and quantify the health problem.</p><p><strong>The connection to Phase 1:</strong> The data should link back to the quality-of-life concerns the community raised. For example, if residents expressed worry about their ability to work and care for their families, and data shows high rates of diabetes-related disability in that community, those two findings connect meaningfully.</p><p><strong>What this phase produces:</strong> A prioritized health problem supported by evidence — the focus of the entire planning effort.</p>"
+  },
+  p3: {
+    title: "Phase 3 — Behavioral &amp; Environmental Assessment",
+    color: "#633806", border: "#FAC775", bg: "#fffbf0",
+    body: "<p><strong>Core question:</strong> What specific behaviors and environmental conditions are causing or worsening the health problem?</p><p>This phase has two distinct parts:</p><ul><li><strong>Behavioral factors</strong> are things individuals do (or don't do) that contribute to the problem — for example, not attending cancer screenings, or consuming high-sodium foods regularly.</li><li><strong>Environmental factors</strong> are conditions outside the individual that influence the problem — for example, no sidewalks for walking, no nearby clinics, or a neighborhood with only fast-food options.</li></ul><p><strong>Why distinguish them?</strong> A behavioral problem requires a different intervention than an environmental one. Educating someone about healthy food is useless if there is no healthy food available to buy. Planners must address both.</p><p><strong>What this phase produces:</strong> A prioritized list of behaviors and environmental conditions that will be targeted by the intervention.</p>"
+  },
+  p4: {
+    title: "Phase 4 — Educational &amp; Ecological Assessment: The P·E·R Factors",
+    color: "#712B13", border: "#F0997B", bg: "#fff5f0",
+    body: "<p><strong>Core question:</strong> WHY are those behaviors happening? What is driving them?</p><p>This is the most analytical phase of PRECEDE. The answer comes in three distinct factor types — and each one demands a completely different type of intervention.</p><div class='per-grid'><div class='per-card' style='background:#E6F1FB;border-color:#85B7EB;'><span class='per-title' style='color:#0C447C;'>Predisposing Factors</span><span class='per-def' style='color:#185FA5;'>Knowledge, beliefs, attitudes, values, and self-efficacy that exist BEFORE a behavior. These are internal — what a person thinks or feels.</span><span class='per-ex' style='color:#185FA5;'>Examples: A patient believes their condition is genetic and cannot be changed. A parent is unaware that a certain food poses a risk. A teen underestimates the harm of a substance.</span></div><div class='per-card' style='background:#E1F5EE;border-color:#5DCAA5;'><span class='per-title' style='color:#085041;'>Enabling Factors</span><span class='per-def' style='color:#0F6E56;'>Structural resources, access to services, skills, and physical conditions that allow or prevent a behavior — regardless of what a person believes or intends.</span><span class='per-ex' style='color:#0F6E56;'>Examples: No health insurance. Nearest clinic is 40 miles away. No sidewalks for walking. Program offered only in English in a Spanish-speaking community.</span></div><div class='per-card' style='background:#FAEEDA;border-color:#FAC775;'><span class='per-title' style='color:#633806;'>Reinforcing Factors</span><span class='per-def' style='color:#854F0B;'>Social rewards, peer reactions, family support or pressure, and feedback from providers that maintain or discourage a behavior after it has started.</span><span class='per-ex' style='color:#854F0B;'>Examples: A doctor consistently encourages physical activity at every visit. Family members cook high-fat meals and pressure a patient not to change. Peers normalize unhealthy behavior.</span></div></div><p style='margin-top:12px;font-size:13px;'>A common mistake is treating these as interchangeable. They are not. Changing a belief requires education. Removing a structural barrier requires policy or resource change. Shifting social norms requires a community-level approach. Using the wrong strategy for the wrong factor wastes resources and produces no change.</p>"
+  },
+  p5: {
+    title: "Phase 5 — Implementation",
+    color: "#085041", border: "#5DCAA5", bg: "#f0fdf6",
+    body: "<p><strong>Core question:</strong> What specific program or intervention will we launch, and how?</p><p>This is where PRECEDE ends and PROCEED begins. The intervention is designed based directly on the PER factor analysis from Phase 4. Each program strategy should target one or more of the identified predisposing, enabling, or reinforcing factors.</p><p><strong>Key principle:</strong> A well-designed implementation plan specifies who delivers the program, to whom, where, how often, with what resources, and how fidelity to the plan will be maintained.</p><ul><li>If the main issue is predisposing: design a health education or awareness campaign</li><li>If the main issue is enabling: advocate for policy change, create new services, or remove access barriers</li><li>If the main issue is reinforcing: build peer support programs, train providers, or engage family networks</li></ul><p><strong>What this phase produces:</strong> A detailed implementation plan tied directly to the root causes identified in PRECEDE.</p>"
+  },
+  p6: {
+    title: "Phase 6 — Process Evaluation",
+    color: "#27500A", border: "#97C459", bg: "#f4fce8",
+    body: "<p><strong>Core question:</strong> Did we do what we planned to do?</p><p>Process evaluation measures the <em>delivery</em> of the program — not whether it worked yet, but whether it was implemented as intended. This is sometimes called fidelity evaluation.</p><p><strong>What process evaluation measures:</strong></p><ul><li>Were all planned sessions held?</li><li>How many participants were reached, and were they the intended population?</li><li>Were trained staff delivering the content correctly?</li><li>Were materials culturally appropriate and available in the right languages?</li><li>Was the program reaching the community where they are?</li></ul><p><strong>Why this matters:</strong> If Phase 7 or 8 shows no change, the first question is always whether the program was actually implemented correctly. Without process evaluation data, you cannot distinguish a program that failed from a program that was never properly delivered.</p>"
+  },
+  p7: {
+    title: "Phase 7 — Impact Evaluation",
+    color: "#3C3489", border: "#AFA9EC", bg: "#f5f4ff",
+    body: "<p><strong>Core question:</strong> Did the predisposing, enabling, or reinforcing factors change as a result of the program?</p><p>Impact evaluation is the middle layer of evaluation. It measures whether the factors identified in Phase 4 actually shifted after the intervention. These changes are the mechanism through which health outcomes eventually improve.</p><p><strong>Examples of impact measures by factor type:</strong></p><ul><li><em>Predisposing:</em> Did participants' knowledge scores increase? Did their attitudes or self-efficacy change on a validated scale?</li><li><em>Enabling:</em> Did access to services improve? Did policy change take effect? Did the number of referral completions rise?</li><li><em>Reinforcing:</em> Did provider counseling rates increase? Did social norms surveys show a shift? Did peer support network participation grow?</li></ul><p><strong>Why this matters:</strong> Impact changes typically appear before health outcomes do. A positive impact evaluation tells you the program is working — even before disease rates or mortality statistics change.</p>"
+  },
+  p8: {
+    title: "Phase 8 — Outcome Evaluation",
+    color: "#4B1528", border: "#ED93B1", bg: "#fff0f5",
+    body: "<p><strong>Core question:</strong> Did the health problem actually improve?</p><p>Outcome evaluation measures the ultimate goal: a change in the health status of the community. This is the hardest evaluation to conduct well because health outcomes change slowly and are influenced by many factors beyond your program.</p><p><strong>Examples of outcome measures:</strong></p><ul><li>Did disease incidence or prevalence decrease?</li><li>Did hospitalization rates for the targeted condition fall?</li><li>Did mortality from the targeted cause decline?</li><li>Did quality-of-life scores improve among the target population?</li></ul><p><strong>The important nuance:</strong> Even if process and impact evaluations were both positive, an outcome might not change immediately — or might change for reasons unrelated to your program. Strong outcome evaluation requires a comparison group, sufficient time, and careful attention to confounding factors. This is why all three evaluation phases together tell a more complete story than outcome data alone.</p>"
+  }
+};
+
+function show(id) {
+  var ph = data[id];
+  var d = document.getElementById('detail');
+  d.style.display = 'block';
+  d.style.borderColor = ph.border;
+  d.style.background = ph.bg;
+  d.innerHTML = '<h3 style="color:' + ph.color + '">' + ph.title + '</h3>' + ph.body;
+  d.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+</script>
+</body>
+</html>

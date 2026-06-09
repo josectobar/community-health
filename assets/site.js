@@ -145,11 +145,6 @@ function showPhase(id) {
   panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-function renderNav(links = []) {
-  if (!links.length) return '';
-  return `<div class="nav-stack">${links.map((link) => `<a class="nav-link${link.active ? ' is-active' : ''}" href="${link.href}">${link.label}</a>`).join('')}</div>`;
-}
-
 function renderSummary(config) {
   const focusItems = (config.focusItems || []).map((item) => `<li>${item}</li>`).join('');
   return `
@@ -173,12 +168,7 @@ function renderPage() {
           <p class="eyebrow">${config.kicker || 'Interactive route'}</p>
           <h1>${title}</h1>
           <p class="hero-text">${config.intro || 'Explore the PRECEDE-PROCEED model through the clickable diagram below.'}</p>
-          <div class="route-meta">
-            <span class="route-chip">${config.routeLabel || 'Static GitHub Pages route'}</span>
-            ${config.phaseSpan ? `<span class="route-chip">${config.phaseSpan}</span>` : ''}
-          </div>
         </div>
-        ${renderNav(config.links)}
       </header>
 
       <section class="content-grid">

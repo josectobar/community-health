@@ -4,38 +4,77 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PRECEDE-PROCEED Interactive Model</title>
-<link rel="stylesheet" href="assets/site.css">
+<style>
+	* { box-sizing: border-box; }
+	html, body { margin: 0; padding: 0; }
+	body {
+		min-height: 100vh;
+		display: grid;
+		place-items: center;
+		font-family: Arial, sans-serif;
+		background: linear-gradient(180deg, #ffffff 0%, #f6f9fc 100%);
+		color: #1f2937;
+		padding: 24px;
+	}
+	main {
+		max-width: 760px;
+		width: 100%;
+		padding: 28px 26px;
+		border: 1px solid rgba(31, 41, 55, 0.1);
+		border-radius: 18px;
+		background: rgba(255, 255, 255, 0.9);
+		box-shadow: 0 12px 30px rgba(31, 41, 55, 0.08);
+	}
+	.eyebrow {
+		margin: 0 0 10px;
+		font-size: 12px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: #54708a;
+		font-weight: 700;
+	}
+	h1 {
+		margin: 0;
+		font-size: clamp(28px, 4vw, 42px);
+		line-height: 1.05;
+		color: #102030;
+	}
+	p {
+		margin: 14px 0 0;
+		font-size: 16px;
+		line-height: 1.7;
+		color: #4b5b6b;
+	}
+	.routes {
+		margin-top: 18px;
+		padding: 0;
+		list-style: none;
+		display: grid;
+		gap: 10px;
+	}
+	.routes li {
+		padding: 12px 14px;
+		border-radius: 12px;
+		background: #f8fafc;
+		border: 1px solid rgba(31, 41, 55, 0.08);
+		color: #34495e;
+		font-size: 14px;
+		line-height: 1.5;
+	}
+	.routes strong { color: #102030; }
+</style>
 </head>
 <body>
-<main class="landing-shell">
-  <section class="landing-hero">
-    <p class="eyebrow">GitHub Pages routes</p>
-    <h1>PRECEDE-PROCEED Interactive Model</h1>
-    <p class="landing-copy">Choose one of the four routes below. Each page uses the same interactive model, but starts from a different part of the framework so you can jump straight to the section you need.</p>
-  </section>
-
-  <section class="landing-grid">
-    <a class="landing-card" href="precede-model/">
-      <span class="card-route">/precede-model/</span>
-      <h2>Model overview</h2>
-      <p>Full interactive map of all eight phases with the Mesa Verde example.</p>
-    </a>
-    <a class="landing-card" href="social-assessment/">
-      <span class="card-route">/social-assessment/</span>
-      <h2>Assessment</h2>
-      <p>Focuses on the social and epidemiological steps that define the problem.</p>
-    </a>
-    <a class="landing-card" href="implementation/">
-      <span class="card-route">/implementation/</span>
-      <h2>Implementation</h2>
-      <p>Centers on behavior, environment, and program delivery decisions.</p>
-    </a>
-    <a class="landing-card" href="evaluation/">
-      <span class="card-route">/evaluation/</span>
-      <h2>Evaluation</h2>
-      <p>Starts with process, impact, and outcome evaluation in the PROCEED phase.</p>
-    </a>
-  </section>
+<main>
+	<p class="eyebrow">Static route index</p>
+	<h1>PRECEDE-PROCEED Interactive Model</h1>
+	<p>This repository serves standalone static pages under the <strong>/models</strong> path. Open the route you need directly; the pages are intentionally independent and do not share in-app navigation.</p>
+	<ul class="routes" aria-label="Available routes">
+		<li><strong>/models/generalized-model/</strong> Generalized planning model</li>
+		<li><strong>/models/map-model/</strong> Generalized planning model route</li>
+		<li><strong>/models/precede-model/</strong> PRECEDE-PROCEED route</li>
+		<li><strong>/models/three-fs-model/</strong> Three Fs route</li>
+	</ul>
 </main>
 </body>
 </html>

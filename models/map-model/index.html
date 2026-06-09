@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAPP Framework Interactive</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #fff; color: #222; font-size: 14px; line-height: 1.6; }
+  h2 { font-size: 16px; font-weight: bold; color: #1F3864; margin: 0 0 4px; }
+  .subtitle { font-size: 13px; color: #555; margin: 0 0 14px; }
+
+  /* phase nav strip */
+  .phase-strip { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .p-btn {
+    flex: 1 1 auto;
+    min-width: 90px;
+    background: #fff;
+    border: 1.5px solid #ccc;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    color: #222;
+    transition: background 0.12s;
+    line-height: 1.4;
+  }
+  .p-btn:hover { background: #f0f0f0; }
+  .p-btn .num { display: block; font-size: 10px; font-weight: normal; margin-bottom: 2px; }
+  .p-btn.active { color: #fff; }
+
+  /* detail panel */
+  #detail {
+    display: none;
+    padding: 16px 18px;
+    border-radius: 10px;
+    border: 2px solid #ccc;
+    background: #fafafa;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  #detail h3 { margin: 0 0 8px; font-size: 15px; font-weight: bold; }
+  #detail p { margin: 0 0 8px; }
+  #detail ul { margin: 6px 0 8px; padding-left: 20px; }
+  #detail li { margin-bottom: 4px; font-size: 13px; }
+
+  /* four-assessment grid */
+  .a-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+  .a-card { border-radius: 8px; padding: 12px 14px; font-size: 13px; line-height: 1.5; border: 1.5px solid; }
+  .a-card strong { display: block; margin-bottom: 5px; font-size: 13px; }
+
+  @media (max-width: 500px) {
+    .a-grid { grid-template-columns: 1fr; }
+    .p-btn { min-width: 80px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<h2>MAPP: Mobilizing for Action through Planning and Partnerships</h2>
+<p class="subtitle">Click each phase to explore its purpose, key principles, and what it produces.</p>
+
+<div class="phase-strip">
+  <button class="p-btn" id="b1" onclick="show('m1')" style="border-color:#85B7EB;">
+    <span class="num" style="color:#185FA5;">Phase 1</span>Organize &amp; Partner
+  </button>
+  <button class="p-btn" id="b2" onclick="show('m2')" style="border-color:#97C459;">
+    <span class="num" style="color:#3B6D11;">Phase 2</span>Visioning
+  </button>
+  <button class="p-btn" id="b3" onclick="show('m3')" style="border-color:#EF9F27;">
+    <span class="num" style="color:#854F0B;">Phase 3</span>Four Assessments
+  </button>
+  <button class="p-btn" id="b4" onclick="show('m4')" style="border-color:#AFA9EC;">
+    <span class="num" style="color:#534AB7;">Phase 4</span>Strategic Issues
+  </button>
+  <button class="p-btn" id="b5" onclick="show('m5')" style="border-color:#F0997B;">
+    <span class="num" style="color:#993C1D;">Phase 5</span>Goals &amp; Strategies
+  </button>
+  <button class="p-btn" id="b6" onclick="show('m6')" style="border-color:#5DCAA5;">
+    <span class="num" style="color:#0F6E56;">Phase 6</span>Action Cycle
+  </button>
+</div>
+
+<div id="detail"></div>
+
+<script>
+var colors = {
+  m1: { bg: "#f0f7ff", border: "#85B7EB", btn: "#185FA5", h: "#0C447C" },
+  m2: { bg: "#f4fce8", border: "#97C459", btn: "#3B6D11", h: "#27500A" },
+  m3: { bg: "#fffbf0", border: "#EF9F27", btn: "#854F0B", h: "#633806" },
+  m4: { bg: "#f5f4ff", border: "#AFA9EC", btn: "#534AB7", h: "#3C3489" },
+  m5: { bg: "#fff5f0", border: "#F0997B", btn: "#993C1D", h: "#712B13" },
+  m6: { bg: "#f0fdf6", border: "#5DCAA5", btn: "#0F6E56", h: "#085041" }
+};
+
+var data = {
+  m1: {
+    title: "Phase 1 — Organize for Success &amp; Develop Partnerships",
+    body: "<p><strong>Core question:</strong> Who needs to be at the table, and how do we build a coalition that can actually carry this work forward?</p><p>MAPP does not begin with data or with a health problem — it begins with <em>people</em>. Before any assessment takes place, a broad community partnership must be assembled. This is the foundation of the entire process.</p><p><strong>Who belongs in the partnership?</strong> Effective MAPP partnerships are multi-sector and always include community residents as genuine participants — not just professionals. Typical partners include:</p><ul><li>The local or county health department</li><li>Hospitals, clinics, and community health centers</li><li>School districts and universities</li><li>Community-based organizations and nonprofits</li><li>Faith communities</li><li>Business and employer representatives</li><li>Social services agencies</li><li>Government offices (housing, planning, emergency management)</li><li>Residents, especially those from underserved communities</li></ul><p><strong>Key principle:</strong> MAPP is community-driven. Health professionals facilitate — the community owns the process. A partnership made up only of professionals is not a MAPP partnership.</p><p><strong>What this phase produces:</strong> A functioning coalition with shared purpose, clear roles, and the commitment to move through all six phases together.</p>"
+  },
+  m2: {
+    title: "Phase 2 — Visioning",
+    body: "<p><strong>Core question:</strong> What does a healthy, thriving version of this community look like in 10 years?</p><p>Before examining data or identifying problems, the MAPP process asks the community to articulate a shared vision of what they want their future to look like. This is not a mission statement for the health department — it is a collectively created picture of community wellbeing.</p><p><strong>How visioning works:</strong></p><ul><li>All partnership members participate — including community residents</li><li>Participants describe the ideal community without being constrained by current resources or limitations</li><li>Common themes are synthesized into a shared vision statement</li><li>The vision becomes the anchor for every decision made in Phases 3 through 6</li></ul><p><strong>Example vision language from real MAPP communities:</strong> <em>\"A community where all residents have the opportunity to live healthy, productive lives regardless of race, income, or neighborhood.\"</em></p><p><strong>Key principle:</strong> The vision must be co-created. If it is written by health professionals alone, the community will not own it — and without community ownership, the plan will not be sustained.</p><p><strong>What this phase produces:</strong> A written shared vision that guides all strategic decisions and keeps the partnership aligned through the full planning process.</p>"
+  },
+  m3: {
+    title: "Phase 3 — The Four MAPP Assessments",
+    body: "<p><strong>Core question:</strong> What is the complete picture of this community's health — from the data, from residents' perspectives, from the system's performance, and from the forces shaping the future?</p><p>MAPP requires four distinct assessments because no single data source tells the whole story. Each assessment answers a different question. Missing any one leaves a blind spot.</p><div class='a-grid'><div class='a-card' style='background:#E6F1FB;border-color:#85B7EB;'><strong style='color:#0C447C;'>Community Health Status Assessment (CHSA)</strong><span style='color:#185FA5;'>What do the numbers say? Uses health statistics, hospital data, death records, census demographics, and behavioral surveys to document the community's health status. Identifies which health problems are most prevalent and who is most affected.</span></div><div class='a-card' style='background:#EAF3DE;border-color:#97C459;'><strong style='color:#27500A;'>Community Themes &amp; Strengths Assessment (CTSA)</strong><span style='color:#3B6D11;'>What does the community say? Captures resident priorities, concerns, and perceived barriers through forums, door-to-door surveys, and focus groups. Also identifies existing community assets and strengths that can support the plan.</span></div><div class='a-card' style='background:#FAEEDA;border-color:#EF9F27;'><strong style='color:#633806;'>Local Public Health System Assessment (LPHSA)</strong><span style='color:#854F0B;'>How well is the public health system performing? Uses the Ten Essential Public Health Services as a benchmark. Surveys all organizations — not just the health department — that contribute to public health work in the community.</span></div><div class='a-card' style='background:#EEEDFE;border-color:#AFA9EC;'><strong style='color:#3C3489;'>Forces of Change Assessment (FOCA)</strong><span style='color:#534AB7;'>What external forces could affect our community's health in the near future? Identifies legislation, demographic shifts, economic trends, climate change, new technologies, and emerging health threats that planners must account for.</span></div></div><p style='margin-top:12px;font-size:13px;'><strong>Key principle:</strong> Data without community voice produces plans residents don't trust. Community voice without data produces plans that miss the biggest problems. System assessment without forces-of-change analysis produces plans that are outdated before they launch. All four are needed.</p>"
+  },
+  m4: {
+    title: "Phase 4 — Identify Strategic Issues",
+    body: "<p><strong>Core question:</strong> Based on everything the four assessments revealed, what are the most critical challenges that, if not addressed, would prevent this community from achieving its vision?</p><p>A strategic issue is not the same as a health problem. It is a deeper, underlying challenge that cuts across multiple health problems. Strategic issues are identified by synthesizing all four assessment findings and asking: what patterns emerge? What barriers keep showing up across multiple data sources?</p><p><strong>How strategic issues are framed:</strong> They are often written as questions rather than statements. Framing them as questions prevents the partnership from jumping to predetermined solutions.</p><p><strong>Examples of strategic issues from real MAPP communities:</strong></p><ul><li><em>\"How can we eliminate health disparities by race and income in our county?\"</em></li><li><em>\"How can our public health system improve its capacity to reach the most underserved populations?\"</em></li><li><em>\"How can we address the social determinants — housing, income, education — that drive the health problems identified in the CHSA?\"</em></li><li><em>\"How can our fragmented service system improve coordination so residents don't fall through the gaps?\"</em></li></ul><p><strong>What this phase produces:</strong> A short list (typically 3 to 6) of strategic issues that will anchor the goals and strategies in Phase 5.</p>"
+  },
+  m5: {
+    title: "Phase 5 — Formulate Goals &amp; Strategies",
+    body: "<p><strong>Core question:</strong> For each strategic issue, what specific, measurable goals will we pursue — and what strategies will actually get us there?</p><p>This phase converts strategic issues into an action plan. Each strategic issue gets one or more goals, and each goal gets one or more strategies. All strategies must be grounded in assessment data, not assumptions.</p><p><strong>The PEARL test:</strong> Before adopting any strategy, MAPP recommends evaluating it against five criteria:</p><ul><li><strong>P</strong>ropriety — Is it the right thing to do? Does it address the strategic issue?</li><li><strong>E</strong>conomical — Is it cost-effective given available resources?</li><li><strong>A</strong>cceptability — Will the community accept and participate in it?</li><li><strong>R</strong>esources — Do we have (or can we obtain) the funding, staff, and infrastructure needed?</li><li><strong>L</strong>egality — Do we have the legal authority to implement it?</li></ul><p>A strategy that fails any PEARL criterion should be revised or replaced before moving forward — no matter how appealing it sounds.</p><p><strong>What this phase produces:</strong> A community health improvement plan with specific, time-bound, resource-linked goals and strategies ready for implementation.</p>"
+  },
+  m6: {
+    title: "Phase 6 — The Action Cycle",
+    body: "<p><strong>Core question:</strong> Are we implementing our plan, is it working, and are we adjusting based on what we learn?</p><p>The action cycle is MAPP's ongoing implementation and evaluation loop. Unlike Phase 5, which produces the plan, Phase 6 is the living, continuous process of putting the plan into practice and keeping it relevant over time.</p><p><strong>The four steps of the action cycle:</strong></p><ul><li><strong>Plan:</strong> Assign lead organizations, set timelines, secure funding, define roles and accountability for each strategy</li><li><strong>Do:</strong> Implement the strategies as designed; document what is being done and for whom</li><li><strong>Check:</strong> Evaluate whether strategies are being implemented correctly (process) and whether goals are being reached (impact and outcome)</li><li><strong>Act:</strong> Use evaluation data to make adjustments — scale what works, modify what doesn't, drop what is ineffective</li></ul><p><strong>Reassessment timeline:</strong> The four MAPP assessments are typically repeated every 3 to 5 years to ensure the community health improvement plan reflects current conditions, new data, and any forces of change that have emerged.</p><p><strong>Key principle:</strong> A plan that is written once and never revisited is not systematic planning — it is a one-time document. The action cycle transforms MAPP from a planning event into an ongoing system for community health improvement.</p>"
+  }
+};
+
+function show(id) {
+  var ph = data[id];
+  var c = colors[id];
+
+  // reset all buttons
+  for (var k in colors) {
+    var btn = document.getElementById('b' + k.slice(1));
+    btn.classList.remove('active');
+    btn.style.background = '';
+    btn.style.color = '#222';
+  }
+
+  // activate clicked button
+  var activeBtn = document.getElementById('b' + id.slice(1));
+  activeBtn.classList.add('active');
+  activeBtn.style.background = c.btn;
+  activeBtn.style.color = '#fff';
+  activeBtn.style.borderColor = c.border;
+
+  var d = document.getElementById('detail');
+  d.style.display = 'block';
+  d.style.borderColor = c.border;
+  d.style.background = c.bg;
+  d.innerHTML = '<h3 style="color:' + c.h + '">' + ph.title + '</h3>' + ph.body;
+  d.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Three Fs of Program Planning</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #fff; color: #222; font-size: 14px; line-height: 1.6; }
+  h2 { font-size: 16px; font-weight: bold; color: #1F3864; margin: 0 0 4px; }
+  .subtitle { font-size: 13px; color: #555; margin: 0 0 18px; }
+
+  /* tabs for the 3 Fs */
+  .tab-bar { display: flex; gap: 0; border-bottom: 2px solid #ddd; margin-bottom: 0; }
+  .tab {
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    background: #f5f5f5;
+    color: #555;
+    font-family: Arial, sans-serif;
+    margin-right: 4px;
+    transition: background 0.12s;
+  }
+  .tab:hover { background: #eee; }
+  .tab.active { background: #fff; color: #1F3864; border-color: #ddd; border-bottom-color: #fff; font-weight: bold; }
+
+  .tab-content {
+    display: none;
+    border: 1.5px solid #ddd;
+    border-top: none;
+    border-radius: 0 8px 8px 8px;
+    padding: 18px;
+    background: #fff;
+    margin-bottom: 18px;
+  }
+  .tab-content.active { display: block; }
+  .tab-content h3 { font-size: 15px; margin: 0 0 6px; }
+  .tab-content p { margin: 0 0 8px; font-size: 14px; }
+  .tab-content ul { margin: 6px 0 8px; padding-left: 20px; }
+  .tab-content li { margin-bottom: 4px; font-size: 13px; }
+  .f-badge { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 8px; }
+
+  /* decision tool */
+  .tool-section { margin-bottom: 20px; }
+  .tool-q { font-size: 13px; font-weight: bold; margin: 0 0 8px; color: #1F3864; }
+  .opt {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 9px 12px; margin-bottom: 6px;
+    border: 1.5px solid #ddd; border-radius: 8px;
+    cursor: pointer; transition: background 0.12s;
+  }
+  .opt:hover { background: #f5f5f5; }
+  .opt.selected { border-color: #2E75B6; background: #f0f7ff; }
+  .opt input[type="radio"] { margin-top: 3px; flex-shrink: 0; }
+  .opt label { cursor: pointer; font-size: 13px; line-height: 1.5; }
+  .go-btn {
+    padding: 9px 24px; font-size: 14px; font-weight: bold;
+    border: 1.5px solid #2E75B6; border-radius: 8px;
+    background: #2E75B6; color: #fff; cursor: pointer;
+    font-family: Arial, sans-serif; transition: background 0.12s;
+  }
+  .go-btn:hover { background: #185FA5; }
+  #result { display: none; margin-top: 16px; padding: 16px 18px; border-radius: 10px; border: 2px solid #ccc; font-size: 14px; line-height: 1.7; }
+  #result h3 { margin: 0 0 8px; font-size: 15px; font-weight: bold; }
+  #result p { margin: 0 0 8px; }
+  .reset-btn { margin-top: 10px; padding: 6px 16px; font-size: 13px; border: 1.5px solid #bbb; border-radius: 6px; background: #fff; color: #555; cursor: pointer; font-family: Arial, sans-serif; }
+  .reset-btn:hover { background: #f0f0f0; }
+
+  /* comparison table */
+  .comp-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+  .comp-table th { background: #1F3864; color: #fff; padding: 8px 10px; text-align: left; font-weight: bold; }
+  .comp-table td { padding: 8px 10px; border-bottom: 1px solid #e5e5e5; vertical-align: top; }
+  .comp-table tr:nth-child(even) td { background: #f8f8f8; }
+  .comp-table tr:last-child td { border-bottom: none; }
+</style>
+</head>
+<body>
+
+<h2>Choosing the Right Planning Framework: The Three Fs</h2>
+<p class="subtitle">Use the tabs below to learn each F, then try the decision tool to apply them.</p>
+
+<!-- Tab bar -->
+<div class="tab-bar">
+  <div class="tab active" onclick="switchTab('fluidity')">Fluidity</div>
+  <div class="tab" onclick="switchTab('flexibility')">Flexibility</div>
+  <div class="tab" onclick="switchTab('functionality')">Functionality</div>
+  <div class="tab" onclick="switchTab('compare')">Compare Models</div>
+  <div class="tab" onclick="switchTab('tool')">Decision Tool</div>
+</div>
+
+<!-- Fluidity -->
+<div id="tab-fluidity" class="tab-content active">
+  <span class="f-badge" style="background:#E6F1FB;color:#0C447C;">First F</span>
+  <h3 style="color:#0C447C;">Fluidity — How well understood is the problem?</h3>
+  <p>Fluidity asks: <strong>How much do we already know about this community's health problem and its causes?</strong> It describes the state of your knowledge before planning begins.</p>
+  <p>Think of fluidity as a spectrum:</p>
+  <ul>
+    <li><strong>Low fluidity</strong> — The community is understudied. Root causes are unclear. You need a framework with strong exploratory assessment built in. MAPP's four-assessment approach is well-suited here because it gathers data from multiple angles simultaneously.</li>
+    <li><strong>Moderate fluidity</strong> — Some data exists but community perspectives and system performance are unknown. Both frameworks can apply, depending on scope.</li>
+    <li><strong>High fluidity</strong> — The health problem and its causes are well-documented. You are ready to design a targeted intervention. PRECEDE-PROCEED's structured phase-by-phase diagnosis works well when the problem is already defined.</li>
+  </ul>
+  <p><strong>The key question to ask yourself:</strong> Am I still trying to discover what the problem is, or do I already know and need to figure out how to address it?</p>
+</div>
+
+<!-- Flexibility -->
+<div id="tab-flexibility" class="tab-content">
+  <span class="f-badge" style="background:#EAF3DE;color:#27500A;">Second F</span>
+  <h3 style="color:#27500A;">Flexibility — What is the scope and complexity of the planning task?</h3>
+  <p>Flexibility asks: <strong>Are we planning one specific program, or coordinating a broad community health improvement strategy across many organizations and priorities?</strong></p>
+  <ul>
+    <li><strong>Narrow scope</strong> — One health problem, one target population, one intervention. PRECEDE-PROCEED is designed for this. It goes very deep on one specific problem — analyzing behaviors, environments, and the three PER factors in detail.</li>
+    <li><strong>Broad scope</strong> — Multiple health priorities, multiple sectors, multiple organizations that all need to coordinate. MAPP is designed for this. It produces a community health improvement plan that can guide many organizations simultaneously.</li>
+  </ul>
+  <p><strong>The key question to ask yourself:</strong> Am I solving one specific problem, or building a system-wide plan that addresses the health of an entire community?</p>
+  <p><strong>Important:</strong> Broad scope does not mean PRECEDE-PROCEED is irrelevant. In practice, MAPP is often used to identify community-wide priorities, and PRECEDE-PROCEED is then used to design the specific programs that address each priority. They are complementary.</p>
+</div>
+
+<!-- Functionality -->
+<div id="tab-functionality" class="tab-content">
+  <span class="f-badge" style="background:#FAEEDA;color:#633806;">Third F</span>
+  <h3 style="color:#633806;">Functionality — Who is driving the process, and what must the end product accomplish?</h3>
+  <p>Functionality asks: <strong>What does the end product need to do, and who has the authority and capacity to implement it?</strong></p>
+  <ul>
+    <li><strong>Program-level functionality</strong> — A health department or program team needs a plan for a specific intervention they will implement. PRECEDE-PROCEED produces exactly this: a detailed program plan with clear PER factor analysis and evaluation structure.</li>
+    <li><strong>System-level functionality</strong> — A multi-sector coalition needs a shared agenda that coordinates many organizations across many years. MAPP produces a Community Health Improvement Plan (CHIP) — a living document that is formally adopted by the community and updated over time.</li>
+    <li><strong>Community ownership</strong> — If the end product must be owned and driven by the community rather than by a single agency, MAPP's partnership-first approach is essential. A plan that is imposed rather than co-created rarely sustains itself.</li>
+  </ul>
+  <p><strong>The key question to ask yourself:</strong> Who will implement this plan, and what kind of document do they need to do that work effectively?</p>
+</div>
+
+<!-- Compare -->
+<div id="tab-compare" class="tab-content">
+  <h3 style="color:#1F3864;">PRECEDE-PROCEED vs. MAPP: Side-by-Side</h3>
+  <p style="font-size:13px;color:#555;">Use this table as a quick reference when deciding which framework fits your planning situation.</p>
+  <table class="comp-table">
+    <tr>
+      <th>Feature</th>
+      <th>PRECEDE-PROCEED</th>
+      <th>MAPP</th>
+    </tr>
+    <tr>
+      <td><strong>Primary purpose</strong></td>
+      <td>Diagnose a specific health problem deeply, then design and evaluate a targeted intervention</td>
+      <td>Coordinate a community-wide health improvement strategy across multiple organizations and priorities</td>
+    </tr>
+    <tr>
+      <td><strong>Scope</strong></td>
+      <td>One health problem, one intervention, one population</td>
+      <td>Multiple health priorities, whole community, many sectors</td>
+    </tr>
+    <tr>
+      <td><strong>Who leads it</strong></td>
+      <td>Health planners, program designers, research teams</td>
+      <td>A broad multi-sector coalition including community residents</td>
+    </tr>
+    <tr>
+      <td><strong>Starting point</strong></td>
+      <td>Community quality-of-life concerns (Phase 1)</td>
+      <td>Building the partnership (Phase 1)</td>
+    </tr>
+    <tr>
+      <td><strong>Diagnostic depth</strong></td>
+      <td>Very deep — analyzes predisposing, enabling, and reinforcing factors</td>
+      <td>Broad — uses four different assessment lenses</td>
+    </tr>
+    <tr>
+      <td><strong>Community strengths</strong></td>
+      <td>Focused primarily on needs and risk factors</td>
+      <td>Explicitly identifies community assets and strengths (CTSA)</td>
+    </tr>
+    <tr>
+      <td><strong>End product</strong></td>
+      <td>A detailed program plan with evaluation built in</td>
+      <td>A Community Health Improvement Plan (CHIP) adopted by the coalition</td>
+    </tr>
+    <tr>
+      <td><strong>Evaluation structure</strong></td>
+      <td>Three distinct levels: process, impact, and outcome</td>
+      <td>Built into the Action Cycle (plan, do, check, act)</td>
+    </tr>
+    <tr>
+      <td><strong>Best used when</strong></td>
+      <td>You know the problem and need a structured, evidence-based program to address it</td>
+      <td>You need a multi-year, multi-sector community health improvement plan</td>
+    </tr>
+    <tr>
+      <td><strong>Used together?</strong></td>
+      <td colspan="2" style="background:#f0f7ff;color:#0C447C;font-weight:bold;">Yes — MAPP identifies priorities; PRECEDE-PROCEED designs the programs that address them. They are complementary tools, not competing alternatives.</td>
+    </tr>
+  </table>
+</div>
+
+<!-- Decision Tool -->
+<div id="tab-tool" class="tab-content">
+  <h3 style="color:#1F3864;">Decision Tool: Which Framework Fits Your Situation?</h3>
+  <p style="font-size:13px;color:#555;">Answer three questions based on your planning scenario. The tool will recommend a framework and explain why.</p>
+
+  <div class="tool-section">
+    <p class="tool-q">1. Fluidity — How well understood is the health problem?</p>
+    <div class="opt" onclick="pick('fl','a',this)"><input type="radio" name="fl" id="fl-a"><label for="fl-a">The problem is not well understood yet. We need broad assessment from multiple angles to discover root causes.</label></div>
+    <div class="opt" onclick="pick('fl','b',this)"><input type="radio" name="fl" id="fl-b"><label for="fl-b">Some data exists, but community perspectives and system performance gaps are still unknown.</label></div>
+    <div class="opt" onclick="pick('fl','c',this)"><input type="radio" name="fl" id="fl-c"><label for="fl-c">The problem and its main causes are well-documented. We are ready to design a specific intervention.</label></div>
+  </div>
+
+  <div class="tool-section">
+    <p class="tool-q">2. Flexibility — What is the scope of the planning task?</p>
+    <div class="opt" onclick="pick('fx','a',this)"><input type="radio" name="fx" id="fx-a"><label for="fx-a">We are designing one specific program for one health problem and one target population.</label></div>
+    <div class="opt" onclick="pick('fx','b',this)"><input type="radio" name="fx" id="fx-b"><label for="fx-b">We need to address multiple health priorities across an entire community, coordinating many organizations.</label></div>
+  </div>
+
+  <div class="tool-section">
+    <p class="tool-q">3. Functionality — Who will implement the plan and what must it produce?</p>
+    <div class="opt" onclick="pick('fn','a',this)"><input type="radio" name="fn" id="fn-a"><label for="fn-a">A program team or health department will implement a specific intervention — they need a detailed program plan with evaluation built in.</label></div>
+    <div class="opt" onclick="pick('fn','b',this)"><input type="radio" name="fn" id="fn-b"><label for="fn-b">A broad multi-sector coalition must own the plan — the community needs a shared improvement agenda that multiple organizations can act on together.</label></div>
+  </div>
+
+  <button class="go-btn" onclick="recommend()">See recommendation</button>
+  <div id="result"></div>
+</div>
+
+<script>
+var answers = { fl: null, fx: null, fn: null };
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(function(t, i) {
+    var names = ['fluidity','flexibility','functionality','compare','tool'];
+    t.classList.toggle('active', names[i] === name);
+  });
+  document.querySelectorAll('.tab-content').forEach(function(c) {
+    c.classList.remove('active');
+  });
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function pick(q, v, el) {
+  answers[q] = v;
+  document.getElementById(q + '-' + v).checked = true;
+  el.parentNode.querySelectorAll('.opt').forEach(function(o) { o.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+
+function recommend() {
+  if (!answers.fl || !answers.fx || !answers.fn) {
+    alert('Please answer all three questions before continuing.');
+    return;
+  }
+  var fl = answers.fl, fx = answers.fx, fn = answers.fn;
+  var isPP   = (fl === 'c' || fx === 'a');
+  var isMAPP = (fx === 'b' || fn === 'b');
+  var d = document.getElementById('result');
+  d.style.display = 'block';
+
+  var title, body, color, bg, border;
+
+  if (isPP && !isMAPP) {
+    title = 'Recommended: PRECEDE-PROCEED';
+    color = '#0C447C'; bg = '#f0f7ff'; border = '#85B7EB';
+    body = '<p>Your answers point to a situation where the health problem is well-defined, the scope is focused, and a program team is ready to design and implement a specific intervention. PRECEDE-PROCEED is the right tool.</p><p>Use the PRECEDE phases to work backward through the root causes: start with what the community values (Phase 1), confirm the health problem with data (Phase 2), identify the specific behaviors and environmental conditions driving it (Phase 3), and analyze the predisposing, enabling, and reinforcing factors that explain those behaviors (Phase 4). Then move into PROCEED to implement, and evaluate at process, impact, and outcome levels.</p><p><strong>The payoff:</strong> A program that is precisely targeted to the actual causes of the problem — not a generic response — and an evaluation structure that shows exactly what changed and why.</p>';
+  } else if (isMAPP && !isPP) {
+    title = 'Recommended: MAPP';
+    color = '#085041'; bg = '#f0fdf6'; border = '#5DCAA5';
+    body = '<p>Your answers point to a situation requiring broad community coordination across multiple priorities. MAPP is designed for exactly this.</p><p>Begin by building a genuine multi-sector partnership that includes community residents (Phase 1). Establish a shared vision for community health (Phase 2). Then conduct all four assessments — CHSA, CTSA, LPHSA, and FOCA — to build a complete picture (Phase 3). Identify the strategic issues that cut across the data (Phase 4), develop goals and strategies using the PEARL test (Phase 5), and launch the action cycle to implement, evaluate, and continuously improve (Phase 6).</p><p><strong>The payoff:</strong> A Community Health Improvement Plan that is owned by the community, grounded in multiple data sources, and sustainable because many organizations are invested in it.</p>';
+  } else {
+    title = 'Recommended: Use both — MAPP first, then PRECEDE-PROCEED';
+    color = '#633806'; bg = '#fffbf0'; border = '#EF9F27';
+    body = '<p>Your answers reflect a situation that is both broad in scope (pointing to MAPP) and specific enough to require a targeted program design (pointing to PRECEDE-PROCEED). This is actually the most common real-world scenario — and the best news is these two frameworks are designed to work together.</p><p><strong>How to combine them:</strong></p><ul><li>Use MAPP to build your community coalition, establish a shared vision, conduct the four assessments, and identify the 3 to 6 strategic issues your community faces</li><li>Once the top strategic issues are identified, use PRECEDE-PROCEED to design the specific programs that address each issue — going deep on the PER factors, administrative barriers, and evaluation planning for each one</li><li>The MAPP Action Cycle then tracks implementation and reassesses the community health improvement plan over time</li></ul><p><strong>The payoff:</strong> A community-owned, multi-sector strategic plan (from MAPP) backed by precisely designed, evidence-based programs (from PRECEDE-PROCEED). This combination is the gold standard in community health planning.</p>';
+  }
+
+  d.style.background = bg;
+  d.style.borderColor = border;
+  d.innerHTML = '<h3 style="color:' + color + '">' + title + '</h3>' + body +
+    '<button class="reset-btn" onclick="resetTool()">Start over</button>';
+  d.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function resetTool() {
+  answers = { fl: null, fx: null, fn: null };
+  document.querySelectorAll('input[type="radio"]').forEach(function(r) { r.checked = false; });
+  document.querySelectorAll('.opt').forEach(function(o) { o.classList.remove('selected'); });
+  document.getElementById('result').style.display = 'none';
+}
+</script>
+</body>
+</html>
