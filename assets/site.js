@@ -43,7 +43,9 @@ const phases = {
 
 function buildSvg() {
   return `
-<svg class="model-svg" viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg">
+<svg class="model-svg" viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg" role="group" aria-labelledby="model-title model-desc">
+  <title id="model-title">PRECEDE-PROCEED model phases</title>
+  <desc id="model-desc">An interactive diagram showing phases 1 through 4 for PRECEDE, followed by phases 5 through 8 for PROCEED. Each phase can be selected to show details below.</desc>
   <defs>
     <marker id="arr" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
       <path d="M0,0 L0,6 L7,3 z" fill="#888"/>
@@ -56,7 +58,7 @@ function buildSvg() {
   <rect x="356" y="8" width="336" height="205" rx="10" fill="none" stroke="#5DCAA5" stroke-width="1.5" stroke-dasharray="5,3"/>
   <text x="524" y="24" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#0F6E56">PROCEED — implement &amp; evaluate</text>
 
-  <g class="phase-box" onclick="showPhase('p1')">
+  <g class="phase-box" role="button" tabindex="0" aria-controls="detail-panel" aria-pressed="false" aria-label="Show Phase 1, Social assessment" onclick="showPhase('p1')" onkeydown="handlePhaseKey(event, 'p1')">
     <rect x="18" y="38" width="76" height="158" rx="6" fill="#E6F1FB" stroke="#85B7EB" stroke-width="1.5"/>
     <text x="56" y="82" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#0C447C">Phase 1</text>
     <text x="56" y="97" text-anchor="middle" font-family="Arial" font-size="10" fill="#185FA5">Social</text>
@@ -64,7 +66,7 @@ function buildSvg() {
     <text x="56" y="155" text-anchor="middle" font-family="Arial" font-size="9" fill="#185FA5">click to learn</text>
   </g>
 
-  <g class="phase-box" onclick="showPhase('p2')">
+  <g class="phase-box" role="button" tabindex="0" aria-controls="detail-panel" aria-pressed="false" aria-label="Show Phase 2, Epidemiological assessment" onclick="showPhase('p2')" onkeydown="handlePhaseKey(event, 'p2')">
     <rect x="102" y="38" width="76" height="158" rx="6" fill="#E6F1FB" stroke="#85B7EB" stroke-width="1.5"/>
     <text x="140" y="82" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#0C447C">Phase 2</text>
     <text x="140" y="97" text-anchor="middle" font-family="Arial" font-size="10" fill="#185FA5">Epidemiological</text>
@@ -72,7 +74,7 @@ function buildSvg() {
     <text x="140" y="155" text-anchor="middle" font-family="Arial" font-size="9" fill="#185FA5">click to learn</text>
   </g>
 
-  <g class="phase-box" onclick="showPhase('p3')">
+  <g class="phase-box" role="button" tabindex="0" aria-controls="detail-panel" aria-pressed="false" aria-label="Show Phase 3, Behavioral and environmental assessment" onclick="showPhase('p3')" onkeydown="handlePhaseKey(event, 'p3')">
     <rect x="186" y="38" width="76" height="158" rx="6" fill="#FAEEDA" stroke="#FAC775" stroke-width="1.5"/>
     <text x="224" y="75" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#633806">Phase 3</text>
     <text x="224" y="90" text-anchor="middle" font-family="Arial" font-size="10" fill="#854F0B">Behavioral &amp;</text>
@@ -81,7 +83,7 @@ function buildSvg() {
     <text x="224" y="155" text-anchor="middle" font-family="Arial" font-size="9" fill="#854F0B">click to learn</text>
   </g>
 
-  <g class="phase-box" onclick="showPhase('p4')">
+  <g class="phase-box" role="button" tabindex="0" aria-controls="detail-panel" aria-pressed="false" aria-label="Show Phase 4, Educational and ecological assessment: the P E R factors" onclick="showPhase('p4')" onkeydown="handlePhaseKey(event, 'p4')">
     <rect x="270" y="38" width="76" height="158" rx="6" fill="#FAECE7" stroke="#F0997B" stroke-width="1.5"/>
     <text x="308" y="75" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#712B13">Phase 4</text>
     <text x="308" y="90" text-anchor="middle" font-family="Arial" font-size="10" fill="#993C1D">Educational &amp;</text>
@@ -96,7 +98,7 @@ function buildSvg() {
   <line x1="262" y1="117" x2="270" y2="117" stroke="#888" stroke-width="1.2" marker-end="url(#arr)"/>
   <line x1="346" y1="117" x2="356" y2="117" stroke="#888" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
 
-  <g class="phase-box" onclick="showPhase('p5')">
+  <g class="phase-box" role="button" tabindex="0" aria-controls="detail-panel" aria-pressed="false" aria-label="Show Phase 5, Implementation" onclick="showPhase('p5')" onkeydown="handlePhaseKey(event, 'p5')">
     <rect x="366" y="38" width="74" height="158" rx="6" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="1.5"/>
     <text x="403" y="82" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#085041">Phase 5</text>
     <text x="403" y="97" text-anchor="middle" font-family="Arial" font-size="10" fill="#0F6E56">Implement-</text>
@@ -104,7 +106,7 @@ function buildSvg() {
     <text x="403" y="155" text-anchor="middle" font-family="Arial" font-size="9" fill="#0F6E56">click to learn</text>
   </g>
 
-  <g class="phase-box" onclick="showPhase('p6')">
+  <g class="phase-box" role="button" tabindex="0" aria-controls="detail-panel" aria-pressed="false" aria-label="Show Phase 6, Process evaluation" onclick="showPhase('p6')" onkeydown="handlePhaseKey(event, 'p6')">
     <rect x="448" y="38" width="74" height="158" rx="6" fill="#EAF3DE" stroke="#97C459" stroke-width="1.5"/>
     <text x="485" y="82" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#27500A">Phase 6</text>
     <text x="485" y="97" text-anchor="middle" font-family="Arial" font-size="10" fill="#3B6D11">Process</text>
@@ -112,7 +114,7 @@ function buildSvg() {
     <text x="485" y="155" text-anchor="middle" font-family="Arial" font-size="9" fill="#3B6D11">click to learn</text>
   </g>
 
-  <g class="phase-box" onclick="showPhase('p7')">
+  <g class="phase-box" role="button" tabindex="0" aria-controls="detail-panel" aria-pressed="false" aria-label="Show Phase 7, Impact evaluation" onclick="showPhase('p7')" onkeydown="handlePhaseKey(event, 'p7')">
     <rect x="530" y="38" width="74" height="158" rx="6" fill="#EEEDFE" stroke="#AFA9EC" stroke-width="1.5"/>
     <text x="567" y="82" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#3C3489">Phase 7</text>
     <text x="567" y="97" text-anchor="middle" font-family="Arial" font-size="10" fill="#534AB7">Impact</text>
@@ -120,7 +122,7 @@ function buildSvg() {
     <text x="567" y="155" text-anchor="middle" font-family="Arial" font-size="9" fill="#534AB7">click to learn</text>
   </g>
 
-  <g class="phase-box" onclick="showPhase('p8')">
+  <g class="phase-box" role="button" tabindex="0" aria-controls="detail-panel" aria-pressed="false" aria-label="Show Phase 8, Outcome evaluation" onclick="showPhase('p8')" onkeydown="handlePhaseKey(event, 'p8')">
     <rect x="612" y="38" width="72" height="158" rx="6" fill="#FBEAF0" stroke="#ED93B1" stroke-width="1.5"/>
     <text x="648" y="82" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#4B1528">Phase 8</text>
     <text x="648" y="97" text-anchor="middle" font-family="Arial" font-size="10" fill="#72243E">Outcome</text>
@@ -134,6 +136,12 @@ function buildSvg() {
 </svg>`;
 }
 
+function handlePhaseKey(event, id) {
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+  event.preventDefault();
+  showPhase(id);
+}
+
 function showPhase(id) {
   const ph = phases[id];
   const panel = document.getElementById('detail-panel');
@@ -141,7 +149,13 @@ function showPhase(id) {
   panel.style.display = 'block';
   panel.style.borderColor = ph.border;
   panel.style.background = ph.bg;
-  panel.innerHTML = `<h3 style="color:${ph.color}">${ph.title}</h3>${ph.body}`;
+  panel.innerHTML = `<h3 id="detail-panel-heading" style="color:${ph.color}">${ph.title}</h3>${ph.body}`;
+  panel.setAttribute('aria-labelledby', 'detail-panel-heading');
+  document.querySelectorAll('.phase-box').forEach((box) => {
+    box.setAttribute('aria-pressed', 'false');
+  });
+  const activeBox = document.querySelector(`.phase-box[onclick="showPhase('${id}')"]`);
+  if (activeBox) activeBox.setAttribute('aria-pressed', 'true');
   panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
@@ -174,15 +188,17 @@ function renderPage() {
       <section class="content-grid">
         ${renderSummary(config)}
         <section class="model-card">
-          <p class="model-note">Click any phase to learn what it involves and how it connects to the Mesa Verde vaping scenario.</p>
+          <h2 class="sr-only">Interactive phase diagram</h2>
+          <p class="model-note">Select any phase to learn what it involves and how it connects to the Mesa Verde vaping scenario.</p>
           ${buildSvg()}
-          <p class="hint">Click any phase box above to see its definition and example.</p>
-          <div id="detail-panel"></div>
+          <p class="hint">Select any phase box above to see its definition and example.</p>
+          <div id="detail-panel" role="region" aria-live="polite" tabindex="-1"></div>
         </section>
       </section>
     </main>`;
 
   window.showPhase = showPhase;
+  window.handlePhaseKey = handlePhaseKey;
   if (config.defaultPhase) {
     showPhase(config.defaultPhase);
   }
