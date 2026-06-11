@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Selecting a Theory or Model – Interactive Widget</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f2f5f0; color: #1a1a2e; min-height: 100vh; }
+  header { background: linear-gradient(135deg, #2e5fa3, #1a3a6a); color: #fff; padding: 28px 32px 22px; }
+  header h1 { font-size: 1.5rem; font-weight: 700; }
+  header p { margin-top: 6px; font-size: .95rem; opacity: .88; }
+  .skip-link { position: absolute; left: -9999px; top: 4px; background: #2e5fa3; color: #fff; padding: 8px 16px; border-radius: 4px; font-weight: 700; z-index: 9999; text-decoration: none; }
+  .skip-link:focus { left: 8px; }
+  .tabs { display: flex; gap: 4px; padding: 16px 20px 0; background: #fff; border-bottom: 2px solid #e0e8f0; flex-wrap: wrap; }
+  .tab { padding: 10px 18px; border: 2px solid transparent; background: none; font-size: .9rem; font-weight: 600; color: #555; cursor: pointer; border-radius: 8px 8px 0 0; transition: background .2s, color .2s; }
+  .tab[aria-selected="true"] { background: #2e5fa3; color: #fff; border-color: #2e5fa3; }
+  .tab:hover:not([aria-selected="true"]) { background: #e8eef8; color: #2e5fa3; }
+  .tab:focus-visible { outline: 3px solid #c97d2e; outline-offset: 2px; }
+  .panel { display: none; padding: 26px 22px; }
+  .panel.active { display: block; }
+  .step-wrap { background: #fff; border-radius: 14px; padding: 22px; margin-bottom: 18px; border: 2px solid #d8e4f0; }
+  .step-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .step-num { width: 32px; height: 32px; border-radius: 50%; background: #2e5fa3; color: #fff; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .step-title { font-size: 1rem; font-weight: 700; color: #2e5fa3; }
+  .filter-btn { padding: 8px 16px; border: 2px solid #c0d0e8; background: #fff; border-radius: 24px; cursor: pointer; font-size: .85rem; font-weight: 600; transition: all .2s; color: #333; }
+  .filter-btn:hover { border-color: #2e5fa3; background: #e8eef8; }
+  .filter-btn:focus-visible { outline: 3px solid #c97d2e; outline-offset: 2px; }
+  .filter-btn[aria-pressed="true"] { background: #2e5fa3; border-color: #2e5fa3; color: #fff; }
+  .theory-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 14px; }
+  .theory-result-card { border: 2px solid #d8e4f0; border-radius: 10px; padding: 14px; background: #fff; }
+  .theory-result-card.highlight { border-color: #2e5fa3; background: #eef3fa; }
+  .theory-result-card h4 { font-size: .88rem; font-weight: 700; color: #2e5fa3; margin-bottom: 6px; }
+  .theory-result-card p { font-size: .82rem; color: #555; line-height: 1.5; }
+  .match-badge { display: inline-block; font-size: .72rem; padding: 2px 8px; border-radius: 12px; font-weight: 700; margin-top: 6px; }
+  .match-badge.strong { background: #e6f4ee; color: #155724; }
+  .match-badge.partial { background: #fef6ec; color: #7a4a10; }
+  .case-scenario { background: #eef3fa; border-radius: 10px; padding: 16px; border-left: 5px solid #2e5fa3; font-size: .88rem; line-height: 1.7; color: #333; margin-bottom: 14px; }
+  .analysis-step { background: #fff; border-radius: 10px; padding: 16px; border: 2px solid #e0e8f0; margin-bottom: 12px; }
+  .analysis-step h4 { font-size: .88rem; font-weight: 700; color: #2e5fa3; margin-bottom: 8px; }
+  .opt-btn { padding: 8px 14px; border: 2px solid #c0d0e8; background: #fff; border-radius: 8px; cursor: pointer; font-size: .83rem; transition: all .2s; }
+  .opt-btn:hover:not(:disabled) { border-color: #2e5fa3; background: #eef3fa; }
+  .opt-btn:focus-visible { outline: 3px solid #c97d2e; outline-offset: 2px; }
+  .opt-btn[aria-pressed="true"] { border-color: #2e5fa3; background: #eef3fa; font-weight: 600; color: #2e5fa3; }
+  .opt-btn.correct { border-color: #2e7d5a; background: #e6f4ee; color: #155724; font-weight: 600; }
+  .opt-btn.wrong { border-color: #b03a3a; background: #fdeaea; color: #721c24; }
+  .fb-inline { font-size: .83rem; padding: 8px 12px; border-radius: 6px; margin-top: 8px; line-height: 1.5; }
+  .fb-inline[hidden] { display: none; }
+  .fb-inline.ok { background: #e6f4ee; color: #155724; border-left: 3px solid #2e7d5a; }
+  .fb-inline.no { background: #fdeaea; color: #721c24; border-left: 3px solid #b03a3a; }
+  .limit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 14px; }
+  .limit-card { background: #fff; border-radius: 12px; padding: 18px; border: 2px solid #e0e8f0; cursor: pointer; transition: border-color .2s; }
+  .limit-card:hover, .limit-card[aria-expanded="true"] { border-color: #b03a3a; background: #fdeaea; }
+  .limit-card:focus-visible { outline: 3px solid #c97d2e; outline-offset: 2px; }
+  .limit-card .lc-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .limit-card .lc-title { font-size: .92rem; font-weight: 700; color: #b03a3a; }
+  .limit-card .lc-hint { font-size: .82rem; color: #888; }
+  .limit-card .lc-body { font-size: .84rem; color: #555; line-height: 1.55; margin-top: 8px; }
+  .limit-card[aria-expanded="false"] .lc-body { display: none; }
+  .scenario-opt { padding: 9px 16px; border: 2px solid #c0d0e8; background: #fff; border-radius: 24px; cursor: pointer; font-size: .88rem; font-weight: 600; transition: all .2s; }
+  .scenario-opt:hover:not(:disabled) { border-color: #b03a3a; background: #fdeaea; }
+  .scenario-opt:focus-visible { outline: 3px solid #c97d2e; outline-offset: 2px; }
+  .scenario-opt.correct { background: #e6f4ee; border-color: #2e7d5a; color: #155724; }
+  .scenario-opt.wrong { background: #fdeaea; border-color: #b03a3a; color: #721c24; }
+  .feedback-msg { margin-top: 12px; font-size: .88rem; padding: 10px 14px; border-radius: 8px; }
+  .feedback-msg[hidden] { display: none; }
+  .feedback-msg.ok { background: #e6f4ee; color: #155724; border-left: 4px solid #2e7d5a; }
+  .feedback-msg.no { background: #fdeaea; color: #721c24; border-left: 4px solid #b03a3a; }
+  .quiz-q { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 16px; border: 2px solid #e0e8f0; }
+  .quiz-q h4 { font-size: .93rem; font-weight: 600; margin-bottom: 14px; line-height: 1.5; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { padding: 10px 16px; border: 2px solid #d0d8dc; border-radius: 8px; background: #fff; cursor: pointer; font-size: .87rem; text-align: left; transition: all .18s; }
+  .quiz-opt:hover:not(:disabled) { border-color: #2e5fa3; background: #eef3fa; }
+  .quiz-opt:focus-visible { outline: 3px solid #c97d2e; outline-offset: 2px; }
+  .quiz-opt[aria-pressed="true"] { border-color: #2e5fa3; background: #eef3fa; }
+  .quiz-opt.correct { background: #e6f4ee; border-color: #2e7d5a; color: #155724; font-weight: 600; }
+  .quiz-opt.wrong { background: #fdeaea; border-color: #b03a3a; color: #721c24; }
+  .quiz-explanation { margin-top: 10px; font-size: .84rem; padding: 10px 14px; border-radius: 8px; background: #eef3fa; color: #444; border-left: 4px solid #2e5fa3; }
+  .quiz-explanation[hidden] { display: none; }
+  .score-bar { background: #fff; border-radius: 12px; padding: 20px; text-align: center; border: 2px solid #2e5fa3; margin-bottom: 20px; }
+  .score-bar[hidden] { display: none; }
+  .score-bar h3 { font-size: 1.3rem; color: #2e5fa3; font-weight: 700; }
+  .btn-primary { padding: 10px 24px; background: #2e5fa3; color: #fff; border: 2px solid #2e5fa3; border-radius: 8px; font-size: .9rem; font-weight: 600; cursor: pointer; transition: background .2s; margin-top: 14px; }
+  .btn-primary:hover { background: #1a3a6a; border-color: #1a3a6a; }
+  .btn-primary:focus-visible { outline: 3px solid #c97d2e; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<header>
+  <h1>Selecting a Theory or Model — Interactive Learning</h1>
+  <p>Practice the 3-step selection process, work through case studies, and examine theory limitations</p>
+</header>
+
+<div aria-live="polite" aria-atomic="true" id="live-announcer" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;"></div>
+
+<div class="tabs" role="tablist" aria-label="Activity sections" id="main-content">
+  <button class="tab" role="tab" aria-selected="true" aria-controls="tab-selector" id="btn-selector" onclick="switchTab('selector',this)">Theory Selector</button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-casestudy" id="btn-casestudy" onclick="switchTab('casestudy',this)">Case Study Walkthrough</button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-limits" id="btn-limits" onclick="switchTab('limits',this)">Theory Limitations</button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-quiz" id="btn-quiz" onclick="switchTab('quiz',this)">Knowledge Check</button>
+</div>
+
+<!-- Theory Selector Panel -->
+<div id="tab-selector" class="panel active" role="tabpanel" aria-labelledby="btn-selector">
+  <div style="background:#eef3fa;border-radius:12px;padding:16px;border-left:5px solid #2e5fa3;margin-bottom:20px;font-size:.88rem;line-height:1.6;color:#333;" role="note">
+    <strong>How to use this tool:</strong> Work through the three steps below. Filter your selections at each step to see how the logic narrows which theories fit your health problem.
+  </div>
+
+  <div class="step-wrap">
+    <div class="step-header"><div class="step-num" aria-hidden="true">1</div><h2 class="step-title" id="step1-label">What LEVEL is the primary influence operating at?</h2></div>
+    <p style="font-size:.88rem;color:#444;line-height:1.6;" id="step1-desc">Identify where the most important drivers of the behavior exist — inside the person, in their relationships, in the community structure, or in policy.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;" role="group" aria-labelledby="step1-label" aria-describedby="step1-desc" id="level-filter">
+      <button class="filter-btn" aria-pressed="false" onclick="filterLevel('intrapersonal',this)">Intrapersonal (individual)</button>
+      <button class="filter-btn" aria-pressed="false" onclick="filterLevel('interpersonal',this)">Interpersonal (relationships)</button>
+      <button class="filter-btn" aria-pressed="false" onclick="filterLevel('community',this)">Community or Organizational</button>
+      <button class="filter-btn" aria-pressed="false" onclick="filterLevel('structural',this)">Policy or Structural</button>
+    </div>
+  </div>
+
+  <div class="step-wrap" id="step2-wrap" style="opacity:.4;">
+    <div class="step-header"><div class="step-num" aria-hidden="true">2</div><h2 class="step-title" id="step2-label">What are the KEY DETERMINANTS of this behavior?</h2></div>
+    <p style="font-size:.88rem;color:#444;line-height:1.6;" id="step2-desc">Within that level, which specific factors drive the behavior? Select all that apply. Complete Step 1 first.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;" role="group" aria-labelledby="step2-label" aria-describedby="step2-desc" id="det-filter"></div>
+  </div>
+
+  <div class="step-wrap" id="step3-wrap" style="opacity:.4;">
+    <div class="step-header"><div class="step-num" aria-hidden="true">3</div><h2 class="step-title">Theory Recommendations</h2></div>
+    <p style="font-size:.88rem;color:#444;line-height:1.6;">Based on your selections, here are the theories that best fit. Consider evidence base, practical measurement, and stakeholder alignment.</p>
+    <div class="theory-results" id="theory-results" aria-live="polite" aria-label="Theory recommendations">
+      <p style="font-size:.88rem;color:#888;grid-column:1/-1;">Complete Steps 1 and 2 to see theory recommendations.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Case Study Panel -->
+<div id="tab-casestudy" class="panel" role="tabpanel" aria-labelledby="btn-casestudy" hidden>
+  <div style="background:#fff;border-radius:14px;padding:22px;border:2px solid #d8e4f0;margin-bottom:16px;">
+    <h2 style="color:#2e5fa3;font-size:1rem;margin-bottom:12px;" id="case-select-label">Choose a Case Study</h2>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;" role="group" aria-labelledby="case-select-label" id="case-select">
+      <button class="filter-btn" aria-pressed="false" onclick="loadCase(0,this)">Physical Activity — Latina Women</button>
+      <button class="filter-btn" aria-pressed="false" onclick="loadCase(1,this)">Youth Vaping — Rural High School</button>
+      <button class="filter-btn" aria-pressed="false" onclick="loadCase(2,this)">Food Access — Urban Neighborhood</button>
+    </div>
+  </div>
+  <div id="case-content" hidden>
+    <div class="case-scenario" id="case-scenario-text"></div>
+    <div class="analysis-steps" id="case-steps"></div>
+    <button class="btn-primary" id="case-reveal-btn" onclick="revealCaseAnswers()" hidden>Show Recommended Theory Fit</button>
+    <div id="case-conclusion" role="region" aria-label="Theory recommendation" hidden style="background:#eef3fa;border-radius:12px;padding:20px;margin-top:14px;border-left:5px solid #2e5fa3;font-size:.88rem;line-height:1.7;color:#333;"></div>
+  </div>
+</div>
+
+<!-- Limitations Panel -->
+<div id="tab-limits" class="panel" role="tabpanel" aria-labelledby="btn-limits" hidden>
+  <p style="font-size:.88rem;color:#555;margin-bottom:14px;line-height:1.6;" id="limit-instructions">Press Enter or Space on each limitation to expand it and see a real-world example.</p>
+  <div class="limit-grid" id="limit-grid" aria-describedby="limit-instructions"></div>
+
+  <div style="background:#fff;border-radius:12px;padding:20px;margin-top:18px;border:2px dashed #b03a3a;">
+    <h3 style="color:#b03a3a;font-size:.95rem;font-weight:700;margin-bottom:12px;">Spot the Limitation</h3>
+    <p style="font-size:.88rem;color:#444;line-height:1.6;margin-bottom:14px;">
+      A smoking cessation program was rigorously tested with suburban, highly educated White adults in the Midwest and found to be effective. It is then implemented without modification in a low-income, predominantly Black community in the urban South, where smoking is driven heavily by tobacco industry targeting, job stress, and lack of healthcare access. The program shows no effect. Which limitation does this scenario most directly illustrate?
+    </p>
+    <p style="font-size:.88rem;font-weight:600;color:#555;" id="limit-q-label">Select the most relevant limitation:</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;" role="group" aria-labelledby="limit-q-label" id="limit-opts">
+      <button class="scenario-opt" aria-pressed="false" onclick="limitScenario(this,'wrong')">Measurement challenges</button>
+      <button class="scenario-opt" aria-pressed="false" onclick="limitScenario(this,'wrong')">Theory does not equal program</button>
+      <button class="scenario-opt" aria-pressed="false" onclick="limitScenario(this,'correct')">Context specificity</button>
+      <button class="scenario-opt" aria-pressed="false" onclick="limitScenario(this,'wrong')">Static versus dynamic behavior</button>
+    </div>
+    <div class="feedback-msg" id="limit-fb" role="status" hidden></div>
+  </div>
+</div>
+
+<!-- Quiz Panel -->
+<div id="tab-quiz" class="panel" role="tabpanel" aria-labelledby="btn-quiz" hidden>
+  <div class="score-bar" id="score-bar3" role="status" hidden></div>
+  <div id="quiz-container3"></div>
+  <button class="btn-primary" onclick="submitQuiz3()" id="quiz-btn3">Submit Answers</button>
+</div>
+
+<script>
+function announce(msg) {
+  const el = document.getElementById('live-announcer');
+  el.textContent = '';
+  setTimeout(() => { el.textContent = msg; }, 50);
+}
+function switchTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => { p.classList.remove('active'); p.hidden = true; });
+  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected','false'));
+  const panel = document.getElementById('tab-' + id);
+  panel.classList.add('active'); panel.hidden = false;
+  btn.setAttribute('aria-selected','true');
+  if (id === 'quiz') buildQuiz3();
+  announce('Showing ' + btn.textContent.trim() + ' section');
+}
+
+// Theory Selector
+const determinants = {
+  intrapersonal: [
+    { key: 'perceivedRisk', label: 'Perceived risk or severity' },
+    { key: 'attitudes', label: 'Attitudes and beliefs' },
+    { key: 'motivation', label: 'Motivation and intention' },
+    { key: 'stagesChange', label: 'Readiness to change' },
+    { key: 'skills', label: 'Skills and behavioral capability' },
+  ],
+  interpersonal: [
+    { key: 'selfEfficacy', label: 'Self-efficacy and modeling' },
+    { key: 'socialNorms', label: 'Social norms and peer influence' },
+    { key: 'networkPosition', label: 'Network position and connections' },
+    { key: 'trust', label: 'Trust and social support' },
+    { key: 'power', label: 'Access to power or institutions' },
+  ],
+  community: [
+    { key: 'commReadiness', label: 'Community readiness and capacity' },
+    { key: 'diffusion', label: 'Spread of new practices or innovations' },
+    { key: 'orgCapacity', label: 'Organizational leadership' },
+    { key: 'norms', label: 'Community-wide norms' },
+  ],
+  structural: [
+    { key: 'policy', label: 'Laws and policies' },
+    { key: 'builtEnv', label: 'Built environment and access' },
+    { key: 'economics', label: 'Economic factors and income' },
+  ]
+};
+
+const theoryMap = {
+  'HBM': { name: 'Health Belief Model', keys: ['perceivedRisk','attitudes'], desc: 'Best for: addressing perceived threat and cost-benefit of action. Strong when lack of awareness or misperception of risk drives inaction.' },
+  'TPB': { name: 'Theory of Planned Behavior', keys: ['attitudes','motivation','socialNorms'], desc: 'Best for: intention-driven behaviors where attitudes, norms, and perceived control are the primary drivers.' },
+  'TTM': { name: 'Transtheoretical Model', keys: ['stagesChange','motivation'], desc: 'Best for: populations at different stages of readiness. Tailors messages to where individuals are in the change process.' },
+  'SCT': { name: 'Social Cognitive Theory', keys: ['selfEfficacy','socialNorms','skills'], desc: 'Best for: behaviors requiring skill-building and peer modeling. Strong when self-efficacy is low or social learning opportunities exist.' },
+  'SNT': { name: 'Social Network Theory', keys: ['networkPosition','socialNorms','selfEfficacy'], desc: 'Best for: leveraging network structure — peer health education, opinion leader strategies, or mapping how behaviors spread.' },
+  'SCap': { name: 'Social Capital Theory', keys: ['trust','power','socialNorms'], desc: 'Best for: building community trust and connections. Useful when isolation, lack of collective efficacy, or need for cross-sector work is present.' },
+  'DOI': { name: 'Diffusion of Innovations', keys: ['diffusion','norms','socialNorms'], desc: 'Best for: introducing new programs, technologies, or practices into a community and understanding why uptake may be slow.' },
+  'CRM': { name: 'Community Readiness Model', keys: ['commReadiness','orgCapacity','norms'], desc: 'Best for: assessing whether a community is ready before launching any program. Essential first step when readiness is unknown.' },
+  'SEModel': { name: 'Social-Ecological Model', keys: ['policy','builtEnv','economics','norms'], desc: 'Best for: multi-level problems driven by structural and environmental factors. Coordinates interventions across multiple levels.' },
+};
+
+let selectedLevel = null;
+let selectedDets = new Set();
+
+function filterLevel(level, btn) {
+  selectedLevel = level;
+  selectedDets.clear();
+  document.querySelectorAll('#level-filter .filter-btn').forEach(b => b.setAttribute('aria-pressed','false'));
+  btn.setAttribute('aria-pressed','true');
+  const step2 = document.getElementById('step2-wrap');
+  step2.style.opacity = '1';
+  const detFilter = document.getElementById('det-filter');
+  detFilter.innerHTML = '';
+  (determinants[level] || []).forEach(d => {
+    const b = document.createElement('button');
+    b.className = 'filter-btn';
+    b.setAttribute('aria-pressed','false');
+    b.textContent = d.label;
+    b.onclick = () => {
+      const pressed = b.getAttribute('aria-pressed') === 'true';
+      b.setAttribute('aria-pressed', pressed ? 'false' : 'true');
+      if (!pressed) selectedDets.add(d.key); else selectedDets.delete(d.key);
+      updateTheoryResults();
+    };
+    detFilter.appendChild(b);
+  });
+  updateTheoryResults();
+  announce(btn.textContent + ' selected. Now select determinants in Step 2.');
+}
+
+function updateTheoryResults() {
+  const container = document.getElementById('theory-results');
+  const step3 = document.getElementById('step3-wrap');
+  step3.style.opacity = '1';
+  const scores = Object.entries(theoryMap).map(([key, t]) => {
+    const overlap = t.keys.filter(k => selectedDets.has(k)).length;
+    const total = Math.max(selectedDets.size, t.keys.length) || 1;
+    return { key, t, overlap, pct: overlap / total };
+  }).filter(s => s.overlap > 0).sort((a, b) => b.pct - a.pct);
+  if (scores.length === 0) {
+    container.innerHTML = '<p style="font-size:.88rem;color:#888;grid-column:1/-1;">Select determinants in Step 2 to see recommendations.</p>';
+    return;
+  }
+  container.innerHTML = '';
+  scores.slice(0, 6).forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'theory-result-card' + (s.pct >= 0.5 ? ' highlight' : '');
+    card.innerHTML = `<h4>${s.t.name}</h4><p>${s.t.desc}</p><span class="match-badge ${s.pct >= 0.5 ? 'strong' : 'partial'}">${s.pct >= 0.5 ? 'Strong match' : 'Partial match'}</span>`;
+    container.appendChild(card);
+  });
+  const count = scores.length;
+  announce(`${count} theory match${count !== 1 ? 'es' : ''} found. Top match: ${scores[0].t.name}.`);
+}
+
+// Case Studies
+const cases = [
+  {
+    title: "Physical Activity — Latina Women",
+    scenario: "A community health center serves a predominantly Latina community in a low-income urban neighborhood. Physical activity rates among adult women are very low. Needs assessment interviews reveal: (1) Many women feel unsafe walking or exercising outdoors. (2) Cultural norms emphasize that women's primary role is to care for their families, and exercise feels selfish. (3) Women report low confidence in their ability to maintain a routine. (4) There are few organized fitness resources in the community, and those that exist are unaffordable. (5) Women say that if friends exercised together, they would be more likely to join.",
+    steps: [
+      { q: "Step 1: What level or levels do the primary determinants operate at? Select the best two.", opts: ["Intrapersonal only — knowledge and attitudes", "Interpersonal — norms, peer influence, and self-efficacy", "Community or structural — lack of safe spaces and cost", "Policy level — national fitness guidelines"], correct: [1,2], type: 'multi', fb_ok: "Correct. Both interpersonal factors (cultural norms, low self-efficacy, peer support) and structural factors (no safe spaces, no affordable facilities) are primary. Neither individual-level nor community-only approaches will be sufficient alone.", fb_no: "Not quite. The primary drivers are interpersonal (cultural norms, self-efficacy, peer support) AND structural (no safe spaces, unaffordable facilities). Individual knowledge is not the barrier." },
+      { q: "Step 2: Which combination of theories would best address these determinants?", opts: ["Health Belief Model plus Transtheoretical Model", "Social Cognitive Theory plus Social Capital Theory", "Community Readiness Model plus Diffusion of Innovations", "Theory of Planned Behavior only"], correct: [1], type: 'single', fb_ok: "Correct. SCT addresses self-efficacy through peer modeling and behavioral capability through group fitness instruction. Social Capital Theory guides group walking clubs (bonding capital) and coalition-building with neighborhood organizations (bridging capital). Together they address all identified barriers.", fb_no: "Not the best fit. HBM and TTM focus on individual perceptions and readiness. CRM and DOI focus on community adoption, not the specific behavior determinants here. Only SCT plus Social Capital Theory together address self-efficacy, cultural norms, and structural isolation simultaneously." },
+    ],
+    conclusion: "Recommended Theory Fit: Social Cognitive Theory plus Social Capital Theory, with ecological considerations for the structural environment. SCT guides the program to build self-efficacy through peer modeling, provide behavioral capability through group instruction, and incorporate self-regulation via goal-setting. Social Capital Theory guides communal walking groups (bonding capital) and cross-sector partnerships with parks departments and local businesses (linking capital). Evidence base: Interventions like CAMINA and Fe en Accion apply this combination with demonstrated effectiveness in Latina women."
+  },
+  {
+    title: "Youth Vaping — Rural High School",
+    scenario: "A rural county school district has seen a rise in vaping among students aged 14 to 18. A survey shows: (1) Most students know vaping is unhealthy but underestimate addiction risk. (2) Vaping is seen as a social norm — everyone does it. (3) Students are aware of it only through peer networks; few get information from adults or media. (4) Community leaders say it is just a teen thing and do not believe formal action is needed. (5) The school district wants to launch a prevention program but does not know where to start.",
+    steps: [
+      { q: "Step 1: What is the community's readiness level based on community leaders' response?", opts: ["Stage 1: No Awareness", "Stage 2: Denial", "Stage 5: Preparation", "Stage 7: Stabilization"], correct: [1], type: 'single', fb_ok: "Correct — Stage 2 (Denial). Leaders acknowledge teen vaping exists nationally but minimize its local significance. That is the hallmark of Stage 2. Before any program can succeed, readiness must be built.", fb_no: "Not quite. The leaders' dismissal ('it's just a teen thing') indicates they recognize the issue in general but deny its local significance and urgency — Stage 2: Denial." },
+      { q: "Step 2: Social norms among peers are the primary driver. Which theory's constructs MOST directly address this?", opts: ["Health Belief Model — perceived susceptibility and severity", "Transtheoretical Model — stages of readiness to quit", "Social Cognitive Theory — observational learning and social norms as outcome expectations", "Community Readiness Model — community capacity for action"], correct: [2], type: 'single', fb_ok: "Correct. SCT addresses the social norm barrier through counter-modeling, outcome expectations, and peer pressure resistance skills. The social norm mechanism is exactly what SCT is built to address.", fb_no: "Not the best fit for this specific driver. For the peer social norm mechanism, SCT constructs — observational learning, outcome expectations, social norms as reinforcers — are the strongest match." }
+    ],
+    conclusion: "Recommended Approach: Begin with Community Readiness building (CRM) before launching any student-level program. Once readiness reaches Stage 4 or 5, implement an SCT-based peer education program. Sequence matters: without community buy-in from parents, teachers, and leaders, any student program will lack structural support. Once community leaders accept the local problem, use SCT to design peer-led counter-norm campaigns where students model non-vaping behavior."
+  },
+  {
+    title: "Food Access — Urban Neighborhood",
+    scenario: "A public health team assesses food access in a dense, low-income urban neighborhood. Findings: (1) No full-service grocery stores within a mile; only convenience stores and fast food. (2) Residents know healthy food is important but feel powerless to change their options. (3) A small group of community leaders has been meeting informally and wants to do something but has no plan. (4) Residents have strong social ties within the community but weak ties to city officials or food systems organizations. (5) A successful urban garden program in a neighboring district could potentially be adopted here.",
+    steps: [
+      { q: "Step 1: For the community leaders already meeting and wanting to act, what readiness stage are they at?", opts: ["Stage 1: No Awareness", "Stage 3: Vague Awareness", "Stage 4: Preplanning", "Stage 6: Initiation"], correct: [2], type: 'single', fb_ok: "Correct — Stage 4 (Preplanning). Leaders acknowledge the problem and want to act, but have no plan yet. Small informal meetings are characteristic of Preplanning. The right move is to support planning conversations, not launch a program.", fb_no: "Not quite. Having informal meetings with motivation but no plan is the hallmark of Stage 4: Preplanning. They are beyond vague awareness but have not yet reached initiation." },
+      { q: "Step 2: The community has strong bonding capital but weak linking capital to city officials. Which strategy directly addresses this gap?", opts: ["Train peer educators using Social Cognitive Theory", "Use DOI to help the community adopt the neighboring garden program", "Build linking capital by connecting community leaders to city planning and food systems organizations", "Use the Transtheoretical Model to assess residents' readiness to eat healthy"], correct: [2], type: 'single', fb_ok: "Correct. Weak linking capital — the gap between community members and institutional power — is precisely what Social Capital Theory's linking mechanism addresses. Connecting leaders to city officials and food organizations addresses the structural barrier directly.", fb_no: "Not the best match for this specific gap. The identified gap is structural — weak linking capital to institutions — which calls for Social Capital Theory's linking capital strategy, not individual-level approaches." }
+    ],
+    conclusion: "Multi-theory approach: CRM guides the first phase — support leaders from Preplanning to Preparation. Social Capital Theory guides coalition-building (linking capital to city officials and food organizations; bridging capital to connect the neighboring garden program). DOI then guides the adoption of the urban garden model, addressing compatibility, trialability, and observability for residents. Key insight: This is a structural problem that cannot be solved by individual-level theories alone."
+  }
+];
+
+let caseAnswers = {};
+
+function loadCase(idx, btn) {
+  document.querySelectorAll('#case-select .filter-btn').forEach(b => b.setAttribute('aria-pressed','false'));
+  btn.setAttribute('aria-pressed','true');
+  const c = cases[idx];
+  caseAnswers = { idx, answers: [], done: [] };
+  document.getElementById('case-scenario-text').innerHTML = c.scenario;
+  const stepsDiv = document.getElementById('case-steps');
+  stepsDiv.innerHTML = '';
+  c.steps.forEach((step, si) => {
+    const div = document.createElement('div');
+    div.className = 'analysis-step';
+    div.id = `cstep-${si}`;
+    const gid = `cstep-grp-${si}`;
+    const labelId = `cstep-lbl-${si}`;
+    const optsHtml = step.opts.map((o, oi) =>
+      `<button class="opt-btn" data-si="${si}" data-oi="${oi}" aria-pressed="false" onclick="caseAnswer(${idx},${si},${oi},this)">${o}</button>`
+    ).join('');
+    div.innerHTML = `<h4 id="${labelId}">${step.q}</h4><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;" role="group" aria-labelledby="${labelId}" id="${gid}">${optsHtml}</div><div class="fb-inline" id="cstep-fb-${si}" role="status" hidden></div>`;
+    stepsDiv.appendChild(div);
+  });
+  const revBtn = document.getElementById('case-reveal-btn');
+  revBtn.hidden = true;
+  document.getElementById('case-conclusion').hidden = true;
+  document.getElementById('case-content').hidden = false;
+  announce(c.title + ' case study loaded.');
+}
+
+function caseAnswer(caseIdx, stepIdx, optIdx, btn) {
+  const c = cases[caseIdx];
+  const step = c.steps[stepIdx];
+  if (caseAnswers.done.includes(stepIdx)) return;
+  const group = document.getElementById(`cstep-grp-${stepIdx}`);
+  if (step.type === 'single') {
+    group.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+    const correct = step.correct.includes(optIdx);
+    btn.classList.add(correct ? 'correct' : 'wrong');
+    if (!correct) group.querySelector(`[data-oi="${step.correct[0]}"]`).classList.add('correct');
+    const fb = document.getElementById(`cstep-fb-${stepIdx}`);
+    fb.hidden = false;
+    fb.className = 'fb-inline ' + (correct ? 'ok' : 'no');
+    fb.textContent = correct ? step.fb_ok : step.fb_no;
+    announce(fb.textContent);
+    caseAnswers.done.push(stepIdx);
+  } else {
+    btn.setAttribute('aria-pressed', btn.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+    if (!caseAnswers.answers[stepIdx]) caseAnswers.answers[stepIdx] = new Set();
+    if (btn.getAttribute('aria-pressed') === 'true') caseAnswers.answers[stepIdx].add(optIdx);
+    else caseAnswers.answers[stepIdx].delete(optIdx);
+    if (caseAnswers.answers[stepIdx].size === step.correct.length) {
+      group.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+      const allCorrect = step.correct.every(c => caseAnswers.answers[stepIdx].has(c));
+      step.correct.forEach(c => group.querySelector(`[data-oi="${c}"]`).classList.add('correct'));
+      [...caseAnswers.answers[stepIdx]].filter(o => !step.correct.includes(o)).forEach(o => group.querySelector(`[data-oi="${o}"]`).classList.add('wrong'));
+      const fb = document.getElementById(`cstep-fb-${stepIdx}`);
+      fb.hidden = false;
+      fb.className = 'fb-inline ' + (allCorrect ? 'ok' : 'no');
+      fb.textContent = allCorrect ? step.fb_ok : step.fb_no;
+      announce(fb.textContent);
+      caseAnswers.done.push(stepIdx);
+    }
+  }
+  if (caseAnswers.done.length === c.steps.length) {
+    document.getElementById('case-reveal-btn').hidden = false;
+    announce('All steps complete. Select "Show Recommended Theory Fit" to see the full recommendation.');
+  }
+}
+
+function revealCaseAnswers() {
+  const idx = caseAnswers.idx;
+  const concl = document.getElementById('case-conclusion');
+  concl.textContent = cases[idx].conclusion;
+  concl.hidden = false;
+  document.getElementById('case-reveal-btn').hidden = true;
+  announce('Theory recommendation revealed.');
+  concl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Limitations
+const limitations = [
+  { title: 'Oversimplification', body: 'Most theories reduce complex behavior to a handful of constructs. Real human behavior is shaped by biology, history, culture, economics, emotion, and chance — far more than any theory captures. Example: A theory that attributes smoking purely to perceived risk misses addiction, stress, marketing, and access to cessation resources.' },
+  { title: 'Context Specificity', body: 'Most foundational health behavior theories were developed and tested with Western, educated, individualistic populations. They may not translate across cultures, socioeconomic contexts, or structural conditions. Example: A theory built around individual decision-making may underperform in collectivist cultures where family or community consensus drives behavior.' },
+  { title: 'Static versus Dynamic Behavior', body: 'Most theories model behavior at a snapshot in time. Health behavior is dynamic — shaped by life transitions, relationships, policy changes, and evolving contexts. Example: A person\'s stage of change can fluctuate dramatically after a job loss, illness, or major life event — factors that static models do not accommodate.' },
+  { title: 'Measurement Challenges', body: 'Constructs like self-efficacy, social capital, or community readiness are abstract and difficult to measure reliably across diverse populations. Poor measurement produces misleading data about whether the theory is working. Example: A self-efficacy scale validated in English may not translate culturally or linguistically without significant re-validation work.' },
+  { title: 'Individual-level Bias', body: 'Even theories with social components often ultimately locate the cause and solution within the individual. This can obscure structural determinants — poverty, racism, housing instability — that are the root causes of many health disparities. Example: Addressing low self-efficacy for healthy eating without addressing food deserts places blame on individuals for structural failures.' },
+  { title: 'Theory Does Not Equal Program', body: 'Selecting the right theory does not guarantee an effective program. The theory must be correctly operationalized — its constructs must be translated into program activities with fidelity. If implementation is weak, the theory is never truly tested. Example: Claiming a program is SCT-based while only providing one-time lectures fails to operationalize self-efficacy building, modeling, or self-regulation.' },
+];
+
+const limitGrid = document.getElementById('limit-grid');
+limitations.forEach(l => {
+  const card = document.createElement('div');
+  card.className = 'limit-card';
+  card.setAttribute('role','button');
+  card.setAttribute('tabindex','0');
+  card.setAttribute('aria-expanded','false');
+  card.setAttribute('aria-label', l.title + ' — press Enter or Space to expand');
+  card.innerHTML = `<div class="lc-head"><span class="lc-title">${l.title}</span></div><p class="lc-hint">Press Enter or Space to expand</p><div class="lc-body">${l.body}</div>`;
+  function toggle() {
+    const open = card.getAttribute('aria-expanded') === 'true';
+    card.setAttribute('aria-expanded', open ? 'false' : 'true');
+    card.querySelector('.lc-hint').textContent = open ? 'Press Enter or Space to expand' : 'Press Enter or Space to collapse';
+    if (!open) announce(l.title + '. ' + l.body);
+  }
+  card.onclick = toggle;
+  card.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } };
+  limitGrid.appendChild(card);
+});
+
+function limitScenario(btn, result) {
+  document.querySelectorAll('#limit-opts .scenario-opt').forEach(o => { o.disabled = true; o.setAttribute('aria-pressed','false'); });
+  btn.setAttribute('aria-pressed','true');
+  const fb = document.getElementById('limit-fb');
+  fb.hidden = false;
+  let msg, cls;
+  if (result === 'correct') {
+    btn.classList.add('correct'); cls = 'ok';
+    msg = 'Correct — Context Specificity. The program was developed and validated with a population fundamentally different from the target group. Structural drivers in the second community were not the theory\'s constructs. Applying the program without cultural and contextual adaptation is a failure of context specificity.';
+  } else {
+    btn.classList.add('wrong'); cls = 'no';
+    msg = 'The primary limitation here is Context Specificity. The program worked for one group but failed because it was not designed for the structural, cultural, and historical context of the new community.';
+  }
+  fb.className = 'feedback-msg ' + cls;
+  fb.textContent = msg;
+  announce(msg);
+}
+
+// Quiz 3
+const questions3 = [
+  { q: "A health educator begins designing a program to reduce alcohol use among college students. Which should be the FIRST step in selecting a theory?", opts: ["Review all available theories and pick the most popular one", "Conduct a needs assessment to identify the primary determinants of the behavior", "Select Social Cognitive Theory because it covers multiple constructs", "Check which theories were used at other universities"], correct: 1, explain: "Theory selection must begin with understanding the problem — specifically its determinants and the level at which they operate. Without a needs assessment, theory selection is guesswork, not evidence-based practice." },
+  { q: "A health promotion program serves a community with strong existing social trust and tight-knit networks, but very little connection to outside resources or formal institutions. Which theory's constructs most directly address this gap?", opts: ["Transtheoretical Model", "Health Belief Model", "Social Capital Theory — building linking capital", "Diffusion of Innovations"], correct: 2, explain: "Strong bonding capital but weak linking capital is exactly what Social Capital Theory addresses. The gap is not individual attitudes or community readiness — it is the structural absence of connections to power and resources." },
+  { q: "A program claimed to be based on Social Cognitive Theory produced no significant changes in self-efficacy, modeling, or self-regulation because activities only consisted of informational lectures. This is an example of which limitation?", opts: ["Context specificity", "Oversimplification", "Theory does not equal program — poor operationalization", "Static versus dynamic behavior"], correct: 2, explain: "When a theory is named but its constructs are not built into program activities, the theory was never implemented. This is poor operationalization — Theory does not equal Program." },
+  { q: "Which criterion is LEAST important when selecting a theory for a community health program?", opts: ["Does the evidence support this theory with similar populations?", "Can the theory's constructs be realistically measured with available resources?", "Was this theory developed by a well-known researcher?", "Do program activities align with the theory's key constructs?"], correct: 2, explain: "The reputation of the theorist is irrelevant to practical application. What matters is evidence base, practical fit, construct alignment, and stakeholder acceptability." },
+  { q: "A high-income community with access to healthy food, parks, and healthcare still has low physical activity rates. Assessment shows residents are aware of benefits but do not prioritize exercise. What level of theory is most likely to be useful here?", opts: ["Community level — diffusion of a walking program", "Structural level — advocate for policy changes", "Intrapersonal level — address attitudes, motivation, and behavioral intention", "Community Readiness Model — assess readiness to act"], correct: 2, explain: "When structural barriers are absent and the issue is primarily motivational within a resource-rich population, intrapersonal theories such as TPB, HBM, or TTM are the strongest fit." },
+  { q: "A breast cancer screening program has been running 18 months. Only 2.5% of eligible women have used it. According to Diffusion of Innovations, these early users most likely represent:", opts: ["The Early Majority — the program is nearly at critical mass", "Laggards — the most resistant group has adopted first", "Innovators — first adopters who are risk-tolerant but not representative of the mainstream", "Late Majority — skeptical adopters driven by social pressure"], correct: 2, explain: "2.5% adoption closely matches Rogers' Innovator category. These early users tend to be risk-tolerant and often health professionals, but are not representative of the broader community. The program has not yet reached Early Adopters." },
+];
+
+let quiz3Built = false;
+function buildQuiz3() {
+  if (quiz3Built) return;
+  quiz3Built = true;
+  const container = document.getElementById('quiz-container3');
+  questions3.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'quiz-q';
+    div.innerHTML = `<h4 id="q3-label-${i}">${i+1}. ${q.q}</h4>
+      <div class="quiz-options" role="group" aria-labelledby="q3-label-${i}">
+        ${q.opts.map((o,j) => `<button class="quiz-opt" data-q="${i}" data-idx="${j}" aria-pressed="false" onclick="selectQ3(this)">${o}</button>`).join('')}
+      </div>
+      <div class="quiz-explanation" id="qe3-${i}" hidden>${q.explain}</div>`;
+    container.appendChild(div);
+  });
+}
+
+function selectQ3(btn) {
+  const qi = btn.dataset.q;
+  document.querySelectorAll(`[data-q="${qi}"]`).forEach(b => { b.setAttribute('aria-pressed','false'); b.style.borderColor=''; b.style.background=''; delete b.dataset.selected; });
+  btn.setAttribute('aria-pressed','true');
+  btn.style.borderColor = '#2e5fa3'; btn.style.background = '#eef3fa';
+  btn.dataset.selected = 'true';
+}
+
+function submitQuiz3() {
+  let score = 0, answered = 0;
+  questions3.forEach((q, i) => {
+    const sel = document.querySelector(`[data-q="${i}"][data-selected="true"]`);
+    if (!sel) return;
+    answered++;
+    document.querySelectorAll(`[data-q="${i}"]`).forEach(b => b.disabled = true);
+    if (parseInt(sel.dataset.idx) === q.correct) { sel.classList.add('correct'); score++; }
+    else { sel.classList.add('wrong'); document.querySelector(`[data-q="${i}"][data-idx="${q.correct}"]`).classList.add('correct'); }
+    document.getElementById(`qe3-${i}`).hidden = false;
+  });
+  if (answered < questions3.length) { alert('Please answer all questions before submitting.'); return; }
+  const bar = document.getElementById('score-bar3');
+  bar.hidden = false;
+  const msg = score === questions3.length ? 'Excellent! You can apply the theory selection process with skill.' : score >= 4 ? 'Good work! Review the explanations for any missed questions.' : 'Work through the Theory Selector and Case Studies tabs again, then retry.';
+  bar.innerHTML = `<h3>Score: ${score} out of ${questions3.length}</h3><p>${msg}</p>`;
+  announce(`Quiz submitted. Score: ${score} out of ${questions3.length}. ${msg}`);
+  const qbtn = document.getElementById('quiz-btn3'); qbtn.textContent = 'Try Again'; qbtn.onclick = resetQuiz3;
+  bar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resetQuiz3() {
+  quiz3Built = false;
+  document.getElementById('quiz-container3').innerHTML = '';
+  document.getElementById('score-bar3').hidden = true;
+  const qbtn = document.getElementById('quiz-btn3'); qbtn.textContent = 'Submit Answers'; qbtn.onclick = submitQuiz3;
+  buildQuiz3();
+  announce('Quiz has been reset.');
+}
+</script>
+</body>
+</html>

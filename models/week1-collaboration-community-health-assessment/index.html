@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page 1: Collaboration in Community Health</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f8f7f4;
+    color: #1a1a1a;
+    font-size: 15px;
+    line-height: 1.6;
+    padding: 0;
+    min-height: 100vh;
+  }
+  .header {
+    background: #1e3a5f;
+    color: #fff;
+    padding: 20px 24px 16px;
+    border-bottom: 3px solid #4a90d9;
+  }
+  .header-eyebrow { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #9bbfe0; margin-bottom: 4px; }
+  .header-title { font-size: 20px; font-weight: 600; }
+  .tab-bar {
+    display: flex;
+    background: #fff;
+    border-bottom: 1px solid #e0ddd6;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab {
+    flex-shrink: 0;
+    padding: 12px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b6b6b;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+  .tab:hover { color: #1e3a5f; }
+  .tab.active { color: #1e3a5f; border-bottom-color: #4a90d9; }
+  .content { padding: 20px 24px; max-width: 760px; }
+  .section { display: none; }
+  .section.visible { display: block; }
+  .card {
+    background: #fff;
+    border: 1px solid #e0ddd6;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+  }
+  .card-intro { font-size: 14px; color: #444; margin-bottom: 14px; }
+  .group-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+  .group-card { border-radius: 8px; padding: 14px; }
+  .group-card.interprofessional { background: #eef3fb; border-left: 4px solid #4a90d9; }
+  .group-card.stakeholder { background: #edf7f2; border-left: 4px solid #3aaa72; }
+  .group-card.decision { background: #fef3ec; border-left: 4px solid #e87a34; }
+  .group-label { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+  .group-label.blue { color: #1e5fa0; }
+  .group-label.green { color: #1a7a4a; }
+  .group-label.orange { color: #b05a1a; }
+  .group-text { font-size: 13px; color: #444; line-height: 1.5; }
+  .callout { background: #f0f5fc; border-radius: 8px; padding: 12px 16px; font-size: 14px; color: #1e3a5f; margin-top: 4px; }
+  .callout strong { font-weight: 600; }
+  .challenge-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin: 14px 0; }
+  .challenge-item { background: #f8f7f4; border: 1px solid #e0ddd6; border-radius: 8px; padding: 12px 14px; }
+  .challenge-name { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; }
+  .challenge-desc { font-size: 13px; color: #555; }
+  .role-list { list-style: none; padding: 0; }
+  .role-list li { font-size: 14px; color: #333; padding: 7px 0 7px 24px; border-bottom: 1px solid #f0ede8; position: relative; }
+  .role-list li:last-child { border-bottom: none; }
+  .role-list li::before { content: '→'; position: absolute; left: 0; color: #4a90d9; font-weight: 600; }
+  .principle-list { list-style: none; padding: 0; }
+  .principle-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #f0ede8; }
+  .principle-item:last-child { border-bottom: none; }
+  .p-num { min-width: 30px; height: 30px; border-radius: 50%; background: #1e3a5f; color: #fff; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .p-content { flex: 1; }
+  .p-text { font-size: 14px; color: #1a1a1a; line-height: 1.5; }
+  .toggle-btn { font-size: 12px; color: #4a90d9; background: none; border: none; cursor: pointer; padding: 4px 0 0; text-decoration: underline; }
+  .p-detail { font-size: 13px; color: #555; margin-top: 6px; line-height: 1.5; background: #f0f5fc; padding: 8px 12px; border-radius: 6px; display: none; }
+  .p-detail.show { display: block; }
+  .quiz-q { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 14px; }
+  .quiz-meta { font-size: 12px; color: #888; margin-bottom: 10px; }
+  .opt-btn {
+    display: block; width: 100%; text-align: left;
+    padding: 10px 14px; font-size: 14px;
+    border: 1px solid #d8d4cc; border-radius: 8px;
+    background: #fff; color: #1a1a1a; cursor: pointer;
+    margin-bottom: 8px; transition: all 0.15s;
+  }
+  .opt-btn:hover:not(:disabled) { background: #f0f5fc; border-color: #4a90d9; }
+  .opt-btn.correct { background: #edf7f2; border-color: #3aaa72; color: #1a5c35; }
+  .opt-btn.wrong { background: #fef0ed; border-color: #e05a3a; color: #8a2a14; }
+  .feedback {
+    font-size: 14px; padding: 10px 14px; border-radius: 8px;
+    margin-top: 6px; display: none; line-height: 1.5;
+  }
+  .feedback.show { display: block; }
+  .feedback.correct { background: #edf7f2; color: #1a5c35; border-left: 3px solid #3aaa72; }
+  .feedback.wrong { background: #fef0ed; color: #8a2a14; border-left: 3px solid #e05a3a; }
+  .next-btn {
+    margin-top: 12px; padding: 9px 22px; font-size: 14px;
+    background: #1e3a5f; color: #fff; border: none; border-radius: 8px; cursor: pointer;
+    display: none; transition: background 0.15s;
+  }
+  .next-btn:hover { background: #2a4f80; }
+  .next-btn.show { display: inline-block; }
+  .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: #888; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <p class="header-eyebrow">Module 1 · Page 1</p>
+  <h1 class="header-title">Collaboration in Community Health Assessment</h1>
+</div>
+
+<div class="tab-bar" role="tablist">
+  <button class="tab active" role="tab" onclick="show('collab', this)">Who to involve</button>
+  <button class="tab" role="tab" onclick="show('challenges', this)">Navigating challenges</button>
+  <button class="tab" role="tab" onclick="show('principles', this)">5 foundational principles</button>
+  <button class="tab" role="tab" onclick="show('quiz', this)">Knowledge check</button>
+</div>
+
+<div class="content">
+
+  <!-- WHO TO INVOLVE -->
+  <div id="s-collab" class="section visible">
+    <div class="card">
+      <p class="card-intro">A community health assessment requires bringing the right people together. Three distinct groups must be identified and engaged from the start:</p>
+      <div class="group-grid">
+        <div class="group-card interprofessional">
+          <p class="group-label blue">Interprofessional team</p>
+          <p class="group-text">Other health and public health professionals whose expertise complements yours — nurses, social workers, epidemiologists, physicians.</p>
+        </div>
+        <div class="group-card stakeholder">
+          <p class="group-label green">Stakeholders</p>
+          <p class="group-text">Individuals and organizations with a direct interest in health outcomes — residents, schools, faith communities, and local nonprofits.</p>
+        </div>
+        <div class="group-card decision">
+          <p class="group-label orange">Decision-makers</p>
+          <p class="group-text">People who can act on findings, allocate funding, or implement policy — directors, administrators, and elected officials.</p>
+        </div>
+      </div>
+    </div>
+    <div class="callout">
+      As a health education specialist, you are not just a content expert — you are a <strong>connector and coordinator</strong>. Collaboration is a core professional competency, not an optional add-on.
+    </div>
+  </div>
+
+  <!-- CHALLENGES -->
+  <div id="s-challenges" class="section">
+    <div class="card">
+      <p class="card-intro">Different groups bring different priorities, vocabularies, and pressures. These differences are normal — but they require intentional navigation.</p>
+      <div class="challenge-grid">
+        <div class="challenge-item">
+          <p class="challenge-name">Physician</p>
+          <p class="challenge-desc">Focuses on clinical outcomes and medical evidence</p>
+        </div>
+        <div class="challenge-item">
+          <p class="challenge-name">Community organizer</p>
+          <p class="challenge-desc">Prioritizes resident trust and lived experience</p>
+        </div>
+        <div class="challenge-item">
+          <p class="challenge-name">Government official</p>
+          <p class="challenge-desc">Driven by budget constraints and policy timelines</p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <p class="section-label">Your role as a health education specialist</p>
+      <ul class="role-list">
+        <li>Identify where priorities align across groups</li>
+        <li>Facilitate open communication between groups</li>
+        <li>Keep the focus on the community's needs — not any one profession's agenda</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PRINCIPLES -->
+  <div id="s-principles" class="section">
+    <div class="card">
+      <p class="card-intro">Health promotion is grounded in five foundational principles. These explain why health education specialists cannot rely on intuition or one-size-fits-all programs. Click <em>why this matters</em> under each one.</p>
+      <ul class="principle-list">
+        <li class="principle-item">
+          <div class="p-num">1</div>
+          <div class="p-content">
+            <p class="p-text">Health status can be changed.</p>
+            <button class="toggle-btn" onclick="toggleDetail(this)">why this matters ▾</button>
+            <p class="p-detail">This is the foundation of the entire field. If health couldn't change, there would be no reason for health education to exist.</p>
+          </div>
+        </li>
+        <li class="principle-item">
+          <div class="p-num">2</div>
+          <div class="p-content">
+            <p class="p-text">Behavior can be changed, and those changes can influence health.</p>
+            <button class="toggle-btn" onclick="toggleDetail(this)">why this matters ▾</button>
+            <p class="p-detail">This justifies behavioral interventions. It means programs we design can actually move the needle on health outcomes.</p>
+          </div>
+        </li>
+        <li class="principle-item">
+          <div class="p-num">3</div>
+          <div class="p-content">
+            <p class="p-text">Initiating and maintaining behavior change is complex and difficult.</p>
+            <button class="toggle-btn" onclick="toggleDetail(this)">why this matters ▾</button>
+            <p class="p-detail">This warns against simplistic "just tell them what to do" approaches. Programs must account for barriers, stages of readiness, and the possibility of relapse.</p>
+          </div>
+        </li>
+        <li class="principle-item">
+          <div class="p-num">4</div>
+          <div class="p-content">
+            <p class="p-text">Before behaviors can change, the determinants, nature, and motivation for the behavior must be understood. Individuals must be ready to change.</p>
+            <button class="toggle-btn" onclick="toggleDetail(this)">why this matters ▾</button>
+            <p class="p-detail">This is why assessment always comes before intervention. You can't design an effective program without understanding what's actually driving the behavior.</p>
+          </div>
+        </li>
+        <li class="principle-item">
+          <div class="p-num">5</div>
+          <div class="p-content">
+            <p class="p-text">Health is multidimensional — shaped by individual behavior, social factors, biology, health services, and policymaking interacting together.</p>
+            <button class="toggle-btn" onclick="toggleDetail(this)">why this matters ▾</button>
+            <p class="p-detail">No single-factor solution works. Effective programs must be tailored to address the full web of influences on a specific community's health.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="s-quiz" class="section">
+    <div class="card" id="quiz-card"></div>
+  </div>
+
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+  document.getElementById('s-' + id).classList.add('visible');
+  btn.classList.add('active');
+  btn.setAttribute('aria-selected','true');
+}
+
+function toggleDetail(btn) {
+  const d = btn.nextElementSibling;
+  const open = d.classList.toggle('show');
+  btn.textContent = open ? 'hide ▴' : 'why this matters ▾';
+}
+
+const questions = [
+  {
+    q: "A community resident group, a hospital administrator, and a nurse are joining a health assessment team. Which category does the hospital administrator fall into?",
+    opts: ["Interprofessional team member","Stakeholder","Decision-maker","Community asset"],
+    correct: 2,
+    ok: "Correct! Hospital administrators hold authority to allocate funding and implement changes — that places them in the decision-maker category.",
+    err: "Not quite. Think about who has the authority to act on findings or allocate resources. That defining feature points to the decision-maker category."
+  },
+  {
+    q: "A physician and a community organizer disagree on how to approach a neighborhood health issue. As the health education specialist, what is your primary role?",
+    opts: ["Side with the physician since they have medical expertise","Facilitate communication and keep focus on community needs","Let the community organizer lead since they know the residents","Defer to whoever holds the highest authority"],
+    correct: 1,
+    ok: "Correct! Your role is to facilitate communication between groups and keep the focus on the community's needs — not on any one profession's agenda.",
+    err: "Not quite. The health education specialist's role is to bridge differences, not to choose a side or defer. Think: connector and coordinator."
+  },
+  {
+    q: "Which foundational principle best explains why a 'one-size-fits-all' health program is unlikely to be effective?",
+    opts: ["Health status can be changed","Behavior change is complex and difficult","Health is multidimensional and shaped by many interacting forces","Behavior can influence health outcomes"],
+    correct: 2,
+    ok: "Correct! Because health is shaped by the fluid interaction of behavior, social factors, biology, healthcare, and policymaking, programs must be tailored to each community's unique characteristics.",
+    err: "Close, but Principle 5 most directly explains why one-size-fits-all fails. Health varies across communities because so many different forces interact — programs must be tailored accordingly."
+  }
+];
+
+let cur = 0, answered = false;
+
+function renderQ() {
+  const q = questions[cur];
+  document.getElementById('quiz-card').innerHTML = `
+    <p class="quiz-meta">Question ${cur+1} of ${questions.length}</p>
+    <p class="quiz-q">${q.q}</p>
+    ${q.opts.map((o,i) => `<button class="opt-btn" onclick="answer(${i})">${o}</button>`).join('')}
+    <div id="fb" class="feedback"></div>
+    <button id="nxt" class="next-btn" onclick="nextQ()">${cur < questions.length-1 ? 'Next question →' : 'Start over'}</button>
+  `;
+  answered = false;
+}
+
+function answer(i) {
+  if (answered) return;
+  answered = true;
+  const q = questions[cur];
+  document.querySelectorAll('.opt-btn').forEach((b,idx) => {
+    if (idx === q.correct) b.classList.add('correct');
+    else if (idx === i) b.classList.add('wrong');
+    b.disabled = true;
+  });
+  const fb = document.getElementById('fb');
+  const ok = i === q.correct;
+  fb.textContent = (ok ? '✓ ' : '✗ ') + (ok ? q.ok : q.err);
+  fb.className = 'feedback show ' + (ok ? 'correct' : 'wrong');
+  document.getElementById('nxt').classList.add('show');
+}
+
+function nextQ() { cur = (cur + 1) % questions.length; renderQ(); }
+
+renderQ();
+</script>
+</body>
+</html>

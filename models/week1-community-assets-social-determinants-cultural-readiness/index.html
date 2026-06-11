@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page 2: Community Assets, SDOH & Cultural Readiness</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f8f7f4;
+    color: #1a1a1a;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .header {
+    background: #1a4a32;
+    color: #fff;
+    padding: 20px 24px 16px;
+    border-bottom: 3px solid #3aaa72;
+  }
+  .header-eyebrow { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #7fcfa4; margin-bottom: 4px; }
+  .header-title { font-size: 20px; font-weight: 600; }
+  .tab-bar { display: flex; background: #fff; border-bottom: 1px solid #e0ddd6; overflow-x: auto; scrollbar-width: none; }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab { flex-shrink: 0; padding: 12px 18px; font-size: 13px; font-weight: 500; color: #6b6b6b; background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
+  .tab:hover { color: #1a4a32; }
+  .tab.active { color: #1a4a32; border-bottom-color: #3aaa72; }
+  .content { padding: 20px 24px; max-width: 760px; }
+  .section { display: none; }
+  .section.visible { display: block; }
+  .card { background: #fff; border: 1px solid #e0ddd6; border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .card-intro { font-size: 14px; color: #444; margin-bottom: 14px; }
+  .sdoh-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .sdoh-item { background: #f0f8f4; border: 1px solid #cde9da; border-radius: 8px; padding: 12px 14px; }
+  .sdoh-name { font-size: 13px; font-weight: 600; color: #1a4a32; margin-bottom: 3px; }
+  .sdoh-desc { font-size: 12px; color: #555; }
+  .scenario-box { background: #fffbf5; border: 1px solid #f0ddb8; border-left: 4px solid #e8a020; border-radius: 8px; padding: 12px 16px; font-size: 14px; color: #333; line-height: 1.6; font-style: italic; }
+  .scenario-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #b07010; margin-bottom: 6px; font-style: normal; }
+  .asset-pool { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px; min-height: 38px; }
+  .chip { padding: 6px 14px; font-size: 13px; border: 1px solid #c8c4bc; border-radius: 99px; background: #fff; color: #1a1a1a; cursor: pointer; user-select: none; transition: all 0.15s; }
+  .chip:hover { background: #f0f8f4; border-color: #3aaa72; }
+  .chip.selected { background: #edf7f2; border-color: #3aaa72; color: #1a4a32; outline: 2px solid #3aaa72; }
+  .chip.placed { opacity: 0.35; pointer-events: none; }
+  .zone-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .zone { border: 2px dashed #c8c4bc; border-radius: 8px; padding: 10px 12px; min-height: 80px; cursor: pointer; transition: border-color 0.15s; }
+  .zone:hover { border-color: #3aaa72; }
+  .zone-title { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #888; margin-bottom: 8px; }
+  .zone-items { display: flex; flex-direction: column; gap: 5px; }
+  .placed-chip { font-size: 12px; padding: 4px 10px; border-radius: 99px; background: #edf7f2; color: #1a4a32; border: 1px solid #3aaa72; cursor: pointer; text-align: left; }
+  .placed-chip:hover { opacity: 0.65; }
+  .check-btn { padding: 9px 22px; font-size: 14px; background: #1a4a32; color: #fff; border: none; border-radius: 8px; cursor: pointer; transition: background 0.15s; }
+  .check-btn:hover { background: #26603f; }
+  .result { font-size: 14px; padding: 10px 14px; border-radius: 8px; margin-top: 10px; display: none; line-height: 1.5; }
+  .result.show { display: block; }
+  .result.ok { background: #edf7f2; color: #1a5c35; border-left: 3px solid #3aaa72; }
+  .result.err { background: #fef0ed; color: #8a2a14; border-left: 3px solid #e05a3a; }
+  .culture-item { padding: 12px 16px; border-radius: 8px; margin-bottom: 10px; }
+  .culture-item.lang { background: #edf7f2; border-left: 4px solid #3aaa72; }
+  .culture-item.relig { background: #eef3fb; border-left: 4px solid #4a90d9; }
+  .culture-item.norms { background: #fef9ec; border-left: 4px solid #e8a020; }
+  .culture-item.trust { background: #fef0ed; border-left: 4px solid #e05a3a; }
+  .culture-name { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; }
+  .culture-desc { font-size: 13px; color: #444; line-height: 1.5; }
+  .callout { background: #f0f8f4; border-radius: 8px; padding: 12px 16px; font-size: 14px; color: #1a4a32; margin-top: 4px; font-style: italic; }
+  .sc-card { background: #fff; border: 1px solid #e0ddd6; border-radius: 10px; padding: 16px 20px; }
+  .sc-meta { font-size: 12px; color: #888; margin-bottom: 10px; }
+  .sc-q { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 14px; }
+  .opt-btn { display: block; width: 100%; text-align: left; padding: 10px 14px; font-size: 14px; border: 1px solid #d8d4cc; border-radius: 8px; background: #fff; color: #1a1a1a; cursor: pointer; margin-bottom: 8px; transition: all 0.15s; }
+  .opt-btn:hover:not(:disabled) { background: #f0f8f4; border-color: #3aaa72; }
+  .opt-btn.correct { background: #edf7f2; border-color: #3aaa72; color: #1a5c35; }
+  .opt-btn.wrong { background: #fef0ed; border-color: #e05a3a; color: #8a2a14; }
+  .feedback { font-size: 14px; padding: 10px 14px; border-radius: 8px; margin-top: 6px; display: none; line-height: 1.5; }
+  .feedback.show { display: block; }
+  .feedback.correct { background: #edf7f2; color: #1a5c35; border-left: 3px solid #3aaa72; }
+  .feedback.wrong { background: #fef0ed; color: #8a2a14; border-left: 3px solid #e05a3a; }
+  .next-btn { margin-top: 12px; padding: 9px 22px; font-size: 14px; background: #1a4a32; color: #fff; border: none; border-radius: 8px; cursor: pointer; display: none; transition: background 0.15s; }
+  .next-btn:hover { background: #26603f; }
+  .next-btn.show { display: inline-block; }
+  .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: #888; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <p class="header-eyebrow">Module 1 · Page 2</p>
+  <h1 class="header-title">Community Assets, Social Determinants & Cultural Readiness</h1>
+</div>
+
+<div class="tab-bar" role="tablist">
+  <button class="tab active" role="tab" onclick="show('sdoh', this)">Social determinants</button>
+  <button class="tab" role="tab" onclick="show('assets', this)">Sort community assets</button>
+  <button class="tab" role="tab" onclick="show('culture', this)">Cultural factors</button>
+  <button class="tab" role="tab" onclick="show('scenarios', this)">Apply it</button>
+</div>
+
+<div class="content">
+
+  <!-- SDOH -->
+  <div id="s-sdoh" class="section visible">
+    <div class="card">
+      <p class="card-intro">Social determinants of health (SDOH) are the conditions in which people are born, grow, live, work, and age. They often have a <strong>greater impact</strong> on health outcomes than individual behaviors or clinical care alone.</p>
+      <div class="sdoh-grid">
+        <div class="sdoh-item"><p class="sdoh-name">Economic stability</p><p class="sdoh-desc">Income, employment, financial security</p></div>
+        <div class="sdoh-item"><p class="sdoh-name">Education & literacy</p><p class="sdoh-desc">Schooling level, health literacy, access to learning</p></div>
+        <div class="sdoh-item"><p class="sdoh-name">Healthcare access</p><p class="sdoh-desc">Service availability, transportation, insurance</p></div>
+        <div class="sdoh-item"><p class="sdoh-name">Housing & neighborhood</p><p class="sdoh-desc">Housing quality, neighborhood safety, food access</p></div>
+        <div class="sdoh-item"><p class="sdoh-name">Social connections</p><p class="sdoh-desc">Support networks, community connectedness</p></div>
+      </div>
+      <div class="scenario-box">
+        <p class="scenario-label">Real-world example</p>
+        A community member may fully understand that managing their diabetes requires dietary changes — but if they live in a food desert, work two jobs, or cannot afford medication, that knowledge alone will not be enough.
+      </div>
+    </div>
+    <div class="card">
+      <p class="section-label">Why this matters for program design</p>
+      <p style="font-size:14px; color:#333;">Understanding SDOH means you design programs that meet people where they <em>actually are</em> — not where you assume them to be.</p>
+    </div>
+  </div>
+
+  <!-- ASSETS SORT -->
+  <div id="s-assets" class="section">
+    <div class="card">
+      <p class="card-intro">Effective health education starts with a <strong>strengths-based lens</strong>. Click an asset chip to select it, then click a category zone to place it there. Click a placed chip to return it to the pool.</p>
+      <div class="asset-pool" id="pool"></div>
+      <div class="zone-grid">
+        <div class="zone" id="z-org" onclick="placeChip('z-org')">
+          <p class="zone-title">Organizational</p>
+          <div class="zone-items" id="z-org-items"></div>
+        </div>
+        <div class="zone" id="z-human" onclick="placeChip('z-human')">
+          <p class="zone-title">Human</p>
+          <div class="zone-items" id="z-human-items"></div>
+        </div>
+        <div class="zone" id="z-social" onclick="placeChip('z-social')">
+          <p class="zone-title">Social</p>
+          <div class="zone-items" id="z-social-items"></div>
+        </div>
+        <div class="zone" id="z-inst" onclick="placeChip('z-inst')">
+          <p class="zone-title">Institutional</p>
+          <div class="zone-items" id="z-inst-items"></div>
+        </div>
+      </div>
+      <button class="check-btn" onclick="checkAssets()">Check answers</button>
+      <div id="asset-result" class="result"></div>
+    </div>
+  </div>
+
+  <!-- CULTURE -->
+  <div id="s-culture" class="section">
+    <div class="card">
+      <p class="card-intro">Culture is not a barrier to work around — it is a context to work within. Four key cultural factors shape whether a health program will actually be used:</p>
+      <div class="culture-item lang">
+        <p class="culture-name">Language</p>
+        <p class="culture-desc">Materials or programs delivered only in English may exclude significant portions of a community, reducing both access and trust.</p>
+      </div>
+      <div class="culture-item relig">
+        <p class="culture-name">Religious or spiritual beliefs</p>
+        <p class="culture-desc">These may shape attitudes toward certain medical treatments, preventive care, or even the concept of illness itself.</p>
+      </div>
+      <div class="culture-item norms">
+        <p class="culture-name">Community norms</p>
+        <p class="culture-desc">Expectations around gender roles, family decision-making, or help-seeking behavior can influence whether someone engages with a health program at all.</p>
+      </div>
+      <div class="culture-item trust">
+        <p class="culture-name">Historical mistrust of healthcare</p>
+        <p class="culture-desc">Communities that have experienced discrimination or neglect by healthcare institutions may approach new programs with skepticism — and rightfully so.</p>
+      </div>
+    </div>
+    <div class="callout">
+      A health education specialist who ignores these factors risks designing a program that is culturally irrelevant, unintentionally offensive, or simply unused.
+    </div>
+  </div>
+
+  <!-- SCENARIOS -->
+  <div id="s-scenarios" class="section">
+    <div id="sc-container"></div>
+  </div>
+
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+  document.getElementById('s-' + id).classList.add('visible');
+  btn.classList.add('active'); btn.setAttribute('aria-selected','true');
+}
+
+// ASSET SORT
+const assets = [
+  { label: 'Community center', zone: 'z-org' },
+  { label: 'Faith-based organization', zone: 'z-org' },
+  { label: 'Local free clinic', zone: 'z-org' },
+  { label: 'Bilingual volunteers', zone: 'z-human' },
+  { label: 'Trusted community leaders', zone: 'z-human' },
+  { label: 'Neighbor support networks', zone: 'z-social' },
+  { label: 'Cultural traditions of collective care', zone: 'z-social' },
+  { label: 'University partnership', zone: 'z-inst' },
+  { label: 'Local government partnership', zone: 'z-inst' },
+];
+
+let selChip = null, placed = {};
+
+function initAssets() {
+  const pool = document.getElementById('pool');
+  pool.innerHTML = '';
+  assets.forEach((a, i) => {
+    const c = document.createElement('button');
+    c.className = 'chip';
+    c.textContent = a.label;
+    c.dataset.i = i;
+    c.onclick = () => {
+      if (placed[i]) return;
+      document.querySelectorAll('.chip').forEach(ch => ch.classList.remove('selected'));
+      selChip = i;
+      c.classList.add('selected');
+    };
+    pool.appendChild(c);
+  });
+}
+
+function placeChip(zoneId) {
+  if (selChip === null) return;
+  const i = selChip;
+  if (placed[i]) return;
+  const prev = Object.keys(placed).find(k => placed[k] === zoneId && placed[k]);
+  placed[i] = zoneId;
+  document.querySelectorAll('.chip').forEach(c => {
+    if (parseInt(c.dataset.i) === i) { c.classList.add('placed'); c.classList.remove('selected'); }
+  });
+  const btn = document.createElement('button');
+  btn.className = 'placed-chip';
+  btn.textContent = assets[i].label;
+  btn.onclick = () => { delete placed[i]; btn.remove(); document.querySelectorAll('.chip').forEach(c => { if (parseInt(c.dataset.i) === i) c.classList.remove('placed'); }); document.getElementById('asset-result').className = 'result'; };
+  document.getElementById(zoneId + '-items').appendChild(btn);
+  selChip = null;
+  document.getElementById('asset-result').className = 'result';
+}
+
+function checkAssets() {
+  const n = Object.keys(placed).length;
+  const r = document.getElementById('asset-result');
+  if (n < assets.length) { r.textContent = `You've placed ${n} of ${assets.length} items. Place all items before checking.`; r.className = 'result show err'; return; }
+  const correct = Object.entries(placed).filter(([i,z]) => assets[i].zone === z).length;
+  if (correct === assets.length) { r.textContent = '✓ All correct! You correctly categorized all community assets.'; r.className = 'result show ok'; }
+  else { r.textContent = `${correct} of ${assets.length} correct. Tip: organizational = groups or places; human = individual people; social = relationships and norms; institutional = formal partnerships.`; r.className = 'result show err'; }
+}
+
+initAssets();
+
+// SCENARIOS
+const scenarios = [
+  {
+    sc: "A health team is planning a diabetes prevention program for a low-income neighborhood. Many residents work multiple jobs, live far from grocery stores, and have limited transportation. The team has clinical risk factor data but has not spoken with any community members.",
+    q: "What is the most critical gap in this team's approach before moving forward?",
+    opts: ["They haven't gathered enough clinical data","They haven't conducted a pre-planning phase that includes SDOH context, asset mapping, and resident input","They need more interprofessional team members","They need to define their evaluation metrics first"],
+    correct: 1,
+    ok: "Correct! The team is missing the pre-planning phase. Without community input, an SDOH analysis, and asset mapping, they risk building a program that is well-intentioned but inaccessible to the people they're trying to serve.",
+    err: "Not quite. The scenario describes a team with clinical data but no community context. The missing piece is the pre-planning phase — gathering community input, assessing SDOH, and mapping existing assets before designing anything."
+  },
+  {
+    sc: "A community health educator is told that a neighborhood has 'a lot of trust issues' with healthcare providers due to a history of inadequate services. She plans to deliver a standard health education workshop and assumes residents will attend once they see the program is high quality.",
+    q: "Based on cultural influences on learning readiness, what is the main flaw in this plan?",
+    opts: ["The program isn't evidence-based enough","She is ignoring historical mistrust as a cultural factor that shapes whether residents will engage at all","She doesn't have enough stakeholders involved","She needs more visual aids in the workshop"],
+    correct: 1,
+    ok: "Correct! Historical mistrust of healthcare institutions directly affects whether community members will engage with a program. Assuming quality alone will overcome that barrier is a common — and costly — oversight.",
+    err: "Not quite. The key issue is that historical mistrust is a real cultural barrier to engagement. Simply offering a high-quality program doesn't address the community's legitimate reasons for skepticism."
+  }
+];
+
+let scIdx = 0, scAnswered = false;
+
+function renderSc() {
+  const s = scenarios[scIdx];
+  document.getElementById('sc-container').innerHTML = `
+    <div class="sc-card">
+      <p class="sc-meta">Scenario ${scIdx+1} of ${scenarios.length}</p>
+      <div class="scenario-box" style="margin-bottom:14px;"><p class="scenario-label">Scenario</p>${s.sc}</div>
+      <p class="sc-q">${s.q}</p>
+      ${s.opts.map((o,i) => `<button class="opt-btn" onclick="scAnswer(${i})">${o}</button>`).join('')}
+      <div id="sc-fb" class="feedback"></div>
+      <button id="sc-nxt" class="next-btn" onclick="scNext()">${scIdx < scenarios.length-1 ? 'Next scenario →' : 'Start over'}</button>
+    </div>`;
+  scAnswered = false;
+}
+
+function scAnswer(i) {
+  if (scAnswered) return;
+  scAnswered = true;
+  const s = scenarios[scIdx];
+  document.querySelectorAll('.opt-btn').forEach((b,idx) => { if (idx === s.correct) b.classList.add('correct'); else if (idx === i) b.classList.add('wrong'); b.disabled = true; });
+  const fb = document.getElementById('sc-fb');
+  const ok = i === s.correct;
+  fb.textContent = (ok ? '✓ ' : '✗ ') + (ok ? s.ok : s.err);
+  fb.className = 'feedback show ' + (ok ? 'correct' : 'wrong');
+  document.getElementById('sc-nxt').classList.add('show');
+}
+
+function scNext() { scIdx = (scIdx + 1) % scenarios.length; renderSc(); }
+
+renderSc();
+</script>
+</body>
+</html>

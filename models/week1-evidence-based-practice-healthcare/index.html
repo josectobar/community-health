@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Widget 2: Evidence-Based Practice in Health Promotion</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f5f7fa;
+    color: #1a1a1a;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .header {
+    background: #1a4a32;
+    color: #fff;
+    padding: 20px 24px 16px;
+    border-bottom: 3px solid #3aaa72;
+  }
+  .header-eyebrow { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #7fcfa4; margin-bottom: 4px; }
+  .header-title { font-size: 20px; font-weight: 600; }
+  .header-sub { font-size: 13px; color: #a8dcc0; margin-top: 4px; }
+
+  .tab-bar { display: flex; background: #fff; border-bottom: 1px solid #dde3ea; overflow-x: auto; scrollbar-width: none; }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab { flex-shrink: 0; padding: 12px 18px; font-size: 13px; font-weight: 500; color: #6b7280; background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap; transition: color 0.15s, border-color 0.15s; }
+  .tab:hover { color: #1a4a32; }
+  .tab.active { color: #1a4a32; border-bottom-color: #3aaa72; }
+
+  .content { padding: 22px 24px; max-width: 780px; }
+  .section { display: none; }
+  .section.visible { display: block; }
+
+  .card { background: #fff; border: 1px solid #dde3ea; border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .card-title { font-size: 14px; font-weight: 600; color: #1a4a32; margin-bottom: 8px; }
+  .card-body { font-size: 14px; color: #374151; line-height: 1.6; }
+  .callout { background: #f0fdf4; border-left: 4px solid #3aaa72; border-radius: 6px; padding: 12px 16px; font-size: 14px; color: #1a4a32; font-style: italic; margin: 10px 0; line-height: 1.6; }
+
+  /* ── SOURCE CARDS ── */
+  .source-grid { display: flex; flex-direction: column; gap: 12px; }
+  .source-card { background: #fff; border: 1px solid #dde3ea; border-radius: 10px; overflow: hidden; }
+  .source-header { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; }
+  .source-logo {
+    min-width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center;
+    justify-content: center; font-size: 11px; font-weight: 800; text-align: center; line-height: 1.2; flex-shrink: 0;
+  }
+  .logo-cochrane { background: #e8f0fb; color: #1a3c8f; }
+  .logo-nci      { background: #fef0ed; color: #7a2418; }
+  .logo-samhsa   { background: #f0fdf4; color: #1a5c35; }
+  .logo-cg       { background: #fef9c3; color: #7a5c0a; }
+  .logo-cdc      { background: #eef4fb; color: #1a3c5e; }
+  .source-info { flex: 1; }
+  .source-name { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
+  .source-type { font-size: 12px; color: #9ca3af; }
+  .ebp-badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 99px; flex-shrink: 0; }
+  .ebp-yes  { background: #dcfce7; color: #14532d; }
+  .ebp-no   { background: #fee2e2; color: #7f1d1d; }
+  .source-body { padding: 0 16px 14px; display: none; border-top: 1px solid #f0f2f5; }
+  .source-body.open { display: block; padding-top: 12px; }
+  .source-body p { font-size: 14px; color: #374151; line-height: 1.6; margin-bottom: 8px; }
+  .source-body ul { font-size: 13px; color: #374151; padding-left: 1.25rem; margin-bottom: 8px; line-height: 1.7; }
+  .source-body .why { font-size: 13px; background: #f8fafc; border-radius: 6px; padding: 8px 12px; color: #374151; margin-top: 6px; }
+  .expand-hint { font-size: 12px; color: #9ca3af; margin-left: auto; flex-shrink: 0; }
+
+  /* ── IDENTIFY ACTIVITY ── */
+  .identify-intro { font-size: 14px; color: #374151; margin-bottom: 16px; line-height: 1.6; }
+  .id-item { background: #fff; border: 1px solid #dde3ea; border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .id-source { font-size: 13px; font-weight: 600; color: #1a4a32; margin-bottom: 6px; }
+  .id-desc { font-size: 14px; color: #374151; margin-bottom: 12px; line-height: 1.5; }
+  .id-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+  .id-btn { padding: 8px 20px; font-size: 13px; font-weight: 500; border: 1.5px solid #c8d4e0; border-radius: 8px; background: transparent; cursor: pointer; transition: all 0.15s; }
+  .id-btn:hover:not(:disabled) { background: #f0fdf4; border-color: #3aaa72; }
+  .id-btn.picked-yes { background: #dcfce7; border-color: #22c55e; color: #14532d; }
+  .id-btn.picked-no  { background: #fee2e2; border-color: #ef4444; color: #7f1d1d; }
+  .id-btn.correct-yes { background: #dcfce7; border-color: #22c55e; color: #14532d; font-weight: 700; }
+  .id-btn.correct-no  { background: #fee2e2; border-color: #ef4444; color: #7f1d1d; font-weight: 700; }
+  .id-fb { font-size: 13px; margin-top: 10px; padding: 8px 12px; border-radius: 6px; display: none; line-height: 1.5; }
+  .id-fb.show { display: block; }
+  .id-fb.ok  { background: #dcfce7; color: #14532d; }
+  .id-fb.err { background: #fee2e2; color: #7f1d1d; }
+  .id-score { text-align: center; background: #fff; border: 1px solid #dde3ea; border-radius: 10px; padding: 24px; margin-top: 12px; display: none; }
+  .id-score.show { display: block; }
+  .id-score-big { font-size: 44px; font-weight: 700; color: #1a4a32; }
+  .id-score-msg { font-size: 15px; color: #6b7280; margin-top: 4px; }
+  .id-restart { margin-top: 14px; padding: 9px 22px; font-size: 14px; background: #1a4a32; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+
+  /* ── QUIZ ── */
+  .quiz-meta { font-size: 12px; color: #9ca3af; margin-bottom: 10px; }
+  .quiz-q { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 14px; line-height: 1.5; }
+  .opt-btn { display: block; width: 100%; text-align: left; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d9e0; border-radius: 8px; background: #fff; color: #1a1a1a; cursor: pointer; margin-bottom: 8px; transition: all 0.15s; line-height: 1.5; }
+  .opt-btn:hover:not(:disabled) { background: #f0fdf4; border-color: #3aaa72; }
+  .opt-btn.correct { background: #dcfce7; border-color: #22c55e; color: #14532d; }
+  .opt-btn.wrong   { background: #fee2e2; border-color: #ef4444; color: #7f1d1d; }
+  .feedback { font-size: 14px; padding: 10px 14px; border-radius: 8px; margin-top: 4px; display: none; line-height: 1.5; }
+  .feedback.show { display: block; }
+  .feedback.ok  { background: #dcfce7; color: #14532d; border-left: 3px solid #22c55e; }
+  .feedback.err { background: #fee2e2; color: #7f1d1d; border-left: 3px solid #ef4444; }
+  .next-btn { margin-top: 12px; padding: 9px 22px; font-size: 14px; background: #1a4a32; color: #fff; border: none; border-radius: 8px; cursor: pointer; display: none; }
+  .next-btn:hover { background: #22603f; }
+  .next-btn.show { display: inline-block; }
+  .progress-bar-wrap { background: #e5e7eb; border-radius: 99px; height: 6px; margin-bottom: 16px; }
+  .progress-bar-fill { background: #3aaa72; border-radius: 99px; height: 6px; transition: width 0.3s; }
+  .score-box { text-align: center; padding: 24px; background: #fff; border: 1px solid #dde3ea; border-radius: 10px; }
+  .score-big { font-size: 48px; font-weight: 700; color: #1a4a32; }
+  .score-label { font-size: 15px; color: #6b7280; margin-top: 4px; }
+  .restart-btn { margin-top: 16px; padding: 9px 22px; font-size: 14px; background: #1a4a32; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <p class="header-eyebrow">Chapter 2 · Evidence-Based Practice</p>
+  <h1 class="header-title">Identifying Evidence-Based Sources in Health Promotion</h1>
+  <p class="header-sub">Learn the major EBP registries, then test your ability to tell evidence-based sources from non-evidence-based ones.</p>
+</div>
+
+<div class="tab-bar" role="tablist">
+  <button class="tab active" onclick="showTab('sources',this)">Major EBP sources</button>
+  <button class="tab" onclick="showTab('identify',this)">EBP or not? Activity</button>
+  <button class="tab" onclick="showTab('quiz',this)">Knowledge check</button>
+</div>
+
+<div class="content">
+
+  <!-- ══ TAB 1: SOURCES ═══════════════════════════════════════════ -->
+  <div id="s-sources" class="section visible">
+    <div class="card">
+      <p class="card-body">Evidence-based practice means using the <strong>best available research evidence</strong> — combined with professional judgment and community values — to design health promotion programs. Several established registries and databases have done the systematic review work for you. Click each source to learn more.</p>
+      <div class="callout">Not all sources are equal. A vendor brochure, a testimonial, or a single unpublished study is not evidence-based in the same sense as a systematic review or a federally vetted program registry.</div>
+    </div>
+
+    <div class="source-grid">
+
+      <div class="source-card">
+        <div class="source-header" onclick="toggleSource('cochrane')">
+          <div class="source-logo logo-cochrane">COCHRANE</div>
+          <div class="source-info">
+            <p class="source-name">Cochrane Reviews</p>
+            <p class="source-type">International systematic review network</p>
+          </div>
+          <span class="ebp-badge ebp-yes">✓ Evidence-Based</span>
+          <span class="expand-hint" id="hint-cochrane">▾ expand</span>
+        </div>
+        <div id="body-cochrane" class="source-body">
+          <p>Cochrane is an international network of researchers who produce systematic reviews of healthcare and public health interventions. Cochrane reviews are considered among the highest standards of evidence in the world.</p>
+          <ul>
+            <li>Reviews synthesize results from multiple high-quality studies</li>
+            <li>Independent — no commercial funding influences reviews</li>
+            <li>Covers public health, behavioral health, clinical care, and health promotion</li>
+            <li>Freely searchable at cochrane.org</li>
+          </ul>
+          <p class="why"><strong>Why use it:</strong> When writing a program rationale, citing a Cochrane review that supports your proposed intervention is one of the strongest evidence claims you can make.</p>
+        </div>
+      </div>
+
+      <div class="source-card">
+        <div class="source-header" onclick="toggleSource('nci')">
+          <div class="source-logo logo-nci">NCI<br>RTIPs</div>
+          <div class="source-info">
+            <p class="source-name">NCI Research-Tested Intervention Programs (RTIPs)</p>
+            <p class="source-type">National Cancer Institute registry</p>
+          </div>
+          <span class="ebp-badge ebp-yes">✓ Evidence-Based</span>
+          <span class="expand-hint" id="hint-nci">▾ expand</span>
+        </div>
+        <div id="body-nci" class="source-body">
+          <p>The National Cancer Institute's RTIPs database compiles cancer control interventions that have been tested in research studies and rated for scientific rigor. Programs are organized by cancer type, target population, and setting.</p>
+          <ul>
+            <li>Programs reviewed and rated by NCI scientists</li>
+            <li>Includes evidence summaries and implementation materials</li>
+            <li>Particularly useful for cancer screening, tobacco cessation, and nutrition programs</li>
+          </ul>
+          <p class="why"><strong>Why use it:</strong> If your program targets cancer-related health issues, RTIPs lets you identify and adapt an existing, tested intervention — saving time and strengthening your rationale.</p>
+        </div>
+      </div>
+
+      <div class="source-card">
+        <div class="source-header" onclick="toggleSource('samhsa')">
+          <div class="source-logo logo-samhsa">SAMHSA</div>
+          <div class="source-info">
+            <p class="source-name">SAMHSA Evidence-Based Practices Resource Center</p>
+            <p class="source-type">Substance Abuse & Mental Health Services Administration</p>
+          </div>
+          <span class="ebp-badge ebp-yes">✓ Evidence-Based</span>
+          <span class="expand-hint" id="hint-samhsa">▾ expand</span>
+        </div>
+        <div id="body-samhsa" class="source-body">
+          <p>SAMHSA's resource center compiles evidence-based practices for mental health and substance use prevention and treatment. It integrates the former National Registry of Evidence-based Programs and Practices (NREPP).</p>
+          <ul>
+            <li>Programs reviewed and rated for quality of research and readiness for dissemination</li>
+            <li>Covers substance use prevention, mental health promotion, and treatment</li>
+            <li>Includes implementation tools and training resources</li>
+          </ul>
+          <p class="why"><strong>Why use it:</strong> Essential for programs addressing mental health, substance use, and behavioral health. The registry tells you what works and how strongly the evidence supports it.</p>
+        </div>
+      </div>
+
+      <div class="source-card">
+        <div class="source-header" onclick="toggleSource('cg')">
+          <div class="source-logo logo-cg">THE<br>COMM.<br>GUIDE</div>
+          <div class="source-info">
+            <p class="source-name">The Community Guide (Community Preventive Services Task Force)</p>
+            <p class="source-type">U.S. systematic review repository for public health</p>
+          </div>
+          <span class="ebp-badge ebp-yes">✓ Evidence-Based</span>
+          <span class="expand-hint" id="hint-cg">▾ expand</span>
+        </div>
+        <div id="body-cg" class="source-body">
+          <p>The Community Guide is a free, evidence-based resource developed by the Community Preventive Services Task Force. It summarizes scientific evidence for community preventive services, policies, and programs across many health topics.</p>
+          <ul>
+            <li>Systematic reviews across cardiovascular disease, cancer, diabetes, tobacco, obesity, and more</li>
+            <li>Clear recommendations based on strength of evidence</li>
+            <li>Referenced in the program rationale chapter as a key source (e.g., "evidence of effectiveness — e.g., The Community Guide")</li>
+          </ul>
+          <p class="why"><strong>Why use it:</strong> Directly referenced in your textbook. When a rationale cites a Community Guide recommendation, it carries significant weight with public health decision makers.</p>
+        </div>
+      </div>
+
+      <div class="source-card">
+        <div class="source-header" onclick="toggleSource('cdc')">
+          <div class="source-logo logo-cdc">CDC<br>WONDER</div>
+          <div class="source-info">
+            <p class="source-name">CDC WONDER / National Center for Health Statistics</p>
+            <p class="source-type">Epidemiological data source (Step 1 — Background Info)</p>
+          </div>
+          <span class="ebp-badge ebp-yes">✓ Evidence-Based</span>
+          <span class="expand-hint" id="hint-cdc">▾ expand</span>
+        </div>
+        <div id="body-cdc" class="source-body">
+          <p>The CDC's WONDER database and the National Center for Health Statistics provide the epidemiological data essential to Step 1 of the rationale — establishing the status and severity of a health problem in a given population.</p>
+          <ul>
+            <li>Mortality, morbidity, incidence, and prevalence data by geography and population</li>
+            <li>Behavioral Risk Factor Surveillance System (BRFSS) data</li>
+            <li>National Health Interview Survey (NHIS) data</li>
+          </ul>
+          <p class="why"><strong>Why use it:</strong> This is your primary source for establishing the scope of the problem in your rationale. It gives you the numbers you will translate through social math into compelling, locally relevant language.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ TAB 2: IDENTIFY ══════════════════════════════════════════ -->
+  <div id="s-identify" class="section">
+    <p class="identify-intro">For each source below, decide: is this an <strong>evidence-based</strong> source suitable for a program rationale, or <strong>not evidence-based</strong>? Click your answer and read why. Complete all 10 to see your score.</p>
+    <div id="id-items-wrap"></div>
+    <div id="id-score-wrap" class="id-score">
+      <div class="id-score-big" id="id-score-num"></div>
+      <div class="id-score-msg" id="id-score-msg"></div>
+      <button class="id-restart" onclick="initIdentify()">Try again</button>
+    </div>
+  </div>
+
+  <!-- ══ TAB 3: QUIZ ══════════════════════════════════════════════ -->
+  <div id="s-quiz" class="section">
+    <div id="quiz-wrap"></div>
+  </div>
+
+</div>
+
+<script>
+// ── TAB SWITCHING ──
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('visible');
+  btn.classList.add('active');
+}
+
+// ── SOURCE ACCORDIONS ──
+function toggleSource(id) {
+  const body = document.getElementById('body-' + id);
+  const hint = document.getElementById('hint-' + id);
+  const open = body.classList.toggle('open');
+  hint.textContent = open ? '▴ collapse' : '▾ expand';
+}
+
+// ── IDENTIFY ACTIVITY ──
+const idItems = [
+  {
+    source: 'Cochrane Systematic Review on physical activity interventions for obesity prevention',
+    ebp: true,
+    ok: 'Correct! Cochrane systematic reviews synthesize results from multiple rigorous studies. They are considered one of the highest standards of evidence available for health promotion programs.',
+    err: 'Not quite. Cochrane systematic reviews are one of the strongest forms of evidence in health promotion. They rigorously synthesize results from multiple peer-reviewed studies.'
+  },
+  {
+    source: 'A wellness company brochure claiming their program reduced employee sick days by 40%',
+    ebp: false,
+    ok: 'Correct! A vendor or company brochure is a marketing tool, not peer-reviewed evidence. The 40% claim has not been independently verified through systematic research.',
+    err: 'Not quite. Company brochures are marketing materials, not peer-reviewed evidence. Claims in them have not been independently tested or verified — they should not be used as evidence in a program rationale.'
+  },
+  {
+    source: 'SAMHSA Evidence-Based Practices Resource Center listing for a substance use prevention program',
+    ebp: true,
+    ok: 'Correct! SAMHSA\'s resource center reviews and rates behavioral health programs for the quality of their research. Programs listed there have been vetted for scientific rigor.',
+    err: 'Not quite. SAMHSA\'s evidence-based practices resource center is a federally supported registry that reviews and rates programs for scientific rigor. It is a credible evidence-based source.'
+  },
+  {
+    source: 'A testimonial from a community member saying a program "changed their life"',
+    ebp: false,
+    ok: 'Correct! Personal testimonials reflect individual experience, not systematic evidence. While compelling for community engagement, they do not constitute scientific evidence of program effectiveness.',
+    err: 'Not quite. Individual testimonials are anecdotal — they reflect one person\'s experience, not the systematic evidence needed to demonstrate program effectiveness in a rationale.'
+  },
+  {
+    source: 'The Community Guide recommendation on worksite health promotion programs',
+    ebp: true,
+    ok: 'Correct! The Community Guide is directly cited in the textbook as a key source of evidence. It produces systematic reviews and issues recommendations based on the strength of the available evidence.',
+    err: 'Not quite. The Community Guide is specifically mentioned in the textbook chapter as an evidence source (e.g., "evidence of effectiveness — e.g., The Community Guide"). It is a systematic review repository produced by the Community Preventive Services Task Force.'
+  },
+  {
+    source: 'A single unpublished pilot study conducted by a local nonprofit with no control group',
+    ebp: false,
+    ok: 'Correct! A single unpublished study with no control group cannot establish causality or demonstrate that results are generalizable. It may be useful for building local context but does not meet the standard of evidence-based practice.',
+    err: 'Not quite. Evidence-based practice requires peer-reviewed research, ideally with control groups and replication across populations. A single unpublished study with no control group is not sufficient on its own.'
+  },
+  {
+    source: 'NCI Research-Tested Intervention Programs (RTIPs) database entry for a tobacco cessation intervention',
+    ebp: true,
+    ok: 'Correct! NCI\'s RTIPs registry compiles cancer control interventions rated by NCI scientists for scientific rigor. A tobacco cessation program listed there has been verified as research-tested.',
+    err: 'Not quite. NCI\'s RTIPs database is a federally supported registry of research-tested, evidence-based interventions. Programs listed there have been reviewed and rated by NCI scientists.'
+  },
+  {
+    source: 'CDC WONDER data showing county-level mortality rates for cardiovascular disease',
+    ebp: true,
+    ok: 'Correct! CDC WONDER provides federally collected epidemiological data essential for Step 1 of the rationale — establishing the scope and severity of the health problem in a specific population.',
+    err: 'Not quite. CDC WONDER provides federally collected, verified epidemiological data. It is a credible source for establishing the status of a health problem in your community — a key requirement in Step 1 of the rationale.'
+  },
+  {
+    source: 'A blog post by a personal trainer describing their own weight loss approach',
+    ebp: false,
+    ok: 'Correct! A personal blog post is not peer-reviewed or systematically tested. Personal experience, no matter how compelling, does not meet the standard of evidence-based practice.',
+    err: 'Not quite. Blog posts and personal accounts — even from health professionals — are not peer-reviewed evidence. Evidence-based practice requires research that has been tested and reviewed by independent experts.'
+  },
+  {
+    source: 'A peer-reviewed journal article reporting results of a randomized controlled trial on a stress reduction intervention',
+    ebp: true,
+    ok: 'Correct! A randomized controlled trial published in a peer-reviewed journal is one of the strongest forms of scientific evidence. This meets the standard for evidence-based practice.',
+    err: 'Not quite. A randomized controlled trial in a peer-reviewed journal is among the highest standards of scientific evidence. This is exactly the type of source that should be cited in a program rationale.'
+  }
+];
+
+let idAnswered = {}, idCorrect = 0;
+
+function initIdentify() {
+  idAnswered = {}; idCorrect = 0;
+  const wrap = document.getElementById('id-items-wrap');
+  document.getElementById('id-score-wrap').className = 'id-score';
+  wrap.innerHTML = '';
+  idItems.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'id-item'; div.id = 'id-item-' + i;
+    div.innerHTML = `
+      <p class="id-source">Source ${i+1} of ${idItems.length}</p>
+      <p class="id-desc">${item.source}</p>
+      <div class="id-btns">
+        <button class="id-btn" id="idbtn-yes-${i}" onclick="idAnswer(${i}, true)">✓ Evidence-based</button>
+        <button class="id-btn" id="idbtn-no-${i}" onclick="idAnswer(${i}, false)">✗ Not evidence-based</button>
+      </div>
+      <div id="id-fb-${i}" class="id-fb"></div>`;
+    wrap.appendChild(div);
+  });
+}
+
+function idAnswer(i, guess) {
+  if (idAnswered[i] !== undefined) return;
+  idAnswered[i] = guess;
+  const item = idItems[i];
+  const correct = guess === item.ebp;
+  if (correct) idCorrect++;
+  const yesBtn = document.getElementById('idbtn-yes-' + i);
+  const noBtn  = document.getElementById('idbtn-no-'  + i);
+  yesBtn.disabled = noBtn.disabled = true;
+  if (item.ebp) { yesBtn.className = 'id-btn correct-yes'; } else { noBtn.className = 'id-btn correct-no'; }
+  if (guess !== item.ebp) { (guess ? yesBtn : noBtn).className = 'id-btn ' + (guess ? 'picked-yes' : 'picked-no'); }
+  const fb = document.getElementById('id-fb-' + i);
+  fb.textContent = (correct ? '✓ ' : '✗ ') + (correct ? item.ok : item.err);
+  fb.className = 'id-fb show ' + (correct ? 'ok' : 'err');
+  if (Object.keys(idAnswered).length === idItems.length) showIdScore();
+}
+
+function showIdScore() {
+  const pct = Math.round((idCorrect / idItems.length) * 100);
+  const msg = pct === 100 ? 'Perfect! You can confidently distinguish evidence-based sources from non-evidence-based ones.' :
+              pct >= 80  ? 'Great work! Review any incorrect items above.' :
+              pct >= 60  ? 'Good effort. Review the "Major EBP Sources" tab and try again.' :
+                           'Keep going — revisit the source profiles and look for the key markers of EBP quality.';
+  document.getElementById('id-score-num').textContent = `${idCorrect}/${idItems.length}`;
+  document.getElementById('id-score-msg').textContent = `${pct}% — ${msg}`;
+  document.getElementById('id-score-wrap').className = 'id-score show';
+  document.getElementById('id-score-wrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+initIdentify();
+
+// ── QUIZ ──
+const questions = [
+  {
+    q: "A health planner is writing a program rationale for a tobacco cessation initiative. They want to cite evidence that a specific intervention has been tested and rated for scientific rigor. Which source is most appropriate?",
+    opts: ["A news article about a celebrity quitting smoking","NCI Research-Tested Intervention Programs (RTIPs)","A wellness company's website promoting their cessation app","A coworker's personal success story"],
+    correct: 1,
+    ok: "Correct! NCI's RTIPs database compiles cancer control interventions reviewed and rated for scientific rigor — exactly the evidence source needed for a tobacco cessation program rationale.",
+    err: "Not quite. NCI's RTIPs is the appropriate source here. It is a federally supported registry of research-tested tobacco and cancer control interventions, reviewed by NCI scientists."
+  },
+  {
+    q: "Which of the following best defines evidence-based practice (EBP) in health promotion?",
+    opts: [
+      "Using only programs that have been approved by the federal government",
+      "Selecting the most popular intervention in the community",
+      "Integrating the best available research evidence with professional judgment and community values",
+      "Following the same approach used by the most successful health organizations"
+    ],
+    correct: 2,
+    ok: "Correct! EBP integrates three elements: the best available research evidence, professional judgment, and the values and preferences of the priority population. No single element alone defines EBP.",
+    err: "Not quite. Evidence-based practice is the integration of the best available research evidence with professional judgment and community values. Federal approval, popularity, and organizational success are not the defining features."
+  },
+  {
+    q: "A planner finds a Cochrane Review that supports their proposed physical activity intervention. Why is this a strong addition to their program rationale?",
+    opts: [
+      "Because Cochrane reviews are written by government officials with authority over health programs",
+      "Because Cochrane reviews synthesize results from multiple rigorous studies and are independently produced",
+      "Because Cochrane reviews are always free to access online",
+      "Because Cochrane is the only organization that publishes health research"
+    ],
+    correct: 1,
+    ok: "Correct! Cochrane reviews synthesize results from multiple peer-reviewed studies and are produced independently — free from commercial influence. This makes them one of the highest standards of evidence in health promotion.",
+    err: "Not quite. Cochrane reviews are valued because they synthesize results from multiple rigorous studies and are independently produced without commercial funding influence — making them a gold standard for evidence."
+  },
+  {
+    q: "The Community Guide is cited in the textbook chapter as a key source of 'evidence of effectiveness.' What type of resource is it?",
+    opts: [
+      "A government website listing approved health programs by state",
+      "A systematic review repository that issues recommendations based on strength of evidence",
+      "A database of clinical trials registered with the FDA",
+      "A directory of community health organizations and their contact information"
+    ],
+    correct: 1,
+    ok: "Correct! The Community Guide is produced by the Community Preventive Services Task Force and provides systematic reviews of community preventive services, issuing recommendations based on the strength of available evidence.",
+    err: "Not quite. The Community Guide is a systematic review repository — it summarizes scientific evidence for community preventive services and issues evidence-strength recommendations. It is not a state directory or a clinical trials database."
+  },
+  {
+    q: "A planner is designing a mental health promotion program and needs to find evidence-based interventions. Which source is best suited for this purpose?",
+    opts: ["CDC WONDER mortality data","The Community Guide on cardiovascular disease","SAMHSA's Evidence-Based Practices Resource Center","NCI Research-Tested Intervention Programs (RTIPs)"],
+    correct: 2,
+    ok: "Correct! SAMHSA's resource center specifically covers mental health and substance use programs, reviewing them for scientific rigor. It is the primary go-to registry for behavioral health evidence-based practices.",
+    err: "Not quite. For mental health promotion programs, SAMHSA's Evidence-Based Practices Resource Center is the appropriate source — it compiles and rates programs specifically in mental health and behavioral health."
+  },
+  {
+    q: "Which of the following statements about evidence-based practice in program planning is accurate?",
+    opts: [
+      "There is one universally 'best' evidence-based program that should be used for all populations",
+      "Evidence-based practice eliminates the need for a program rationale",
+      "The best program is the one supported by evidence, appropriate for the priority population, and feasible within available resources",
+      "Evidence-based practice only applies to clinical settings, not community health promotion"
+    ],
+    correct: 2,
+    ok: "Correct! There is no single best program for all situations. The best program is evidence-based, appropriate for the specific priority population, and feasible within the available resources and organizational context.",
+    err: "Not quite. Evidence-based practice recognizes that there is no single 'best' program for all populations and settings. The right program is the one that is evidence-backed, appropriate for the community, and feasible to implement."
+  },
+  {
+    q: "A colleague says they found a study that supports their intervention, but the study was conducted with a small sample, had no control group, and was never published in a peer-reviewed journal. How should this source be treated?",
+    opts: [
+      "It should be cited prominently as direct evidence of effectiveness",
+      "It may provide background context but does not meet the standard for evidence-based practice on its own",
+      "It should be rejected entirely and never referenced",
+      "It is acceptable if the sample population was similar to the priority population"
+    ],
+    correct: 1,
+    ok: "Correct! A single small, uncontrolled, unpublished study provides weak evidence. It may offer useful background context but cannot support a claim of evidence-based effectiveness on its own. Stronger sources are needed.",
+    err: "Not quite. Evidence-based practice requires peer-reviewed, well-designed research. A small, unpublished, uncontrolled study can provide context but does not meet the standard for claiming evidence-based effectiveness."
+  }
+];
+
+let qIdx = 0, qAnswered = false, userAnswers = [];
+
+function renderQ() {
+  const q = questions[qIdx];
+  const pct = Math.round((qIdx / questions.length) * 100);
+  document.getElementById('quiz-wrap').innerHTML = `
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+    <div class="card">
+      <p class="quiz-meta">Question ${qIdx + 1} of ${questions.length}</p>
+      <p class="quiz-q">${q.q}</p>
+      ${q.opts.map((o,i) => `<button class="opt-btn" onclick="answerQ(${i})">${o}</button>`).join('')}
+      <div id="qfb" class="feedback"></div>
+      <button id="qnxt" class="next-btn" onclick="nextQ()">${qIdx < questions.length - 1 ? 'Next question →' : 'See my score'}</button>
+    </div>`;
+  qAnswered = false;
+}
+
+function answerQ(i) {
+  if (qAnswered) return;
+  qAnswered = true;
+  userAnswers.push(i === questions[qIdx].correct ? 1 : 0);
+  const q = questions[qIdx];
+  document.querySelectorAll('.opt-btn').forEach((b, idx) => {
+    if (idx === q.correct) b.classList.add('correct');
+    else if (idx === i) b.classList.add('wrong');
+    b.disabled = true;
+  });
+  const fb = document.getElementById('qfb');
+  const ok = i === q.correct;
+  fb.textContent = (ok ? '✓ ' : '✗ ') + (ok ? q.ok : q.err);
+  fb.className = 'feedback show ' + (ok ? 'ok' : 'err');
+  document.getElementById('qnxt').classList.add('show');
+}
+
+function nextQ() {
+  qIdx++;
+  if (qIdx >= questions.length) showScore();
+  else renderQ();
+}
+
+function showScore() {
+  const total = userAnswers.reduce((a,b) => a+b, 0);
+  const pct = Math.round((total / questions.length) * 100);
+  const msg = pct === 100 ? 'Outstanding! You have a strong command of evidence-based practice concepts.' :
+              pct >= 70  ? 'Good work! Review the sources tab for any gaps.' :
+                           'Keep going — revisit the "Major EBP Sources" tab and the identify activity.';
+  document.getElementById('quiz-wrap').innerHTML = `
+    <div class="score-box">
+      <div class="score-big">${total}/${questions.length}</div>
+      <div class="score-label">${pct}% — ${msg}</div>
+      <button class="restart-btn" onclick="restartQuiz()">Try again</button>
+    </div>`;
+}
+
+function restartQuiz() {
+  qIdx = 0; userAnswers = [];
+  renderQ();
+}
+
+renderQ();
+</script>
+</body>
+</html>

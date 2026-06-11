@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Widget 1: Types of Models and Theories</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f7fa; color: #1a1a1a; font-size: 15px; line-height: 1.6; min-height: 100vh; }
+
+  .header { background: #1a3c5e; color: #fff; padding: 20px 24px 16px; border-bottom: 3px solid #4a90d9; }
+  .header-eyebrow { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #9bbfe0; margin-bottom: 4px; }
+  .header-title { font-size: 20px; font-weight: 600; }
+  .header-sub { font-size: 13px; color: #c0d8f0; margin-top: 4px; }
+
+  .tab-bar { display: flex; background: #fff; border-bottom: 1px solid #dde3ea; overflow-x: auto; scrollbar-width: none; }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab { flex-shrink: 0; padding: 12px 18px; font-size: 13px; font-weight: 500; color: #6b7280; background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
+  .tab:hover { color: #1a3c5e; }
+  .tab.active { color: #1a3c5e; border-bottom-color: #4a90d9; }
+
+  .content { padding: 22px 24px; max-width: 800px; }
+  .section { display: none; }
+  .section.visible { display: block; }
+
+  /* shared */
+  .card { background: #fff; border: 1px solid #dde3ea; border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .card-title { font-size: 14px; font-weight: 600; color: #1a3c5e; margin-bottom: 8px; }
+  .card-body { font-size: 14px; color: #374151; line-height: 1.6; }
+  .callout { background: #eef4fb; border-left: 4px solid #4a90d9; border-radius: 6px; padding: 12px 16px; font-size: 14px; color: #1a3c5e; font-style: italic; margin: 10px 0; line-height: 1.6; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 99px; margin-bottom: 8px; }
+  .tag-blue   { background: #dbeafe; color: #1e3a8a; }
+  .tag-purple { background: #ede9fe; color: #4c1d95; }
+  .tag-teal   { background: #ccfbf1; color: #134e4a; }
+  .tag-amber  { background: #fef9c3; color: #78350f; }
+  .tag-green  { background: #dcfce7; color: #14532d; }
+
+  /* ── KEY TERMS ── */
+  .terms-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 10px; }
+  .term-card { background: #f8fafc; border: 1px solid #dde3ea; border-radius: 8px; padding: 14px; }
+  .term-word { font-size: 14px; font-weight: 700; color: #1a3c5e; margin-bottom: 4px; }
+  .term-def  { font-size: 13px; color: #374151; line-height: 1.5; }
+
+  /* ── THEORY TYPES EXPLORER ── */
+  .explorer-intro { font-size: 14px; color: #374151; margin-bottom: 14px; line-height: 1.6; }
+  .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  @media (max-width: 520px) { .split-grid { grid-template-columns: 1fr; } }
+  .type-btn {
+    background: #fff; border: 2px solid #dde3ea; border-radius: 10px; padding: 16px 18px;
+    cursor: pointer; text-align: left; transition: all 0.15s;
+  }
+  .type-btn:hover { border-color: #4a90d9; background: #eef4fb; }
+  .type-btn.active { border-color: #1a3c5e; background: #eef4fb; }
+  .type-btn-label { font-size: 13px; font-weight: 600; color: #1a3c5e; margin-bottom: 4px; }
+  .type-btn-sub   { font-size: 12px; color: #6b7280; }
+  .type-detail { display: none; }
+  .type-detail.open { display: block; }
+
+  .theory-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+  .theory-item { background: #fff; border: 1px solid #dde3ea; border-radius: 8px; overflow: hidden; }
+  .theory-hdr { display: flex; align-items: center; gap: 10px; padding: 12px 14px; cursor: pointer; }
+  .theory-hdr:hover { background: #f8fafc; }
+  .theory-name { font-size: 14px; font-weight: 600; color: #1a1a1a; flex: 1; }
+  .theory-badge { font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 99px; flex-shrink: 0; }
+  .badge-cont { background: #dbeafe; color: #1e3a8a; }
+  .badge-stage { background: #ede9fe; color: #4c1d95; }
+  .badge-plan  { background: #ccfbf1; color: #134e4a; }
+  .badge-intra { background: #fef9c3; color: #78350f; }
+  .badge-inter { background: #dcfce7; color: #14532d; }
+  .badge-comm  { background: #fce7f3; color: #831843; }
+  .theory-chevron { font-size: 13px; color: #9ca3af; transition: transform 0.2s; }
+  .theory-chevron.open { transform: rotate(180deg); }
+  .theory-body { display: none; padding: 0 14px 14px; border-top: 1px solid #f0f2f5; }
+  .theory-body.open { display: block; padding-top: 10px; }
+  .theory-body p { font-size: 13px; color: #374151; line-height: 1.6; margin-bottom: 6px; }
+  .theory-body ul { font-size: 13px; color: #374151; padding-left: 1.2rem; line-height: 1.7; margin-bottom: 6px; }
+  .theory-body .level-tag { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-right: 6px; background: #f1f5f9; color: #475569; }
+
+  /* ── ECOLOGICAL LEVELS ── */
+  .eco-wrap { display: flex; flex-direction: column; gap: 0; margin: 10px 0; }
+  .eco-row {
+    display: flex; align-items: stretch; cursor: pointer; border: none; background: none; padding: 0;
+    width: 100%; text-align: left; transition: opacity 0.15s;
+  }
+  .eco-bar { display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; padding: 10px 12px; min-width: 130px; flex-shrink: 0; transition: filter 0.15s; }
+  .eco-row:hover .eco-bar { filter: brightness(0.9); }
+  .eco-bar-1 { background: #1a3c5e; border-radius: 8px 0 0 0; }
+  .eco-bar-2 { background: #2860a0; }
+  .eco-bar-3 { background: #4a90d9; }
+  .eco-bar-4 { background: #6baee8; }
+  .eco-bar-5 { background: #94c7f0; border-radius: 0 0 0 8px; }
+  .eco-content { flex: 1; padding: 10px 14px; background: #fff; border: 1px solid #dde3ea; border-left: none; }
+  .eco-row:first-child .eco-content { border-top: 1px solid #dde3ea; border-radius: 0 8px 0 0; }
+  .eco-row:last-child  .eco-content { border-bottom: 1px solid #dde3ea; border-radius: 0 0 8px 0; }
+  .eco-level-name { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
+  .eco-level-desc { font-size: 12px; color: #6b7280; }
+  .eco-detail { font-size: 13px; color: #374151; line-height: 1.5; padding: 8px 14px 10px; background: #f8fafc; border: 1px solid #dde3ea; border-top: none; display: none; }
+  .eco-detail.open { display: block; }
+
+  /* ── MATCH ACTIVITY ── */
+  .match-pool { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; min-height: 38px; }
+  .m-chip { padding: 6px 14px; font-size: 13px; border: 1px solid #c8d4e0; border-radius: 99px; background: #fff; color: #1a1a1a; cursor: pointer; user-select: none; transition: all 0.15s; }
+  .m-chip:hover { background: #eef4fb; border-color: #4a90d9; }
+  .m-chip.selected { background: #eef4fb; border-color: #4a90d9; outline: 2px solid #4a90d9; color: #1a3c5e; }
+  .m-chip.placed { opacity: 0.35; pointer-events: none; }
+  .match-rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+  .match-row { display: flex; gap: 10px; align-items: flex-start; }
+  .match-scenario { font-size: 13px; color: #374151; flex: 1 1 55%; line-height: 1.5; padding: 8px 12px; background: #f8fafc; border-radius: 6px; border: 1px solid #e5e9ef; }
+  .match-slot { flex: 1 1 40%; min-height: 36px; padding: 7px 12px; border: 2px dashed #c8d4e0; border-radius: 8px; font-size: 13px; color: #9ca3af; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; }
+  .match-slot:hover { border-color: #4a90d9; }
+  .match-slot.filled { border-style: solid; border-color: #c8d4e0; color: #1a1a1a; background: #f8fafc; }
+  .match-slot.correct { border-style: solid; border-color: #22c55e; background: #dcfce7; color: #14532d; }
+  .match-slot.wrong   { border-style: solid; border-color: #ef4444; background: #fee2e2; color: #7f1d1d; }
+  .action-btn { padding: 9px 22px; font-size: 14px; background: #1a3c5e; color: #fff; border: none; border-radius: 8px; cursor: pointer; margin-right: 8px; }
+  .reset-btn  { padding: 9px 22px; font-size: 14px; background: transparent; color: #6b7280; border: 1px solid #c8d4e0; border-radius: 8px; cursor: pointer; }
+  .result-msg { font-size: 14px; padding: 10px 14px; border-radius: 8px; margin-top: 10px; display: none; line-height: 1.5; }
+  .result-msg.show { display: block; }
+  .result-msg.ok  { background: #dcfce7; color: #14532d; border-left: 3px solid #22c55e; }
+  .result-msg.err { background: #fee2e2; color: #7f1d1d; border-left: 3px solid #ef4444; }
+
+  /* ── QUIZ ── */
+  .quiz-meta { font-size: 12px; color: #9ca3af; margin-bottom: 10px; }
+  .quiz-q { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 14px; line-height: 1.5; }
+  .opt-btn { display: block; width: 100%; text-align: left; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d9e0; border-radius: 8px; background: #fff; color: #1a1a1a; cursor: pointer; margin-bottom: 8px; transition: all 0.15s; line-height: 1.5; }
+  .opt-btn:hover:not(:disabled) { background: #eef4fb; border-color: #4a90d9; }
+  .opt-btn.correct { background: #dcfce7; border-color: #22c55e; color: #14532d; }
+  .opt-btn.wrong   { background: #fee2e2; border-color: #ef4444; color: #7f1d1d; }
+  .feedback { font-size: 14px; padding: 10px 14px; border-radius: 8px; margin-top: 4px; display: none; line-height: 1.5; }
+  .feedback.show { display: block; }
+  .feedback.ok  { background: #dcfce7; color: #14532d; border-left: 3px solid #22c55e; }
+  .feedback.err { background: #fee2e2; color: #7f1d1d; border-left: 3px solid #ef4444; }
+  .next-btn { margin-top: 12px; padding: 9px 22px; font-size: 14px; background: #1a3c5e; color: #fff; border: none; border-radius: 8px; cursor: pointer; display: none; transition: background 0.15s; }
+  .next-btn:hover { background: #254d78; }
+  .next-btn.show { display: inline-block; }
+  .progress-bar-wrap { background: #e5e7eb; border-radius: 99px; height: 6px; margin-bottom: 16px; }
+  .progress-bar-fill { background: #4a90d9; border-radius: 99px; height: 6px; transition: width 0.3s; }
+  .score-box { text-align: center; padding: 28px 24px; background: #fff; border: 1px solid #dde3ea; border-radius: 10px; }
+  .score-big { font-size: 52px; font-weight: 700; color: #1a3c5e; }
+  .score-label { font-size: 15px; color: #6b7280; margin-top: 6px; line-height: 1.5; }
+  .restart-btn { margin-top: 16px; padding: 9px 22px; font-size: 14px; background: #1a3c5e; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <p class="header-eyebrow">Chapter 7 · Theories and Models</p>
+  <h1 class="header-title">Types of Models and Theories in Health Promotion</h1>
+  <p class="header-sub">Explore the framework, understand the levels, and test your knowledge.</p>
+</div>
+
+<div class="tab-bar" role="tablist">
+  <button class="tab active" onclick="showTab('terms',this)">Key terms</button>
+  <button class="tab" onclick="showTab('types',this)">Theory types explorer</button>
+  <button class="tab" onclick="showTab('eco',this)">Ecological levels</button>
+  <button class="tab" onclick="showTab('match',this)">Match activity</button>
+  <button class="tab" onclick="showTab('quiz',this)">Knowledge check</button>
+</div>
+
+<div class="content">
+
+<!-- ══ TAB 1: KEY TERMS ═══════════════════════════════════════════ -->
+<div id="s-terms" class="section visible">
+  <div class="card">
+    <p class="card-body" style="margin-bottom:14px;">These foundational terms are the vocabulary of theoretical work in health promotion. Understanding the distinction between them is essential before selecting or applying any framework.</p>
+    <div class="terms-grid">
+      <div class="term-card">
+        <p class="term-word">Theory</p>
+        <p class="term-def">A set of interrelated concepts, definitions, and propositions that present a systematic view of a situation — indicating relations among variables to explain and predict events <em>(Kerlinger, 1986).</em></p>
+      </div>
+      <div class="term-card">
+        <p class="term-word">Model</p>
+        <p class="term-def">A composite of ideas and concepts taken from multiple theories and used together <em>(Hayden, 2019).</em> More practical and integrative than a single theory.</p>
+      </div>
+      <div class="term-card">
+        <p class="term-word">Concept</p>
+        <p class="term-def">The primary building blocks of a theory <em>(Glanz et al., 2008).</em> General ideas that a theory is organized around.</p>
+      </div>
+      <div class="term-card">
+        <p class="term-word">Construct</p>
+        <p class="term-def">A concept used within a specific theory. When a concept is adopted into a particular theory, it becomes a construct of that theory.</p>
+      </div>
+      <div class="term-card">
+        <p class="term-word">Variable</p>
+        <p class="term-def">The measurement of a construct. Variables operationalize constructs so they can be studied in research and evaluated in programs.</p>
+      </div>
+      <div class="term-card" style="background:#eef4fb; border-color:#4a90d9;">
+        <p class="term-word" style="color:#1a3c5e;">Key Principle</p>
+        <p class="term-def">There is no single "best" theory. The best theory is the one that meets the needs of any given program and priority population.</p>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <p class="card-title">Theory vs. Model — Why the Distinction Matters</p>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:8px;">
+      <div style="background:#f8fafc; border-radius:8px; padding:12px 14px; border:1px solid #dde3ea;">
+        <p style="font-size:13px; font-weight:700; color:#1a3c5e; margin-bottom:4px;">Theory</p>
+        <p style="font-size:13px; color:#374151; line-height:1.5;">Explains the <em>why</em> behind behavior. Provides a single explanatory lens grounded in research. Used to understand what drives or prevents behavior change.</p>
+      </div>
+      <div style="background:#f8fafc; border-radius:8px; padding:12px 14px; border:1px solid #dde3ea;">
+        <p style="font-size:13px; font-weight:700; color:#1a3c5e; margin-bottom:4px;">Model</p>
+        <p style="font-size:13px; color:#374151; line-height:1.5;">Draws on <em>multiple</em> theories. More practical and integrative. Used to organize the planning process or structure how an intervention is designed and delivered.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TAB 2: THEORY TYPES EXPLORER ══════════════════════════════ -->
+<div id="s-types" class="section">
+  <div class="card">
+    <p class="card-body" style="margin-bottom:12px;">Chapter 7 organizes theories into two major categories and two sub-types within behavior change theories. Select a category to explore the theories it contains. Click any theory to read its key details.</p>
+    <div class="split-grid">
+      <button class="type-btn active" id="btn-planning" onclick="showType('planning')">
+        <p class="type-btn-label">📋 Planning Models &amp; Theories</p>
+        <p class="type-btn-sub">Used to plan, implement, and evaluate health promotion programs</p>
+      </button>
+      <button class="type-btn" id="btn-bchange" onclick="showType('bchange')">
+        <p class="type-btn-label">🔄 Behavior Change Theories</p>
+        <p class="type-btn-sub">Explain how change takes place — what drives or prevents behavior</p>
+      </button>
+    </div>
+  </div>
+
+  <!-- Planning -->
+  <div id="type-planning" class="type-detail open">
+    <div class="card">
+      <p class="card-title">Planning Models &amp; Theories</p>
+      <p class="card-body" style="margin-bottom:12px;">These frameworks provide structure for the <em>process</em> of designing, implementing, and evaluating a health promotion program. They answer the question: <em>How do I organize this work?</em></p>
+      <div class="callout">A planning model does not tell you what drives behavior — it tells you how to go about building a program. Pair it with a behavior change theory to address both process and content.</div>
+      <div class="theory-list">
+        <div class="theory-item">
+          <div class="theory-hdr" onclick="toggleTheory('generalized')">
+            <span class="theory-badge badge-plan">Planning</span>
+            <span class="theory-name">The Generalized Model</span>
+            <span class="theory-chevron" id="chev-generalized">▾</span>
+          </div>
+          <div id="tbody-generalized" class="theory-body">
+            <p>A widely used step-by-step framework for health program planning. Phases include pre-planning, needs assessment, goal and objective setting, intervention development, implementation, and evaluation.</p>
+            <p>The community needs assessment lives in the first two phases. What planners learn there directly shapes every decision that follows.</p>
+          </div>
+        </div>
+        <div class="theory-item">
+          <div class="theory-hdr" onclick="toggleTheory('precede')">
+            <span class="theory-badge badge-plan">Planning</span>
+            <span class="theory-name">PRECEDE-PROCEED Model</span>
+            <span class="theory-chevron" id="chev-precede">▾</span>
+          </div>
+          <div id="tbody-precede" class="theory-body">
+            <p>A comprehensive planning framework that begins with the desired outcome (health quality of life) and works backward to identify the factors that must be addressed. PRECEDE focuses on assessment; PROCEED guides implementation and evaluation.</p>
+            <p>Particularly useful for complex, multi-level programs targeting populations with varied health determinants.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Behavior Change -->
+  <div id="type-bchange" class="type-detail">
+    <div class="card">
+      <p class="card-title">Behavior Change Theories</p>
+      <p class="card-body" style="margin-bottom:12px;">These theories explain the <em>why</em> behind health behavior. They identify what factors drive or prevent behavior change and guide what an intervention needs to address. They divide into two sub-types:</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+        <div style="background:#eef4fb; border-radius:8px; padding:10px 14px; border:1px solid #bcd3f0;">
+          <p style="font-size:12px; font-weight:700; color:#1a3c5e; margin-bottom:4px;">Continuum theories</p>
+          <p style="font-size:12px; color:#374151; line-height:1.5;">Identify variables that influence actions and combine them to predict behavior. Change is on a spectrum — the goal is to shift people along it.</p>
+        </div>
+        <div style="background:#ede9fe; border-radius:8px; padding:10px 14px; border:1px solid #c4b5fd;">
+          <p style="font-size:12px; font-weight:700; color:#4c1d95; margin-bottom:4px;">Stage theories</p>
+          <p style="font-size:12px; color:#374151; line-height:1.5;">Propose an ordered set of categories — people move through stages and different factors drive movement at each stage. Must "stage" the audience first.</p>
+        </div>
+      </div>
+      <div class="theory-list">
+
+        <div class="theory-item">
+          <div class="theory-hdr" onclick="toggleTheory('tpb')">
+            <span class="theory-badge badge-cont">Continuum</span>
+            <span class="theory-name">Theory of Planned Behavior (TPB)</span>
+            <span class="theory-chevron" id="chev-tpb">▾</span>
+          </div>
+          <div id="tbody-tpb" class="theory-body">
+            <span class="level-tag">Intrapersonal</span>
+            <p>A value-expectancy theory — explains how beliefs and attitudes influence behavior. Built on the earlier Theory of Reasoned Action (TRA). Most useful with <em>volitional</em> behaviors (those under conscious control).</p>
+            <p><strong>Intention</strong> is the core driver, shaped by three factors:</p>
+            <ul>
+              <li><strong>Attitude toward the behavior</strong> — personal evaluation (good/bad, worth it/not)</li>
+              <li><strong>Subjective norm</strong> — perceived social pressure from important others</li>
+              <li><strong>Perceived behavioral control</strong> — belief in ability to perform the behavior</li>
+            </ul>
+            <p>Actual behavioral control combined with intention determines performance.</p>
+          </div>
+        </div>
+
+        <div class="theory-item">
+          <div class="theory-hdr" onclick="toggleTheory('hbm')">
+            <span class="theory-badge badge-cont">Continuum</span>
+            <span class="theory-name">Health Belief Model (HBM)</span>
+            <span class="theory-chevron" id="chev-hbm">▾</span>
+          </div>
+          <div id="tbody-hbm" class="theory-body">
+            <span class="level-tag">Intrapersonal</span>
+            <p>Another value-expectancy theory. Health-related action depends on the simultaneous occurrence of three classes of factors:</p>
+            <ul>
+              <li><strong>Motivation</strong> — general health motivation</li>
+              <li><strong>Perceived threat</strong> — perceived susceptibility + perceived severity</li>
+              <li><strong>Perceived benefits vs. barriers</strong> — will the action help? Is it worth the cost?</li>
+            </ul>
+            <p><strong>Self-efficacy</strong> impacts perceived barriers — if a person doesn't believe they can do the behavior, barriers loom larger.</p>
+          </div>
+        </div>
+
+        <div class="theory-item">
+          <div class="theory-hdr" onclick="toggleTheory('ttm')">
+            <span class="theory-badge badge-stage">Stage</span>
+            <span class="theory-name">Transtheoretical Model (TTM / Stages of Change)</span>
+            <span class="theory-chevron" id="chev-ttm">▾</span>
+          </div>
+          <div id="tbody-ttm" class="theory-body">
+            <span class="level-tag">Intrapersonal</span>
+            <p>Sometimes called the Stages of Change Model. Helps explain how people move through behavior change over time. People are not uniformly ready — interventions must match the person's current stage.</p>
+            <p><strong>Core constructs:</strong> stages of change, processes of change, decisional balance, self-efficacy, and temptation.</p>
+            <p><strong>The 5 stages:</strong> Precontemplation → Contemplation → Preparation → Action → Maintenance</p>
+            <p>Key insight: the same intervention will not work for someone in precontemplation and someone in action. Planners must stage the audience first.</p>
+          </div>
+        </div>
+
+        <div class="theory-item">
+          <div class="theory-hdr" onclick="toggleTheory('sr')">
+            <span class="theory-badge badge-cont">Continuum</span>
+            <span class="theory-name">Stimulus Response (SR) Theory</span>
+            <span class="theory-chevron" id="chev-sr">▾</span>
+          </div>
+          <div id="tbody-sr" class="theory-body">
+            <span class="level-tag">Intrapersonal</span>
+            <p>A stimulus is presented and a subsequent behavior is performed. Behavior frequency is determined by reinforcements — reinforcement strengthens behaviors; punishment suppresses them.</p>
+            <p>Reinforcement and punishment can each be <em>positive</em> (adding something) or <em>negative</em> (removing something):</p>
+            <ul>
+              <li><strong>Positive reinforcement</strong> — add a reward → behavior increases</li>
+              <li><strong>Negative reinforcement</strong> — remove an aversive stimulus → behavior increases</li>
+              <li><strong>Positive punishment</strong> — add an aversive stimulus → behavior decreases</li>
+              <li><strong>Negative punishment</strong> — remove a reward → behavior decreases</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="theory-item">
+          <div class="theory-hdr" onclick="toggleTheory('pmt')">
+            <span class="theory-badge badge-cont">Continuum</span>
+            <span class="theory-name">Protection Motivation Theory (PMT)</span>
+            <span class="theory-chevron" id="chev-pmt">▾</span>
+          </div>
+          <div id="tbody-pmt" class="theory-body">
+            <span class="level-tag">Intrapersonal</span>
+            <p>A value-expectancy theory explaining how persuasive communication affects attitudes and behavior through cognitive threat appraisal. Two appraisal processes determine behavior:</p>
+            <ul>
+              <li><strong>Threat appraisal</strong> — weighs rewards of unhealthy behavior against perceived severity and vulnerability</li>
+              <li><strong>Coping appraisal</strong> — assesses response efficacy (will this action work?) and self-efficacy (can I do it?)</li>
+            </ul>
+            <p>The combined outcome of these appraisals determines whether protective motivation occurs.</p>
+          </div>
+        </div>
+
+        <div class="theory-item">
+          <div class="theory-hdr" onclick="toggleTheory('elm')">
+            <span class="theory-badge badge-cont">Continuum</span>
+            <span class="theory-name">Elaboration Likelihood Model (ELM)</span>
+            <span class="theory-chevron" id="chev-elm">▾</span>
+          </div>
+          <div id="tbody-elm" class="theory-body">
+            <span class="level-tag">Intrapersonal</span>
+            <p>Explains how persuasion messages aimed at attitude change are received. Attitude change can occur through two routes:</p>
+            <ul>
+              <li><strong>Central route</strong> — high elaboration (deep cognitive processing). Arguments are carefully considered. Attitude change is stronger and more lasting.</li>
+              <li><strong>Peripheral route</strong> — low elaboration (shallow processing). Attitude change is influenced by cues (attractiveness, authority) rather than argument quality. Less durable.</li>
+            </ul>
+            <p><em>Elaboration</em> = the amount of cognitive processing. Many factors affect elaboration (motivation, ability, message relevance).</p>
+          </div>
+        </div>
+
+        <div class="theory-item">
+          <div class="theory-hdr" onclick="toggleTheory('imb')">
+            <span class="theory-badge badge-cont">Continuum</span>
+            <span class="theory-name">Information-Motivation-Behavioral (IMB) Skills Model</span>
+            <span class="theory-chevron" id="chev-imb">▾</span>
+          </div>
+          <div id="tbody-imb" class="theory-body">
+            <span class="level-tag">Intrapersonal</span>
+            <p>Three fundamental determinants of preventive behavior:</p>
+            <ul>
+              <li><strong>Information</strong> — must be relevant and actionable; serves as a personal guide to behavior</li>
+              <li><strong>Motivation</strong> — both personal motivation and social motivation are needed to act</li>
+              <li><strong>Behavioral skills</strong> — objective ability AND self-efficacy to perform the behavior</li>
+            </ul>
+            <p>All three must be based on the specific needs of the priority population. Missing any one diminishes effectiveness.</p>
+          </div>
+        </div>
+
+        <div class="theory-item">
+          <div class="theory-hdr" onclick="toggleTheory('papm')">
+            <span class="theory-badge badge-stage">Stage</span>
+            <span class="theory-name">Precaution Adoption Process Model (PAPM)</span>
+            <span class="theory-chevron" id="chev-papm">▾</span>
+          </div>
+          <div id="tbody-papm" class="theory-body">
+            <span class="level-tag">Intrapersonal</span>
+            <p>A stage model best used for <em>new precautions</em> (e.g., a new vaccination) or <em>abandoning a risky behavior</em> (e.g., stopping a single unsafe habit). Works best for single-step behaviors, not gradual change over time.</p>
+            <p>Includes <strong>seven stages</strong>; people can be "staged" through a series of questions.</p>
+            <p>Key distinction from TTM: PAPM is designed for novel behaviors where people may not even be <em>aware</em> the issue applies to them — Stage 1 is "unaware of the issue," which TTM does not have.</p>
+          </div>
+        </div>
+
+        <div class="theory-item">
+          <div class="theory-hdr" onclick="toggleTheory('sct')">
+            <span class="theory-badge badge-inter">Interpersonal</span>
+            <span class="theory-name">Social Cognitive Theory (SCT)</span>
+            <span class="theory-chevron" id="chev-sct">▾</span>
+          </div>
+          <div id="tbody-sct" class="theory-body">
+            <span class="level-tag">Interpersonal</span>
+            <p>Combines SR theory with cognitive theory. Explains behavior through <strong>triadic reciprocal causation</strong> — internal personal factors, behavioral patterns, and environmental influences all interact bidirectionally.</p>
+            <p>Key constructs include self-efficacy, reciprocal determinism, behavioral capability, reinforcement (direct, vicarious, self), expectations, expectancies, self-regulation, locus of control, and emotional coping response.</p>
+            <p>Widely applicable across health topics. Especially strong when both social learning and individual cognition are central to the behavior change goal.</p>
+          </div>
+        </div>
+
+        <div class="theory-item">
+          <div class="theory-hdr" onclick="toggleTheory('scat')">
+            <span class="theory-badge badge-inter">Interpersonal</span>
+            <span class="theory-name">Social Capital Theory</span>
+            <span class="theory-chevron" id="chev-scat">▾</span>
+          </div>
+          <div id="tbody-scat" class="theory-body">
+            <span class="level-tag">Interpersonal</span>
+            <p>Focuses on relationships and structures within a community. Social capital is a <em>collective</em> asset — not an individual one. It refers to the trust, reciprocity, and networks that make collective action possible.</p>
+            <p><strong>Three network types:</strong></p>
+            <ul>
+              <li><strong>Bonding</strong> — strong ties among similar people</li>
+              <li><strong>Bridging</strong> — weak ties across different groups (valuable for new resources)</li>
+              <li><strong>Linking</strong> — connections to people/institutions in power</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="theory-item">
+          <div class="theory-hdr" onclick="toggleTheory('diff')">
+            <span class="theory-badge badge-comm">Community</span>
+            <span class="theory-name">Diffusion of Innovations Theory</span>
+            <span class="theory-chevron" id="chev-diff">▾</span>
+          </div>
+          <div id="tbody-diff" class="theory-body">
+            <span class="level-tag">Community</span>
+            <p>Explains the spread of innovations (something new) through a population. Useful for designing interventions or messaging for people at different stages of adoption.</p>
+            <p><strong>Adopter categories:</strong> Innovators → Early adopters → Early majority → Late majority → Laggards</p>
+            <p>Health promotion application: design messages and interventions that match where various segments of the priority population fall in the adoption curve.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TAB 3: ECOLOGICAL LEVELS ══════════════════════════════════ -->
+<div id="s-eco" class="section">
+  <div class="card">
+    <p class="card-body" style="margin-bottom:12px;">The socioecological approach is the overarching concept organizing behavior change theories. It holds that human behavior is shaped by — and shapes — multiple simultaneous levels of influence. Click each level to see what it includes and how it connects to theory selection.</p>
+  </div>
+  <div class="eco-wrap">
+    <button class="eco-row" onclick="toggleEco('e1')">
+      <div class="eco-bar eco-bar-1">Intrapersonal</div>
+      <div class="eco-content">
+        <p class="eco-level-name">Individual Level</p>
+        <p class="eco-level-desc">Factors within the person: knowledge, attitudes, beliefs, self-efficacy, developmental history</p>
+      </div>
+    </button>
+    <div id="eco-e1" class="eco-detail">
+      This is the level most theories in Chapter 7 address. Interventions at this level aim to change what a person knows, believes, or feels confident about. Examples: TPB, HBM, TTM, PMT, ELM, IMB, PAPM, SR Theory. <em>Limitation:</em> ignores the social and environmental context that also shapes behavior.
+    </div>
+
+    <button class="eco-row" onclick="toggleEco('e2')">
+      <div class="eco-bar eco-bar-2">Interpersonal</div>
+      <div class="eco-content">
+        <p class="eco-level-name">Social/Relational Level</p>
+        <p class="eco-level-desc">Family, peers, social networks, social support — the people who surround and influence us</p>
+      </div>
+    </button>
+    <div id="eco-e2" class="eco-detail">
+      Interpersonal-level theories recognize that we don't change in isolation — our social relationships shape what we do. Examples: Social Cognitive Theory, Social Capital Theory, Social Network Theory. Programs at this level may use peer health educators, social support groups, or family-based interventions.
+    </div>
+
+    <button class="eco-row" onclick="toggleEco('e3')">
+      <div class="eco-bar eco-bar-3">Institutional / Organizational</div>
+      <div class="eco-content">
+        <p class="eco-level-name">Organizational Level</p>
+        <p class="eco-level-desc">Rules, policies, norms, and organizational structures that regulate behavior</p>
+      </div>
+    </button>
+    <div id="eco-e3" class="eco-detail">
+      Workplace wellness policies, school nutrition rules, and hospital protocols are examples of institutional-level influences. Changing organizational culture or policy can have a broader and more lasting impact than individual-level change alone.
+    </div>
+
+    <button class="eco-row" onclick="toggleEco('e4')">
+      <div class="eco-bar eco-bar-4">Community</div>
+      <div class="eco-content">
+        <p class="eco-level-name">Community Level</p>
+        <p class="eco-level-desc">Social norms, networks, and standards within communities — collective behavior and environment</p>
+      </div>
+    </button>
+    <div id="eco-e4" class="eco-detail">
+      Community-level theories include Diffusion of Innovations and the Community Readiness Model. Programs at this level focus on community organizing, norm change, and mobilizing collective action. Assessing community readiness is essential before launching interventions here.
+    </div>
+
+    <button class="eco-row" onclick="toggleEco('e5')">
+      <div class="eco-bar eco-bar-5">Public Policy &amp; Environment</div>
+      <div class="eco-content">
+        <p class="eco-level-name">Policy / Environmental Level</p>
+        <p class="eco-level-desc">Local, state, and national laws, policies, and the built/social environment</p>
+      </div>
+    </button>
+    <div id="eco-e5" class="eco-detail">
+      The broadest level of influence. Tobacco taxes, food labeling laws, built environment design (bike lanes, parks), and insurance coverage are all policy-level factors that shape health behavior across entire populations. The most powerful and most difficult to change.
+    </div>
+  </div>
+  <div class="card" style="margin-top:12px;">
+    <p class="card-title">Why this matters for theory selection</p>
+    <p class="card-body">A program that only addresses the intrapersonal level may miss the social environment where behavior is reinforced. An interpersonal intervention in a community with deeply entrenched policy barriers may achieve limited reach. Effective health promotion considers which level(s) the evidence points to — and selects theories accordingly.</p>
+  </div>
+</div>
+
+<!-- ══ TAB 4: MATCH ACTIVITY ══════════════════════════════════════ -->
+<div id="s-match" class="section">
+  <div class="card">
+    <p class="card-title">Match the scenario to the theory</p>
+    <p class="card-body" style="margin-bottom:14px;">Click a theory chip to select it, then click the slot next to the matching scenario. Click a placed chip to return it to the pool.</p>
+    <div id="match-pool" class="match-pool"></div>
+    <div id="match-rows" class="match-rows"></div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="action-btn" onclick="checkMatch()">Check answers</button>
+      <button class="reset-btn"  onclick="resetMatch()">Reset</button>
+    </div>
+    <div id="match-result" class="result-msg"></div>
+  </div>
+</div>
+
+<!-- ══ TAB 5: QUIZ ════════════════════════════════════════════════ -->
+<div id="s-quiz" class="section">
+  <div id="quiz-wrap"></div>
+</div>
+
+</div><!-- /content -->
+
+<script>
+// ── TABS ──
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('visible');
+  btn.classList.add('active');
+}
+
+// ── THEORY TYPE BUTTONS ──
+function showType(id) {
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.type-detail').forEach(d => d.classList.remove('open'));
+  document.getElementById('btn-' + id).classList.add('active');
+  document.getElementById('type-' + id).classList.add('open');
+}
+
+// ── THEORY ACCORDIONS ──
+function toggleTheory(id) {
+  const body = document.getElementById('tbody-' + id);
+  const chev = document.getElementById('chev-' + id);
+  const open = body.classList.toggle('open');
+  chev.classList.toggle('open', open);
+}
+
+// ── ECO LEVELS ──
+function toggleEco(id) {
+  const el = document.getElementById('eco-' + id);
+  el.classList.toggle('open');
+}
+
+// ── MATCH ACTIVITY ──
+const matchItems = [
+  { scenario: 'A nurse believes that eating more vegetables would improve her health but isn\'t sure she can maintain the habit — she has low confidence in her ability to stick with the change.', correct: 'Self-efficacy (SCT)', tip: 'Self-efficacy — belief in one\'s ability to perform a behavior — is a core SCT construct. Low self-efficacy is a direct intervention target.' },
+  { scenario: 'A health planner wants to reduce teen vaping. She surveys students and finds half are unaware that e-cigarettes contain nicotine. She decides the first step is factual information.', correct: 'IMB Skills Model', tip: 'The IMB model identifies Information as the first fundamental determinant of preventive behavior — it must be relevant and actionable.' },
+  { scenario: 'A program targets employees who have never considered quitting smoking and have no intention to do so in the next 6 months.', correct: 'Transtheoretical Model (TTM)', tip: 'TTM stage assessment: this audience is in Precontemplation. Interventions must match the stage — raising awareness, not action planning.' },
+  { scenario: 'A community health worker notes that neighborhood social ties are weak and residents don\'t trust local institutions. She proposes building community trust and shared networks as a program strategy.', correct: 'Social Capital Theory', tip: 'Social Capital Theory focuses on the trust, networks, and reciprocity within communities — a collective asset that can be built and leveraged.' },
+  { scenario: 'A planner designs a messaging campaign where trusted community members share their own success stories with healthy eating on social media, to show others that change is possible.', correct: 'Vicarious reinforcement (SCT)', tip: 'Observing others succeed and be rewarded for a behavior is vicarious reinforcement — a key SCT mechanism, especially for modeling.' },
+  { scenario: 'A new home radon testing kit is being promoted in a region where most residents have never heard of radon as a health risk.', correct: 'Precaution Adoption Process Model (PAPM)', tip: 'PAPM is best suited for new precautions. Stage 1 is "unaware of the issue" — which fits a population that doesn\'t know radon is a concern.' },
+  { scenario: 'An employer wants employees who already intend to exercise more to actually follow through. She adds an app that tracks workouts and sends weekly progress summaries.', correct: 'Theory of Planned Behavior (TPB)', tip: 'TPB focuses on intention → behavior. Self-monitoring tools support perceived behavioral control and bridge the intention-action gap.' },
+];
+
+const matchAnswers = ['Self-efficacy (SCT)','IMB Skills Model','Transtheoretical Model (TTM)','Social Capital Theory','Vicarious reinforcement (SCT)','Precaution Adoption Process Model (PAPM)','Theory of Planned Behavior (TPB)'];
+let mSel = null, mPlaced = {};
+
+function initMatch() {
+  mSel = null; mPlaced = {};
+  const pool = document.getElementById('match-pool');
+  pool.innerHTML = '';
+  matchAnswers.forEach(a => {
+    const c = document.createElement('button');
+    c.className = 'm-chip'; c.textContent = a; c.dataset.val = a;
+    c.onclick = () => {
+      document.querySelectorAll('.m-chip').forEach(ch => ch.classList.remove('selected'));
+      mSel = a; c.classList.add('selected');
+    };
+    pool.appendChild(c);
+  });
+  const rows = document.getElementById('match-rows');
+  rows.innerHTML = '';
+  matchItems.forEach((item, i) => {
+    const row = document.createElement('div');
+    row.className = 'match-row';
+    row.innerHTML = `<div class="match-scenario">${item.scenario}</div><div class="match-slot" id="ms-${i}" onclick="mPlace(${i})" title="Click to place selected theory">click to place</div>`;
+    rows.appendChild(row);
+  });
+  document.getElementById('match-result').className = 'result-msg';
+}
+
+function mPlace(i) {
+  if (!mSel) return;
+  const slot = document.getElementById('ms-' + i);
+  if (slot.classList.contains('correct')) return;
+  const prev = mPlaced[i];
+  if (prev) { document.querySelectorAll('.m-chip').forEach(c => { if (c.dataset.val === prev) c.classList.remove('placed'); }); }
+  mPlaced[i] = mSel;
+  slot.textContent = mSel; slot.className = 'match-slot filled';
+  document.querySelectorAll('.m-chip').forEach(c => { if (c.dataset.val === mSel) { c.classList.add('placed'); c.classList.remove('selected'); } });
+  mSel = null;
+  document.getElementById('match-result').className = 'result-msg';
+}
+
+function checkMatch() {
+  const n = Object.keys(mPlaced).length;
+  const r = document.getElementById('match-result');
+  if (n < matchItems.length) { r.textContent = `You've filled ${n} of ${matchItems.length} slots. Fill all slots before checking.`; r.className = 'result-msg show err'; return; }
+  let correct = 0;
+  matchItems.forEach((item, i) => {
+    const slot = document.getElementById('ms-' + i);
+    if (mPlaced[i] === item.correct) { slot.className = 'match-slot correct'; slot.title = '✓ ' + item.tip; correct++; }
+    else { slot.className = 'match-slot wrong'; slot.title = 'Incorrect. ' + item.tip; }
+  });
+  if (correct === matchItems.length) { r.textContent = '✓ Perfect! All scenarios correctly matched. Hover over the green slots to read the explanation.'; r.className = 'result-msg show ok'; }
+  else { r.textContent = `${correct} of ${matchItems.length} correct. Slots shown in red are incorrect. Hover over each slot for a hint, then reset and try again.`; r.className = 'result-msg show err'; }
+}
+
+function resetMatch() { initMatch(); }
+initMatch();
+
+// ── QUIZ ──
+const questions = [
+  { q: 'What is the key difference between a theory and a model in health promotion?', opts: ['Theories are older; models are more modern','A theory explains behavior from a single conceptual lens; a model combines concepts from multiple theories','A theory is used for research; a model is only used for practice','Models are more rigorous than theories'], correct: 1, ok: 'Correct! A theory offers a single systematic explanatory lens; a model is more integrative, drawing concepts from multiple theories and used together for practical program design.', err: 'Not quite. The distinction is conceptual: a theory presents a systematic view from one framework, while a model combines ideas from multiple theories into a usable composite.' },
+  { q: 'A health program finds that participants understand the risks of physical inactivity (high perceived threat) but are not changing their behavior because they don\'t believe they can fit exercise into their schedule. Which Health Belief Model construct is the primary barrier?', opts: ['Motivation','Perceived severity','Perceived barriers','Perceived susceptibility'], correct: 2, ok: 'Correct! Perceived barriers — the obstacles a person sees to taking action — are the primary driver here. The person has threat awareness but is blocked by perceived barriers (time constraints).', err: 'Not quite. The person understands the risk (motivation and perceived threat are present) but is blocked by perceived barriers — the belief that action is too difficult or costly.' },
+  { q: 'The Transtheoretical Model is a stage theory. What does this mean for how planners should design interventions?', opts: ['One universal intervention should be applied to all participants at the same time','The intervention must match the participant\'s current stage of readiness for change','The program should focus only on participants who are already ready to act','Stage theories are only useful for clinical populations, not community programs'], correct: 1, ok: 'Correct! Stage theories require that planners first stage the audience — identifying where each person is in the change process — then design interventions that match that stage. A precontemplator needs different intervention content than someone in maintenance.', err: 'Not quite. Stage theories require interventions to be matched to the person\'s current stage. The same message that works for someone ready to act can be counterproductive for someone not yet contemplating change.' },
+  { q: 'In Social Cognitive Theory, "triadic reciprocal causation" refers to which relationship?', opts: ['The three stages of behavior change: intention, action, maintenance','The bidirectional interaction between personal factors, behavior, and environment','The three types of reinforcement: direct, vicarious, and self','The relationship between self-efficacy, behavioral capability, and skills'], correct: 1, ok: 'Correct! Triadic reciprocal causation is SCT\'s core claim: internal personal factors, behavioral patterns, and environmental influences all interact bidirectionally. Each affects and is affected by the others.', err: 'Not quite. Triadic reciprocal causation specifically describes the bidirectional relationship among the three domains in SCT: personal factors (cognition, affect, biology), behavioral patterns, and environmental influences.' },
+  { q: 'Which of the following best explains why there is no single "best" theory for health promotion?', opts: ['Theories are too complex to be applied in real programs','Different health problems and populations require different explanatory frameworks and intervention points','The research supporting most theories is not strong enough to rely on','Planners generally prefer models to theories', ], correct: 1, ok: 'Correct! Health problems and populations vary enormously. The ecological level, the type of behavior, the population\'s readiness, and the available resources all influence which theory is most appropriate for a given program.', err: 'Not quite. No single theory fits every situation because health problems differ in their determinants, populations differ in their readiness and context, and interventions must be matched to both.' },
+  { q: 'The Elaboration Likelihood Model distinguishes between the central and peripheral routes to persuasion. Which condition is most likely to produce lasting attitude change?', opts: ['Peripheral route — when attractive or authoritative communicators deliver the message','Central route — when audiences engage in deep cognitive processing of the argument','Peripheral route — when the message is repeated frequently','Central route — when the message is kept short and simple'], correct: 1, ok: 'Correct! The central route involves deep cognitive processing of the argument itself. Attitude change formed through the central route is stronger, more resistant to counter-arguments, and more predictive of behavior change than peripheral route attitude change.', err: 'Not quite. The central route — where people carefully process the quality of the argument — produces more durable attitude change. Peripheral route change is less stable and less predictive of sustained behavior change.' },
+  { q: 'A planner is developing a program for a neighborhood where residents share strong social ties and trust one another, but have little access to city resources or government programs. According to Social Capital Theory, what type of network is strong — and what type is weak?', opts: ['Bridging networks are strong; linking networks are weak','Bonding networks are strong; linking networks are weak','Linking networks are strong; bonding networks are weak','Bonding networks are strong; bridging networks are weak'], correct: 1, ok: 'Correct! Strong mutual trust among similar residents = strong bonding networks. Limited connection to institutions with resources = weak linking networks. Understanding this helps planners design strategies to strengthen the weakest link.', err: 'Not quite. Bonding networks = strong ties among people who are similar (shared trust, shared circumstances). Linking networks = connections to people or institutions in power. The scenario describes strong bonding and weak linking.' }
+];
+
+let qIdx = 0, qAnswered = false, userAnswers = [];
+
+function renderQ() {
+  const q = questions[qIdx];
+  const pct = Math.round((qIdx / questions.length) * 100);
+  document.getElementById('quiz-wrap').innerHTML = `
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+    <div class="card">
+      <p class="quiz-meta">Question ${qIdx+1} of ${questions.length}</p>
+      <p class="quiz-q">${q.q}</p>
+      ${q.opts.map((o,i) => `<button class="opt-btn" onclick="answerQ(${i})">${o}</button>`).join('')}
+      <div id="qfb" class="feedback"></div>
+      <button id="qnxt" class="next-btn" onclick="nextQ()">${qIdx < questions.length-1 ? 'Next question →' : 'See my score'}</button>
+    </div>`;
+  qAnswered = false;
+}
+
+function answerQ(i) {
+  if (qAnswered) return;
+  qAnswered = true;
+  userAnswers.push(i === questions[qIdx].correct ? 1 : 0);
+  const q = questions[qIdx];
+  document.querySelectorAll('.opt-btn').forEach((b,idx) => {
+    if (idx === q.correct) b.classList.add('correct');
+    else if (idx === i) b.classList.add('wrong');
+    b.disabled = true;
+  });
+  const fb = document.getElementById('qfb');
+  const ok = i === q.correct;
+  fb.textContent = (ok ? '✓ ' : '✗ ') + (ok ? q.ok : q.err);
+  fb.className = 'feedback show ' + (ok ? 'ok' : 'err');
+  document.getElementById('qnxt').classList.add('show');
+}
+
+function nextQ() {
+  qIdx++;
+  if (qIdx >= questions.length) showScore();
+  else renderQ();
+}
+
+function showScore() {
+  const total = userAnswers.reduce((a,b) => a+b, 0);
+  const pct = Math.round((total/questions.length)*100);
+  const msg = pct===100 ? 'Excellent! You have a strong grasp of theories and models.' :
+              pct>=70  ? 'Good work! Review the Theory Types Explorer for any gaps.' :
+                         'Keep going — revisit the tabs and try again.';
+  document.getElementById('quiz-wrap').innerHTML = `
+    <div class="score-box">
+      <div class="score-big">${total}/${questions.length}</div>
+      <div class="score-label">${pct}% — ${msg}</div>
+      <button class="restart-btn" onclick="restartQuiz()">Try again</button>
+    </div>`;
+}
+
+function restartQuiz() { qIdx = 0; userAnswers = []; renderQ(); }
+renderQ();
+</script>
+</body>
+</html>
