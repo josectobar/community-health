@@ -7,7 +7,7 @@
 <style>
   * { box-sizing: border-box; }
   body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #fff; color: #222; font-size: 14px; line-height: 1.6; }
-  h2 { font-size: 16px; font-weight: bold; color: #1F3864; margin: 0 0 4px; }
+  h1 { font-size: 16px; font-weight: bold; color: #1F3864; margin: 0 0 4px; }
   .subtitle { font-size: 13px; color: #555; margin: 0 0 14px; }
 
   /* phase nav strip */
@@ -29,6 +29,7 @@
     line-height: 1.4;
   }
   .p-btn:hover { background: #f0f0f0; }
+  .p-btn:focus-visible { outline: 3px solid #2E75B6; outline-offset: 2px; }
   .p-btn .num { display: block; font-size: 10px; font-weight: normal; margin-bottom: 2px; }
   .p-btn.active { color: #fff; }
 
@@ -42,7 +43,7 @@
     font-size: 14px;
     line-height: 1.7;
   }
-  #detail h3 { margin: 0 0 8px; font-size: 15px; font-weight: bold; }
+  #detail h2 { margin: 0 0 8px; font-size: 15px; font-weight: bold; }
   #detail p { margin: 0 0 8px; }
   #detail ul { margin: 6px 0 8px; padding-left: 20px; }
   #detail li { margin-bottom: 4px; font-size: 13px; }
@@ -60,31 +61,33 @@
 </head>
 <body>
 
-<h2>MAPP: Mobilizing for Action through Planning and Partnerships</h2>
-<p class="subtitle">Click each phase to explore its purpose, key principles, and what it produces.</p>
+<main>
+<h1>MAPP: Mobilizing for Action through Planning and Partnerships</h1>
+<p class="subtitle">Select each phase to explore its purpose, key principles, and what it produces.</p>
 
-<div class="phase-strip">
-  <button class="p-btn" id="b1" onclick="show('m1')" style="border-color:#85B7EB;">
+<div class="phase-strip" aria-label="MAPP phases">
+  <button class="p-btn" id="b1" onclick="show('m1')" aria-controls="detail" aria-expanded="false" style="border-color:#85B7EB;">
     <span class="num" style="color:#185FA5;">Phase 1</span>Organize &amp; Partner
   </button>
-  <button class="p-btn" id="b2" onclick="show('m2')" style="border-color:#97C459;">
+  <button class="p-btn" id="b2" onclick="show('m2')" aria-controls="detail" aria-expanded="false" style="border-color:#97C459;">
     <span class="num" style="color:#3B6D11;">Phase 2</span>Visioning
   </button>
-  <button class="p-btn" id="b3" onclick="show('m3')" style="border-color:#EF9F27;">
+  <button class="p-btn" id="b3" onclick="show('m3')" aria-controls="detail" aria-expanded="false" style="border-color:#EF9F27;">
     <span class="num" style="color:#854F0B;">Phase 3</span>Four Assessments
   </button>
-  <button class="p-btn" id="b4" onclick="show('m4')" style="border-color:#AFA9EC;">
+  <button class="p-btn" id="b4" onclick="show('m4')" aria-controls="detail" aria-expanded="false" style="border-color:#AFA9EC;">
     <span class="num" style="color:#534AB7;">Phase 4</span>Strategic Issues
   </button>
-  <button class="p-btn" id="b5" onclick="show('m5')" style="border-color:#F0997B;">
+  <button class="p-btn" id="b5" onclick="show('m5')" aria-controls="detail" aria-expanded="false" style="border-color:#F0997B;">
     <span class="num" style="color:#993C1D;">Phase 5</span>Goals &amp; Strategies
   </button>
-  <button class="p-btn" id="b6" onclick="show('m6')" style="border-color:#5DCAA5;">
+  <button class="p-btn" id="b6" onclick="show('m6')" aria-controls="detail" aria-expanded="false" style="border-color:#5DCAA5;">
     <span class="num" style="color:#0F6E56;">Phase 6</span>Action Cycle
   </button>
 </div>
 
-<div id="detail"></div>
+<div id="detail" role="region" aria-live="polite" tabindex="-1"></div>
+</main>
 
 <script>
 var colors = {
@@ -131,6 +134,7 @@ function show(id) {
   for (var k in colors) {
     var btn = document.getElementById('b' + k.slice(1));
     btn.classList.remove('active');
+    btn.setAttribute('aria-expanded', 'false');
     btn.style.background = '';
     btn.style.color = '#222';
   }
@@ -138,6 +142,7 @@ function show(id) {
   // activate clicked button
   var activeBtn = document.getElementById('b' + id.slice(1));
   activeBtn.classList.add('active');
+  activeBtn.setAttribute('aria-expanded', 'true');
   activeBtn.style.background = c.btn;
   activeBtn.style.color = '#fff';
   activeBtn.style.borderColor = c.border;
@@ -146,7 +151,8 @@ function show(id) {
   d.style.display = 'block';
   d.style.borderColor = c.border;
   d.style.background = c.bg;
-  d.innerHTML = '<h3 style="color:' + c.h + '">' + ph.title + '</h3>' + ph.body;
+  d.innerHTML = '<h2 id="detail-heading" style="color:' + c.h + '">' + ph.title + '</h2>' + ph.body;
+  d.setAttribute('aria-labelledby', 'detail-heading');
   d.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 </script>
