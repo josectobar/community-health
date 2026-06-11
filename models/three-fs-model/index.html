@@ -7,7 +7,7 @@
 <style>
   * { box-sizing: border-box; }
   body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #fff; color: #222; font-size: 14px; line-height: 1.6; }
-  h2 { font-size: 16px; font-weight: bold; color: #1F3864; margin: 0 0 4px; }
+  h1 { font-size: 16px; font-weight: bold; color: #1F3864; margin: 0 0 4px; }
   .subtitle { font-size: 13px; color: #555; margin: 0 0 18px; }
 
   /* tabs for the 3 Fs */
@@ -27,6 +27,7 @@
     transition: background 0.12s;
   }
   .tab:hover { background: #eee; }
+  .tab:focus-visible { outline: 3px solid #2E75B6; outline-offset: 2px; }
   .tab.active { background: #fff; color: #1F3864; border-color: #ddd; border-bottom-color: #fff; font-weight: bold; }
 
   .tab-content {
@@ -55,6 +56,7 @@
     cursor: pointer; transition: background 0.12s;
   }
   .opt:hover { background: #f5f5f5; }
+  .opt:focus-within { outline: 3px solid #2E75B6; outline-offset: 2px; }
   .opt.selected { border-color: #2E75B6; background: #f0f7ff; }
   .opt input[type="radio"] { margin-top: 3px; flex-shrink: 0; }
   .opt label { cursor: pointer; font-size: 13px; line-height: 1.5; }
@@ -65,6 +67,7 @@
     font-family: Arial, sans-serif; transition: background 0.12s;
   }
   .go-btn:hover { background: #185FA5; }
+  .go-btn:focus-visible, .reset-btn:focus-visible { outline: 3px solid #2E75B6; outline-offset: 2px; }
   #result { display: none; margin-top: 16px; padding: 16px 18px; border-radius: 10px; border: 2px solid #ccc; font-size: 14px; line-height: 1.7; }
   #result h3 { margin: 0 0 8px; font-size: 15px; font-weight: bold; }
   #result p { margin: 0 0 8px; }
@@ -81,20 +84,21 @@
 </head>
 <body>
 
-<h2>Choosing the Right Planning Framework: The Three Fs</h2>
+<main>
+<h1>Choosing the Right Planning Framework: The Three Fs</h1>
 <p class="subtitle">Use the tabs below to learn each F, then try the decision tool to apply them.</p>
 
 <!-- Tab bar -->
-<div class="tab-bar">
-  <div class="tab active" onclick="switchTab('fluidity')">Fluidity</div>
-  <div class="tab" onclick="switchTab('flexibility')">Flexibility</div>
-  <div class="tab" onclick="switchTab('functionality')">Functionality</div>
-  <div class="tab" onclick="switchTab('compare')">Compare Models</div>
-  <div class="tab" onclick="switchTab('tool')">Decision Tool</div>
+<div class="tab-bar" role="tablist" aria-label="Three Fs sections">
+  <button class="tab active" id="tab-button-fluidity" role="tab" aria-selected="true" aria-controls="tab-fluidity" onclick="switchTab('fluidity')">Fluidity</button>
+  <button class="tab" id="tab-button-flexibility" role="tab" aria-selected="false" aria-controls="tab-flexibility" onclick="switchTab('flexibility')">Flexibility</button>
+  <button class="tab" id="tab-button-functionality" role="tab" aria-selected="false" aria-controls="tab-functionality" onclick="switchTab('functionality')">Functionality</button>
+  <button class="tab" id="tab-button-compare" role="tab" aria-selected="false" aria-controls="tab-compare" onclick="switchTab('compare')">Compare Models</button>
+  <button class="tab" id="tab-button-tool" role="tab" aria-selected="false" aria-controls="tab-tool" onclick="switchTab('tool')">Decision Tool</button>
 </div>
 
 <!-- Fluidity -->
-<div id="tab-fluidity" class="tab-content active">
+<div id="tab-fluidity" class="tab-content active" role="tabpanel" aria-labelledby="tab-button-fluidity">
   <span class="f-badge" style="background:#E6F1FB;color:#0C447C;">First F</span>
   <h3 style="color:#0C447C;">Fluidity — How well understood is the problem?</h3>
   <p>Fluidity asks: <strong>How much do we already know about this community's health problem and its causes?</strong> It describes the state of your knowledge before planning begins.</p>
@@ -108,7 +112,7 @@
 </div>
 
 <!-- Flexibility -->
-<div id="tab-flexibility" class="tab-content">
+<div id="tab-flexibility" class="tab-content" role="tabpanel" aria-labelledby="tab-button-flexibility">
   <span class="f-badge" style="background:#EAF3DE;color:#27500A;">Second F</span>
   <h3 style="color:#27500A;">Flexibility — What is the scope and complexity of the planning task?</h3>
   <p>Flexibility asks: <strong>Are we planning one specific program, or coordinating a broad community health improvement strategy across many organizations and priorities?</strong></p>
@@ -121,7 +125,7 @@
 </div>
 
 <!-- Functionality -->
-<div id="tab-functionality" class="tab-content">
+<div id="tab-functionality" class="tab-content" role="tabpanel" aria-labelledby="tab-button-functionality">
   <span class="f-badge" style="background:#FAEEDA;color:#633806;">Third F</span>
   <h3 style="color:#633806;">Functionality — Who is driving the process, and what must the end product accomplish?</h3>
   <p>Functionality asks: <strong>What does the end product need to do, and who has the authority and capacity to implement it?</strong></p>
@@ -134,7 +138,7 @@
 </div>
 
 <!-- Compare -->
-<div id="tab-compare" class="tab-content">
+<div id="tab-compare" class="tab-content" role="tabpanel" aria-labelledby="tab-button-compare">
   <h3 style="color:#1F3864;">PRECEDE-PROCEED vs. MAPP: Side-by-Side</h3>
   <p style="font-size:13px;color:#555;">Use this table as a quick reference when deciding which framework fits your planning situation.</p>
   <table class="comp-table">
@@ -196,32 +200,33 @@
 </div>
 
 <!-- Decision Tool -->
-<div id="tab-tool" class="tab-content">
+<div id="tab-tool" class="tab-content" role="tabpanel" aria-labelledby="tab-button-tool">
   <h3 style="color:#1F3864;">Decision Tool: Which Framework Fits Your Situation?</h3>
   <p style="font-size:13px;color:#555;">Answer three questions based on your planning scenario. The tool will recommend a framework and explain why.</p>
 
   <div class="tool-section">
     <p class="tool-q">1. Fluidity — How well understood is the health problem?</p>
-    <div class="opt" onclick="pick('fl','a',this)"><input type="radio" name="fl" id="fl-a"><label for="fl-a">The problem is not well understood yet. We need broad assessment from multiple angles to discover root causes.</label></div>
-    <div class="opt" onclick="pick('fl','b',this)"><input type="radio" name="fl" id="fl-b"><label for="fl-b">Some data exists, but community perspectives and system performance gaps are still unknown.</label></div>
-    <div class="opt" onclick="pick('fl','c',this)"><input type="radio" name="fl" id="fl-c"><label for="fl-c">The problem and its main causes are well-documented. We are ready to design a specific intervention.</label></div>
+    <div class="opt" onclick="pick('fl','a',this)"><input type="radio" name="fl" id="fl-a" onchange="pick('fl','a',this.closest('.opt'))"><label for="fl-a">The problem is not well understood yet. We need broad assessment from multiple angles to discover root causes.</label></div>
+    <div class="opt" onclick="pick('fl','b',this)"><input type="radio" name="fl" id="fl-b" onchange="pick('fl','b',this.closest('.opt'))"><label for="fl-b">Some data exists, but community perspectives and system performance gaps are still unknown.</label></div>
+    <div class="opt" onclick="pick('fl','c',this)"><input type="radio" name="fl" id="fl-c" onchange="pick('fl','c',this.closest('.opt'))"><label for="fl-c">The problem and its main causes are well-documented. We are ready to design a specific intervention.</label></div>
   </div>
 
   <div class="tool-section">
     <p class="tool-q">2. Flexibility — What is the scope of the planning task?</p>
-    <div class="opt" onclick="pick('fx','a',this)"><input type="radio" name="fx" id="fx-a"><label for="fx-a">We are designing one specific program for one health problem and one target population.</label></div>
-    <div class="opt" onclick="pick('fx','b',this)"><input type="radio" name="fx" id="fx-b"><label for="fx-b">We need to address multiple health priorities across an entire community, coordinating many organizations.</label></div>
+    <div class="opt" onclick="pick('fx','a',this)"><input type="radio" name="fx" id="fx-a" onchange="pick('fx','a',this.closest('.opt'))"><label for="fx-a">We are designing one specific program for one health problem and one target population.</label></div>
+    <div class="opt" onclick="pick('fx','b',this)"><input type="radio" name="fx" id="fx-b" onchange="pick('fx','b',this.closest('.opt'))"><label for="fx-b">We need to address multiple health priorities across an entire community, coordinating many organizations.</label></div>
   </div>
 
   <div class="tool-section">
     <p class="tool-q">3. Functionality — Who will implement the plan and what must it produce?</p>
-    <div class="opt" onclick="pick('fn','a',this)"><input type="radio" name="fn" id="fn-a"><label for="fn-a">A program team or health department will implement a specific intervention — they need a detailed program plan with evaluation built in.</label></div>
-    <div class="opt" onclick="pick('fn','b',this)"><input type="radio" name="fn" id="fn-b"><label for="fn-b">A broad multi-sector coalition must own the plan — the community needs a shared improvement agenda that multiple organizations can act on together.</label></div>
+    <div class="opt" onclick="pick('fn','a',this)"><input type="radio" name="fn" id="fn-a" onchange="pick('fn','a',this.closest('.opt'))"><label for="fn-a">A program team or health department will implement a specific intervention — they need a detailed program plan with evaluation built in.</label></div>
+    <div class="opt" onclick="pick('fn','b',this)"><input type="radio" name="fn" id="fn-b" onchange="pick('fn','b',this.closest('.opt'))"><label for="fn-b">A broad multi-sector coalition must own the plan — the community needs a shared improvement agenda that multiple organizations can act on together.</label></div>
   </div>
 
-  <button class="go-btn" onclick="recommend()">See recommendation</button>
-  <div id="result"></div>
+  <button class="go-btn" onclick="recommend()" aria-controls="result">See recommendation</button>
+  <div id="result" role="region" aria-live="polite" tabindex="-1"></div>
 </div>
+</main>
 
 <script>
 var answers = { fl: null, fx: null, fn: null };
@@ -230,6 +235,7 @@ function switchTab(name) {
   document.querySelectorAll('.tab').forEach(function(t, i) {
     var names = ['fluidity','flexibility','functionality','compare','tool'];
     t.classList.toggle('active', names[i] === name);
+    t.setAttribute('aria-selected', names[i] === name ? 'true' : 'false');
   });
   document.querySelectorAll('.tab-content').forEach(function(c) {
     c.classList.remove('active');
@@ -275,6 +281,7 @@ function recommend() {
   d.style.borderColor = border;
   d.innerHTML = '<h3 style="color:' + color + '">' + title + '</h3>' + body +
     '<button class="reset-btn" onclick="resetTool()">Start over</button>';
+  d.setAttribute('aria-label', title);
   d.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 

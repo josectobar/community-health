@@ -7,12 +7,15 @@
 <style>
   * { box-sizing: border-box; }
   body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #fff; color: #222; font-size: 14px; line-height: 1.6; }
-  h2 { font-size: 16px; font-weight: bold; color: #1F3864; margin: 0 0 4px; text-align: center; }
+  h1 { font-size: 16px; font-weight: bold; color: #1F3864; margin: 0 0 4px; text-align: center; }
   .subtitle { font-size: 13px; color: #555; margin: 0 auto 14px; text-align: center; }
   svg { width: 100%; max-width: 680px; display: block; margin: 0 auto; }
   .phase-box { cursor: pointer; }
   .phase-box rect { transition: stroke-width 0.15s; }
-  .phase-box:hover rect { stroke-width: 3 !important; }
+  .phase-box:hover rect,
+  .phase-box:focus-visible rect { stroke-width: 3 !important; }
+  .phase-box:focus-visible { outline: none; }
+  .phase-box:focus-visible rect { filter: drop-shadow(0 0 0.2rem rgba(46, 117, 182, 0.75)); }
   #detail {
     display: none;
     margin-top: 14px;
@@ -23,7 +26,7 @@
     font-size: 14px;
     line-height: 1.7;
   }
-  #detail h3 { margin: 0 0 8px; font-size: 15px; font-weight: bold; }
+  #detail h2 { margin: 0 0 8px; font-size: 15px; font-weight: bold; }
   #detail p { margin: 0 0 8px; }
   #detail ul { margin: 6px 0 8px; padding-left: 20px; }
   #detail li { margin-bottom: 4px; font-size: 13px; }
@@ -38,10 +41,13 @@
 </head>
 <body>
 
-<h2>PRECEDE-PROCEED: An Interactive Guide</h2>
-<p class="subtitle">Click any phase to learn its purpose, key questions, and what it produces.</p>
+<main>
+<h1>PRECEDE-PROCEED: An Interactive Guide</h1>
+<p class="subtitle">Select any phase to learn its purpose, key questions, and what it produces.</p>
 
-<svg viewBox="0 0 680 210" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 680 210" xmlns="http://www.w3.org/2000/svg" role="group" aria-labelledby="precede-title precede-desc">
+  <title id="precede-title">PRECEDE-PROCEED phase diagram</title>
+  <desc id="precede-desc">An interactive diagram showing four PRECEDE planning phases followed by four PROCEED implementation and evaluation phases. Select a phase to show details below.</desc>
   <defs>
     <marker id="arr" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
       <path d="M0,0 L0,6 L7,3 z" fill="#888"/>
@@ -57,7 +63,7 @@
   <text x="509" y="21" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#0F6E56">PROCEED — implement &amp; evaluate</text>
 
   <!-- P1 Social -->
-  <g class="phase-box" onclick="show('p1')">
+  <g class="phase-box" role="button" tabindex="0" aria-controls="detail" aria-pressed="false" aria-label="Show Phase 1, Social Assessment" onclick="show('p1')" onkeydown="handlePhaseKey(event, 'p1')">
     <rect x="14" y="30" width="72" height="160" rx="6" fill="#E6F1FB" stroke="#85B7EB" stroke-width="1.5"/>
     <text x="50" y="72" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#0C447C">Phase 1</text>
     <text x="50" y="87" text-anchor="middle" font-family="Arial" font-size="10" fill="#185FA5">Social</text>
@@ -66,7 +72,7 @@
   </g>
 
   <!-- P2 Epidemiological -->
-  <g class="phase-box" onclick="show('p2')">
+  <g class="phase-box" role="button" tabindex="0" aria-controls="detail" aria-pressed="false" aria-label="Show Phase 2, Epidemiological Assessment" onclick="show('p2')" onkeydown="handlePhaseKey(event, 'p2')">
     <rect x="92" y="30" width="72" height="160" rx="6" fill="#E6F1FB" stroke="#85B7EB" stroke-width="1.5"/>
     <text x="128" y="72" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#0C447C">Phase 2</text>
     <text x="128" y="87" text-anchor="middle" font-family="Arial" font-size="10" fill="#185FA5">Epidemio-</text>
@@ -75,7 +81,7 @@
   </g>
 
   <!-- P3 Behavioral -->
-  <g class="phase-box" onclick="show('p3')">
+  <g class="phase-box" role="button" tabindex="0" aria-controls="detail" aria-pressed="false" aria-label="Show Phase 3, Behavioral and Environmental Assessment" onclick="show('p3')" onkeydown="handlePhaseKey(event, 'p3')">
     <rect x="170" y="30" width="72" height="160" rx="6" fill="#FAEEDA" stroke="#FAC775" stroke-width="1.5"/>
     <text x="206" y="65" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#633806">Phase 3</text>
     <text x="206" y="80" text-anchor="middle" font-family="Arial" font-size="10" fill="#854F0B">Behavioral</text>
@@ -85,7 +91,7 @@
   </g>
 
   <!-- P4 PER -->
-  <g class="phase-box" onclick="show('p4')">
+  <g class="phase-box" role="button" tabindex="0" aria-controls="detail" aria-pressed="false" aria-label="Show Phase 4, Educational and Ecological Assessment: the P E R factors" onclick="show('p4')" onkeydown="handlePhaseKey(event, 'p4')">
     <rect x="248" y="30" width="72" height="160" rx="6" fill="#FAECE7" stroke="#F0997B" stroke-width="1.5"/>
     <text x="284" y="65" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#712B13">Phase 4</text>
     <text x="284" y="80" text-anchor="middle" font-family="Arial" font-size="10" fill="#993C1D">Educational</text>
@@ -101,7 +107,7 @@
   <line x1="320" y1="110" x2="344" y2="110" stroke="#888" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
 
   <!-- P5 Implementation -->
-  <g class="phase-box" onclick="show('p5')">
+  <g class="phase-box" role="button" tabindex="0" aria-controls="detail" aria-pressed="false" aria-label="Show Phase 5, Implementation" onclick="show('p5')" onkeydown="handlePhaseKey(event, 'p5')">
     <rect x="352" y="30" width="70" height="160" rx="6" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="1.5"/>
     <text x="387" y="72" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#085041">Phase 5</text>
     <text x="387" y="87" text-anchor="middle" font-family="Arial" font-size="10" fill="#0F6E56">Implement-</text>
@@ -110,7 +116,7 @@
   </g>
 
   <!-- P6 Process -->
-  <g class="phase-box" onclick="show('p6')">
+  <g class="phase-box" role="button" tabindex="0" aria-controls="detail" aria-pressed="false" aria-label="Show Phase 6, Process Evaluation" onclick="show('p6')" onkeydown="handlePhaseKey(event, 'p6')">
     <rect x="428" y="30" width="70" height="160" rx="6" fill="#EAF3DE" stroke="#97C459" stroke-width="1.5"/>
     <text x="463" y="72" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#27500A">Phase 6</text>
     <text x="463" y="87" text-anchor="middle" font-family="Arial" font-size="10" fill="#3B6D11">Process</text>
@@ -119,7 +125,7 @@
   </g>
 
   <!-- P7 Impact -->
-  <g class="phase-box" onclick="show('p7')">
+  <g class="phase-box" role="button" tabindex="0" aria-controls="detail" aria-pressed="false" aria-label="Show Phase 7, Impact Evaluation" onclick="show('p7')" onkeydown="handlePhaseKey(event, 'p7')">
     <rect x="504" y="30" width="70" height="160" rx="6" fill="#EEEDFE" stroke="#AFA9EC" stroke-width="1.5"/>
     <text x="539" y="72" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#3C3489">Phase 7</text>
     <text x="539" y="87" text-anchor="middle" font-family="Arial" font-size="10" fill="#534AB7">Impact</text>
@@ -128,7 +134,7 @@
   </g>
 
   <!-- P8 Outcome -->
-  <g class="phase-box" onclick="show('p8')">
+  <g class="phase-box" role="button" tabindex="0" aria-controls="detail" aria-pressed="false" aria-label="Show Phase 8, Outcome Evaluation" onclick="show('p8')" onkeydown="handlePhaseKey(event, 'p8')">
     <rect x="580" y="30" width="70" height="160" rx="6" fill="#FBEAF0" stroke="#ED93B1" stroke-width="1.5"/>
     <text x="615" y="72" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#4B1528">Phase 8</text>
     <text x="615" y="87" text-anchor="middle" font-family="Arial" font-size="10" fill="#72243E">Outcome</text>
@@ -142,9 +148,10 @@
   <line x1="574" y1="110" x2="580" y2="110" stroke="#888" stroke-width="1.2" marker-end="url(#arr)"/>
 </svg>
 
-<p class="hint">Click any phase box above to see its definition, key question, and what it produces.</p>
+<p class="hint">Select any phase box above to see its definition, key question, and what it produces.</p>
 
-<div id="detail"></div>
+<div id="detail" role="region" aria-live="polite" tabindex="-1"></div>
+</main>
 
 <script>
 var data = {
@@ -190,13 +197,25 @@ var data = {
   }
 };
 
+function handlePhaseKey(event, id) {
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+  event.preventDefault();
+  show(id);
+}
+
 function show(id) {
   var ph = data[id];
   var d = document.getElementById('detail');
   d.style.display = 'block';
   d.style.borderColor = ph.border;
   d.style.background = ph.bg;
-  d.innerHTML = '<h3 style="color:' + ph.color + '">' + ph.title + '</h3>' + ph.body;
+  d.innerHTML = '<h2 id="detail-heading" style="color:' + ph.color + '">' + ph.title + '</h2>' + ph.body;
+  d.setAttribute('aria-labelledby', 'detail-heading');
+  document.querySelectorAll('.phase-box').forEach(function(box) {
+    box.setAttribute('aria-pressed', 'false');
+  });
+  var activeBox = document.querySelector(".phase-box[onclick=\"show('" + id + "')\"]");
+  if (activeBox) activeBox.setAttribute('aria-pressed', 'true');
   d.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 </script>
