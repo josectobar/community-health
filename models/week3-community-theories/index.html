@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community Level Theories – Interactive Widget</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #faf7f2; color: #1a1a2e; min-height: 100vh; }
+  header { background: linear-gradient(135deg, #c97d2e, #a05f18); color: #fff; padding: 28px 32px 22px; }
+  header h1 { font-size: 1.5rem; font-weight: 700; }
+  header p { margin-top: 6px; font-size: .95rem; opacity: .88; }
+  .skip-link { position: absolute; left: -9999px; top: 4px; background: #c97d2e; color: #fff; padding: 8px 16px; border-radius: 4px; font-weight: 700; z-index: 9999; text-decoration: none; }
+  .skip-link:focus { left: 8px; }
+  .tabs { display: flex; gap: 4px; padding: 16px 20px 0; background: #fff; border-bottom: 2px solid #f0e8dc; flex-wrap: wrap; }
+  .tab { padding: 10px 20px; border: 2px solid transparent; background: none; font-size: .92rem; font-weight: 600; color: #555; cursor: pointer; border-radius: 8px 8px 0 0; transition: background .2s, color .2s; }
+  .tab[aria-selected="true"] { background: #c97d2e; color: #fff; border-color: #c97d2e; }
+  .tab:hover:not([aria-selected="true"]) { background: #fef6ec; color: #c97d2e; }
+  .tab:focus-visible { outline: 3px solid #1a7a8a; outline-offset: 2px; }
+  .panel { display: none; padding: 28px 24px; }
+  .panel.active { display: block; }
+  .doi-curve-wrap { background: #fff; border-radius: 14px; padding: 20px; margin-bottom: 20px; border: 2px solid #f0e0c8; }
+  .adopter-segments { display: flex; gap: 2px; margin: 10px 0; border-radius: 10px; overflow: hidden; }
+  .adopter-seg { flex: 1; padding: 10px 6px; text-align: center; cursor: pointer; font-weight: 700; font-size: .78rem; border: 3px solid transparent; transition: filter .2s; }
+  .adopter-seg:hover { filter: brightness(1.1); }
+  .adopter-seg:focus-visible { outline: 3px solid #1a1a2e; outline-offset: 2px; }
+  .adopter-seg[aria-pressed="true"] { border-color: #1a1a2e; }
+  .adopter-seg.inn { background: #1a7a8a; color: #fff; flex: 0.5; }
+  .adopter-seg.ea { background: #2e7d5a; color: #fff; flex: 0.8; }
+  .adopter-seg.em { background: #c97d2e; color: #fff; flex: 1.5; }
+  .adopter-seg.lm { background: #8a5a2e; color: #fff; flex: 1.5; }
+  .adopter-seg.lag { background: #555; color: #fff; flex: 0.7; }
+  .seg-pct { font-size: .72rem; font-weight: 400; margin-top: 3px; }
+  .adopter-info { background: #fef6ec; border-radius: 10px; padding: 16px; border-left: 5px solid #c97d2e; min-height: 90px; margin-top: 12px; font-size: .88rem; line-height: 1.6; color: #333; }
+  .attributes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 16px; }
+  .attr-card { background: #fff; border: 2px solid #f0e0c8; border-radius: 10px; padding: 14px; cursor: pointer; transition: border-color .2s; }
+  .attr-card:hover, .attr-card[aria-pressed="true"] { border-color: #c97d2e; background: #fef6ec; }
+  .attr-card:focus-visible { outline: 3px solid #1a7a8a; outline-offset: 2px; }
+  .attr-card h4 { font-size: .9rem; font-weight: 700; color: #c97d2e; margin-bottom: 6px; }
+  .attr-card p { font-size: .82rem; color: #555; line-height: 1.5; }
+  .attr-detail { background: #fef6ec; border-radius: 10px; padding: 16px; margin-top: 14px; border-left: 5px solid #c97d2e; font-size: .88rem; line-height: 1.6; color: #333; }
+  .attr-detail[hidden] { display: none; }
+  .crm-slider-wrap { background: #fff; border-radius: 14px; padding: 22px; margin-bottom: 20px; border: 2px solid #d0d8ec; }
+  .stage-track { display: flex; gap: 3px; margin-bottom: 16px; flex-wrap: wrap; }
+  .stage-btn { flex: 1; min-width: 36px; padding: 10px 4px; border: 2px solid transparent; border-radius: 8px; font-size: .78rem; font-weight: 700; cursor: pointer; text-align: center; transition: all .2s; background: #f0f4fa; color: #2e5fa3; }
+  .stage-btn:hover { border-color: #2e5fa3; }
+  .stage-btn[aria-pressed="true"] { border-color: #2e5fa3; box-shadow: 0 2px 8px rgba(46,95,163,.25); background: #2e5fa3; color: #fff; }
+  .stage-btn:focus-visible { outline: 3px solid #c97d2e; outline-offset: 2px; }
+  .stage-detail { background: #eef3fa; border-radius: 10px; padding: 18px; border-left: 5px solid #2e5fa3; font-size: .88rem; line-height: 1.65; color: #1a1a2e; min-height: 120px; }
+  .scenario-opt { padding: 9px 16px; border: 2px solid #c0d0e8; background: #fff; border-radius: 24px; cursor: pointer; font-size: .88rem; font-weight: 600; transition: all .2s; }
+  .scenario-opt:hover:not(:disabled) { border-color: #2e5fa3; background: #eef3fa; }
+  .scenario-opt:focus-visible { outline: 3px solid #c97d2e; outline-offset: 2px; }
+  .scenario-opt.correct { background: #e6f4ee; border-color: #2e7d5a; color: #155724; }
+  .scenario-opt.wrong { background: #fdeaea; border-color: #b03a3a; color: #721c24; }
+  .feedback-msg { margin-top: 12px; font-size: .88rem; padding: 10px 14px; border-radius: 8px; }
+  .feedback-msg[hidden] { display: none; }
+  .feedback-msg.ok { background: #e6f4ee; color: #155724; border-left: 4px solid #2e7d5a; }
+  .feedback-msg.no { background: #fdeaea; color: #721c24; border-left: 4px solid #b03a3a; }
+  .quiz-q { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 16px; border: 2px solid #e8e0dc; }
+  .quiz-q h4 { font-size: .95rem; font-weight: 600; color: #1a1a2e; margin-bottom: 14px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { padding: 10px 16px; border: 2px solid #d0d8dc; border-radius: 8px; background: #fff; cursor: pointer; font-size: .88rem; text-align: left; transition: all .18s; }
+  .quiz-opt:hover:not(:disabled) { border-color: #c97d2e; background: #fef6ec; }
+  .quiz-opt:focus-visible { outline: 3px solid #1a7a8a; outline-offset: 2px; }
+  .quiz-opt[aria-pressed="true"] { border-color: #c97d2e; background: #fef6ec; }
+  .quiz-opt.correct { background: #e6f4ee; border-color: #2e7d5a; color: #155724; font-weight: 600; }
+  .quiz-opt.wrong { background: #fdeaea; border-color: #b03a3a; color: #721c24; }
+  .quiz-explanation { margin-top: 10px; font-size: .85rem; padding: 10px 14px; border-radius: 8px; background: #fef6ec; color: #444; border-left: 4px solid #c97d2e; }
+  .quiz-explanation[hidden] { display: none; }
+  .score-bar { background: #fff; border-radius: 12px; padding: 20px; text-align: center; border: 2px solid #c97d2e; margin-bottom: 20px; }
+  .score-bar[hidden] { display: none; }
+  .score-bar h3 { font-size: 1.3rem; color: #c97d2e; font-weight: 700; }
+  .btn-primary { padding: 10px 24px; background: #c97d2e; color: #fff; border: 2px solid #c97d2e; border-radius: 8px; font-size: .92rem; font-weight: 600; cursor: pointer; transition: background .2s; margin-top: 16px; }
+  .btn-primary:hover { background: #a05f18; border-color: #a05f18; }
+  .btn-primary:focus-visible { outline: 3px solid #1a7a8a; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<header>
+  <h1>Community Level Theories — Interactive Learning</h1>
+  <p>Apply and test your understanding of Diffusion of Innovations and the Community Readiness Model</p>
+</header>
+
+<div aria-live="polite" aria-atomic="true" id="live-announcer" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;"></div>
+
+<div class="tabs" role="tablist" aria-label="Theory sections" id="main-content">
+  <button class="tab" role="tab" aria-selected="true" aria-controls="tab-doi" id="btn-doi" onclick="switchTab('doi',this)">Diffusion of Innovations</button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-crm" id="btn-crm" onclick="switchTab('crm',this)">Community Readiness Model</button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-quiz" id="btn-quiz" onclick="switchTab('quiz',this)">Knowledge Check</button>
+</div>
+
+<!-- DOI Panel -->
+<div id="tab-doi" class="panel active" role="tabpanel" aria-labelledby="btn-doi">
+  <div class="doi-curve-wrap">
+    <h2 style="color:#c97d2e;font-size:1rem;margin-bottom:8px;" id="adopter-label">Adopter Categories — Select each group to explore</h2>
+    <p style="font-size:.83rem;color:#666;margin-bottom:10px;">The segments below represent the five adopter groups on the diffusion curve, ordered from earliest to latest adopters.</p>
+    <div class="adopter-segments" role="group" aria-labelledby="adopter-label">
+      <button class="adopter-seg inn" aria-pressed="false" onclick="showAdopter('inn',this)">Innovators<div class="seg-pct">2.5%</div></button>
+      <button class="adopter-seg ea" aria-pressed="false" onclick="showAdopter('ea',this)">Early Adopters<div class="seg-pct">13.5%</div></button>
+      <button class="adopter-seg em" aria-pressed="false" onclick="showAdopter('em',this)">Early Majority<div class="seg-pct">34%</div></button>
+      <button class="adopter-seg lm" aria-pressed="false" onclick="showAdopter('lm',this)">Late Majority<div class="seg-pct">34%</div></button>
+      <button class="adopter-seg lag" aria-pressed="false" onclick="showAdopter('lag',this)">Laggards<div class="seg-pct">16%</div></button>
+    </div>
+    <div class="adopter-info" id="adopter-info" role="region" aria-live="polite" aria-label="Adopter group details">
+      Select an adopter group above to explore their characteristics and the best strategy for reaching them.
+    </div>
+  </div>
+
+  <div style="margin-top:6px;margin-bottom:16px;">
+    <h2 style="color:#c97d2e;font-size:1rem;margin-bottom:8px;" id="attr-label">Innovation Attributes — What makes an innovation spread?</h2>
+    <p style="font-size:.87rem;color:#555;margin-bottom:12px;" id="attr-instructions">Select each attribute to learn why it matters and how it can be optimized in program design.</p>
+    <div class="attributes-grid" role="group" aria-labelledby="attr-label" aria-describedby="attr-instructions" id="attr-grid"></div>
+    <div class="attr-detail" id="attr-detail" role="region" aria-live="polite" aria-label="Attribute details" hidden></div>
+  </div>
+
+  <div style="background:#fff;border-radius:12px;padding:20px;border:2px dashed #c97d2e;">
+    <h3 style="color:#c97d2e;font-size:.95rem;font-weight:700;margin-bottom:12px;">Scenario: Applying Diffusion Strategy</h3>
+    <p style="font-size:.88rem;color:#444;line-height:1.6;margin-bottom:14px;">
+      A rural county health department introduces a free mobile mammography van. After 6 months, only a small group of highly health-engaged women — mostly healthcare professionals and health advocates — have used it. The broader community remains unaware or uninterested. What is the most strategic next step according to Diffusion of Innovations?
+    </p>
+    <p style="font-size:.88rem;font-weight:600;color:#555;" id="doi-sc-label">Choose the best next step:</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;" role="group" aria-labelledby="doi-sc-label" id="doi-sc-opts">
+      <button class="scenario-opt" aria-pressed="false" onclick="doiScenario(this,false)">Run a mass media campaign targeting all women equally</button>
+      <button class="scenario-opt" aria-pressed="false" onclick="doiScenario(this,false)">Stop the program — low uptake means the innovation is not viable</button>
+      <button class="scenario-opt" aria-pressed="false" onclick="doiScenario(this,true)">Identify and mobilize early adopters to share testimonials with their networks</button>
+      <button class="scenario-opt" aria-pressed="false" onclick="doiScenario(this,false)">Focus exclusively on laggards who have not used the service</button>
+    </div>
+    <div class="feedback-msg" id="doi-fb" role="status" hidden></div>
+  </div>
+</div>
+
+<!-- CRM Panel -->
+<div id="tab-crm" class="panel" role="tabpanel" aria-labelledby="btn-crm" hidden>
+  <div class="crm-slider-wrap">
+    <h2 style="color:#2e5fa3;font-size:1rem;margin-bottom:8px;" id="stage-label">Community Readiness Stages — Select a stage to explore</h2>
+    <p style="font-size:.83rem;color:#666;margin-bottom:12px;">Stages are numbered 1 through 9, from lowest to highest community readiness. Each stage requires a different type of intervention.</p>
+    <div class="stage-track" role="group" aria-labelledby="stage-label" id="stage-track"></div>
+    <div class="stage-detail" id="stage-detail" role="region" aria-live="polite" aria-label="Stage details">
+      Select a stage above to explore what it looks like in a community and which intervention strategy fits that level of readiness.
+    </div>
+  </div>
+
+  <div style="background:#fff;border-radius:12px;padding:20px;margin-bottom:20px;border:2px solid #d0d8ec;">
+    <h3 style="color:#2e5fa3;font-size:1rem;margin-bottom:12px;" id="crm-sort-label">Scenario Sorting: Match the Stage</h3>
+    <p style="font-size:.87rem;color:#555;margin-bottom:14px;">Read each community scenario and identify the most appropriate readiness stage.</p>
+    <div id="crm-scenarios-container" aria-describedby="crm-sort-label"></div>
+  </div>
+
+  <div style="background:#fff;border-radius:12px;padding:20px;border:2px dashed #2e5fa3;">
+    <h3 style="color:#2e5fa3;font-size:.95rem;font-weight:700;margin-bottom:12px;">Strategy Matching: What should you do?</h3>
+    <p style="font-size:.88rem;color:#444;line-height:1.6;margin-bottom:14px;">
+      A small town is at Stage 2 (Denial) regarding substance use among youth. Community leaders say: "That's a city problem — it does not happen here." Which strategy is most appropriate?
+    </p>
+    <p style="font-size:.88rem;font-weight:600;color:#555;" id="crm-sc-label">Choose the most appropriate strategy:</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;" role="group" aria-labelledby="crm-sc-label" id="crm-sc-opts">
+      <button class="scenario-opt" aria-pressed="false" onclick="crmScenario(this,false)">Launch a full youth substance use prevention program immediately</button>
+      <button class="scenario-opt" aria-pressed="false" onclick="crmScenario(this,true)">Present local data and personal stories from community members to raise awareness</button>
+      <button class="scenario-opt" aria-pressed="false" onclick="crmScenario(this,false)">Provide technical assistance for program implementation</button>
+      <button class="scenario-opt" aria-pressed="false" onclick="crmScenario(this,false)">Focus on program evaluation and expansion</button>
+    </div>
+    <div class="feedback-msg" id="crm-fb" role="status" hidden></div>
+  </div>
+</div>
+
+<!-- Quiz Panel -->
+<div id="tab-quiz" class="panel" role="tabpanel" aria-labelledby="btn-quiz" hidden>
+  <div class="score-bar" id="score-bar2" role="status" hidden></div>
+  <div id="quiz-container2"></div>
+  <button class="btn-primary" onclick="submitQuiz2()" id="quiz-btn2">Submit Answers</button>
+</div>
+
+<script>
+function announce(msg) {
+  const el = document.getElementById('live-announcer');
+  el.textContent = '';
+  setTimeout(() => { el.textContent = msg; }, 50);
+}
+function switchTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => { p.classList.remove('active'); p.hidden = true; });
+  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected','false'));
+  const panel = document.getElementById('tab-' + id);
+  panel.classList.add('active'); panel.hidden = false;
+  btn.setAttribute('aria-selected','true');
+  if (id === 'quiz') buildQuiz2();
+  announce('Showing ' + btn.textContent.trim() + ' section');
+}
+
+// DOI Adopters
+const adopters = {
+  inn: { name: "Innovators (2.5%)", chars: "Risk-tolerant and highly educated. Often socially peripheral to the mainstream but with wide external networks. They try new things because they are new, not because of social norms.", strategy: "Do not build your campaign around innovators alone — they are not representative of your target population. Use their early adoption as evidence that the innovation is viable. Connect them to Early Adopters who can translate their experience into credible peer influence.", example: "Healthcare professionals and health coaches who immediately signed up for the mobile mammography van." },
+  ea: { name: "Early Adopters (13.5%)", chars: "The most strategically important group. Well-integrated, respected, and opinion leaders. They adopt after thoughtful consideration, not recklessly. Their endorsement is the social proof that moves the Early Majority.", strategy: "Invest here. Identify them through community networks, engage them early, train them as peer champions, and make their adoption visible. Their testimonials and visible behavior change will pull in the Early Majority.", example: "Beloved community leaders, active church members, teachers, or trusted neighbors who adopt and visibly recommend the behavior." },
+  em: { name: "Early Majority (34%)", chars: "Deliberate and practical. They will adopt, but only after seeing enough social proof. They watch Early Adopters closely. Reaching this group tips the curve — once Early Majority adopts, the behavior becomes mainstream.", strategy: "Once Early Adopters are engaged, shift messaging to show how many people are already participating. Address practical concerns about convenience, cost, and logistics.", example: "Residents who waited to see if the mammography van was legitimate before booking after several friends recommended it." },
+  lm: { name: "Late Majority (34%)", chars: "Skeptical and risk-averse. They adopt primarily because of social pressure, not personal conviction. They may need the behavior to be nearly universal before participating.", strategy: "Rely on social norms. Remove all possible barriers — make adoption the path of least resistance. By this stage, peer pressure from the Early and Late Majority combined drives adoption.", example: "Women who finally book a mammogram because their social circle has normalized it and scheduling is fully automated." },
+  lag: { name: "Laggards (16%)", chars: "Tradition-bound and highly resistant to change. They may adopt only when the old way is no longer available. Some will never adopt.", strategy: "Carefully evaluate the cost-benefit of targeting laggards. For essential health behaviors, policy-level mandates or access design may be more effective than persuasion campaigns.", example: "Community members who remain resistant despite widespread adoption — may require structural nudges rather than education." }
+};
+
+function showAdopter(key, btn) {
+  document.querySelectorAll('.adopter-seg').forEach(b => b.setAttribute('aria-pressed','false'));
+  btn.setAttribute('aria-pressed','true');
+  const a = adopters[key];
+  const text = `${a.name}. Characteristics: ${a.chars} Strategic approach: ${a.strategy} Example: ${a.example}`;
+  document.getElementById('adopter-info').innerHTML = `<strong>${a.name}</strong><br><br><strong>Characteristics:</strong> ${a.chars}<br><br><strong>Strategic approach:</strong> ${a.strategy}<br><br><em>Example: ${a.example}</em>`;
+  announce(a.name + ' selected. ' + a.chars);
+}
+
+// DOI Attributes
+const attributes = [
+  { name: "Relative Advantage", brief: "Is it better than what it replaces?", detail: "The greater the perceived benefit over the current practice, the faster adoption. Advantages can be economic, social, practical, or health-based. Design tip: Make the advantage concrete and personally relevant." },
+  { name: "Compatibility", brief: "Does it fit existing values and habits?", detail: "Innovations compatible with existing values, past experiences, and community norms are adopted faster. Design tip: Frame the innovation in terms of values already present in the community." },
+  { name: "Complexity", brief: "Is it easy to understand and use?", detail: "Lower complexity means faster adoption. Even highly beneficial innovations fail if they are too complicated. Design tip: Simplify step by step. If trained staff is required, build that infrastructure." },
+  { name: "Trialability", brief: "Can people try it before committing?", detail: "When people can experiment with an innovation on a limited basis, uncertainty decreases and adoption increases. Design tip: Offer free trials, pilot classes, or sample sessions." },
+  { name: "Observability", brief: "Can others see the results?", detail: "Visible results are powerful social proof. If people can see positive outcomes in people they know and trust, adoption accelerates. Design tip: Make adoption visible through community boards, social media stories, or public recognition." },
+];
+
+const grid = document.getElementById('attr-grid');
+attributes.forEach((a, i) => {
+  const card = document.createElement('button');
+  card.className = 'attr-card';
+  card.setAttribute('aria-pressed','false');
+  card.innerHTML = `<h4>${a.name}</h4><p>${a.brief}</p>`;
+  card.onclick = () => {
+    document.querySelectorAll('.attr-card').forEach(c => c.setAttribute('aria-pressed','false'));
+    card.setAttribute('aria-pressed','true');
+    const det = document.getElementById('attr-detail');
+    det.innerHTML = `<strong>${a.name}:</strong> ${a.detail}`;
+    det.hidden = false;
+    announce(a.name + ' selected. ' + a.detail);
+  };
+  grid.appendChild(card);
+});
+
+function doiScenario(btn, correct) {
+  document.querySelectorAll('#doi-sc-opts .scenario-opt').forEach(o => { o.disabled = true; o.setAttribute('aria-pressed','false'); });
+  btn.setAttribute('aria-pressed','true');
+  const fb = document.getElementById('doi-fb');
+  fb.hidden = false;
+  let msg, cls;
+  if (correct) {
+    btn.classList.add('correct'); cls = 'ok';
+    msg = 'Correct! The current users are likely Innovators or Early Adopters. The DOI strategy is to mobilize these trusted community figures to share testimonials with the Early Majority. Peer endorsement from credible early adopters is the engine of mainstream adoption.';
+  } else {
+    btn.classList.add('wrong'); cls = 'no';
+    msg = 'Not the best choice. According to DOI, the critical leverage point is engaging Early Adopters — respected community members who can model and vouch for the innovation to the Early Majority. Mass media reaches everyone but persuades few; early low uptake is normal on the diffusion curve.';
+  }
+  fb.className = 'feedback-msg ' + cls;
+  fb.textContent = msg;
+  announce(msg);
+}
+
+// CRM Stages
+const stages = [
+  { num: 1, name: "No Awareness", desc: "The community does not recognize this issue as a local problem. No programs or conversations exist.", strategy: "Education and outreach first. Introduce basic awareness through community events and one-on-one conversations." },
+  { num: 2, name: "Denial", desc: "Community members may acknowledge the issue exists nationally but believe it does not apply locally. There is active resistance.", strategy: "Present local data. Use local statistics and personal stories from community members to make the issue real and local." },
+  { num: 3, name: "Vague Awareness", desc: "Community members are beginning to recognize the problem exists locally, but do not see it as a priority. Attitudes are passive.", strategy: "Build concern through dialogue. Facilitate community conversations and begin identifying champions who care about this issue." },
+  { num: 4, name: "Preplanning", desc: "Community acknowledges there is a problem and something should be done, but has no clear action plan. Small groups may be meeting informally.", strategy: "Support planning conversations. Help the community explore what other communities have done and facilitate workgroup formation." },
+  { num: 5, name: "Preparation", desc: "Active planning is underway. A core group is working on a plan and reviewing resources.", strategy: "Provide technical assistance. Help formalize the action plan, connect to evidence-based programs, and assist with funding." },
+  { num: 6, name: "Initiation", desc: "A program has just launched. Staff are new, systems are forming, community awareness is limited. Enthusiasm is high but sustainability is fragile.", strategy: "Implementation support. Provide training, ongoing technical assistance, and early data collection." },
+  { num: 7, name: "Stabilization", desc: "The program is running steadily. Staff are experienced, community members are aware, and the program is delivering services.", strategy: "Sustainability planning. Diversify funding, document processes, collect outcome data, and begin evaluating effectiveness." },
+  { num: 8, name: "Confirmation and Expansion", desc: "The community uses evaluation data to improve and expand the program. Leaders actively advocate for the issue.", strategy: "Scale and replicate. Support data-driven expansion and help the community document what works to share with others." },
+  { num: 9, name: "High Level of Community Ownership", desc: "The health issue is now integral to the community's identity. The community is innovative, self-sustaining, and trains other communities.", strategy: "Sustain and learn from them. This community can now serve as a model for others." }
+];
+
+const track = document.getElementById('stage-track');
+stages.forEach(s => {
+  const btn = document.createElement('button');
+  btn.className = 'stage-btn';
+  btn.setAttribute('aria-pressed','false');
+  btn.textContent = s.num;
+  btn.setAttribute('aria-label', `Stage ${s.num}: ${s.name}`);
+  btn.title = s.name;
+  btn.onclick = () => {
+    document.querySelectorAll('.stage-btn').forEach(b => b.setAttribute('aria-pressed','false'));
+    btn.setAttribute('aria-pressed','true');
+    const detail = document.getElementById('stage-detail');
+    detail.innerHTML = `<strong>Stage ${s.num}: ${s.name}</strong><br><br><strong>What this looks like:</strong> ${s.desc}<br><br><strong>Recommended strategy:</strong> ${s.strategy}`;
+    announce(`Stage ${s.num}, ${s.name}. ${s.desc}`);
+  };
+  track.appendChild(btn);
+});
+
+// CRM Scenario sorting
+const crmScenarios = [
+  { text: "Residents say 'Everyone knows vaping is a youth problem here — there is already a task force meeting next month, and we need to figure out which program to choose.'", correctStage: 5, correctName: "Stage 5: Preparation" },
+  { text: "When asked about opioid use, the mayor says: 'We know there is a national crisis, but honestly our community is pretty protected. We have not heard much about it locally.'", correctStage: 2, correctName: "Stage 2: Denial" },
+  { text: "A free diabetes prevention program has been running for two years with a stable team, solid enrollment, and is now beginning to collect and analyze outcome data.", correctStage: 7, correctName: "Stage 7: Stabilization" },
+  { text: "Several residents recently started talking about high rates of teen depression after a local news story. 'Yes, it is a problem, but I do not even know where you would begin.'", correctStage: 3, correctName: "Stage 3: Vague Awareness" },
+];
+
+function buildCRMScenarios() {
+  const container = document.getElementById('crm-scenarios-container');
+  container.innerHTML = '';
+  crmScenarios.forEach((sc, i) => {
+    const fieldset = document.createElement('fieldset');
+    fieldset.style.cssText = 'background:#f8f8f8;border:2px solid #e0e8ec;border-radius:10px;padding:14px;margin-bottom:12px;';
+    const stageOpts = [2, 3, 5, 7].map(n => {
+      const s = stages[n - 1];
+      return `<button class="scenario-opt" style="color:#2e5fa3;" aria-pressed="false" onclick="pickCRMStage(${i},${n},this)">Stage ${n}: ${s.name}</button>`;
+    }).join('');
+    fieldset.innerHTML = `
+      <legend style="font-size:.88rem;color:#333;line-height:1.55;padding:0 4px;font-weight:400;">${i+1}. ${sc.text}</legend>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;" role="group" aria-label="Select the readiness stage">${stageOpts}</div>
+      <div class="feedback-msg" id="crm-sc-fb-${i}" role="status" hidden></div>`;
+    container.appendChild(fieldset);
+  });
+}
+
+function pickCRMStage(i, stageNum, btn) {
+  const sc = crmScenarios[i];
+  btn.closest('[role="group"]').querySelectorAll('.scenario-opt').forEach(o => { o.disabled = true; o.setAttribute('aria-pressed','false'); });
+  btn.setAttribute('aria-pressed','true');
+  const fb = document.getElementById(`crm-sc-fb-${i}`);
+  fb.hidden = false;
+  let msg, cls;
+  if (stageNum === sc.correctStage) {
+    btn.classList.add('correct'); cls = 'ok';
+    msg = 'Correct — ' + sc.correctName + '.';
+  } else {
+    btn.classList.add('wrong'); cls = 'no';
+    msg = 'Incorrect. The correct answer is ' + sc.correctName + '.';
+  }
+  fb.className = 'feedback-msg ' + cls;
+  fb.textContent = msg;
+  announce(msg);
+}
+
+function crmScenario(btn, correct) {
+  document.querySelectorAll('#crm-sc-opts .scenario-opt').forEach(o => { o.disabled = true; o.setAttribute('aria-pressed','false'); });
+  btn.setAttribute('aria-pressed','true');
+  const fb = document.getElementById('crm-fb');
+  fb.hidden = false;
+  let msg, cls;
+  if (correct) {
+    btn.classList.add('correct'); cls = 'ok';
+    msg = 'Correct! At Stage 2 (Denial), the community does not believe the issue applies to them. Present local data and personal stories before launching any program. A program launched at this stage would fail because there is no community will to support it.';
+  } else {
+    btn.classList.add('wrong'); cls = 'no';
+    msg = 'Not the right fit for Stage 2. A community in Denial first needs to accept that the problem is local before any program can succeed. The work now is to raise awareness with local evidence.';
+  }
+  fb.className = 'feedback-msg ' + cls;
+  fb.textContent = msg;
+  announce(msg);
+}
+
+// Quiz 2
+const questions2 = [
+  { q: "Rogers' Diffusion of Innovations theory identifies five attributes that predict adoption speed. Which attribute asks 'Can I try this before fully committing?'", opts: ["Relative Advantage", "Compatibility", "Observability", "Trialability"], correct: 3, explain: "Trialability — the ability to experiment with an innovation on a limited basis before committing — reduces perceived risk and significantly accelerates adoption." },
+  { q: "A public health campaign uses peer champion videos of respected community members endorsing free HIV testing. This strategy primarily targets which adopter category to move them toward adoption?", opts: ["Laggards", "Innovators", "Early Majority", "Early Adopters"], correct: 2, explain: "While peer champions are Early Adopters, the strategy of using their visible endorsement is designed to move the Early Majority — the large practical group who wait for social proof before adopting." },
+  { q: "According to Diffusion of Innovations, which channel is most effective for changing attitudes and moving people from awareness to adoption?", opts: ["Mass media such as TV, radio, and social media", "Interpersonal channels — person-to-person communication", "Medical journals and research publications", "Government mandates"], correct: 1, explain: "While mass media is effective for creating knowledge and awareness, Rogers found that interpersonal channels are far more effective for attitude change and actual adoption of a behavior." },
+  { q: "A Community Readiness Model assessment shows a community is at Stage 4 (Preplanning). What does this mean?", opts: ["The community denies the problem exists locally", "A program has just launched and needs implementation support", "The community acknowledges the problem and wants to act, but has no clear plan yet", "The community is using outcome data to expand its program"], correct: 2, explain: "Stage 4 (Preplanning) means the community recognizes the problem and wants to do something, but has not yet developed a concrete action plan. Workgroups may be forming informally." },
+  { q: "A health educator conducts Community Readiness Model interviews before designing a nutrition program. What is the primary purpose of doing this first?", opts: ["CRM interviews are required by all federal grant programs", "To determine whether the community's readiness level matches the planned intervention", "CRM is only used in rural communities", "To identify Innovators who will adopt the program first"], correct: 1, explain: "The core premise of CRM is that interventions must match the community's current readiness. An intervention designed for Stage 6 will fail in a Stage 2 community. Assessment before design prevents wasted resources." },
+  { q: "Which of the following best illustrates the Observability attribute in Diffusion of Innovations?", opts: ["Making a new diabetes app free for the first month", "Simplifying the signup process from 10 steps to 2", "Creating a public community board where people post their walking progress", "Framing a new behavior in terms of existing cultural values"], correct: 2, explain: "Observability is about making the results of adoption visible to others. A public progress board allows community members to see that their peers are participating and succeeding — this social proof accelerates adoption." },
+];
+
+let quiz2Built = false;
+function buildQuiz2() {
+  if (quiz2Built) return;
+  quiz2Built = true;
+  const container = document.getElementById('quiz-container2');
+  questions2.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'quiz-q';
+    div.innerHTML = `<h4 id="q2-label-${i}">${i+1}. ${q.q}</h4>
+      <div class="quiz-options" role="group" aria-labelledby="q2-label-${i}">
+        ${q.opts.map((o,j) => `<button class="quiz-opt" data-q="${i}" data-idx="${j}" aria-pressed="false" onclick="selectQ2(this)">${o}</button>`).join('')}
+      </div>
+      <div class="quiz-explanation" id="qe2-${i}" hidden>${q.explain}</div>`;
+    container.appendChild(div);
+  });
+}
+
+function selectQ2(btn) {
+  const qi = btn.dataset.q;
+  document.querySelectorAll(`[data-q="${qi}"]`).forEach(b => { b.setAttribute('aria-pressed','false'); b.style.borderColor=''; b.style.background=''; delete b.dataset.selected; });
+  btn.setAttribute('aria-pressed','true');
+  btn.style.borderColor = '#c97d2e'; btn.style.background = '#fef6ec';
+  btn.dataset.selected = 'true';
+}
+
+function submitQuiz2() {
+  let score = 0, answered = 0;
+  questions2.forEach((q, i) => {
+    const sel = document.querySelector(`[data-q="${i}"][data-selected="true"]`);
+    if (!sel) return;
+    answered++;
+    document.querySelectorAll(`[data-q="${i}"]`).forEach(b => b.disabled = true);
+    if (parseInt(sel.dataset.idx) === q.correct) { sel.classList.add('correct'); score++; }
+    else { sel.classList.add('wrong'); document.querySelector(`[data-q="${i}"][data-idx="${q.correct}"]`).classList.add('correct'); }
+    document.getElementById(`qe2-${i}`).hidden = false;
+  });
+  if (answered < questions2.length) { alert('Please answer all questions before submitting.'); return; }
+  const bar = document.getElementById('score-bar2');
+  bar.hidden = false;
+  const msg = score === questions2.length ? 'Excellent! You have a strong grasp of both community-level theories.' : score >= 4 ? 'Good work! Review the explanations for any missed questions.' : 'Keep reviewing — explore the interactive sections and try again.';
+  bar.innerHTML = `<h3>Score: ${score} out of ${questions2.length}</h3><p>${msg}</p>`;
+  announce(`Quiz submitted. Score: ${score} out of ${questions2.length}. ${msg}`);
+  const qbtn = document.getElementById('quiz-btn2'); qbtn.textContent = 'Try Again'; qbtn.onclick = resetQuiz2;
+  bar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resetQuiz2() {
+  quiz2Built = false;
+  document.getElementById('quiz-container2').innerHTML = '';
+  document.getElementById('score-bar2').hidden = true;
+  const qbtn = document.getElementById('quiz-btn2'); qbtn.textContent = 'Submit Answers'; qbtn.onclick = submitQuiz2;
+  buildQuiz2();
+  announce('Quiz has been reset.');
+}
+
+buildCRMScenarios();
+</script>
+</body>
+</html>

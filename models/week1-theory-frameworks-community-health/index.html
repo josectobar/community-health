@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page 3: Theory & Frameworks in Community Health Practice</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f8f7f4;
+    color: #1a1a1a;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .header {
+    background: #3a1e5f;
+    color: #fff;
+    padding: 20px 24px 16px;
+    border-bottom: 3px solid #8a5cd9;
+  }
+  .header-eyebrow { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #c0a8f0; margin-bottom: 4px; }
+  .header-title { font-size: 20px; font-weight: 600; }
+  .tab-bar { display: flex; background: #fff; border-bottom: 1px solid #e0ddd6; overflow-x: auto; scrollbar-width: none; }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab { flex-shrink: 0; padding: 12px 18px; font-size: 13px; font-weight: 500; color: #6b6b6b; background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
+  .tab:hover { color: #3a1e5f; }
+  .tab.active { color: #3a1e5f; border-bottom-color: #8a5cd9; }
+  .content { padding: 20px 24px; max-width: 760px; }
+  .section { display: none; }
+  .section.visible { display: block; }
+  .card { background: #fff; border: 1px solid #e0ddd6; border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .card-intro { font-size: 14px; color: #444; margin-bottom: 14px; }
+  .hf-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); gap: 10px; margin-bottom: 12px; }
+  .hf-cell { background: #f5f3fb; border: 1px solid #ddd8f5; border-radius: 8px; padding: 14px; cursor: pointer; transition: all 0.15s; }
+  .hf-cell:hover { border-color: #8a5cd9; background: #ede9fb; }
+  .hf-cell.active { border-color: #8a5cd9; background: #ede9fb; outline: 2px solid #8a5cd9; }
+  .hf-label { font-size: 13px; font-weight: 600; color: #3a1e5f; margin-bottom: 4px; }
+  .hf-sub { font-size: 12px; color: #666; }
+  .hf-hint { font-size: 12px; color: #8a5cd9; margin-top: 6px; }
+  .hf-detail { font-size: 14px; color: #333; padding: 12px 16px; background: #f5f3fb; border: 1px solid #ddd8f5; border-radius: 8px; margin-top: 4px; line-height: 1.6; display: none; }
+  .hf-detail.show { display: block; }
+  .hf-detail strong { color: #3a1e5f; }
+  .callout-purple { background: #f0ecff; border-radius: 8px; padding: 12px 16px; font-size: 14px; color: #3a1e5f; margin-top: 4px; }
+  .prev-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid #f0ede8; }
+  .prev-item:last-child { border-bottom: none; }
+  .prev-badge { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 10px; border-radius: 99px; min-width: 80px; text-align: center; flex-shrink: 0; }
+  .prev-badge.primary { background: #edf7f2; color: #1a5c35; }
+  .prev-badge.secondary { background: #eef3fb; color: #1e3a5f; }
+  .prev-badge.tertiary { background: #fef0ed; color: #8a2a14; }
+  .prev-text { font-size: 14px; color: #1a1a1a; line-height: 1.5; }
+  .prev-examples { font-size: 13px; color: #666; margin-top: 3px; }
+  .gm-step { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #f0ede8; }
+  .gm-step:last-child { border-bottom: none; }
+  .gm-num { min-width: 30px; height: 30px; border-radius: 50%; background: #3a1e5f; color: #fff; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .gm-num.highlight { background: #8a5cd9; }
+  .gm-label { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
+  .gm-desc { font-size: 13px; color: #555; }
+  .gm-note { font-size: 12px; background: #f5f3fb; color: #3a1e5f; padding: 4px 10px; border-radius: 6px; display: inline-block; margin-top: 4px; }
+  .match-pool { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 14px; }
+  .chip { padding: 7px 14px; font-size: 13px; border: 1px solid #c8c4bc; border-radius: 99px; background: #fff; color: #1a1a1a; cursor: pointer; user-select: none; transition: all 0.15s; }
+  .chip:hover { background: #f5f3fb; border-color: #8a5cd9; }
+  .chip.selected { background: #ede9fb; border-color: #8a5cd9; color: #3a1e5f; outline: 2px solid #8a5cd9; }
+  .chip.placed { opacity: 0.35; pointer-events: none; }
+  .match-rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+  .match-row { display: flex; gap: 10px; align-items: flex-start; }
+  .match-scenario { font-size: 13px; color: #555; line-height: 1.4; flex: 1 1 55%; }
+  .match-slot { flex: 1 1 40%; min-height: 36px; padding: 7px 12px; border: 2px dashed #c8c4bc; border-radius: 8px; font-size: 13px; color: #aaa; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; }
+  .match-slot:hover { border-color: #8a5cd9; }
+  .match-slot.filled { border-style: solid; border-color: #c8c4bc; color: #1a1a1a; background: #f8f7f4; }
+  .match-slot.correct { border-color: #3aaa72; background: #edf7f2; color: #1a5c35; border-style: solid; }
+  .match-slot.wrong { border-color: #e05a3a; background: #fef0ed; color: #8a2a14; border-style: solid; }
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .check-btn { padding: 9px 22px; font-size: 14px; background: #3a1e5f; color: #fff; border: none; border-radius: 8px; cursor: pointer; transition: background 0.15s; }
+  .check-btn:hover { background: #52307a; }
+  .reset-btn { padding: 9px 22px; font-size: 14px; background: transparent; color: #666; border: 1px solid #c8c4bc; border-radius: 8px; cursor: pointer; }
+  .result { font-size: 14px; padding: 10px 14px; border-radius: 8px; margin-top: 10px; display: none; line-height: 1.5; }
+  .result.show { display: block; }
+  .result.ok { background: #edf7f2; color: #1a5c35; border-left: 3px solid #3aaa72; }
+  .result.err { background: #fef0ed; color: #8a2a14; border-left: 3px solid #e05a3a; }
+  .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: #888; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <p class="header-eyebrow">Module 1 · Page 3</p>
+  <h1 class="header-title">Using Theory & Frameworks in Community Health Practice</h1>
+</div>
+
+<div class="tab-bar" role="tablist">
+  <button class="tab active" role="tab" onclick="show('hfc', this)">Health Field Concept</button>
+  <button class="tab" role="tab" onclick="show('prev', this)">Levels of prevention</button>
+  <button class="tab" role="tab" onclick="show('gm', this)">Generalized Model</button>
+  <button class="tab" role="tab" onclick="show('match', this)">Match the example</button>
+</div>
+
+<div class="content">
+
+  <!-- HEALTH FIELD CONCEPT -->
+  <div id="s-hfc" class="section visible">
+    <div class="card">
+      <p class="card-intro">The Health Field Concept (Lalonde, 1974) proposes that health is shaped by four broad categories of factors. Click each field to explore it with a real-world example.</p>
+      <div class="hf-grid">
+        <div class="hf-cell" onclick="selectField(this, 'bio')">
+          <p class="hf-label">Human biology</p>
+          <p class="hf-sub">Genetics, age, physiology</p>
+          <p class="hf-hint">Click to explore →</p>
+        </div>
+        <div class="hf-cell" onclick="selectField(this, 'env')">
+          <p class="hf-label">Environment</p>
+          <p class="hf-sub">Physical, social, economic</p>
+          <p class="hf-hint">Click to explore →</p>
+        </div>
+        <div class="hf-cell" onclick="selectField(this, 'life')">
+          <p class="hf-label">Lifestyle</p>
+          <p class="hf-sub">Individual behaviors & choices</p>
+          <p class="hf-hint">Click to explore →</p>
+        </div>
+        <div class="hf-cell" onclick="selectField(this, 'hco')">
+          <p class="hf-label">Health care organization</p>
+          <p class="hf-sub">Access & quality of care</p>
+          <p class="hf-hint">Click to explore →</p>
+        </div>
+      </div>
+      <div id="hf-detail" class="hf-detail"></div>
+    </div>
+    <div class="callout-purple">
+      This framework was groundbreaking because it challenged the idea that health is determined primarily by medical care or individual behavior. It drew attention to the social and environmental forces that shape health long before a person ever enters a clinic.
+    </div>
+  </div>
+
+  <!-- LEVELS OF PREVENTION -->
+  <div id="s-prev" class="section">
+    <div class="card">
+      <p class="card-intro">Three levels of prevention describe different points at which health education specialists can intervene. Identifying which level your approach targets adds precision and professional depth to your reasoning.</p>
+      <div>
+        <div class="prev-item">
+          <span class="prev-badge primary">Primary</span>
+          <div>
+            <p class="prev-text">Stopping a health problem before it occurs.</p>
+            <p class="prev-examples">Examples: vaccination programs, health education campaigns, community fitness initiatives</p>
+          </div>
+        </div>
+        <div class="prev-item">
+          <span class="prev-badge secondary">Secondary</span>
+          <div>
+            <p class="prev-text">Early detection and intervention to reduce the impact of a problem that has already begun.</p>
+            <p class="prev-examples">Examples: screenings, early diagnosis, risk-reduction programs</p>
+          </div>
+        </div>
+        <div class="prev-item">
+          <span class="prev-badge tertiary">Tertiary</span>
+          <div>
+            <p class="prev-text">Managing and minimizing the effects of an existing condition to prevent further decline.</p>
+            <p class="prev-examples">Examples: chronic disease management programs, rehabilitation, support groups</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <p class="section-label">Quick test yourself</p>
+      <p style="font-size:14px; color:#333;">When you identify stakeholders, community assets, or program strategies in your discussion post, think about which level of prevention your approach targets — and say so. This shows professional precision in your reasoning.</p>
+    </div>
+  </div>
+
+  <!-- GENERALIZED MODEL -->
+  <div id="s-gm" class="section">
+    <div class="card">
+      <p class="card-intro">The Generalized Model is a step-by-step framework for designing health education programs. The community needs assessment lives in the <strong>first two phases</strong> — and what you learn there shapes every decision that follows.</p>
+      <div>
+        <div class="gm-step">
+          <div class="gm-num highlight">1</div>
+          <div>
+            <p class="gm-label">Pre-planning & pre-assessment</p>
+            <p class="gm-desc">Understanding the community before anything is designed — SDOH, asset mapping, cultural context, stakeholder relationships.</p>
+            <span class="gm-note">← Needs assessment begins here</span>
+          </div>
+        </div>
+        <div class="gm-step">
+          <div class="gm-num highlight">2</div>
+          <div>
+            <p class="gm-label">Needs assessment</p>
+            <p class="gm-desc">Systematically identifying the community's health needs, gaps, and priorities through data and community input.</p>
+            <span class="gm-note">← Needs assessment ends here</span>
+          </div>
+        </div>
+        <div class="gm-step">
+          <div class="gm-num">3</div>
+          <div>
+            <p class="gm-label">Goals & objectives</p>
+            <p class="gm-desc">Defining what the program will accomplish, directly grounded in what the assessment revealed.</p>
+          </div>
+        </div>
+        <div class="gm-step">
+          <div class="gm-num">4</div>
+          <div>
+            <p class="gm-label">Developing the intervention</p>
+            <p class="gm-desc">Designing the actual program activities, tailored to the community's context and needs.</p>
+          </div>
+        </div>
+        <div class="gm-step">
+          <div class="gm-num">5</div>
+          <div>
+            <p class="gm-label">Implementation</p>
+            <p class="gm-desc">Delivering the program to the priority population.</p>
+          </div>
+        </div>
+        <div class="gm-step">
+          <div class="gm-num">6</div>
+          <div>
+            <p class="gm-label">Evaluation</p>
+            <p class="gm-desc">Measuring whether the program worked and identifying what to improve for next time.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MATCHING ACTIVITY -->
+  <div id="s-match" class="section">
+    <div class="card">
+      <p class="card-intro">Match each scenario to the correct framework or concept. Click a <em>concept chip</em> to select it, then click the slot next to the matching scenario. Click a placed chip to return it to the pool.</p>
+      <div class="match-pool" id="match-pool"></div>
+      <div class="match-rows" id="match-rows"></div>
+      <div class="btn-row">
+        <button class="check-btn" onclick="checkMatch()">Check answers</button>
+        <button class="reset-btn" onclick="resetMatch()">Reset</button>
+      </div>
+      <div id="match-result" class="result"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+  document.getElementById('s-' + id).classList.add('visible');
+  btn.classList.add('active'); btn.setAttribute('aria-selected','true');
+}
+
+// HFC
+const hfData = {
+  bio: { title: 'Human biology', body: 'Genetics, age, sex, and physiological processes. <strong>Example:</strong> A genetic predisposition to Type 2 diabetes. This field reminds us that not all health risks are behaviorally driven — some are rooted in biology that individuals did not choose.' },
+  env: { title: 'Environment', body: 'Physical surroundings (air quality, water safety), social conditions (neighborhood safety), and economic context (employment, poverty). <strong>Example:</strong> A food desert that makes healthy eating nearly impossible regardless of a person\'s motivation or knowledge.' },
+  life: { title: 'Lifestyle', body: 'Individual behaviors and choices — diet, physical activity, tobacco use, alcohol consumption. <strong>Example:</strong> Sedentary behavior contributing to cardiovascular disease risk. This is the field most often targeted by health education programs, but it doesn\'t operate in isolation from the other three.' },
+  hco: { title: 'Health care organization', body: 'The availability, accessibility, and quality of health services. <strong>Example:</strong> A rural community where the nearest clinic is 40 miles away, or where patients face long wait times and limited access to specialists.' }
+};
+
+function selectField(el, id) {
+  document.querySelectorAll('.hf-cell').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  const d = hfData[id];
+  const det = document.getElementById('hf-detail');
+  det.innerHTML = '<strong>' + d.title + ':</strong> ' + d.body;
+  det.classList.add('show');
+}
+
+// MATCHING
+const matchData = [
+  { sc: 'A county health department offers free mammograms at a community center.', correct: 'Secondary prevention', fb: 'Mammography is early detection — screening for a problem that may have begun but hasn\'t caused symptoms. That\'s secondary prevention.' },
+  { sc: 'A diabetes management support group meets weekly at a local church.', correct: 'Tertiary prevention', fb: 'Managing an existing condition to prevent further decline is tertiary prevention.' },
+  { sc: 'A school offers an after-school fitness program to prevent childhood obesity.', correct: 'Primary prevention', fb: 'Stopping a problem before it starts is the defining feature of primary prevention.' },
+  { sc: 'A program planner reviews demographic data and interviews residents before designing any interventions.', correct: 'Pre-planning phase', fb: 'Understanding the community before designing anything is the pre-planning phase of the Generalized Model.' },
+  { sc: 'A high diabetes rate in a neighborhood is partly explained by food deserts, economic hardship, and limited clinic access.', correct: 'Health Field Concept', fb: 'The Health Field Concept gives language to explain that health problems have multidimensional causes — not just individual lifestyle choices.' },
+];
+
+const answers = ['Primary prevention','Secondary prevention','Tertiary prevention','Pre-planning phase','Health Field Concept'];
+let selMatch = null, matchPlaced = {};
+
+function initMatch() {
+  const pool = document.getElementById('match-pool');
+  pool.innerHTML = '';
+  answers.forEach(a => {
+    const c = document.createElement('button');
+    c.className = 'chip'; c.textContent = a; c.dataset.val = a;
+    c.onclick = () => {
+      document.querySelectorAll('#match-pool .chip').forEach(ch => ch.classList.remove('selected'));
+      selMatch = a; c.classList.add('selected');
+    };
+    pool.appendChild(c);
+  });
+
+  const rows = document.getElementById('match-rows');
+  rows.innerHTML = '';
+  matchData.forEach((m, i) => {
+    const row = document.createElement('div');
+    row.className = 'match-row';
+    row.innerHTML = `<span class="match-scenario">${m.sc}</span><div class="match-slot" id="ms-${i}" onclick="placeMatch(${i})" title="Click to place selected concept">click to place</div>`;
+    rows.appendChild(row);
+  });
+}
+
+function placeMatch(i) {
+  if (!selMatch) return;
+  const slot = document.getElementById('ms-' + i);
+  if (slot.classList.contains('correct')) return;
+  const prev = matchPlaced[i];
+  if (prev) { document.querySelectorAll('#match-pool .chip').forEach(c => { if (c.dataset.val === prev) c.classList.remove('placed'); }); }
+  matchPlaced[i] = selMatch;
+  slot.textContent = selMatch; slot.className = 'match-slot filled';
+  document.querySelectorAll('#match-pool .chip').forEach(c => { if (c.dataset.val === selMatch) { c.classList.add('placed'); c.classList.remove('selected'); } });
+  selMatch = null;
+  document.getElementById('match-result').className = 'result';
+}
+
+function checkMatch() {
+  const n = Object.keys(matchPlaced).length;
+  const r = document.getElementById('match-result');
+  if (n < matchData.length) { r.textContent = `You've filled ${n} of ${matchData.length} slots. Fill all slots before checking.`; r.className = 'result show err'; return; }
+  let correct = 0;
+  matchData.forEach((m, i) => {
+    const slot = document.getElementById('ms-' + i);
+    if (matchPlaced[i] === m.correct) { slot.className = 'match-slot correct'; slot.title = m.fb; correct++; }
+    else slot.className = 'match-slot wrong';
+  });
+  if (correct === matchData.length) { r.textContent = '✓ Perfect score! All examples correctly matched. Hover over the green slots to read why each is correct.'; r.className = 'result show ok'; }
+  else { r.textContent = `${correct} of ${matchData.length} correct. The slots in red are incorrect — move those chips to a different slot and try again.`; r.className = 'result show err'; }
+}
+
+function resetMatch() {
+  selMatch = null; matchPlaced = {};
+  document.getElementById('match-result').className = 'result';
+  initMatch();
+}
+
+initMatch();
+</script>
+</body>
+</html>

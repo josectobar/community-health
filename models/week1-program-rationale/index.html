@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Widget 1: Steps in Creating a Program Rationale</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f5f7fa;
+    color: #1a1a1a;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .header {
+    background: #1a3c5e;
+    color: #fff;
+    padding: 20px 24px 16px;
+    border-bottom: 3px solid #4a90d9;
+  }
+  .header-eyebrow { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #9bbfe0; margin-bottom: 4px; }
+  .header-title { font-size: 20px; font-weight: 600; }
+  .header-sub { font-size: 13px; color: #c0d8f0; margin-top: 4px; }
+
+  .tab-bar { display: flex; background: #fff; border-bottom: 1px solid #dde3ea; overflow-x: auto; scrollbar-width: none; }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab { flex-shrink: 0; padding: 12px 18px; font-size: 13px; font-weight: 500; color: #6b7280; background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
+  .tab:hover { color: #1a3c5e; }
+  .tab.active { color: #1a3c5e; border-bottom-color: #4a90d9; }
+
+  .content { padding: 22px 24px; max-width: 780px; }
+  .section { display: none; }
+  .section.visible { display: block; }
+
+  /* ── OVERVIEW ── */
+  .triangle-wrap { display: flex; flex-direction: column; align-items: center; gap: 0; margin: 1.2rem 0 1.5rem; }
+  .tri-row {
+    display: flex; align-items: center; justify-content: flex-start; gap: 14px;
+    cursor: pointer; border: none; background: none; padding: 0; width: 100%; max-width: 560px;
+    transition: opacity 0.15s;
+  }
+  .tri-row:hover .tri-bar { filter: brightness(0.92); }
+  .tri-bar {
+    height: 52px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; color: #fff; transition: filter 0.15s; flex-shrink: 0;
+  }
+  .tri-bar-1 { width: 100%; background: #1a3c5e; }
+  .tri-bar-2 { width: 80%; background: #2860a0; }
+  .tri-bar-3 { width: 62%; background: #4a90d9; }
+  .tri-bar-4 { width: 45%; background: #76b4e8; }
+  .tri-label { font-size: 13px; font-weight: 500; color: #1a3c5e; min-width: 120px; text-align: left; }
+
+  .overview-hint { font-size: 13px; color: #6b7280; text-align: center; margin-top: 8px; }
+  .step-detail { background: #fff; border: 1px solid #dde3ea; border-radius: 10px; padding: 16px 20px; display: none; margin-top: 8px; }
+  .step-detail.open { display: block; }
+  .step-detail h3 { font-size: 15px; font-weight: 600; color: #1a3c5e; margin-bottom: 8px; }
+  .step-detail p { font-size: 14px; color: #374151; line-height: 1.6; margin-bottom: 8px; }
+  .step-detail ul { font-size: 14px; color: #374151; padding-left: 1.25rem; margin-bottom: 8px; line-height: 1.7; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 99px; margin-bottom: 8px; background: #e8f0fb; color: #1a3c5e; }
+
+  /* ── CARD STYLES ── */
+  .card { background: #fff; border: 1px solid #dde3ea; border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .card-title { font-size: 14px; font-weight: 600; color: #1a3c5e; margin-bottom: 6px; }
+  .card-body { font-size: 14px; color: #374151; line-height: 1.6; }
+  .callout { background: #eef4fb; border-left: 4px solid #4a90d9; border-radius: 6px; padding: 12px 16px; font-size: 14px; color: #1a3c5e; font-style: italic; margin: 10px 0; line-height: 1.6; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 99px; margin-right: 6px; }
+  .badge-blue { background: #dbeafe; color: #1e40af; }
+  .badge-green { background: #dcfce7; color: #166534; }
+  .badge-amber { background: #fef9c3; color: #854d0e; }
+
+  /* ── QUIZ ── */
+  .quiz-meta { font-size: 12px; color: #9ca3af; margin-bottom: 10px; }
+  .quiz-q { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 14px; line-height: 1.5; }
+  .opt-btn {
+    display: block; width: 100%; text-align: left; padding: 10px 14px; font-size: 14px;
+    border: 1px solid #d1d9e0; border-radius: 8px; background: #fff; color: #1a1a1a;
+    cursor: pointer; margin-bottom: 8px; transition: all 0.15s; line-height: 1.5;
+  }
+  .opt-btn:hover:not(:disabled) { background: #eef4fb; border-color: #4a90d9; }
+  .opt-btn.correct { background: #dcfce7; border-color: #22c55e; color: #14532d; }
+  .opt-btn.wrong   { background: #fee2e2; border-color: #ef4444; color: #7f1d1d; }
+  .feedback { font-size: 14px; padding: 10px 14px; border-radius: 8px; margin-top: 4px; display: none; line-height: 1.5; }
+  .feedback.show { display: block; }
+  .feedback.ok  { background: #dcfce7; color: #14532d; border-left: 3px solid #22c55e; }
+  .feedback.err { background: #fee2e2; color: #7f1d1d; border-left: 3px solid #ef4444; }
+  .next-btn { margin-top: 12px; padding: 9px 22px; font-size: 14px; background: #1a3c5e; color: #fff; border: none; border-radius: 8px; cursor: pointer; display: none; transition: background 0.15s; }
+  .next-btn:hover { background: #254d78; }
+  .next-btn.show { display: inline-block; }
+  .progress-bar-wrap { background: #e5e7eb; border-radius: 99px; height: 6px; margin-bottom: 16px; }
+  .progress-bar-fill { background: #4a90d9; border-radius: 99px; height: 6px; transition: width 0.3s; }
+  .score-box { text-align: center; padding: 24px; background: #fff; border: 1px solid #dde3ea; border-radius: 10px; }
+  .score-big { font-size: 48px; font-weight: 700; color: #1a3c5e; }
+  .score-label { font-size: 15px; color: #6b7280; margin-top: 4px; }
+  .restart-btn { margin-top: 16px; padding: 9px 22px; font-size: 14px; background: #1a3c5e; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+
+  /* ── SORT ACTIVITY ── */
+  .sort-intro { font-size: 14px; color: #374151; margin-bottom: 14px; line-height: 1.6; }
+  .sort-pool { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; min-height: 38px; }
+  .sort-chip {
+    padding: 6px 14px; font-size: 13px; border: 1px solid #c8d4e0; border-radius: 99px;
+    background: #fff; color: #1a1a1a; cursor: pointer; user-select: none; transition: all 0.15s;
+  }
+  .sort-chip:hover { background: #eef4fb; border-color: #4a90d9; }
+  .sort-chip.selected { background: #eef4fb; border-color: #4a90d9; outline: 2px solid #4a90d9; color: #1a3c5e; }
+  .sort-chip.placed { opacity: 0.35; pointer-events: none; }
+  .sort-zones { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .sort-zone { border: 2px dashed #c8d4e0; border-radius: 8px; padding: 10px 12px; min-height: 80px; cursor: pointer; transition: border-color 0.15s; }
+  .sort-zone:hover { border-color: #4a90d9; }
+  .sort-zone-title { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #9ca3af; margin-bottom: 8px; }
+  .sort-zone-items { display: flex; flex-direction: column; gap: 5px; }
+  .placed-chip { font-size: 12px; padding: 4px 10px; border-radius: 99px; background: #dcfce7; color: #14532d; border: 1px solid #86efac; cursor: pointer; text-align: left; transition: opacity 0.15s; }
+  .placed-chip:hover { opacity: 0.65; }
+  .action-btn { padding: 9px 22px; font-size: 14px; background: #1a3c5e; color: #fff; border: none; border-radius: 8px; cursor: pointer; margin-right: 8px; }
+  .reset-btn { padding: 9px 22px; font-size: 14px; background: transparent; color: #6b7280; border: 1px solid #c8d4e0; border-radius: 8px; cursor: pointer; }
+  .result-msg { font-size: 14px; padding: 10px 14px; border-radius: 8px; margin-top: 10px; display: none; line-height: 1.5; }
+  .result-msg.show { display: block; }
+  .result-msg.ok  { background: #dcfce7; color: #14532d; border-left: 3px solid #22c55e; }
+  .result-msg.err { background: #fee2e2; color: #7f1d1d; border-left: 3px solid #ef4444; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <p class="header-eyebrow">Chapter 2 · Planning the Program</p>
+  <h1 class="header-title">Steps in Creating a Program Rationale</h1>
+  <p class="header-sub">Explore the steps, test your knowledge, and practice applying the concepts.</p>
+</div>
+
+<div class="tab-bar" role="tablist">
+  <button class="tab active" onclick="showTab('overview',this)">The 4 Steps</button>
+  <button class="tab" onclick="showTab('deeper',this)">Key concepts</button>
+  <button class="tab" onclick="showTab('sort',this)">Sort activity</button>
+  <button class="tab" onclick="showTab('quiz',this)">Knowledge check</button>
+</div>
+
+<div class="content">
+
+  <!-- ══ TAB 1: OVERVIEW ══════════════════════════════════════════ -->
+  <div id="s-overview" class="section visible">
+    <div class="card">
+      <p class="card-body">A program rationale follows an <strong>inverted triangle structure</strong> — starting broad (national/global data) and narrowing to your specific population and proposed solution. Click each step to explore it.</p>
+    </div>
+
+    <div class="triangle-wrap">
+      <button class="tri-row" onclick="toggleStep(1)">
+        <div class="tri-bar tri-bar-1">STEP 1</div>
+        <span class="tri-label">Gather background<br>information</span>
+      </button>
+      <div id="step-1" class="step-detail">
+        <span class="tag">STEP 1 — BROADEST</span>
+        <h3>Identify Appropriate Background Information</h3>
+        <p>Start with a literature review. Gather evidence from multiple sources to build the foundation of your argument. The data you collect must address several questions:</p>
+        <ul>
+          <li>What is the current status of the health problem in this population?</li>
+          <li>What do community members themselves need and want (consumer research)?</li>
+          <li>How does the local problem connect to state and national trends?</li>
+          <li>Is there evidence that programs like this one actually work?</li>
+          <li>What is the potential return on investment — economic, human, or organizational?</li>
+        </ul>
+        <p><strong>Key data sources:</strong> Epidemiological data, economic data (CBA, CEA, ROI), evidence of effectiveness (e.g., The Community Guide), and consumer research data.</p>
+      </div>
+
+      <button class="tri-row" onclick="toggleStep(2)">
+        <div class="tri-bar tri-bar-2">STEP 2</div>
+        <span class="tri-label">Title the rationale</span>
+      </button>
+      <div id="step-2" class="step-detail">
+        <span class="tag">STEP 2</span>
+        <h3>Title the Rationale</h3>
+        <p>Give the rationale a clear, professional title using this format:</p>
+        <div class="callout">"A Rationale for [Title of Program]: A Program to Enhance the Health of [Name of Priority Population]"</div>
+        <p>The title is not cosmetic — it signals to decision makers exactly what you are proposing and for whom. A specific, professional title sets the tone for everything that follows.</p>
+      </div>
+
+      <button class="tri-row" onclick="toggleStep(3)">
+        <div class="tri-bar tri-bar-3">STEP 3</div>
+        <span class="tri-label">Write the content</span>
+      </button>
+      <div id="step-3" class="step-detail">
+        <span class="tag">STEP 3 — CORE</span>
+        <h3>Write the Content of the Rationale</h3>
+        <p>This is where the argument is made. Follow this sequence:</p>
+        <ul>
+          <li><strong>Open with the big picture</strong> — establish the problem at a global or national level first.</li>
+          <li><strong>Narrow to local</strong> — show how the local problem reflects the larger one.</li>
+          <li><strong>Create the problem statement</strong> — define what the problem is, why it matters, why it must be addressed, and what the data shows.</li>
+          <li><strong>Use social math</strong> — translate statistics into language that resonates with your audience (e.g., "47 community members will die from this this year" vs. a rate per 100,000).</li>
+          <li><strong>Propose the solution</strong> — describe the program and what it will accomplish.</li>
+          <li><strong>State why it will work</strong> — cite evidence of effectiveness for programs like yours.</li>
+        </ul>
+      </div>
+
+      <button class="tri-row" onclick="toggleStep(4)">
+        <div class="tri-bar tri-bar-4">STEP 4</div>
+        <span class="tri-label">List references</span>
+      </button>
+      <div id="step-4" class="step-detail">
+        <span class="tag">STEP 4 — NARROWEST</span>
+        <h3>List the References</h3>
+        <p>Provide a complete reference list for all sources cited. This is not a formality — it signals to decision makers that the rationale is grounded in the best available evidence, not in assumptions or enthusiasm.</p>
+        <p>A strong reference list protects the program: if questions arise about the evidence base, the sources are there to examine. It also demonstrates professional rigor and credibility.</p>
+      </div>
+    </div>
+    <p class="overview-hint">↑ Click each step to expand or collapse details</p>
+  </div>
+
+  <!-- ══ TAB 2: DEEPER ════════════════════════════════════════════ -->
+  <div id="s-deeper" class="section">
+    <div class="card">
+      <p class="card-title">What is a Program Rationale?</p>
+      <p class="card-body">A program rationale is a <strong>written justification</strong> used to gain the support of decision makers. It is not a program plan or a list of activities — it is a documented, evidence-backed argument that a health problem exists, that it matters to this community, and that the proposed program can address it.</p>
+    </div>
+
+    <div class="card">
+      <p class="card-title">Decision Makers vs. Stakeholders</p>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;">
+        <div style="background:#eef4fb; border-radius:8px; padding:12px 14px;">
+          <p style="font-size:13px; font-weight:700; color:#1a3c5e; margin-bottom:4px;">Decision Makers</p>
+          <p style="font-size:13px; color:#374151; line-height:1.5;">Individuals in authority to make a full range of decisions about health promotion. They <strong>control resources</strong> — funding, staff, access, infrastructure. The rationale is primarily written for them.</p>
+        </div>
+        <div style="background:#f0fdf4; border-radius:8px; padding:12px 14px;">
+          <p style="font-size:13px; font-weight:700; color:#166534; margin-bottom:4px;">Stakeholders</p>
+          <p style="font-size:13px; color:#374151; line-height:1.5;">Any person or organization with a vested interest in a program. They matter — but may not hold final authority. Their perspectives should inform the rationale without replacing the decision-maker focus.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="card-title">The Inverted Triangle Structure</p>
+      <p class="card-body" style="margin-bottom:10px;">The rationale moves from broad to narrow — like an inverted triangle. You begin at the national or global level, move to state and regional data, then narrow to your specific community, population, and proposed program.</p>
+      <div class="callout">This structure works because it contextualizes the local problem within a larger, credible body of evidence before asking decision makers to act on it.</div>
+    </div>
+
+    <div class="card">
+      <p class="card-title">Social Math — Why It Matters</p>
+      <p class="card-body">Raw statistics rarely persuade. Social math is the practice of translating data into language that is meaningful and resonant to your specific audience.</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+        <div style="background:#fee2e2; border-radius:8px; padding:10px 12px;">
+          <p style="font-size:12px; font-weight:700; color:#7f1d1d; margin-bottom:4px;">Without Social Math</p>
+          <p style="font-size:13px; color:#374151;">"The mortality rate is 12.3 per 100,000 population."</p>
+        </div>
+        <div style="background:#dcfce7; border-radius:8px; padding:10px 12px;">
+          <p style="font-size:12px; font-weight:700; color:#14532d; margin-bottom:4px;">With Social Math</p>
+          <p style="font-size:13px; color:#374151;">"47 people in this county will die from this condition this year."</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="card-title">What Makes a Strong Rationale?</p>
+      <p class="card-body" style="margin-bottom:10px;">According to the textbook, the rationale should:</p>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; gap:10px; align-items:flex-start;">
+          <span style="min-width:22px; height:22px; background:#1a3c5e; color:#fff; border-radius:50%; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">1</span>
+          <p style="font-size:14px; color:#374151;">Show how the benefits of the program <strong>align with the values of decision makers</strong></p>
+        </div>
+        <div style="display:flex; gap:10px; align-items:flex-start;">
+          <span style="min-width:22px; height:22px; background:#1a3c5e; color:#fff; border-radius:50%; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">2</span>
+          <p style="font-size:14px; color:#374151;">Address the potential <strong>return on investment</strong> (economic, organizational, human)</p>
+        </div>
+        <div style="display:flex; gap:10px; align-items:flex-start;">
+          <span style="min-width:22px; height:22px; background:#1a3c5e; color:#fff; border-radius:50%; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">3</span>
+          <p style="font-size:14px; color:#374151;">Be <strong>backed by the best evidence available</strong> — not assumption or anecdote</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB 3: SORT ══════════════════════════════════════════════ -->
+  <div id="s-sort" class="section">
+    <div class="card">
+      <p class="card-title">Sort the Rationale Elements</p>
+      <p class="sort-intro">Each item below belongs in one of the four steps of a program rationale. Click an item to select it, then click the step zone where it belongs. Click a placed item to return it to the pool.</p>
+      <div id="sort-pool" class="sort-pool"></div>
+      <div class="sort-zones" id="sort-zones">
+        <div class="sort-zone" id="sz-1" onclick="sortPlace('sz-1')">
+          <p class="sort-zone-title">Step 1 — Background info</p>
+          <div class="sort-zone-items" id="sz-1-items"></div>
+        </div>
+        <div class="sort-zone" id="sz-2" onclick="sortPlace('sz-2')">
+          <p class="sort-zone-title">Step 2 — Title</p>
+          <div class="sort-zone-items" id="sz-2-items"></div>
+        </div>
+        <div class="sort-zone" id="sz-3" onclick="sortPlace('sz-3')">
+          <p class="sort-zone-title">Step 3 — Write content</p>
+          <div class="sort-zone-items" id="sz-3-items"></div>
+        </div>
+        <div class="sort-zone" id="sz-4" onclick="sortPlace('sz-4')">
+          <p class="sort-zone-title">Step 4 — References</p>
+          <div class="sort-zone-items" id="sz-4-items"></div>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="action-btn" onclick="checkSort()">Check answers</button>
+        <button class="reset-btn" onclick="resetSort()">Reset</button>
+      </div>
+      <div id="sort-result" class="result-msg"></div>
+    </div>
+  </div>
+
+  <!-- ══ TAB 4: QUIZ ══════════════════════════════════════════════ -->
+  <div id="s-quiz" class="section">
+    <div id="quiz-wrap"></div>
+  </div>
+
+</div><!-- /content -->
+
+<script>
+// ── TAB SWITCHING ──────────────────────────────────────────────────
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('visible');
+  btn.classList.add('active');
+}
+
+// ── STEP ACCORDION ─────────────────────────────────────────────────
+function toggleStep(n) {
+  const el = document.getElementById('step-' + n);
+  const open = el.classList.toggle('open');
+}
+
+// ── SORT ACTIVITY ──────────────────────────────────────────────────
+const sortItems = [
+  { label: 'Review epidemiological data on the health problem', correct: 'sz-1' },
+  { label: 'Gather consumer research about priority population needs', correct: 'sz-1' },
+  { label: 'Identify economic data (CBA, CEA, ROI)', correct: 'sz-1' },
+  { label: 'Confirm compatibility with state/national health plans', correct: 'sz-1' },
+  { label: '"A Rationale for [Program]: A Program to Enhance the Health of [Population]"', correct: 'sz-2' },
+  { label: 'Describe the health problem from a global/national perspective', correct: 'sz-3' },
+  { label: 'Create a problem statement (what, why, why now)', correct: 'sz-3' },
+  { label: 'Use social math to make data meaningful', correct: 'sz-3' },
+  { label: 'Propose a solution and project what can be gained', correct: 'sz-3' },
+  { label: 'State why the program will be successful', correct: 'sz-3' },
+  { label: 'Provide a complete list of sources cited', correct: 'sz-4' },
+  { label: 'Show decision makers the evidence has been studied', correct: 'sz-4' },
+];
+
+let sortSel = null, sortPlaced = {};
+
+function initSort() {
+  sortSel = null; sortPlaced = {};
+  const pool = document.getElementById('sort-pool');
+  pool.innerHTML = '';
+  sortItems.forEach((item, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'sort-chip';
+    btn.textContent = item.label;
+    btn.dataset.i = i;
+    btn.onclick = () => {
+      if (sortPlaced[i]) return;
+      document.querySelectorAll('.sort-chip').forEach(c => c.classList.remove('selected'));
+      sortSel = i;
+      btn.classList.add('selected');
+    };
+    pool.appendChild(btn);
+  });
+  ['sz-1','sz-2','sz-3','sz-4'].forEach(z => document.getElementById(z + '-items').innerHTML = '');
+  document.getElementById('sort-result').className = 'result-msg';
+}
+
+function sortPlace(zoneId) {
+  if (sortSel === null) return;
+  const i = sortSel;
+  const prev = sortPlaced[i];
+  if (prev) { document.querySelectorAll('.sort-chip').forEach(c => { if (+c.dataset.i === i) c.classList.remove('placed'); }); document.getElementById(prev + '-items').querySelectorAll('[data-i="' + i + '"]').forEach(el => el.remove()); }
+  sortPlaced[i] = zoneId;
+  document.querySelectorAll('.sort-chip').forEach(c => { if (+c.dataset.i === i) { c.classList.add('placed'); c.classList.remove('selected'); } });
+  const chip = document.createElement('button');
+  chip.className = 'placed-chip'; chip.textContent = sortItems[i].label; chip.dataset.i = i;
+  chip.onclick = () => { delete sortPlaced[i]; chip.remove(); document.querySelectorAll('.sort-chip').forEach(c => { if (+c.dataset.i === i) c.classList.remove('placed'); }); document.getElementById('sort-result').className = 'result-msg'; };
+  document.getElementById(zoneId + '-items').appendChild(chip);
+  sortSel = null;
+  document.getElementById('sort-result').className = 'result-msg';
+}
+
+function checkSort() {
+  const n = Object.keys(sortPlaced).length;
+  const r = document.getElementById('sort-result');
+  if (n < sortItems.length) { r.textContent = `You've placed ${n} of ${sortItems.length} items. Place all items first.`; r.className = 'result-msg show err'; return; }
+  const correct = Object.entries(sortPlaced).filter(([i,z]) => sortItems[i].correct === z).length;
+  if (correct === sortItems.length) { r.textContent = '✓ Perfect! All items correctly sorted across the four steps.'; r.className = 'result-msg show ok'; }
+  else { r.textContent = `${correct} of ${sortItems.length} correct. Review any misplaced items and try again. Hint: Step 1 is all about gathering data before writing anything.`; r.className = 'result-msg show err'; }
+}
+
+function resetSort() { initSort(); }
+initSort();
+
+// ── QUIZ ───────────────────────────────────────────────────────────
+const questions = [
+  {
+    q: "A health education specialist is writing a document to convince the hospital's VP of Operations to fund a new employee wellness program. What is this document called?",
+    opts: ["A program plan","A needs assessment","A program rationale","A logic model"],
+    correct: 2,
+    ok: "Correct! A program rationale is a written justification used to gain the support of decision makers. It argues that the problem is real, relevant, and that the proposed program can address it.",
+    err: "Not quite. The document written to justify a program to decision makers is called a program rationale. A program plan comes later, after approval is secured."
+  },
+  {
+    q: "In Step 1 of creating a program rationale, a planner discovers that the local diabetes rate mirrors national trends and that community members want nutrition education. Which type of data was used to identify what community members want?",
+    opts: ["Epidemiological data","Consumer research data","Economic data","Evidence of effectiveness"],
+    correct: 1,
+    ok: "Correct! Consumer research data captures the needs and wants of the priority population — in this case, community members expressing interest in nutrition education.",
+    err: "Not quite. Epidemiological data describes the health problem in the population. Consumer research data captures what the priority population itself needs and wants. In this case, the community members' expressed desire for nutrition education is consumer research."
+  },
+  {
+    q: "A planner writes: 'This year, 52 employees at our company will be diagnosed with Type 2 diabetes — that's one new case every seven days.' This is an example of what technique?",
+    opts: ["Epidemiological framing","Social math","Cost-benefit analysis","Problem declaration"],
+    correct: 1,
+    ok: "Correct! Social math translates statistics into human-scale, emotionally resonant language. 'One new case every seven days' is far more compelling to most audiences than a rate per 100,000.",
+    err: "Not quite. The technique of translating statistics into emotionally resonant, human-scale language is called social math. It makes data meaningful and memorable for decision makers."
+  },
+  {
+    q: "Which step of the rationale process includes the problem statement?",
+    opts: ["Step 1 — Identify background information","Step 2 — Title the rationale","Step 3 — Write the content","Step 4 — List the references"],
+    correct: 2,
+    ok: "Correct! The problem statement is part of Step 3 — writing the content of the rationale. It defines what the problem is, why it matters, and why it must be addressed.",
+    err: "Not quite. The problem statement belongs in Step 3, the content-writing phase. Step 1 is data gathering, Step 2 is the title, and Step 4 is references."
+  },
+  {
+    q: "Why must a program rationale be tailored to a specific decision maker rather than written as a generic document?",
+    opts: [
+      "Because different decision makers use different citation styles",
+      "Because decision makers control resources and the rationale must show alignment with their values and organizational goals",
+      "Because decision makers are not familiar with health promotion research",
+      "Because a generic rationale is not long enough to be convincing"
+    ],
+    correct: 1,
+    ok: "Correct! Decision makers control resources and approval. The rationale must show how the program aligns with their specific values and organizational mission — a generic document cannot do that effectively.",
+    err: "Not quite. The rationale must be tailored because decision makers control resources and their support depends on seeing how the program fits their organization's goals and values."
+  },
+  {
+    q: "A planner finishes writing a rationale but does not include a reference list. What is the most significant consequence of this omission?",
+    opts: [
+      "The document will be too short to be credible",
+      "Decision makers may question whether the evidence base has been studied and verified",
+      "The rationale cannot be submitted without a reference list per standard formatting rules",
+      "The priority population will not be able to verify the data"
+    ],
+    correct: 1,
+    ok: "Correct! The reference list signals to decision makers that the planner has done their homework — that the rationale is grounded in verified evidence, not assumption. Without it, that credibility is undermined.",
+    err: "Not quite. The primary consequence is that decision makers cannot verify that the evidence has been studied and is credible. The reference list is a signal of rigor, not just a formatting requirement."
+  },
+  {
+    q: "According to the textbook, a program rationale uses an inverted triangle structure. What does this mean for how the content is organized?",
+    opts: [
+      "The most important information goes at the bottom",
+      "The document starts narrow (local data) and broadens to national trends",
+      "The document starts broad (national/global data) and narrows to the specific population and program",
+      "The document lists references at the top and conclusions at the bottom"
+    ],
+    correct: 2,
+    ok: "Correct! The inverted triangle starts broad — establishing the problem at the national or global level — and progressively narrows to the local community, the priority population, and the specific program being proposed.",
+    err: "Not quite. The inverted triangle starts wide (national/global) and narrows downward toward the specific population and program. It is the opposite of starting with the local problem."
+  }
+];
+
+let qIdx = 0, qAnswered = false;
+
+function renderQ() {
+  const q = questions[qIdx];
+  const pct = Math.round((qIdx / questions.length) * 100);
+  document.getElementById('quiz-wrap').innerHTML = `
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+    <div class="card">
+      <p class="quiz-meta">Question ${qIdx + 1} of ${questions.length}</p>
+      <p class="quiz-q">${q.q}</p>
+      ${q.opts.map((o,i) => `<button class="opt-btn" onclick="answerQ(${i})">${o}</button>`).join('')}
+      <div id="qfb" class="feedback"></div>
+      <button id="qnxt" class="next-btn" onclick="nextQ()">${qIdx < questions.length - 1 ? 'Next question →' : 'See my score'}</button>
+    </div>`;
+  qAnswered = false;
+}
+
+function answerQ(i) {
+  if (qAnswered) return;
+  qAnswered = true;
+  const q = questions[qIdx];
+  document.querySelectorAll('.opt-btn').forEach((b, idx) => {
+    if (idx === q.correct) b.classList.add('correct');
+    else if (idx === i) b.classList.add('wrong');
+    b.disabled = true;
+  });
+  const fb = document.getElementById('qfb');
+  const ok = i === q.correct;
+  fb.textContent = (ok ? '✓ ' : '✗ ') + (ok ? q.ok : q.err);
+  fb.className = 'feedback show ' + (ok ? 'ok' : 'err');
+  document.getElementById('qnxt').classList.add('show');
+}
+
+let score = 0;
+function nextQ() {
+  if (document.querySelector('.opt-btn.correct')) {
+    const q = questions[qIdx];
+    const btns = document.querySelectorAll('.opt-btn');
+    if (btns[q.correct].classList.contains('correct') && !document.querySelector('.opt-btn.wrong')) score++;
+    else { const ans = Array.from(btns).findIndex(b => b.classList.contains('correct')); if (document.querySelectorAll('.opt-btn.wrong').length === 0) score++; }
+  }
+  // simpler score tracking
+  qIdx++;
+  if (qIdx >= questions.length) {
+    showScore();
+  } else {
+    renderQ();
+  }
+}
+
+let userAnswers = [];
+function answerQv2(i) {
+  if (qAnswered) return;
+  qAnswered = true;
+  userAnswers.push(i === questions[qIdx].correct ? 1 : 0);
+  const q = questions[qIdx];
+  document.querySelectorAll('.opt-btn').forEach((b, idx) => {
+    if (idx === q.correct) b.classList.add('correct');
+    else if (idx === i) b.classList.add('wrong');
+    b.disabled = true;
+  });
+  const fb = document.getElementById('qfb');
+  const ok = i === q.correct;
+  fb.textContent = (ok ? '✓ ' : '✗ ') + (ok ? q.ok : q.err);
+  fb.className = 'feedback show ' + (ok ? 'ok' : 'err');
+  document.getElementById('qnxt').classList.add('show');
+}
+
+// Replace answerQ with answerQv2
+window.answerQ = answerQv2;
+
+function nextQv2() {
+  qIdx++;
+  if (qIdx >= questions.length) showScore();
+  else renderQ();
+}
+window.nextQ = nextQv2;
+
+function showScore() {
+  const total = userAnswers.reduce((a,b) => a+b, 0);
+  const pct = Math.round((total / questions.length) * 100);
+  const msg = pct === 100 ? 'Excellent work! You have a strong grasp of program rationale concepts.' :
+              pct >= 70  ? 'Good effort! Review the steps and key concepts tabs to strengthen any gaps.' :
+                           'Keep going — revisit the "The 4 Steps" and "Key Concepts" tabs for a closer review.';
+  document.getElementById('quiz-wrap').innerHTML = `
+    <div class="score-box">
+      <div class="score-big">${total}/${questions.length}</div>
+      <div class="score-label">${pct}% — ${msg}</div>
+      <button class="restart-btn" onclick="restartQuiz()">Try again</button>
+    </div>`;
+}
+
+function restartQuiz() {
+  qIdx = 0; userAnswers = [];
+  renderQ();
+}
+
+renderQ();
+</script>
+</body>
+</html>

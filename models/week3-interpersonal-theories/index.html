@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interpersonal Level Theories – Interactive Widget</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f6f8; color: #1a1a2e; min-height: 100vh; }
+  header { background: linear-gradient(135deg, #1a7a8a, #12566a); color: #fff; padding: 28px 32px 22px; }
+  header h1 { font-size: 1.5rem; font-weight: 700; }
+  header p { margin-top: 6px; font-size: .95rem; opacity: .88; }
+
+  /* Skip link */
+  .skip-link { position: absolute; left: -9999px; top: 4px; background: #1a7a8a; color: #fff; padding: 8px 16px; border-radius: 4px; font-weight: 700; z-index: 9999; text-decoration: none; }
+  .skip-link:focus { left: 8px; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 4px; padding: 16px 20px 0; background: #fff; border-bottom: 2px solid #e0e8ec; flex-wrap: wrap; }
+  .tab { padding: 10px 20px; border: 2px solid transparent; background: none; font-size: .92rem; font-weight: 600; color: #555; cursor: pointer; border-radius: 8px 8px 0 0; transition: background .2s, color .2s; }
+  .tab[aria-selected="true"] { background: #1a7a8a; color: #fff; border-color: #1a7a8a; }
+  .tab:hover:not([aria-selected="true"]) { background: #e8f4f6; color: #1a7a8a; }
+  .tab:focus-visible { outline: 3px solid #c97d2e; outline-offset: 2px; }
+  .panel { display: none; padding: 28px 24px; }
+  .panel.active { display: block; }
+
+  /* Flip cards */
+  .construct-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 18px; }
+  .construct-card { background: #fff; border: 2px solid #d0e8ec; border-radius: 12px; padding: 16px; cursor: pointer; transition: border-color .2s, box-shadow .2s; }
+  .construct-card:hover { border-color: #1a7a8a; box-shadow: 0 4px 14px rgba(26,122,138,.15); }
+  .construct-card:focus-visible { outline: 3px solid #c97d2e; outline-offset: 2px; }
+  .construct-card[aria-expanded="true"] { border-color: #1a7a8a; background: #e0f4f6; }
+  .construct-card .front h3 { font-size: 1rem; color: #1a7a8a; font-weight: 700; }
+  .construct-card .front p { font-size: .82rem; color: #888; margin-top: 4px; }
+  .construct-card .back { font-size: .88rem; color: #1a1a2e; line-height: 1.55; }
+  .construct-card[aria-expanded="false"] .back { display: none; }
+  .construct-card[aria-expanded="true"] .front { display: none; }
+  .flip-hint { font-size: .83rem; color: #555; margin-top: 12px; }
+
+  /* Capital table */
+  .capital-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 18px; }
+  .capital-col { background: #fff; border-radius: 12px; padding: 18px; border-top: 5px solid; }
+  .capital-col.bonding { border-color: #5c4a8a; }
+  .capital-col.bridging { border-color: #1a7a8a; }
+  .capital-col.linking { border-color: #2e7d5a; }
+  .capital-col h3 { font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
+  .capital-col.bonding h3 { color: #5c4a8a; }
+  .capital-col.bridging h3 { color: #1a7a8a; }
+  .capital-col.linking h3 { color: #2e7d5a; }
+  .capital-col p { font-size: .87rem; line-height: 1.55; color: #444; }
+
+  /* Scenario / option buttons */
+  .scenario-options { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+  .scenario-opt { padding: 9px 18px; border: 2px solid #c0d8dc; background: #fff; border-radius: 24px; cursor: pointer; font-size: .88rem; font-weight: 600; transition: all .2s; }
+  .scenario-opt:hover:not(:disabled) { border-color: #1a7a8a; background: #e0f4f6; }
+  .scenario-opt:focus-visible { outline: 3px solid #c97d2e; outline-offset: 2px; }
+  .scenario-opt[aria-pressed="true"].correct { background: #e6f4ee; border-color: #2e7d5a; color: #155724; }
+  .scenario-opt[aria-pressed="true"].wrong { background: #fdeaea; border-color: #b03a3a; color: #721c24; }
+  .scenario-opt.correct { background: #e6f4ee; border-color: #2e7d5a; color: #155724; }
+  .scenario-opt.wrong { background: #fdeaea; border-color: #b03a3a; color: #721c24; }
+
+  /* Live feedback */
+  .feedback-msg { margin-top: 12px; font-size: .88rem; padding: 10px 14px; border-radius: 8px; }
+  .feedback-msg[hidden] { display: none; }
+  .feedback-msg.ok { background: #e6f4ee; color: #155724; border-left: 4px solid #2e7d5a; }
+  .feedback-msg.no { background: #fdeaea; color: #721c24; border-left: 4px solid #b03a3a; }
+
+  /* Network diagram */
+  .network-svg-wrap { background: #fff; border-radius: 12px; padding: 16px; margin-top: 18px; }
+  .network-svg-wrap svg { max-width: 100%; display: block; margin: 0 auto; }
+  .net-node-btn { fill: transparent; stroke: transparent; cursor: pointer; }
+  .net-node-btn:focus { outline: none; }
+  .net-node-btn:focus-visible ~ .net-node-highlight, .net-node-btn:focus ~ .net-node-highlight { display: block; }
+  .legend-row { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: .83rem; color: #555; }
+  .legend-dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+  .network-info { background: #fff; border-radius: 12px; padding: 18px; margin-top: 14px; font-size: .88rem; line-height: 1.6; color: #333; border-left: 5px solid #1a7a8a; }
+
+  /* SVG focus rings */
+  .svg-node:focus { outline: 3px solid #c97d2e; }
+
+  /* Network node buttons (overlaid) */
+  .net-focus-ring { display: none; fill: none; stroke: #c97d2e; stroke-width: 3; pointer-events: none; }
+
+  /* Quiz */
+  .quiz-q { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 16px; border: 2px solid #e0e8ec; }
+  .quiz-q h4 { font-size: .95rem; font-weight: 600; color: #1a1a2e; margin-bottom: 14px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; role: radiogroup; }
+  .quiz-opt { padding: 10px 16px; border: 2px solid #d0d8dc; border-radius: 8px; background: #fff; cursor: pointer; font-size: .88rem; text-align: left; transition: all .18s; }
+  .quiz-opt:hover:not(:disabled) { border-color: #1a7a8a; background: #e8f6f8; }
+  .quiz-opt:focus-visible { outline: 3px solid #c97d2e; outline-offset: 2px; }
+  .quiz-opt[aria-pressed="true"] { border-color: #1a7a8a; background: #e8f6f8; }
+  .quiz-opt.correct { background: #e6f4ee; border-color: #2e7d5a; color: #155724; font-weight: 600; }
+  .quiz-opt.wrong { background: #fdeaea; border-color: #b03a3a; color: #721c24; }
+  .quiz-explanation { margin-top: 10px; font-size: .85rem; padding: 10px 14px; border-radius: 8px; background: #f0f6f8; color: #333; border-left: 4px solid #1a7a8a; }
+  .quiz-explanation[hidden] { display: none; }
+  .score-bar { background: #fff; border-radius: 12px; padding: 20px; text-align: center; border: 2px solid #1a7a8a; margin-bottom: 20px; }
+  .score-bar[hidden] { display: none; }
+  .score-bar h3 { font-size: 1.3rem; color: #1a7a8a; font-weight: 700; }
+  .score-bar p { font-size: .9rem; color: #555; margin-top: 6px; }
+  .btn-primary { padding: 10px 24px; background: #1a7a8a; color: #fff; border: 2px solid #1a7a8a; border-radius: 8px; font-size: .92rem; font-weight: 600; cursor: pointer; transition: background .2s; margin-top: 16px; }
+  .btn-primary:hover { background: #12566a; border-color: #12566a; }
+  .btn-primary:focus-visible { outline: 3px solid #c97d2e; outline-offset: 2px; }
+  @media (max-width: 640px) { .capital-container { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<header>
+  <h1>Interpersonal Level Theories — Interactive Learning</h1>
+  <p>Apply and test your understanding of Social Cognitive Theory, Social Capital Theory, and Social Network Theory</p>
+</header>
+
+<!-- Live region for dynamic feedback announced to screen readers -->
+<div aria-live="polite" aria-atomic="true" id="live-announcer" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;"></div>
+
+<div class="tabs" role="tablist" aria-label="Theory sections" id="main-content">
+  <button class="tab" role="tab" aria-selected="true" aria-controls="tab-sct" id="btn-sct" onclick="switchTab('sct',this)">Social Cognitive Theory</button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-capital" id="btn-capital" onclick="switchTab('capital',this)">Social Capital Theory</button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-network" id="btn-network" onclick="switchTab('network',this)">Social Network Theory</button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="tab-quiz" id="btn-quiz" onclick="switchTab('quiz',this)">Knowledge Check</button>
+</div>
+
+<!-- SCT Panel -->
+<div id="tab-sct" class="panel active" role="tabpanel" aria-labelledby="btn-sct">
+  <h2 style="color:#1a7a8a;font-size:1.1rem;margin-bottom:6px;">Social Cognitive Theory: Construct Explorer</h2>
+  <p class="flip-hint" id="flip-instructions">Click or press Enter/Space on each card to reveal how the construct works in a health promotion context.</p>
+  <div class="construct-grid" aria-describedby="flip-instructions">
+
+    <div class="construct-card" role="button" tabindex="0" aria-expanded="false"
+         aria-label="Self-Efficacy — click to expand"
+         onclick="flipCard(this)" onkeydown="cardKey(event,this)">
+      <div class="front" aria-hidden="false"><h3>Self-Efficacy</h3><p>Click to explore</p></div>
+      <div class="back" aria-hidden="true"><strong>Your belief that you CAN do it.</strong><br><br>Self-efficacy is built through four sources: past mastery, observing similar others succeed, verbal encouragement, and reading your own physiological responses.<br><br><em>Program strategy:</em> Start with small wins to build mastery. Use peer testimonials ("She did it — I can too").</div>
+    </div>
+
+    <div class="construct-card" role="button" tabindex="0" aria-expanded="false"
+         aria-label="Observational Learning — click to expand"
+         onclick="flipCard(this)" onkeydown="cardKey(event,this)">
+      <div class="front"><h3>Observational Learning</h3><p>Click to explore</p></div>
+      <div class="back"><strong>Learning by watching others.</strong><br><br>Four conditions must be met: attention (noticing the model), retention (remembering it), reproduction (physical ability), and motivation (desire to replicate).<br><br><em>Program strategy:</em> Use peer role models — people who look like, sound like, and live like your target population.</div>
+    </div>
+
+    <div class="construct-card" role="button" tabindex="0" aria-expanded="false"
+         aria-label="Outcome Expectations — click to expand"
+         onclick="flipCard(this)" onkeydown="cardKey(event,this)">
+      <div class="front"><h3>Outcome Expectations</h3><p>Click to explore</p></div>
+      <div class="back"><strong>What you believe will happen if you act.</strong><br><br>Expectations can be physical (feel better), social (gain respect), or self-evaluative (feel proud). When expected benefits outweigh costs, behavior is more likely.<br><br><em>Program strategy:</em> Explicitly address myths and correct negative expectations. Highlight positive outcomes from real community members.</div>
+    </div>
+
+    <div class="construct-card" role="button" tabindex="0" aria-expanded="false"
+         aria-label="Behavioral Capability — click to expand"
+         onclick="flipCard(this)" onkeydown="cardKey(event,this)">
+      <div class="front"><h3>Behavioral Capability</h3><p>Click to explore</p></div>
+      <div class="back"><strong>Knowledge plus Skills to act.</strong><br><br>You can't do something you don't know how to do. Behavioral capability requires both cognitive knowledge ("what to do") and skill mastery ("how to do it").<br><br><em>Program strategy:</em> Provide step-by-step skills training, not just information delivery. Practice beats lecture.</div>
+    </div>
+
+    <div class="construct-card" role="button" tabindex="0" aria-expanded="false"
+         aria-label="Self-Regulation — click to expand"
+         onclick="flipCard(this)" onkeydown="cardKey(event,this)">
+      <div class="front"><h3>Self-Regulation</h3><p>Click to explore</p></div>
+      <div class="back"><strong>Goal-setting and self-monitoring over time.</strong><br><br>People sustain behavior change when they set specific goals, track progress, and adjust strategies when they fall short. This is how short-term actions become lasting habits.<br><br><em>Program strategy:</em> Incorporate goal-setting worksheets, progress journals, or apps that allow self-monitoring.</div>
+    </div>
+
+    <div class="construct-card" role="button" tabindex="0" aria-expanded="false"
+         aria-label="Reciprocal Determinism — click to expand"
+         onclick="flipCard(this)" onkeydown="cardKey(event,this)">
+      <div class="front"><h3>Reciprocal Determinism</h3><p>Click to explore</p></div>
+      <div class="back"><strong>Person, Behavior, and Environment — all influence each other.</strong><br><br>This is the defining idea of SCT: behavior is not caused by the person alone or the environment alone. Change any piece of the triangle and the others shift.<br><br><em>Program strategy:</em> Intervene at multiple points — change the environment AND build skills AND address attitudes simultaneously.</div>
+    </div>
+  </div>
+
+  <div style="background:#fff;border-radius:12px;padding:20px;margin-top:24px;border:2px dashed #1a7a8a;">
+    <h3 style="color:#1a7a8a;font-size:1rem;margin-bottom:10px;">Scenario: Which Construct is at Work?</h3>
+    <p style="font-size:.9rem;line-height:1.6;color:#333;margin-bottom:14px;">
+      <strong>Maria</strong> wants to start walking 30 minutes a day. She says: <em>"I know walking is good for me and I know how to do it, but I just don't think I'm the type of person who sticks with exercise. My sister-in-law started a walking group last year — watching her lose 20 pounds is making me think maybe I could too."</em>
+    </p>
+    <p style="font-size:.88rem;font-weight:600;color:#555;" id="sct-q-label">Maria's statement about her sister-in-law addresses which construct?</p>
+    <div class="scenario-options" role="group" aria-labelledby="sct-q-label" id="sct-scenario-opts">
+      <button class="scenario-opt" aria-pressed="false" onclick="scenarioAnswer(this,'sct',false)">Self-Regulation</button>
+      <button class="scenario-opt" aria-pressed="false" onclick="scenarioAnswer(this,'sct',false)">Behavioral Capability</button>
+      <button class="scenario-opt" aria-pressed="false" onclick="scenarioAnswer(this,'sct',true)">Self-Efficacy via Vicarious Learning</button>
+      <button class="scenario-opt" aria-pressed="false" onclick="scenarioAnswer(this,'sct',false)">Outcome Expectations</button>
+    </div>
+    <div class="feedback-msg" id="sct-fb" role="status" hidden></div>
+  </div>
+</div>
+
+<!-- Social Capital Panel -->
+<div id="tab-capital" class="panel" role="tabpanel" aria-labelledby="btn-capital" hidden>
+  <h2 style="color:#5c4a8a;font-size:1.1rem;margin-bottom:14px;">Social Capital Theory: Sorting Scenarios</h2>
+  <div class="capital-container" aria-hidden="true">
+    <div class="capital-col bonding">
+      <h3>Bonding Capital</h3>
+      <p><em>Within</em> a group — strong ties, shared identity, high trust. Provides emotional support and resources within the in-group.</p>
+    </div>
+    <div class="capital-col bridging">
+      <h3>Bridging Capital</h3>
+      <p><em>Across</em> groups — connecting people with different backgrounds. Spreads information and norms beyond in-group boundaries.</p>
+    </div>
+    <div class="capital-col linking">
+      <h3>Linking Capital</h3>
+      <p><em>To power</em> — connecting community members to institutions or authority figures. Enables advocacy and access to formal resources.</p>
+    </div>
+  </div>
+  <div style="background:#fff;border-radius:12px;padding:20px;margin-top:20px;border:2px dashed #c0d0dc;">
+    <h3 style="font-size:.95rem;font-weight:700;margin-bottom:14px;" id="cap-instructions">For each scenario, select the type of social capital it represents — Bonding, Bridging, or Linking.</h3>
+    <div id="sc-scenarios" aria-describedby="cap-instructions"></div>
+  </div>
+  <div class="feedback-msg" id="capital-fb" role="status" hidden></div>
+  <button class="btn-primary" onclick="resetCapital()">Reset Scenarios</button>
+</div>
+
+<!-- Network Panel -->
+<div id="tab-network" class="panel" role="tabpanel" aria-labelledby="btn-network" hidden>
+  <h2 style="color:#2e7d5a;font-size:1.1rem;margin-bottom:6px;">Social Network Theory: Visualizing Network Concepts</h2>
+  <p style="font-size:.88rem;color:#555;margin-bottom:14px;" id="net-instructions">Use the buttons below the diagram to explore each node type and its structural role. The diagram is a visual aid; all information is available through the buttons.</p>
+
+  <div class="network-svg-wrap" aria-hidden="true">
+    <svg viewBox="0 0 520 300" xmlns="http://www.w3.org/2000/svg" id="network-svg" role="img" aria-label="Network diagram showing two main clusters connected by a broker node, with a smaller peripheral cluster. Use the buttons below to explore each node type.">
+      <title>Social Network Diagram</title>
+      <desc>Two main clusters (Hub A in teal, Hub B in purple) are connected only through a central Broker/Bridge node in green. A smaller peripheral cluster is also connected through the broker. Dashed green lines represent bridging (weak) ties.</desc>
+      <line x1="100" y1="80" x2="140" y2="140" stroke="#b0c8d0" stroke-width="2"/>
+      <line x1="100" y1="80" x2="60" y2="140" stroke="#b0c8d0" stroke-width="2"/>
+      <line x1="140" y1="140" x2="60" y2="140" stroke="#b0c8d0" stroke-width="2"/>
+      <line x1="100" y1="80" x2="80" y2="30" stroke="#b0c8d0" stroke-width="2"/>
+      <line x1="100" y1="80" x2="145" y2="45" stroke="#b0c8d0" stroke-width="2"/>
+      <line x1="380" y1="100" x2="420" y2="160" stroke="#b0c8d0" stroke-width="2"/>
+      <line x1="380" y1="100" x2="340" y2="160" stroke="#b0c8d0" stroke-width="2"/>
+      <line x1="420" y1="160" x2="340" y2="160" stroke="#b0c8d0" stroke-width="2"/>
+      <line x1="380" y1="100" x2="440" y2="60" stroke="#b0c8d0" stroke-width="2"/>
+      <line x1="380" y1="100" x2="360" y2="45" stroke="#b0c8d0" stroke-width="2"/>
+      <line x1="240" y1="240" x2="200" y2="275" stroke="#b0c8d0" stroke-width="2"/>
+      <line x1="240" y1="240" x2="280" y2="275" stroke="#b0c8d0" stroke-width="2"/>
+      <line x1="200" y1="275" x2="280" y2="275" stroke="#b0c8d0" stroke-width="2"/>
+      <line x1="220" y1="170" x2="140" y2="140" stroke="#2e7d5a" stroke-width="2.5" stroke-dasharray="5,3"/>
+      <line x1="220" y1="170" x2="340" y2="160" stroke="#2e7d5a" stroke-width="2.5" stroke-dasharray="5,3"/>
+      <line x1="220" y1="170" x2="240" y2="240" stroke="#2e7d5a" stroke-width="2.5" stroke-dasharray="5,3"/>
+      <circle cx="100" cy="80" r="16" fill="#1a7a8a" stroke="#fff" stroke-width="2"/>
+      <text x="100" y="84" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Hub A</text>
+      <circle cx="140" cy="140" r="10" fill="#7ab8c2" stroke="#fff" stroke-width="1.5"/>
+      <circle cx="60" cy="140" r="10" fill="#7ab8c2" stroke="#fff" stroke-width="1.5"/>
+      <circle cx="80" cy="30" r="9" fill="#7ab8c2" stroke="#fff" stroke-width="1.5"/>
+      <circle cx="145" cy="45" r="9" fill="#7ab8c2" stroke="#fff" stroke-width="1.5"/>
+      <circle cx="380" cy="100" r="16" fill="#5c4a8a" stroke="#fff" stroke-width="2"/>
+      <text x="380" y="104" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">Hub B</text>
+      <circle cx="420" cy="160" r="10" fill="#a090c0" stroke="#fff" stroke-width="1.5"/>
+      <circle cx="340" cy="160" r="10" fill="#a090c0" stroke="#fff" stroke-width="1.5"/>
+      <circle cx="440" cy="60" r="9" fill="#a090c0" stroke="#fff" stroke-width="1.5"/>
+      <circle cx="360" cy="45" r="9" fill="#a090c0" stroke="#fff" stroke-width="1.5"/>
+      <circle cx="240" cy="240" r="12" fill="#c97d2e" stroke="#fff" stroke-width="2"/>
+      <circle cx="200" cy="275" r="9" fill="#e8b070" stroke="#fff" stroke-width="1.5"/>
+      <circle cx="280" cy="275" r="9" fill="#e8b070" stroke="#fff" stroke-width="1.5"/>
+      <circle cx="220" cy="170" r="18" fill="#2e7d5a" stroke="#fff" stroke-width="3"/>
+      <text x="220" y="166" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">Broker</text>
+      <text x="220" y="178" text-anchor="middle" fill="#fff" font-size="10">/Bridge</text>
+    </svg>
+    <div class="legend-row">
+      <div class="legend-item"><span class="legend-dot" style="background:#1a7a8a;" aria-hidden="true"></span> Hub (high centrality)</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#2e7d5a;" aria-hidden="true"></span> Broker / Bridge</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#7ab8c2;" aria-hidden="true"></span> Cluster member</div>
+      <div class="legend-item" style="display:flex;align-items:center;gap:6px;"><svg width="30" height="8" aria-hidden="true"><line x1="0" y1="4" x2="30" y2="4" stroke="#2e7d5a" stroke-width="2" stroke-dasharray="4,2"/></svg> Bridging ties (weak)</div>
+    </div>
+  </div>
+
+  <!-- Accessible keyboard-navigable node explorer -->
+  <div style="background:#fff;border-radius:12px;padding:16px;margin-top:12px;">
+    <h3 style="font-size:.9rem;font-weight:700;color:#2e7d5a;margin-bottom:10px;" id="node-explorer-label">Node Explorer — Select a node type to learn its role:</h3>
+    <div role="group" aria-labelledby="node-explorer-label" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+      <button class="scenario-opt" aria-pressed="false" onclick="showNode(this,'hub-a')">Hub Node (Cluster A)</button>
+      <button class="scenario-opt" aria-pressed="false" onclick="showNode(this,'hub-b')">Hub Node (Cluster B)</button>
+      <button class="scenario-opt" aria-pressed="false" onclick="showNode(this,'broker')">Broker / Bridge Node</button>
+      <button class="scenario-opt" aria-pressed="false" onclick="showNode(this,'peripheral')">Peripheral Hub</button>
+      <button class="scenario-opt" aria-pressed="false" onclick="showNode(this,'leaf')">Cluster Member Node</button>
+    </div>
+    <div class="network-info" id="network-info" role="region" aria-live="polite" aria-label="Node information">
+      Select a node type above to learn about its structural role and what it means for health promotion targeting.
+    </div>
+  </div>
+
+  <div style="background:#fff;border-radius:12px;padding:20px;margin-top:18px;border:2px dashed #2e7d5a;">
+    <h3 style="color:#2e7d5a;font-size:.95rem;font-weight:700;margin-bottom:12px;">Quick Reflection: Strong vs. Weak Ties</h3>
+    <p style="font-size:.88rem;color:#444;line-height:1.6;margin-bottom:14px;">
+      You want to spread new information about free colorectal cancer screening to as many people as possible. Would you prioritize reaching people through their <strong>strong ties</strong> (close family/friends) or <strong>weak ties</strong> (acquaintances, colleagues)?
+    </p>
+    <p style="font-size:.88rem;font-weight:600;color:#555;" id="tie-q-label">Choose the approach you would prioritize:</p>
+    <div class="scenario-options" role="group" aria-labelledby="tie-q-label">
+      <button class="scenario-opt" aria-pressed="false" onclick="tieAnswer(this, 'strong')">Strong ties — family and close friends</button>
+      <button class="scenario-opt" aria-pressed="false" onclick="tieAnswer(this, 'weak')">Weak ties — acquaintances across different groups</button>
+      <button class="scenario-opt" aria-pressed="false" onclick="tieAnswer(this, 'both')">Both — for different purposes</button>
+    </div>
+    <div class="feedback-msg" id="tie-fb" role="status" hidden></div>
+  </div>
+</div>
+
+<!-- Quiz Panel -->
+<div id="tab-quiz" class="panel" role="tabpanel" aria-labelledby="btn-quiz" hidden>
+  <div class="score-bar" id="score-bar" role="status" hidden></div>
+  <div id="quiz-container"></div>
+  <button class="btn-primary" onclick="submitQuiz()" id="quiz-btn">Submit Answers</button>
+</div>
+
+<script>
+// ── Tab switching ──
+function switchTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => { p.classList.remove('active'); p.hidden = true; });
+  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected','false'));
+  const panel = document.getElementById('tab-' + id);
+  panel.classList.add('active');
+  panel.hidden = false;
+  btn.setAttribute('aria-selected','true');
+  if (id === 'quiz') buildQuiz();
+  announce('Showing ' + btn.textContent + ' section');
+}
+
+function announce(msg) {
+  const el = document.getElementById('live-announcer');
+  el.textContent = '';
+  setTimeout(() => { el.textContent = msg; }, 50);
+}
+
+// ── Flip cards ──
+function flipCard(card) {
+  const expanded = card.getAttribute('aria-expanded') === 'true';
+  card.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+  const front = card.querySelector('.front');
+  const back = card.querySelector('.back');
+  front.setAttribute('aria-hidden', expanded ? 'false' : 'true');
+  back.setAttribute('aria-hidden', expanded ? 'true' : 'false');
+  const title = card.querySelector('h3') ? card.querySelector('h3').textContent : 'Card';
+  announce(expanded ? title + ' collapsed' : title + ' expanded');
+}
+function cardKey(e, card) {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flipCard(card); }
+}
+
+// ── SCT scenario ──
+function scenarioAnswer(btn, group, correct) {
+  const opts = document.querySelectorAll('#sct-scenario-opts .scenario-opt');
+  opts.forEach(o => { o.disabled = true; o.setAttribute('aria-pressed','false'); });
+  btn.setAttribute('aria-pressed','true');
+  const fb = document.getElementById('sct-fb');
+  fb.hidden = false;
+  if (correct) {
+    btn.classList.add('correct');
+    fb.className = 'feedback-msg ok';
+    fb.innerHTML = 'Correct! Watching her sister-in-law succeed is vicarious learning — a key source of self-efficacy in SCT. Observing someone like you succeed makes you believe you can too.';
+  } else {
+    btn.classList.add('wrong');
+    fb.className = 'feedback-msg no';
+    fb.innerHTML = 'Not quite. Maria observing her sister-in-law is an example of vicarious learning building self-efficacy — she\'s learning that her confidence can increase by watching someone similar succeed.';
+  }
+  announce(fb.textContent);
+}
+
+// ── Social Capital sorting ──
+const capitalScenarios = [
+  { text: "Church members in a Haitian immigrant community share rides to medical appointments and remind each other of health screenings.", answer: "bonding" },
+  { text: "A community coalition connects a predominantly African American neighborhood with a predominantly Latino neighborhood to co-host a farmer's market.", answer: "bridging" },
+  { text: "A community health worker facilitates a meeting between rural residents and state health officials to advocate for a new rural health clinic.", answer: "linking" },
+  { text: "A group of mothers at an elementary school create a shared group chat to track head lice outbreaks and share treatment tips.", answer: "bonding" },
+  { text: "Two non-profit organizations — one focused on housing, one on nutrition — partner to address food insecurity across different neighborhoods.", answer: "bridging" },
+  { text: "Residents from a low-income housing project attend a city council meeting to push for increased parks and recreation funding.", answer: "linking" },
+];
+let capitalAnswers = {};
+
+function buildCapitalScenarios() {
+  const container = document.getElementById('sc-scenarios');
+  container.innerHTML = '';
+  capitalAnswers = {};
+  capitalScenarios.forEach((sc, i) => {
+    const fieldset = document.createElement('fieldset');
+    fieldset.style.cssText = 'background:#f8f8f8;border:2px solid #e0e8ec;border-radius:10px;padding:14px;margin-bottom:12px;';
+    fieldset.innerHTML = `
+      <legend style="font-size:.88rem;color:#333;line-height:1.55;padding:0 4px;font-weight:400;">${i+1}. ${sc.text}</legend>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;" role="group" aria-label="Select the type of social capital">
+        <button class="scenario-opt" aria-pressed="false" onclick="pickCapital(${i},'bonding',this)">Bonding</button>
+        <button class="scenario-opt" aria-pressed="false" onclick="pickCapital(${i},'bridging',this)">Bridging</button>
+        <button class="scenario-opt" aria-pressed="false" onclick="pickCapital(${i},'linking',this)">Linking</button>
+      </div>
+      <div class="feedback-msg" id="cap-fb-${i}" role="status" hidden></div>
+    `;
+    container.appendChild(fieldset);
+  });
+}
+
+function pickCapital(i, choice, btn) {
+  const sc = capitalScenarios[i];
+  const opts = btn.closest('[role="group"]').querySelectorAll('.scenario-opt');
+  opts.forEach(o => { o.disabled = true; o.setAttribute('aria-pressed','false'); });
+  btn.setAttribute('aria-pressed','true');
+  capitalAnswers[i] = choice === sc.answer;
+  const fb = document.getElementById(`cap-fb-${i}`);
+  fb.hidden = false;
+  if (choice === sc.answer) {
+    btn.classList.add('correct');
+    fb.className = 'feedback-msg ok';
+    fb.textContent = 'Correct — ' + sc.answer.charAt(0).toUpperCase() + sc.answer.slice(1) + ' Capital.';
+  } else {
+    btn.classList.add('wrong');
+    fb.className = 'feedback-msg no';
+    fb.textContent = 'Incorrect. This is ' + sc.answer.charAt(0).toUpperCase() + sc.answer.slice(1) + ' Capital. ' + (sc.answer === 'bonding' ? 'It connects similar people within an in-group.' : sc.answer === 'bridging' ? 'It links people across different social groups.' : 'It connects community members to institutional power.');
+  }
+  announce(fb.textContent);
+  if (Object.keys(capitalAnswers).length === capitalScenarios.length) {
+    const correct = Object.values(capitalAnswers).filter(Boolean).length;
+    const mainFb = document.getElementById('capital-fb');
+    mainFb.hidden = false;
+    mainFb.className = `feedback-msg ${correct >= 4 ? 'ok' : 'no'}`;
+    mainFb.textContent = `Final score: ${correct} out of ${capitalScenarios.length}. ${correct === capitalScenarios.length ? 'Perfect — you can accurately identify all three forms of social capital.' : correct >= 4 ? 'Good work! Review the ones you missed above.' : 'Review the three types of social capital — focus on who is connecting to whom and their relative power or similarity.'}`;
+    announce(mainFb.textContent);
+  }
+}
+
+function resetCapital() {
+  const fb = document.getElementById('capital-fb');
+  fb.hidden = true;
+  buildCapitalScenarios();
+  announce('Scenarios have been reset.');
+}
+
+// ── Network nodes ──
+const nodeInfo = {
+  'hub-a': 'Hub Node with High Degree Centrality. This node is connected to many others within its cluster. It can rapidly spread information and influence norms among its group. In health promotion, hubs are ideal peer educators — training them creates a multiplier effect. However, hubs embedded only in one cluster may not reach other parts of the network.',
+  'hub-b': 'Hub Node in a Separate Cluster. Another highly connected hub, but in a distinct cluster. Notice how this cluster and Cluster A have no direct ties — without a broker or bridge, health information may never travel between them.',
+  'broker': 'Broker and Bridge Node with High Betweenness Centrality. This is the most strategically important node in the network. It is the only connection between multiple clusters. Removing or training this person has disproportionate impact on the whole system. Community health workers often play this role — connecting isolated communities to resources, institutions, and other networks.',
+  'peripheral': 'Peripheral Hub. This node connects a smaller, more isolated cluster to the rest of the network via the broker. It has medium centrality — important within its small cluster but not well-connected overall. Peripheral hubs may be late adopters of health behaviors unless the broker actively reaches them.',
+  'leaf': 'Cluster Member with Low Betweenness. These nodes are embedded in a tight cluster. They benefit from strong bonding capital — high trust, shared norms, emotional support. However, without connections to other clusters, they are less exposed to new health information. They are most likely to change behavior when their hub or broker changes first.'
+};
+
+function showNode(btn, id) {
+  document.querySelectorAll('#tab-network [role="group"] .scenario-opt').forEach(b => b.setAttribute('aria-pressed','false'));
+  btn.setAttribute('aria-pressed','true');
+  const info = nodeInfo[id] || nodeInfo['leaf'];
+  document.getElementById('network-info').textContent = info;
+}
+
+// ── Tie strength ──
+function tieAnswer(btn, choice) {
+  document.querySelectorAll('#tab-network .scenario-options .scenario-opt').forEach(o => { o.disabled = true; o.setAttribute('aria-pressed','false'); });
+  btn.setAttribute('aria-pressed','true');
+  const fb = document.getElementById('tie-fb');
+  fb.hidden = false;
+  let msg, cls;
+  if (choice === 'both') {
+    btn.classList.add('correct');
+    cls = 'ok';
+    msg = 'Best answer! Strong ties provide trust and depth — people are more likely to act on health information from someone they trust deeply. Weak ties provide reach — they carry information across cluster boundaries to populations you cannot reach through a single in-group. Use both strategically.';
+  } else if (choice === 'weak') {
+    btn.classList.add('correct');
+    cls = 'ok';
+    msg = 'Good reasoning! Weak ties are powerful for spreading novel information across different social circles. Granovetter\'s "strength of weak ties" theory shows that new information tends to travel via weak ties precisely because they connect otherwise separate clusters.';
+  } else {
+    btn.classList.add('wrong');
+    cls = 'no';
+    msg = 'Partially correct. Strong ties connect you mainly to people already in your network. To spread information widely, weak ties that bridge different social groups are more powerful for reach. For depth of adoption, you would return to strong ties.';
+  }
+  fb.className = 'feedback-msg ' + cls;
+  fb.textContent = msg;
+  announce(msg);
+}
+
+// ── Quiz ──
+const questions = [
+  { q: "According to Social Cognitive Theory, which factor is the single strongest predictor of whether someone will attempt a new health behavior?", opts: ["Outcome expectations", "Self-efficacy", "Behavioral capability", "Social support"], correct: 1, explain: "Self-efficacy — the belief in one's ability to perform the behavior — is the central and strongest predictor in SCT. Bandura placed it at the core of his model." },
+  { q: "A health program recruits community members who have successfully quit smoking to share their stories with current smokers. Which SCT mechanism is this primarily using?", opts: ["Self-regulation through goal-setting", "Behavioral capability training", "Vicarious learning to build self-efficacy", "Reciprocal determinism adjustment"], correct: 2, explain: "Sharing stories of similar others who succeeded is classic vicarious learning — a key source of self-efficacy. Seeing someone like you succeed raises your belief that you can too." },
+  { q: "Bonding social capital is most useful for:", opts: ["Connecting a community to government health officials", "Spreading health information across different racial and ethnic groups", "Providing emotional support and trust within a homogeneous group", "Creating new resources where none previously existed"], correct: 2, explain: "Bonding capital operates within similar, homogeneous groups — it provides emotional support, trust, and mutual aid within the in-group." },
+  { q: "A community health worker helps residents meet with the hospital board to advocate for language access services. What type of social capital is this?", opts: ["Bonding", "Bridging", "Linking", "Structural"], correct: 2, explain: "Linking capital involves connections between community members and institutions or individuals who hold formal power. This CHW is linking residents to the hospital system." },
+  { q: "In Social Network Theory, the 'strength of weak ties' concept suggests that:", opts: ["Stronger, closer relationships are always more useful for health behavior change", "Weak ties — connections to acquaintances across different groups — are key conduits for spreading new information", "Health programs should only target the most central nodes in a network", "Weak ties are associated with worse health outcomes due to lack of social support"], correct: 1, explain: "Granovetter's 'strength of weak ties' shows that weak ties carry novel information to parts of the network that strong ties never reach — making them critical for diffusion." },
+  { q: "Which node type in a social network has the highest betweenness centrality and is most strategic for health interventions?", opts: ["Peripheral nodes with few connections", "Cluster members deeply embedded within a single group", "Broker or bridge nodes that connect otherwise separate clusters", "Laggard nodes that resist new health behaviors"], correct: 2, explain: "Broker/bridge nodes sit between clusters and control the flow of information across the network. Intervening here has the greatest network-wide impact." },
+];
+
+let quizBuilt = false;
+function buildQuiz() {
+  if (quizBuilt) return;
+  quizBuilt = true;
+  const container = document.getElementById('quiz-container');
+  questions.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'quiz-q';
+    const groupId = `quiz-group-${i}`;
+    div.innerHTML = `<h4 id="qq-label-${i}">${i+1}. ${q.q}</h4>
+      <div class="quiz-options" role="group" aria-labelledby="qq-label-${i}" id="${groupId}">
+        ${q.opts.map((o,j) => `<button class="quiz-opt" data-q="${i}" data-idx="${j}" aria-pressed="false" onclick="selectQuiz(this)">${o}</button>`).join('')}
+      </div>
+      <div class="quiz-explanation" id="qe${i}" hidden>${q.explain}</div>`;
+    container.appendChild(div);
+  });
+}
+
+function selectQuiz(btn) {
+  const qi = btn.dataset.q;
+  document.querySelectorAll(`[data-q="${qi}"]`).forEach(b => { b.setAttribute('aria-pressed','false'); b.style.borderColor=''; b.style.background=''; });
+  btn.setAttribute('aria-pressed','true');
+  btn.style.borderColor = '#1a7a8a'; btn.style.background = '#e8f6f8';
+  btn.dataset.selected = 'true';
+  document.querySelectorAll(`[data-q="${qi}"]`).forEach(b => { if (b !== btn) delete b.dataset.selected; });
+}
+
+function submitQuiz() {
+  let score = 0, answered = 0;
+  questions.forEach((q, i) => {
+    const selected = document.querySelector(`[data-q="${i}"][data-selected="true"]`);
+    if (!selected) return;
+    answered++;
+    document.querySelectorAll(`[data-q="${i}"]`).forEach(b => b.disabled = true);
+    if (parseInt(selected.dataset.idx) === q.correct) {
+      selected.classList.add('correct'); selected.setAttribute('aria-pressed','true'); score++;
+    } else {
+      selected.classList.add('wrong');
+      document.querySelector(`[data-q="${i}"][data-idx="${q.correct}"]`).classList.add('correct');
+    }
+    const exp = document.getElementById('qe' + i);
+    exp.hidden = false;
+  });
+  if (answered < questions.length) { alert('Please answer all questions before submitting.'); return; }
+  const bar = document.getElementById('score-bar');
+  bar.hidden = false;
+  const msg = score === questions.length ? 'Excellent! You have a strong grasp of all three interpersonal theories.' : score >= 4 ? 'Good work! Review the explanations for any missed questions.' : 'Keep reviewing — revisit the concept explorer tabs and try again.';
+  bar.innerHTML = `<h3>Score: ${score} out of ${questions.length}</h3><p>${msg}</p>`;
+  announce(`Quiz submitted. Score: ${score} out of ${questions.length}. ${msg}`);
+  const qbtn = document.getElementById('quiz-btn');
+  qbtn.textContent = 'Try Again';
+  qbtn.onclick = resetQuiz;
+  bar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resetQuiz() {
+  quizBuilt = false;
+  document.getElementById('quiz-container').innerHTML = '';
+  const bar = document.getElementById('score-bar'); bar.hidden = true;
+  const qbtn = document.getElementById('quiz-btn'); qbtn.textContent = 'Submit Answers'; qbtn.onclick = submitQuiz;
+  buildQuiz();
+  announce('Quiz has been reset.');
+}
+
+// Init capital
+buildCapitalScenarios();
+</script>
+</body>
+</html>

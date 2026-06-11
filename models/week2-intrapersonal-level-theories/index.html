@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intrapersonal Theories — Interactive Widget</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f7fa; color: #1a1a1a; font-size: 15px; line-height: 1.6; min-height: 100vh; }
+
+  .header { background: #1a3c5e; color: #fff; padding: 20px 24px 16px; border-bottom: 3px solid #4a90d9; }
+  .header-eyebrow { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #9bbfe0; margin-bottom: 4px; }
+  .header-title { font-size: 20px; font-weight: 600; }
+  .header-sub { font-size: 13px; color: #c0d8f0; margin-top: 4px; }
+
+  .tab-bar { display: flex; background: #fff; border-bottom: 1px solid #dde3ea; overflow-x: auto; scrollbar-width: none; }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab { flex-shrink: 0; padding: 12px 18px; font-size: 13px; font-weight: 500; color: #6b7280; background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
+  .tab:hover { color: #1a3c5e; }
+  .tab.active { color: #1a3c5e; border-bottom-color: #4a90d9; }
+
+  .content { padding: 22px 24px; max-width: 800px; }
+  .pane { display: none; }
+  .pane.active { display: block; }
+
+  /* shared */
+  .card { background: #fff; border: 1px solid #dde3ea; border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .card-title { font-size: 14px; font-weight: 600; color: #1a3c5e; margin-bottom: 8px; }
+  .card-body { font-size: 14px; color: #374151; line-height: 1.6; }
+  .callout { background: #eef4fb; border-left: 4px solid #4a90d9; border-radius: 0 6px 6px 0; padding: 12px 16px; font-size: 14px; color: #1a3c5e; font-style: italic; margin: 10px 0; line-height: 1.6; }
+
+  /* theory selector */
+  .theory-selector { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .tbtn { padding: 13px 14px; border: 1px solid #dde3ea; border-radius: 10px; background: #fff; cursor: pointer; text-align: left; transition: all 0.15s; }
+  .tbtn:hover { background: #f8fafc; }
+  .tbtn.active { border-width: 2px; }
+  .tbtn-abbr { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .tbtn-name { font-size: 13px; font-weight: 500; color: #1a1a1a; line-height: 1.3; }
+  .tbtn-type { font-size: 11px; color: #9ca3af; margin-top: 3px; }
+  .t-tpb .tbtn-abbr { color: #1a3c5e; } .t-tpb.active { border-color: #1a3c5e; background: #eef4fb; }
+  .t-hbm .tbtn-abbr { color: #b45309; } .t-hbm.active { border-color: #b45309; background: #fef9ec; }
+  .t-ttm .tbtn-abbr { color: #166534; } .t-ttm.active { border-color: #166534; background: #f0fdf4; }
+  .t-sr  .tbtn-abbr { color: #991b1b; } .t-sr.active  { border-color: #991b1b; background: #fef2f2; }
+
+  .theory-panel { display: none; }
+  .theory-panel.active { display: block; }
+
+  /* construct grid */
+  .construct-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; margin-bottom: 10px; }
+  .cbtn { padding: 10px 12px; border: 1px solid #dde3ea; border-radius: 8px; background: #f8fafc; cursor: pointer; text-align: left; transition: all 0.15s; }
+  .cbtn:hover { border-color: #4a90d9; background: #eef4fb; }
+  .cbtn.active { border-color: #4a90d9; background: #eef4fb; }
+  .cbtn-name { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
+  .cbtn-short { font-size: 12px; color: #9ca3af; }
+  .cdetail { background: #eef4fb; border: 1px solid #bee3f8; border-radius: 8px; padding: 14px 16px; display: none; margin-top: 6px; }
+  .cdetail.active { display: block; }
+  .cdetail-name { font-size: 14px; font-weight: 600; color: #1a3c5e; margin-bottom: 8px; }
+  .cdetail-def { font-size: 14px; color: #374151; line-height: 1.65; margin-bottom: 10px; }
+  .cdetail-eg-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #6b7280; margin-bottom: 5px; }
+  .cdetail-eg { font-size: 13px; color: #374151; background: #fff; border-radius: 6px; padding: 10px 12px; border: 1px solid #dde3ea; line-height: 1.6; }
+
+  /* TTM stages */
+  .stage-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #f0ede8; }
+  .stage-item:last-child { border-bottom: none; }
+  .stage-circle { min-width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #fff; flex-shrink: 0; }
+  .stage-name { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 3px; }
+  .stage-def  { font-size: 13px; color: #374151; line-height: 1.55; margin-bottom: 4px; }
+  .stage-int  { font-size: 12px; color: #6b7280; font-style: italic; }
+
+  /* SR 2x2 */
+  .sr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .sr-cell { border-radius: 8px; padding: 14px; border: 1px solid #dde3ea; }
+  .sr-inc { background: #f0fdf4; border-color: #86efac; }
+  .sr-dec { background: #fef2f2; border-color: #fca5a5; }
+  .sr-type { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+  .sr-inc .sr-type { color: #166534; }
+  .sr-dec .sr-type { color: #991b1b; }
+  .sr-title { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 5px; }
+  .sr-def   { font-size: 13px; color: #374151; line-height: 1.55; margin-bottom: 6px; }
+  .sr-eg    { font-size: 12px; color: #6b7280; font-style: italic; }
+
+  /* compare table */
+  .comp-wrap { overflow-x: auto; }
+  .comp-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 560px; }
+  .comp-table th { padding: 10px 12px; font-weight: 600; text-align: left; background: #1a3c5e; color: #fff; font-size: 12px; }
+  .comp-table td { padding: 10px 12px; border-bottom: 1px solid #e5e9ef; color: #374151; vertical-align: top; line-height: 1.55; }
+  .comp-table tr:nth-child(even) td { background: #f8fafc; }
+  .theory-pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 99px; white-space: nowrap; }
+  .pill-tpb { background: #dbeafe; color: #1e3a8a; }
+  .pill-hbm { background: #fef9c3; color: #78350f; }
+  .pill-ttm { background: #dcfce7; color: #14532d; }
+  .pill-sr  { background: #fee2e2; color: #7f1d1d; }
+
+  /* quiz / apply shared */
+  .prog-bar-wrap { background: #e5e7eb; border-radius: 99px; height: 5px; margin-bottom: 16px; }
+  .prog-bar-fill { background: #4a90d9; border-radius: 99px; height: 5px; transition: width 0.3s; }
+  .q-meta { font-size: 12px; color: #9ca3af; margin-bottom: 8px; }
+  .q-q    { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 14px; line-height: 1.5; }
+  .q-scenario { background: #f8fafc; border-left: 4px solid #4a90d9; border-radius: 0 8px 8px 0; padding: 12px 14px; font-size: 14px; color: #374151; margin-bottom: 14px; line-height: 1.65; font-style: italic; }
+  .opt-btn { display: block; width: 100%; text-align: left; padding: 10px 14px; font-size: 14px; border: 1px solid #d1d9e0; border-radius: 8px; background: #fff; color: #1a1a1a; cursor: pointer; margin-bottom: 8px; transition: all 0.15s; line-height: 1.5; }
+  .opt-btn:hover:not(:disabled) { background: #eef4fb; border-color: #4a90d9; }
+  .opt-btn.correct { background: #dcfce7; border-color: #22c55e; color: #14532d; }
+  .opt-btn.wrong   { background: #fee2e2; border-color: #ef4444; color: #7f1d1d; }
+  .feedback { font-size: 14px; padding: 10px 14px; border-radius: 8px; margin-top: 6px; display: none; line-height: 1.55; }
+  .feedback.show { display: block; }
+  .feedback.ok  { background: #dcfce7; color: #14532d; border-left: 3px solid #22c55e; }
+  .feedback.err { background: #fee2e2; color: #7f1d1d; border-left: 3px solid #ef4444; }
+  .next-btn { margin-top: 12px; padding: 9px 22px; font-size: 14px; background: #1a3c5e; color: #fff; border: none; border-radius: 8px; cursor: pointer; display: none; transition: background 0.15s; }
+  .next-btn:hover { background: #254d78; }
+  .next-btn.show { display: inline-block; }
+  .score-box { text-align: center; padding: 28px 24px; background: #fff; border: 1px solid #dde3ea; border-radius: 10px; }
+  .score-big { font-size: 52px; font-weight: 700; color: #1a3c5e; }
+  .score-label { font-size: 15px; color: #6b7280; margin-top: 6px; line-height: 1.6; }
+  .restart-btn { margin-top: 16px; padding: 9px 22px; font-size: 14px; background: #1a3c5e; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <p class="header-eyebrow">Chapter 7 · Intrapersonal Level Theories</p>
+  <h1 class="header-title">TPB · HBM · TTM · Stimulus Response Theory</h1>
+  <p class="header-sub">Explore constructs, compare theories, apply to scenarios, and check your knowledge.</p>
+</div>
+
+<div class="tab-bar" role="tablist">
+  <button class="tab active" onclick="showTab('constructs', this)">Constructs explorer</button>
+  <button class="tab" onclick="showTab('compare', this)">Compare theories</button>
+  <button class="tab" onclick="showTab('apply', this)">Apply it</button>
+  <button class="tab" onclick="showTab('quiz', this)">Knowledge check</button>
+</div>
+
+<div class="content">
+
+  <!-- ══ CONSTRUCTS ══════════════════════════════════════════════ -->
+  <div id="pane-constructs" class="pane active">
+    <div class="card">
+      <p class="card-body">Select a theory to explore its constructs. Click any construct card to see its definition and a health promotion example.</p>
+    </div>
+
+    <div class="theory-selector">
+      <button class="tbtn t-tpb active" onclick="showTheory('tpb', this)">
+        <p class="tbtn-abbr">TPB</p>
+        <p class="tbtn-name">Theory of Planned Behavior</p>
+        <p class="tbtn-type">Continuum · Value-expectancy</p>
+      </button>
+      <button class="tbtn t-hbm" onclick="showTheory('hbm', this)">
+        <p class="tbtn-abbr">HBM</p>
+        <p class="tbtn-name">Health Belief Model</p>
+        <p class="tbtn-type">Continuum · Value-expectancy</p>
+      </button>
+      <button class="tbtn t-ttm" onclick="showTheory('ttm', this)">
+        <p class="tbtn-abbr">TTM</p>
+        <p class="tbtn-name">Transtheoretical Model</p>
+        <p class="tbtn-type">Stage theory</p>
+      </button>
+      <button class="tbtn t-sr" onclick="showTheory('sr', this)">
+        <p class="tbtn-abbr">SR</p>
+        <p class="tbtn-name">Stimulus Response Theory</p>
+        <p class="tbtn-type">Continuum · Behaviorist</p>
+      </button>
+    </div>
+
+    <!-- TPB -->
+    <div id="theory-tpb" class="theory-panel active">
+      <div class="construct-grid" id="cg-tpb"></div>
+      <div id="cd-tpb" class="cdetail"></div>
+    </div>
+
+    <!-- HBM -->
+    <div id="theory-hbm" class="theory-panel">
+      <div class="construct-grid" id="cg-hbm"></div>
+      <div id="cd-hbm" class="cdetail"></div>
+    </div>
+
+    <!-- TTM -->
+    <div id="theory-ttm" class="theory-panel">
+      <div class="card" style="margin-bottom:12px;">
+        <p class="card-body">The TTM is a <strong>stage theory</strong> — its core framework is the stages of change. Interventions must match the participant's current stage. The model also includes processes of change, decisional balance, self-efficacy, and temptation.</p>
+      </div>
+      <div class="card" id="stages-container"></div>
+      <div style="margin-top:12px;">
+        <div class="construct-grid" id="cg-ttm"></div>
+        <div id="cd-ttm" class="cdetail"></div>
+      </div>
+    </div>
+
+    <!-- SR -->
+    <div id="theory-sr" class="theory-panel">
+      <div class="card" style="margin-bottom:12px;">
+        <p class="card-body">SR Theory organizes behavioral consequences into a 2×2 framework. Reinforcement always <strong>increases</strong> behavior; punishment always <strong>decreases</strong> it. Both can be positive (adding something) or negative (removing something).</p>
+      </div>
+      <div class="sr-grid" id="sr-grid"></div>
+    </div>
+  </div>
+
+  <!-- ══ COMPARE ═════════════════════════════════════════════════ -->
+  <div id="pane-compare" class="pane">
+    <div class="card" style="margin-bottom:12px;">
+      <p class="card-body">This table compares the four theories across key dimensions relevant to program planning. Use it to understand when each theory is most appropriate.</p>
+    </div>
+    <div class="comp-wrap">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th style="width:12%;">Theory</th>
+            <th style="width:15%;">Type</th>
+            <th style="width:22%;">Core driver of behavior</th>
+            <th style="width:25%;">Key planning question</th>
+            <th style="width:26%;">Best suited when...</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="theory-pill pill-tpb">TPB</span></td>
+            <td>Continuum · Stage-agnostic</td>
+            <td>Intention — shaped by attitude, subjective norm, and perceived behavioral control</td>
+            <td>Does the person intend to act, and does that intention translate to behavior?</td>
+            <td>Behavior is volitional and social norms or perceived control are relevant barriers</td>
+          </tr>
+          <tr>
+            <td><span class="theory-pill pill-hbm">HBM</span></td>
+            <td>Continuum · Threat-based</td>
+            <td>Perceived threat (susceptibility + severity) and net value of action (benefits minus barriers)</td>
+            <td>Does the person feel at risk, and do they think the action is worth it?</td>
+            <td>The behavior is preventive and the population may not perceive themselves as at risk</td>
+          </tr>
+          <tr>
+            <td><span class="theory-pill pill-ttm">TTM</span></td>
+            <td>Stage theory</td>
+            <td>Stage of readiness — and the processes, decisional balance, and self-efficacy relevant at each stage</td>
+            <td>Where is this person in the change process, and what does someone at that stage need?</td>
+            <td>The population has mixed readiness or sustaining long-term change is the goal</td>
+          </tr>
+          <tr>
+            <td><span class="theory-pill pill-sr">SR</span></td>
+            <td>Continuum · Behaviorist</td>
+            <td>Reinforcement history — the consequences that follow behavior determine its frequency</td>
+            <td>What consequences are currently maintaining this behavior, and what new ones can be introduced?</td>
+            <td>The intervention uses incentives, reward systems, environmental cues, or behavioral contracting</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card" style="margin-top:12px;">
+      <p class="card-title">A note on combining theories</p>
+      <p class="card-body">These theories are not mutually exclusive. A smoking cessation program might use TTM to stage the audience, HBM to raise perceived susceptibility, TPB to address social norms, and SR principles to structure a reward system. Combining theories thoughtfully addresses more dimensions of behavior change.</p>
+    </div>
+  </div>
+
+  <!-- ══ APPLY ═══════════════════════════════════════════════════ -->
+  <div id="pane-apply" class="pane">
+    <div class="card" style="margin-bottom:14px;">
+      <p class="card-body">Each scenario describes a real health promotion situation. Identify the relevant theory and construct. Detailed feedback is provided after each answer.</p>
+    </div>
+    <div id="apply-container"></div>
+  </div>
+
+  <!-- ══ QUIZ ════════════════════════════════════════════════════ -->
+  <div id="pane-quiz" class="pane">
+    <div id="quiz-container"></div>
+  </div>
+
+</div><!-- /content -->
+
+<script>
+// ── TAB SWITCHING ──────────────────────────────────────────────────
+function showTab(id, btn) {
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('pane-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── THEORY PANEL SWITCHING ─────────────────────────────────────────
+function showTheory(id, btn) {
+  document.querySelectorAll('.theory-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tbtn').forEach(b => b.classList.remove('active'));
+  document.getElementById('theory-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── CONSTRUCT DATA ─────────────────────────────────────────────────
+const constructs = {
+  tpb: [
+    { name: 'Attitude toward the behavior', short: 'Personal evaluation of the behavior',
+      def: 'The individual\'s positive or negative evaluation of performing the behavior — whether they think it is good or bad, worthwhile or not. Shaped by beliefs about what the behavior will produce and how much those outcomes are valued.',
+      eg: 'A college student believes the flu vaccine will prevent illness (behavioral belief) and values avoiding illness (outcome evaluation) → positive attitude toward vaccination.' },
+    { name: 'Subjective norm', short: 'Perceived social pressure',
+      def: 'The perceived social pressure to perform or not perform a behavior — what important others (family, peers, colleagues) believe one should do, and how much the person is motivated to comply.',
+      eg: 'An employee believes his coworkers expect him to join the wellness challenge. His desire to fit in increases his intention to participate, even though he is personally ambivalent about exercise.' },
+    { name: 'Perceived behavioral control', short: 'Belief in ability to act',
+      def: 'The person\'s perception of how easy or difficult it will be to perform the behavior — their confidence in their ability to do it. Similar to self-efficacy. High PBC narrows the gap between intention and behavior.',
+      eg: '"I could exercise three times a week if I wanted to" = high PBC. "I could never stick with that" = low PBC. Skills training and scheduling support can build PBC.' },
+    { name: 'Intention', short: 'Motivation and commitment to act',
+      def: 'The most immediate predictor of behavior — the motivational indicator of how hard a person plans to try. Intention is shaped by attitude, subjective norm, and perceived behavioral control.',
+      eg: 'A person who holds positive attitudes, perceives social support, and feels capable of acting will have strong intention — the single best predictor of whether the behavior occurs.' },
+    { name: 'Actual behavioral control', short: 'Real skills and resources',
+      def: 'The actual skills, resources, and opportunities a person has to perform the behavior — as distinct from their perception of control. Combined with strong intention, actual behavioral control determines whether the behavior occurs.',
+      eg: 'A person intends to take their medication daily (high intention) but a complex dosing schedule and inability to afford refills (low actual behavioral control) prevent consistent adherence.' },
+  ],
+  hbm: [
+    { name: 'Perceived susceptibility', short: 'Am I personally at risk?',
+      def: 'The person\'s belief about their personal chances of getting a condition or experiencing a health threat. The most foundational HBM construct — without some sense of personal risk, action is unlikely regardless of other factors.',
+      eg: 'A 40-year-old man who says "diabetes is something that happens to other people" has low perceived susceptibility. Personalized risk assessments and community statistics can raise it.' },
+    { name: 'Perceived severity', short: 'How serious would it be?',
+      def: 'Belief about how serious the condition and its consequences would be — both medically (pain, disability, death) and socially (impact on work, relationships, finances).',
+      eg: 'A person knows they are at risk for diabetes but doesn\'t think it\'s "that serious." Communicating the full consequences — including kidney disease, amputation, and blindness — addresses perceived severity.' },
+    { name: 'Perceived benefits', short: 'Will action help?',
+      def: 'Belief in the effectiveness of taking the recommended action to reduce the threat. Perceived benefits must outweigh perceived barriers for action to occur.',
+      eg: 'Believing that a daily 30-minute walk will meaningfully reduce blood pressure is a perceived benefit. Showing evidence that the action has worked for people like them strengthens this construct.' },
+    { name: 'Perceived barriers', short: 'What stands in the way?',
+      def: 'Beliefs about the obstacles to taking action — cost, inconvenience, side effects, embarrassment, time, stigma. Net value of action = benefits minus barriers. Even high threat perception won\'t produce action if barriers feel insurmountable.',
+      eg: '"I want to get screened but the clinic is far, I\'d need time off work, and I\'m afraid of the results." Three barriers: access, cost, fear. Self-efficacy helps people believe they can overcome them.' },
+    { name: 'Cues to action', short: 'Triggers that prompt action',
+      def: 'Internal or external stimuli that trigger health-related action — a symptom, a media message, a physician\'s reminder, a friend\'s diagnosis. Cues activate the HBM process; without them, even high threat perception may not produce behavior change.',
+      eg: 'A friend\'s breast cancer diagnosis prompts a woman to schedule her first mammogram. The friend\'s diagnosis is an external cue to action that converts existing perceived threat into concrete behavior.' },
+    { name: 'Self-efficacy', short: 'Confidence to act (added later)',
+      def: 'Added to the HBM to explain how confidence modulates perception of barriers. High self-efficacy → barriers feel manageable. Low self-efficacy → barriers feel overwhelming, even if they are objectively small.',
+      eg: 'Two people face the same barrier: gym membership costs $40/month. The person with high self-efficacy finds a free alternative. The person with low self-efficacy uses the cost as a reason not to start.' },
+  ],
+  ttm: [
+    { name: 'Decisional balance', short: 'Weighing pros and cons of change',
+      def: 'How a person evaluates the advantages (pros) and disadvantages (cons) of changing. In early stages, cons dominate; as people progress, pros gradually outweigh cons. Shifting decisional balance is a key early-stage strategy.',
+      eg: 'A smoker in precontemplation: pros of smoking (stress relief, social connection) >> cons (health risk feels distant). In contemplation: the balance begins shifting. Interventions raise the perceived value of the pros of change.' },
+    { name: 'Processes of change', short: 'Cognitive and behavioral strategies',
+      def: 'Ten strategies — cognitive (e.g., consciousness raising, self-reevaluation) and behavioral (e.g., stimulus control, reinforcement management) — that support movement between stages. Cognitive processes are more relevant early; behavioral processes later.',
+      eg: 'A person in contemplation benefits from consciousness raising (new risk information). A person in action benefits from stimulus control (removing cigarettes from the house) and reinforcement management (rewarding smoke-free days).' },
+    { name: 'Self-efficacy', short: 'Confidence to change and sustain change',
+      def: 'Confidence in the ability to make and maintain the behavior change in tempting situations. Increases as people progress through stages. Distinct from HBM self-efficacy — here it specifically concerns sustained change over time.',
+      eg: 'A person in action who successfully abstains from alcohol for two weeks builds self-efficacy for continued abstinence. Mastery experiences, social support, and skills practice all build TTM self-efficacy.' },
+    { name: 'Temptation', short: 'Urge to engage in the old behavior',
+      def: 'The intensity of urges to engage in the old behavior in challenging situations — emotional distress, social contexts, or positive opportunity. Decreases as a person progresses beyond the action stage.',
+      eg: 'A person in maintenance who quit smoking a year ago still experiences strong temptation at social gatherings. Relapse prevention planning specifically targets high-temptation situations before they occur.' },
+  ],
+};
+
+const stages = [
+  { n: 'Stage 1 — Precontemplation', d: 'Not intending to take action in the next 6 months. May be unaware of the problem, in denial, or demoralized by past failures.', int: 'Raise awareness; provide personalized risk information; do not push action planning.', color: '#1a3c5e' },
+  { n: 'Stage 2 — Contemplation',    d: 'Intending to take action within the next 6 months. Aware of the problem and seriously considering change, but ambivalent — weighing pros and cons.', int: 'Work on decisional balance; explore ambivalence; build motivation.', color: '#2860a0' },
+  { n: 'Stage 3 — Preparation',      d: 'Intending to take action within the next 30 days and has taken some behavioral steps. Has a plan.', int: 'Help develop a specific action plan; connect to resources and support.', color: '#4a90d9' },
+  { n: 'Stage 4 — Action',           d: 'Has made overt, observable behavior changes within the past 6 months.', int: 'Reinforce commitment; build coping strategies; strengthen self-efficacy.', color: '#166534' },
+  { n: 'Stage 5 — Maintenance',      d: 'Working to prevent relapse and consolidate gains. Has sustained action for more than 6 months.', int: 'Relapse prevention planning; build confidence in high-risk situations.', color: '#15803d' },
+];
+
+const srCells = [
+  { type: 'Increases behavior', title: 'Positive reinforcement', def: 'Adding a reward after a behavior → behavior increases in frequency.', eg: 'Employee receives a gift card for completing a health screening.', cls: 'sr-inc' },
+  { type: 'Increases behavior', title: 'Negative reinforcement', def: 'Removing an aversive stimulus after a behavior → behavior increases.', eg: 'A patient\'s medication dose (with unpleasant side effects) is reduced when they consistently complete physical therapy exercises.', cls: 'sr-inc' },
+  { type: 'Decreases behavior', title: 'Positive punishment',   def: 'Adding an aversive stimulus after a behavior → behavior decreases.', eg: 'A smoker receives a fine each time they smoke in a non-smoking zone.', cls: 'sr-dec' },
+  { type: 'Decreases behavior', title: 'Negative punishment',   def: 'Removing a reward after a behavior → behavior decreases.', eg: 'A wellness participant loses accumulated points when they miss a required fitness activity.', cls: 'sr-dec' },
+];
+
+// ── BUILD CONSTRUCT GRIDS ──────────────────────────────────────────
+let activeConstruct = {};
+
+function buildGrid(theory) {
+  const grid = document.getElementById('cg-' + theory);
+  const det  = document.getElementById('cd-' + theory);
+  if (!grid) return;
+  constructs[theory].forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'cbtn';
+    btn.innerHTML = `<p class="cbtn-name">${c.name}</p><p class="cbtn-short">${c.short}</p>`;
+    btn.onclick = () => {
+      if (activeConstruct[theory] === i) {
+        btn.classList.remove('active');
+        det.classList.remove('active');
+        activeConstruct[theory] = null;
+      } else {
+        grid.querySelectorAll('.cbtn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        det.innerHTML = `<p class="cdetail-name">${c.name}</p><p class="cdetail-def">${c.def}</p><p class="cdetail-eg-label">Health promotion example</p><p class="cdetail-eg">${c.eg}</p>`;
+        det.classList.add('active');
+        activeConstruct[theory] = i;
+      }
+    };
+    grid.appendChild(btn);
+  });
+}
+
+buildGrid('tpb');
+buildGrid('hbm');
+buildGrid('ttm');
+
+// ── BUILD STAGES ───────────────────────────────────────────────────
+const stageContainer = document.getElementById('stages-container');
+stages.forEach(s => {
+  const div = document.createElement('div');
+  div.className = 'stage-item';
+  div.innerHTML = `
+    <div class="stage-circle" style="background:${s.color};">${stages.indexOf(s)+1}</div>
+    <div>
+      <p class="stage-name">${s.n}</p>
+      <p class="stage-def">${s.d}</p>
+      <p class="stage-int">${s.int}</p>
+    </div>`;
+  stageContainer.appendChild(div);
+});
+
+// ── BUILD SR GRID ──────────────────────────────────────────────────
+const srGrid = document.getElementById('sr-grid');
+srCells.forEach(c => {
+  const cell = document.createElement('div');
+  cell.className = `sr-cell ${c.cls}`;
+  cell.innerHTML = `<p class="sr-type">${c.type}</p><p class="sr-title">${c.title}</p><p class="sr-def">${c.def}</p><p class="sr-eg">${c.eg}</p>`;
+  srGrid.appendChild(cell);
+});
+
+// ── APPLY SCENARIOS ────────────────────────────────────────────────
+const applyQuestions = [
+  {
+    scenario: 'A 55-year-old man knows his family has a history of colorectal cancer but says, "That\'s something that happens to older people. I feel fine." He has never had a colonoscopy.',
+    q: 'Which HBM construct is the primary barrier in this scenario?',
+    opts: [
+      'Perceived barriers — the colonoscopy is too inconvenient',
+      'Perceived susceptibility — he does not believe he is personally at risk',
+      'Cues to action — no trigger has prompted him to act',
+      'Perceived severity — he does not think colorectal cancer is serious'
+    ],
+    correct: 1,
+    ok: 'Correct. Despite knowing his family history, he does not perceive himself as susceptible — "that happens to older people, I feel fine." Low perceived susceptibility is the primary barrier. An intervention must raise his personal sense of risk before other HBM constructs can work.',
+    err: 'Not quite. He is aware cancer is serious and there is no mention of inconvenience. The key statement — "that happens to other people" — directly expresses low perceived susceptibility. This must be addressed before any other HBM construct becomes actionable.'
+  },
+  {
+    scenario: 'A workplace wellness coordinator surveys 200 employees about physical activity. She finds: 35 have no interest in changing; 40 are thinking about it but not planning; 50 plan to start within the month; 45 have recently started; and 30 are already exercising regularly.',
+    q: 'Which theory is most appropriate for designing this program, and why?',
+    opts: [
+      'Health Belief Model — because perceived barriers vary across employees',
+      'Theory of Planned Behavior — because all employees have different attitudes',
+      'Transtheoretical Model — because the population is spread across different stages of readiness',
+      'Stimulus Response Theory — because incentives will motivate all employees equally'
+    ],
+    correct: 2,
+    ok: 'Correct. The survey data mirrors the TTM stage distribution — from no interest (precontemplation) to regular exercise (maintenance). TTM is specifically designed for populations with mixed readiness: each stage requires different intervention content, and a single uniform program will fail most of this group.',
+    err: 'Not quite. The survey results directly map to TTM stages — from precontemplation through maintenance. A single intervention would miss most of this population. TTM is designed precisely for this situation: heterogeneous readiness requiring stage-matched strategies.'
+  },
+  {
+    scenario: 'A school nutrition program gives students a "veggie stamp" each time they choose a vegetable at lunch. After 10 stamps, they receive a free smoothie from the cafeteria.',
+    q: 'Which SR mechanism is this program primarily using?',
+    opts: [
+      'Negative reinforcement — removing an aversive stimulus to increase behavior',
+      'Positive punishment — adding a consequence to decrease unhealthy eating',
+      'Positive reinforcement — adding a reward to increase the desired behavior',
+      'Negative punishment — removing a reward to decrease undesired behavior'
+    ],
+    correct: 2,
+    ok: 'Correct. Adding a desirable reward (free smoothie) after a desired behavior (choosing vegetables) is positive reinforcement. The expected result is an increase in vegetable selection frequency — the defining outcome of any reinforcement strategy.',
+    err: 'Not quite. Positive reinforcement = adding something desirable (the reward) after a behavior → behavior increases. Negative reinforcement involves removing something aversive. Punishment always decreases behavior. A free smoothie is a reward added to increase a behavior — that is positive reinforcement.'
+  },
+  {
+    scenario: 'A health educator works with adults who all say they intend to check their blood glucose regularly. Six weeks later, only 20% are doing it. Many say they are not sure how to use the glucometer correctly.',
+    q: 'Using the Theory of Planned Behavior, which construct explains the gap between intention and behavior?',
+    opts: [
+      'Subjective norm — social pressure is preventing them from acting',
+      'Attitude — they do not value blood glucose monitoring',
+      'Perceived behavioral control — low confidence in their ability to perform the behavior correctly',
+      'Decisional balance — the cons of monitoring outweigh the pros'
+    ],
+    correct: 2,
+    ok: 'Correct. Intention is strong — everyone said they intended to act. TPB identifies perceived behavioral control (and actual behavioral control) as the bridge between intention and behavior. Not knowing how to use the glucometer = low actual behavioral control, reflected as low PBC. A skills-training session directly addresses this.',
+    err: 'Not quite. Everyone intends to act, so attitudes and subjective norms are not the barrier. Decisional balance is a TTM construct. The gap between strong intention and low behavior in TPB is explained by low perceived and actual behavioral control — they want to, but don\'t know how.'
+  },
+  {
+    scenario: 'A community health program targets smoking cessation. The assessment finds that most smokers say: "I know smoking is bad. I\'ve tried to quit four times. It never works for me. I\'ve just accepted that I\'m a smoker."',
+    q: 'Using the Transtheoretical Model, what best describes this audience — and what does that mean for intervention design?',
+    opts: [
+      'Contemplation — they are ambivalent and need decisional balance work',
+      'Precontemplation — unaware of risk; raise awareness about health consequences',
+      'Preparation — they are ready to act; provide a quit plan',
+      'Precontemplation (demoralized) — past failures have eroded self-efficacy and intention; rebuild confidence before targeting behavior change'
+    ],
+    correct: 3,
+    ok: 'Correct. This is demoralized precontemplation — they know the risk but have stopped intending to change because of repeated failure. Pushing a quit plan will increase demoralization. The priority is rebuilding self-efficacy and reconnecting intention to change before any behavioral intervention is appropriate.',
+    err: 'Not quite. This group is not unaware of the risk — they\'ve tried four times. This is demoralized precontemplation: people who are no longer intending to try because they\'ve lost confidence after failure. Action-oriented strategies are inappropriate here. Rebuilding self-efficacy and motivation comes first.'
+  },
+  {
+    scenario: 'A hospital wants to increase hand hygiene compliance among clinical staff. Assessment shows that staff know hand hygiene prevents infection and believe it is important. Compliance is still at 60%. The main complaint: "The hand sanitizer dispensers are too far from patient beds."',
+    q: 'Which theory and construct best identifies the root barrier here?',
+    opts: [
+      'Health Belief Model — low perceived severity',
+      'Theory of Planned Behavior — low actual behavioral control due to an environmental access barrier',
+      'Stimulus Response Theory — negative punishment reducing compliance',
+      'Transtheoretical Model — staff are in contemplation'
+    ],
+    correct: 1,
+    ok: 'Correct. Knowledge is high, attitudes are positive, intention is presumably strong — but behavior is still low because of an environmental access barrier. TPB identifies actual behavioral control as the bridge between intention and behavior. "Dispensers are too far" = low actual behavioral control. The intervention: move the dispensers closer to patient beds.',
+    err: 'Not quite. HBM would apply if staff didn\'t perceive the risk — but they do. SR and TTM don\'t fit here. The barrier is not motivational or attitudinal. TPB identifies the problem: strong intention exists but actual behavioral control — physical access — is insufficient to support the behavior.'
+  },
+];
+
+let applyIdx = 0, applyAnswered = false, applyScores = [];
+
+function renderApply() {
+  const q = applyQuestions[applyIdx];
+  const pct = Math.round((applyIdx / applyQuestions.length) * 100);
+  document.getElementById('apply-container').innerHTML = `
+    <div class="prog-bar-wrap"><div class="prog-bar-fill" style="width:${pct}%"></div></div>
+    <div class="card">
+      <p class="q-meta">Scenario ${applyIdx + 1} of ${applyQuestions.length}</p>
+      <div class="q-scenario">${q.scenario}</div>
+      <p class="q-q">${q.q}</p>
+      ${q.opts.map((o, i) => `<button class="opt-btn" onclick="answerApply(${i})">${o}</button>`).join('')}
+      <div id="apply-fb" class="feedback"></div>
+      <button id="apply-nxt" class="next-btn" onclick="nextApply()">${applyIdx < applyQuestions.length - 1 ? 'Next scenario →' : 'See my score'}</button>
+    </div>`;
+  applyAnswered = false;
+}
+
+function answerApply(i) {
+  if (applyAnswered) return;
+  applyAnswered = true;
+  const q = applyQuestions[applyIdx];
+  applyScores.push(i === q.correct ? 1 : 0);
+  document.querySelectorAll('#apply-container .opt-btn').forEach((b, idx) => {
+    if (idx === q.correct) b.classList.add('correct');
+    else if (idx === i) b.classList.add('wrong');
+    b.disabled = true;
+  });
+  const fb = document.getElementById('apply-fb');
+  const ok = i === q.correct;
+  fb.textContent = (ok ? '✓ ' : '✗ ') + (ok ? q.ok : q.err);
+  fb.className = 'feedback show ' + (ok ? 'ok' : 'err');
+  document.getElementById('apply-nxt').classList.add('show');
+}
+
+function nextApply() {
+  applyIdx++;
+  if (applyIdx >= applyQuestions.length) showApplyScore();
+  else renderApply();
+}
+
+function showApplyScore() {
+  const total = applyScores.reduce((a, b) => a + b, 0);
+  const pct = Math.round((total / applyQuestions.length) * 100);
+  const msg = pct === 100 ? 'Outstanding — you can confidently apply all four theories to real scenarios.' :
+              pct >= 70  ? 'Good work. Review any missed scenarios and revisit the constructs explorer.' :
+                           'Keep going — review the constructs and compare tabs, then try again.';
+  document.getElementById('apply-container').innerHTML = `
+    <div class="score-box">
+      <div class="score-big">${total}/${applyQuestions.length}</div>
+      <div class="score-label">${pct}% — ${msg}</div>
+      <button class="restart-btn" onclick="restartApply()">Try again</button>
+    </div>`;
+}
+
+function restartApply() { applyIdx = 0; applyScores = []; renderApply(); }
+renderApply();
+
+// ── KNOWLEDGE CHECK ────────────────────────────────────────────────
+const quizQuestions = [
+  {
+    q: 'A value-expectancy theory explains behavior by focusing on:',
+    opts: ['Reinforcement history and environmental stimuli', 'Beliefs about outcomes and the value placed on those outcomes', 'The stage of readiness a person is currently in', 'Social pressure from important others'],
+    correct: 1,
+    ok: 'Correct. Value-expectancy theories (both TPB and HBM are examples) explain behavior through beliefs about what a behavior will produce and how much those outcomes are valued. Both the belief and the valuation must be present.',
+    err: 'Not quite. Value-expectancy theories center on two elements: the belief that a behavior will produce a certain outcome (expectancy) and the value placed on that outcome. Both TPB and HBM are value-expectancy frameworks.'
+  },
+  {
+    q: 'In the Theory of Planned Behavior, what is the most proximal (immediate) predictor of behavior?',
+    opts: ['Attitude toward the behavior', 'Perceived behavioral control', 'Intention', 'Subjective norm'],
+    correct: 2,
+    ok: 'Correct. Intention is the most immediate predictor of behavior in the TPB. Attitude, subjective norm, and perceived behavioral control all feed into intention, but intention itself is what directly precedes action.',
+    err: 'Not quite. While attitude, subjective norm, and PBC all influence the TPB process, intention is the most immediate predictor of behavior. It is what directly precedes action in the model.'
+  },
+  {
+    q: 'In the Health Belief Model, "perceived barriers" are best defined as:',
+    opts: ['The actual physical obstacles that prevent a behavior', 'Beliefs about obstacles or costs to taking the recommended action', 'A lack of general motivation to address health problems', 'Low perceived susceptibility to a health threat'],
+    correct: 1,
+    ok: 'Correct. Perceived barriers are perceptions — beliefs about obstacles, costs, and difficulties — not necessarily the actual obstacles themselves. Two people facing the same barrier may perceive it very differently, which is why self-efficacy is also part of the HBM.',
+    err: 'Not quite. Perceived barriers are specifically beliefs about obstacles — not the objective barriers themselves. This distinction matters: interventions target the perception, not only the objective obstacle.'
+  },
+  {
+    q: 'A person in the Contemplation stage of the TTM is best described as someone who:',
+    opts: ['Has no awareness of the problem and no intention to change', 'Is aware of the problem, considering change within 6 months, but still ambivalent', 'Has made a specific plan and is ready to act within 30 days', 'Has maintained behavior change for more than 6 months'],
+    correct: 1,
+    ok: 'Correct. Contemplation = awareness + ambivalence + considering change within 6 months. The key feature is ambivalence — weighing pros and cons without committing to a plan. Decisional balance work is the appropriate intervention at this stage.',
+    err: 'Not quite. Precontemplation = no intention. Contemplation = awareness + considering change within 6 months but ambivalent. Preparation = ready to act within 30 days. Maintenance = sustained change beyond 6 months.'
+  },
+  {
+    q: 'Which statement correctly distinguishes positive reinforcement from negative reinforcement?',
+    opts: [
+      'Positive reinforcement increases behavior by adding a reward; negative reinforcement decreases behavior by removing a reward',
+      'Positive reinforcement adds a reward to increase behavior; negative reinforcement removes an aversive stimulus to increase behavior',
+      'Positive reinforcement is always more effective than negative reinforcement',
+      'Positive reinforcement adds something pleasant; negative reinforcement adds something unpleasant'
+    ],
+    correct: 1,
+    ok: 'Correct. Both positive and negative reinforcement increase behavior — that is what makes them reinforcement. The difference: positive reinforcement adds something desirable; negative reinforcement removes something aversive. Both result in the behavior increasing in frequency.',
+    err: 'Not quite. Both types of reinforcement increase behavior. Positive adds a desirable stimulus; negative removes an aversive one. Neither decreases behavior — that is punishment. This distinction is frequently confused and frequently tested.'
+  },
+  {
+    q: 'The Theory of Planned Behavior is most useful for which type of behaviors?',
+    opts: ['Automatic and habitual behaviors', 'Volitional behaviors — those under conscious control', 'Stage-dependent behaviors requiring sequential progression', 'Behaviors driven entirely by environmental reinforcement'],
+    correct: 1,
+    ok: 'Correct. The TPB works best with volitional behaviors — ones that are consciously chosen and under the person\'s control. For highly automatic or biologically driven behaviors, TPB has limited explanatory power.',
+    err: 'Not quite. The TPB is specifically designed for volitional (consciously chosen) behaviors. Automatic behaviors, stage models, and reinforcement-based behaviors are better addressed by other frameworks.'
+  },
+  {
+    q: 'A planner designing for a population in early TTM stages (precontemplation and contemplation) should primarily use which type of intervention strategies?',
+    opts: [
+      'Action plans and skill-building workshops',
+      'Consciousness raising and decisional balance work — increasing awareness and shifting perceived pros of change',
+      'Incentive reward programs for behavior change outcomes',
+      'Relapse prevention content and maintenance strategies'
+    ],
+    correct: 1,
+    ok: 'Correct. Cognitive processes of change — particularly consciousness raising and decisional balance work — are most relevant for early stages. Action plans, skills, rewards, and relapse prevention belong in later stages. Stage-matching is the central TTM design principle.',
+    err: 'Not quite. TTM requires stage-matched interventions. Action plans, incentives, and relapse prevention are for people in preparation, action, and maintenance. For precontemplation and contemplation, cognitive strategies (awareness, exploring ambivalence) are appropriate.'
+  },
+];
+
+let qIdx = 0, qAnswered = false, qScores = [];
+
+function renderQuiz() {
+  const q = quizQuestions[qIdx];
+  const pct = Math.round((qIdx / quizQuestions.length) * 100);
+  document.getElementById('quiz-container').innerHTML = `
+    <div class="prog-bar-wrap"><div class="prog-bar-fill" style="width:${pct}%"></div></div>
+    <div class="card">
+      <p class="q-meta">Question ${qIdx + 1} of ${quizQuestions.length}</p>
+      <p class="q-q">${q.q}</p>
+      ${q.opts.map((o, i) => `<button class="opt-btn" onclick="answerQuiz(${i})">${o}</button>`).join('')}
+      <div id="quiz-fb" class="feedback"></div>
+      <button id="quiz-nxt" class="next-btn" onclick="nextQuiz()">${qIdx < quizQuestions.length - 1 ? 'Next question →' : 'See my score'}</button>
+    </div>`;
+  qAnswered = false;
+}
+
+function answerQuiz(i) {
+  if (qAnswered) return;
+  qAnswered = true;
+  const q = quizQuestions[qIdx];
+  qScores.push(i === q.correct ? 1 : 0);
+  document.querySelectorAll('#quiz-container .opt-btn').forEach((b, idx) => {
+    if (idx === q.correct) b.classList.add('correct');
+    else if (idx === i) b.classList.add('wrong');
+    b.disabled = true;
+  });
+  const fb = document.getElementById('quiz-fb');
+  const ok = i === q.correct;
+  fb.textContent = (ok ? '✓ ' : '✗ ') + (ok ? q.ok : q.err);
+  fb.className = 'feedback show ' + (ok ? 'ok' : 'err');
+  document.getElementById('quiz-nxt').classList.add('show');
+}
+
+function nextQuiz() {
+  qIdx++;
+  if (qIdx >= quizQuestions.length) showQuizScore();
+  else renderQuiz();
+}
+
+function showQuizScore() {
+  const total = qScores.reduce((a, b) => a + b, 0);
+  const pct = Math.round((total / quizQuestions.length) * 100);
+  const msg = pct === 100 ? 'Excellent — strong command of all four theories.' :
+              pct >= 70  ? 'Good work. Review the constructs explorer for any gaps.' :
+                           'Keep going — revisit the constructs and compare tabs, then try again.';
+  document.getElementById('quiz-container').innerHTML = `
+    <div class="score-box">
+      <div class="score-big">${total}/${quizQuestions.length}</div>
+      <div class="score-label">${pct}% — ${msg}</div>
+      <button class="restart-btn" onclick="restartQuiz()">Try again</button>
+    </div>`;
+}
+
+function restartQuiz() { qIdx = 0; qScores = []; renderQuiz(); }
+renderQuiz();
+</script>
+</body>
+</html>
