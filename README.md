@@ -24,6 +24,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/map-model/](models/map-model/): MAPP community planning route.
 - [models/precede-model/](models/precede-model/): PRECEDE-PROCEED route.
 - [models/three-fs-model/](models/three-fs-model/): three Fs route.
+- [models/teach-back-practice/](models/teach-back-practice/): teach-back communication practice.
 - [models/week1-collaboration-community-health-assessment/](models/week1-collaboration-community-health-assessment/): collaboration in community health assessment.
 - [models/week1-community-assets-social-determinants-cultural-readiness/](models/week1-community-assets-social-determinants-cultural-readiness/): community assets, social determinants, and cultural readiness.
 - [models/week1-evidence-based-practice-healthcare/](models/week1-evidence-based-practice-healthcare/): evidence-based practice in health promotion.
