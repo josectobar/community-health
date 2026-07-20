@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Six Steps of a Needs Assessment</title>
+<style>
+  :root {
+    color-scheme: light;
+    --teal: #1A6B72;
+    --teal-light: #D6ECED;
+    --gold: #B07D2A;
+    --gold-light: #FEF3DC;
+    --purple: #5B3A8E;
+    --purple-light: #EDE6F7;
+    --red: #9B2335;
+    --red-light: #FBDDE0;
+    --gray: #F4F4F4;
+    --border: #CCCCCC;
+    --text: #1A1A1A;
+    --white: #FFFFFF;
+    --s1: #1A6B72; --s2: #2A8A6B; --s3: #5B3A8E;
+    --s4: #B07D2A; --s5: #C04A2A; --s6: #1A3F6B;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 15px; color: var(--text); background: #fff; padding: 20px; max-width: 860px; margin: 0 auto; }
+
+  h1 { font-size: 1.3rem; color: var(--teal); border-bottom: 3px solid var(--teal); padding-bottom: 8px; margin-bottom: 6px; }
+  .subtitle { font-size: 0.88rem; color: #555; margin-bottom: 20px; }
+
+  .tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .tab-btn {
+    padding: 8px 18px; border: 2px solid var(--teal); background: #fff;
+    color: var(--teal); border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: bold;
+  }
+  .tab-btn:hover { background: var(--teal-light); }
+  .tab-btn[aria-selected="true"] { background: var(--teal); color: #fff; }
+  .tab-btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .instructions {
+    background: var(--teal-light); border-left: 4px solid var(--teal);
+    padding: 12px 16px; border-radius: 4px; margin-bottom: 20px; font-size: 0.9rem;
+  }
+  .instructions strong { color: var(--teal); }
+
+  /* ── STEP MAP (Part 1) ── */
+  .step-map { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+  @media (max-width: 560px) { .step-map { grid-template-columns: repeat(2, 1fr); } }
+
+  .step-tile {
+    border: 2px solid var(--border); border-radius: 8px; padding: 12px 10px;
+    cursor: pointer; text-align: center; transition: all 0.15s; background: #fff;
+  }
+  .step-tile:hover { transform: translateY(-2px); box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
+  .step-tile:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  .step-tile[aria-pressed="true"] { box-shadow: 0 3px 10px rgba(0,0,0,0.18); }
+
+  .step-num { font-size: 1.6rem; font-weight: bold; margin-bottom: 4px; }
+  .step-title { font-size: 0.82rem; font-weight: bold; line-height: 1.3; }
+
+  .step-detail {
+    border: 1px solid var(--border); border-radius: 8px; padding: 18px;
+    background: var(--gray); margin-bottom: 18px; display: none; min-height: 80px;
+  }
+  .step-detail.show { display: block; }
+  .sd-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .sd-badge { font-size: 1.5rem; font-weight: bold; padding: 6px 14px; border-radius: 6px; color: #fff; }
+  .sd-title { font-size: 1.05rem; font-weight: bold; }
+  .sd-purpose { font-size: 0.9rem; line-height: 1.55; margin-bottom: 10px; }
+  .sd-section-label { font-size: 0.78rem; font-weight: bold; color: var(--teal); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; margin-top: 10px; }
+  .sd-actions-list { padding-left: 0; list-style: none; }
+  .sd-actions-list li { font-size: 0.88rem; line-height: 1.45; padding: 4px 0; border-bottom: 1px solid #ddd; }
+  .sd-actions-list li:last-child { border-bottom: none; }
+  .sd-actions-list li::before { content: "→ "; color: var(--teal); font-weight: bold; }
+  .sd-key { font-size: 0.88rem; font-style: italic; color: #555; margin-top: 8px; background: var(--teal-light); padding: 8px 12px; border-radius: 4px; }
+  .step-placeholder { font-size: 0.9rem; color: #888; font-style: italic; text-align: center; padding: 18px; }
+
+  /* ── ACTION SORTER (Part 2) ── */
+  .action-card {
+    border: 1px solid var(--border); border-radius: 6px; margin-bottom: 20px; overflow: hidden;
+  }
+  .action-header { background: var(--gray); padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .action-num { font-size: 0.78rem; font-weight: bold; color: var(--teal); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+  .action-text { font-size: 0.95rem; line-height: 1.55; }
+  .action-choices { padding: 14px 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .step-btn {
+    padding: 7px 12px; border: 2px solid var(--border); border-radius: 4px;
+    background: #fff; cursor: pointer; font-size: 0.83rem; transition: all 0.15s;
+    color: var(--text); text-align: center;
+  }
+  .step-btn:hover:not([disabled]) { border-color: var(--teal); background: var(--teal-light); }
+  .step-btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  .step-btn.correct { border-color: var(--teal); background: var(--teal-light); color: var(--teal); font-weight: bold; }
+  .step-btn.correct::after { content: " ✓"; }
+  .step-btn.wrong { border-color: var(--red); background: var(--red-light); color: var(--red); }
+  .step-btn.wrong::after { content: " ✗"; }
+  .step-btn[disabled] { cursor: default; }
+
+  .action-feedback {
+    margin: 0 16px 14px; padding: 10px 14px; border-radius: 4px; font-size: 0.88rem;
+    line-height: 1.5; display: none;
+  }
+  .action-feedback.show { display: block; }
+  .action-feedback.correct { background: var(--teal-light); color: #0F4A4F; border-left: 4px solid var(--teal); }
+  .action-feedback.wrong { background: var(--red-light); color: #6B1020; border-left: 4px solid var(--red); }
+
+  .score-row { display: flex; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap; }
+  .score-badge { background: var(--teal); color: #fff; padding: 5px 14px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; white-space: nowrap; }
+  .reset-btn { padding: 6px 14px; border: 2px solid var(--teal); background: #fff; color: var(--teal); border-radius: 4px; cursor: pointer; font-size: 0.88rem; font-weight: bold; }
+  .reset-btn:hover { background: var(--teal-light); }
+  .reset-btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  .sr-only { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+</style>
+</head>
+<body>
+
+<h1>The Six Steps of a Community Health Needs Assessment</h1>
+<p class="subtitle">Explore each step in depth, then test your ability to place real actions into the right step of the process.</p>
+
+<div class="tabs" role="tablist" aria-label="Activity tabs">
+  <button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-map" id="tab-map" onclick="switchTab('map')">Part 1: Step Explorer</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-sorter" id="tab-sorter" onclick="switchTab('sorter')">Part 2: Action Sorter</button>
+</div>
+
+<div aria-live="polite" aria-atomic="true" class="sr-only" id="live-announce"></div>
+
+<!-- PART 1: STEP EXPLORER -->
+<div class="tab-panel active" id="panel-map" role="tabpanel" aria-labelledby="tab-map">
+
+  <div class="instructions">
+    <strong>Directions:</strong> Click any step tile to explore what happens in that step of the needs assessment process — including its purpose, the actions it involves, and the key question it answers.
+  </div>
+
+  <div class="step-map" id="step-map-grid"></div>
+
+  <div class="step-detail" id="step-detail-panel" role="region" aria-label="Step details">
+    <div class="step-placeholder">Select a step above to see details here.</div>
+  </div>
+</div>
+
+<!-- PART 2: ACTION SORTER -->
+<div class="tab-panel" id="panel-sorter" role="tabpanel" aria-labelledby="tab-sorter">
+
+  <div class="instructions">
+    <strong>Directions:</strong> Each card describes a specific action taken during a community health needs assessment. Select which of the six steps that action belongs to. Think carefully — some actions might seem to fit more than one step, but one is always the best fit.
+  </div>
+
+  <div id="sorter-container"></div>
+
+  <div class="score-row">
+    <div class="score-badge" id="sorter-score" aria-live="polite">Score: 0 / 8</div>
+    <button class="reset-btn" onclick="resetSorter()">Reset Part 2</button>
+  </div>
+</div>
+
+<script>
+// ── STEP DATA ──────────────────────────────────────────────────────────────
+const steps = [
+  {
+    num: 1, color: "#1A6B72",
+    title: "Determining Scope & Purpose",
+    purpose: "Before any data is collected, the team must define the boundaries of the assessment: which population, which health topics, which geography, and what the findings will be used for. This step sets the entire direction of the process.",
+    actions: [
+      "Identifying the target population and geographic boundaries",
+      "Clarifying who will use the findings and for what decisions",
+      "Agreeing on which health domains or topics are in scope",
+      "Establishing a timeline, budget, and staffing plan for the assessment",
+      "Engaging key stakeholders to align on purpose and expectations"
+    ],
+    key: "Key question: What are we trying to learn, for whom, and why?"
+  },
+  {
+    num: 2, color: "#2A8A6B",
+    title: "Gathering Data",
+    purpose: "With scope established, the team collects the information needed to understand the community's health. This involves selecting and using the right mix of primary data methods (surveys, focus groups, NGT) and secondary data sources (databases, surveillance systems, prior assessments).",
+    actions: [
+      "Administering surveys to community members",
+      "Conducting focus groups or key informant interviews",
+      "Pulling state and national health statistics from databases like BRFSS or CDC WONDER",
+      "Reviewing prior community health needs assessments or reports",
+      "Applying the Nominal Group Technique to gather community priorities"
+    ],
+    key: "Key question: What information do we need, and how will we collect it?"
+  },
+  {
+    num: 3, color: "#5B3A8E",
+    title: "Analyzing Data",
+    purpose: "Raw data only becomes useful when it is organized, interpreted, and compared. The analysis step involves identifying patterns, examining disparities, comparing local rates to benchmarks, and triangulating findings across multiple data sources.",
+    actions: [
+      "Calculating disease prevalence rates and comparing them to state and national averages",
+      "Identifying health disparities across demographic subgroups (race, income, age)",
+      "Coding and theming qualitative data from focus group transcripts",
+      "Mapping health outcomes by neighborhood or ZIP code",
+      "Noting gaps in data and naming what the assessment cannot tell you"
+    ],
+    key: "Key question: What do the data show, and what do they mean?"
+  },
+  {
+    num: 4, color: "#B07D2A",
+    title: "Identifying Risk Factors",
+    purpose: "Once patterns emerge, the team examines why they exist — connecting observed health outcomes to their underlying causes at the individual, social, environmental, and systemic levels. A social determinants of health (SDOH) lens is essential here.",
+    actions: [
+      "Mapping upstream determinants (poverty, housing, transportation) linked to health outcomes",
+      "Identifying behavioral risk factors such as tobacco use or physical inactivity",
+      "Connecting structural barriers (no nearby pharmacies, limited sick leave) to health patterns",
+      "Using logic models or causal diagrams to visualize the chain from risk factor to outcome",
+      "Reviewing evidence-based literature on known risk factors for the identified health issues"
+    ],
+    key: "Key question: Why does this health problem exist in this community?"
+  },
+  {
+    num: 5, color: "#C04A2A",
+    title: "Identifying Program Focus",
+    purpose: "Not every identified need can be addressed at once. This step uses the evidence collected and analyzed to select a focused, actionable priority — the health issue or risk factor the program will address. Structured prioritization tools guide transparent decision-making.",
+    actions: [
+      "Using a priority matrix to weigh magnitude, changeability, and community concern",
+      "Applying PEARL criteria (Propriety, Economics, Acceptability, Resources, Legality) to evaluate options",
+      "Engaging community members and stakeholders in a prioritization discussion",
+      "Considering organizational capacity, available funding, and existing partnerships",
+      "Documenting the rationale for the chosen priority clearly and transparently"
+    ],
+    key: "Key question: Given everything we know, what should we focus on — and why?"
+  },
+  {
+    num: 6, color: "#1A3F6B",
+    title: "Validating the Need",
+    purpose: "The final step confirms that the identified program priority is supported by sufficient evidence and recognized as a priority by community stakeholders. Validation is both a technical check and a community engagement process.",
+    actions: [
+      "Presenting findings to community members and gathering feedback on whether the priority reflects their experience",
+      "Sharing data and conclusions with partner organizations and decision-makers",
+      "Verifying that data is current, representative, and sufficient to justify action",
+      "Documenting the evidence base in a format suitable for funders or accreditors",
+      "Building stakeholder consensus and commitment around the chosen program focus"
+    ],
+    key: "Key question: Is this need real, well-supported, and recognized by those most affected?"
+  }
+];
+
+// ── ACTION SORTER DATA ─────────────────────────────────────────────────────
+const actions = [
+  {
+    text: "The needs assessment team creates a map of Maricopa County showing diabetes hospitalization rates by ZIP code, then overlays it with household income data to identify which neighborhoods have the highest burden and the lowest economic resources.",
+    correct: 2, // Step 3 (index)
+    feedback: "This is Step 3: Analyzing Data. Mapping health outcomes by geography and comparing them to social determinants is a core analysis activity — it transforms raw data into interpretable patterns.",
+    wrongFeedback: "Think about what the team is doing with the data: comparing, mapping, and identifying patterns across two datasets. That is analysis, not collection. This belongs in Step 3."
+  },
+  {
+    text: "Before beginning any data work, the county health department convenes a planning meeting with the hospital, the school district, and community organizations to agree that the assessment will focus on adults ages 18–64 living in underserved ZIP codes and will be used to write a five-year CHIP.",
+    correct: 0, // Step 1
+    feedback: "This is Step 1: Determining Scope and Purpose. Convening stakeholders before data collection begins, defining the target population, and clarifying how findings will be used are all scope-setting activities.",
+    wrongFeedback: "The key clue is 'before beginning any data work.' The team is defining who they are studying, what geography matters, and what the findings will be used for — that is scope and purpose, Step 1."
+  },
+  {
+    text: "After completing their analysis, the team presents their findings at a community town hall, where residents confirm that access to mental health care is their top concern — and several community leaders commit to supporting a new program if it moves forward.",
+    correct: 5, // Step 6
+    feedback: "This is Step 6: Validating the Need. Sharing findings with the community, gathering their confirmation that the priority reflects their experience, and building stakeholder commitment are all validation activities.",
+    wrongFeedback: "The team has finished analysis and is now confirming the priority with the community and building buy-in. That confirmation step — ensuring the need is recognized and supported — is validation, Step 6."
+  },
+  {
+    text: "The team administers a 20-question online survey to 400 adults in the target community asking about their health behaviors, insurance status, and barriers to care.",
+    correct: 1, // Step 2
+    feedback: "This is Step 2: Gathering Data. Administering a survey to collect information directly from community members is a primary data collection activity — the hallmark of the data gathering step.",
+    wrongFeedback: "The team is actively collecting information from community members through a survey. Creating and distributing instruments to gather original data is Step 2: Gathering Data."
+  },
+  {
+    text: "After reviewing health outcome data showing high rates of cardiovascular disease in the south corridor, the team meets to examine what factors might explain the pattern — identifying limited access to fresh food, high rates of uninsured residents, and long working hours that prevent primary care visits.",
+    correct: 3, // Step 4
+    feedback: "This is Step 4: Identifying Risk Factors. The team is moving beyond what the data shows to explain why — connecting the health outcome to upstream determinants like food access, insurance, and working conditions.",
+    wrongFeedback: "The team already has the data — now they are asking why the pattern exists. Examining the underlying causes and determinants of a health outcome is Step 4: Identifying Risk Factors Linked to a Health Problem."
+  },
+  {
+    text: "The team downloads five years of mortality data from CDC WONDER and pulls county-level chronic disease prevalence rates from the County Health Rankings website to establish a baseline picture of the community's health status.",
+    correct: 1, // Step 2
+    feedback: "This is Step 2: Gathering Data. Accessing secondary data sources — even though the data already exists — is still part of the data gathering step. The team is collecting the information they need to conduct their assessment.",
+    wrongFeedback: "Even though these are existing databases (secondary data), the team is in the process of gathering the information they need for the assessment. Accessing and pulling data — primary or secondary — is Step 2."
+  },
+  {
+    text: "The needs assessment team uses a priority matrix to weigh five health issues against criteria including how many people are affected, whether evidence-based interventions exist, and whether the organization has capacity to act — and selects hypertension management as the program focus.",
+    correct: 4, // Step 5
+    feedback: "This is Step 5: Identifying the Program Focus. Using a structured tool to weigh and compare health issues and select a specific priority for programming is the defining activity of this step.",
+    wrongFeedback: "The team is using a structured method to choose which health issue to focus on for their program. Weighing options and selecting a priority based on multiple criteria is Step 5: Identifying the Program Focus."
+  },
+  {
+    text: "A health coalition reviews the high rates of low birth weight in a rural county and concludes that stress during pregnancy, limited prenatal care access, and housing instability all contribute to the pattern — and that these factors compound each other for women living in poverty.",
+    correct: 3, // Step 4
+    feedback: "This is Step 4: Identifying Risk Factors. The coalition is connecting a health outcome (low birth weight) to its underlying causes — stress, care access, housing — and examining how they interact. That causal analysis is Step 4.",
+    wrongFeedback: "The coalition already has the outcome data. Now they are examining why birth weight is low in this county — identifying the risk factors and determinants behind the pattern. That explanatory work is Step 4."
+  }
+];
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+let activeStep = null;
+let sorterAnswered = new Array(actions.length).fill(false);
+let sorterCorrect  = new Array(actions.length).fill(false);
+
+// ── RENDER STEP MAP ────────────────────────────────────────────────────────
+function renderStepMap() {
+  const grid = document.getElementById('step-map-grid');
+  grid.innerHTML = '';
+  steps.forEach((s, i) => {
+    const tile = document.createElement('button');
+    tile.className = 'step-tile';
+    tile.id = `tile-${i}`;
+    tile.setAttribute('aria-pressed', 'false');
+    tile.innerHTML = `
+      <div class="step-num" style="color:${s.color}">${s.num}</div>
+      <div class="step-title" style="color:${s.color}">${s.title}</div>
+    `;
+    tile.style.borderColor = s.color;
+    tile.onclick = () => showStep(i);
+    tile.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showStep(i); } });
+    grid.appendChild(tile);
+  });
+}
+
+function showStep(i) {
+  if (activeStep !== null) {
+    document.getElementById(`tile-${activeStep}`).setAttribute('aria-pressed', 'false');
+    document.getElementById(`tile-${activeStep}`).style.background = '#fff';
+  }
+  activeStep = i;
+  const tile = document.getElementById(`tile-${i}`);
+  tile.setAttribute('aria-pressed', 'true');
+  tile.style.background = steps[i].color + '18';
+
+  const s = steps[i];
+  const panel = document.getElementById('step-detail-panel');
+  panel.classList.add('show');
+  panel.innerHTML = `
+    <div class="sd-header">
+      <div class="sd-badge" style="background:${s.color}">Step ${s.num}</div>
+      <div class="sd-title">${s.title}</div>
+    </div>
+    <div class="sd-purpose">${s.purpose}</div>
+    <div class="sd-section-label">Typical actions in this step</div>
+    <ul class="sd-actions-list">
+      ${s.actions.map(a => `<li>${a}</li>`).join('')}
+    </ul>
+    <div class="sd-key">${s.key}</div>
+  `;
+  announce(`Step ${s.num}: ${s.title}. ${s.purpose}`);
+}
+
+// ── RENDER ACTION SORTER ───────────────────────────────────────────────────
+const stepLabels = ["1: Scope & Purpose","2: Gathering Data","3: Analyzing Data","4: Risk Factors","5: Program Focus","6: Validating"];
+
+function renderSorter() {
+  const c = document.getElementById('sorter-container');
+  c.innerHTML = '';
+  actions.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'action-card';
+    div.innerHTML = `
+      <div class="action-header">
+        <div class="action-num">Action ${i+1} of ${actions.length}</div>
+        <div class="action-text">${item.text}</div>
+      </div>
+      <fieldset style="border:none;padding:0;margin:0" id="af-${i}">
+        <legend class="sr-only">Which step does action ${i+1} belong to?</legend>
+        <div class="action-choices">
+          ${stepLabels.map((lbl, j) => `<button class="step-btn" id="ab-${i}-${j}" onclick="answerAction(${i},${j})">${lbl}</button>`).join('')}
+        </div>
+      </fieldset>
+      <div class="action-feedback" id="afb-${i}" role="alert"></div>
+    `;
+    c.appendChild(div);
+  });
+  updateScore();
+}
+
+function answerAction(item, choice) {
+  if (sorterAnswered[item]) return;
+  sorterAnswered[item] = true;
+  const correct = choice === actions[item].correct;
+  sorterCorrect[item] = correct;
+
+  stepLabels.forEach((_, j) => {
+    const btn = document.getElementById(`ab-${item}-${j}`);
+    btn.disabled = true;
+    if (j === choice) btn.classList.add(correct ? 'correct' : 'wrong');
+    if (!correct && j === actions[item].correct) btn.classList.add('correct');
+  });
+
+  const fb = document.getElementById(`afb-${item}`);
+  fb.textContent = correct ? actions[item].feedback : actions[item].wrongFeedback;
+  fb.className = `action-feedback show ${correct ? 'correct' : 'wrong'}`;
+
+  announce(`Action ${item+1}: ${correct ? 'Correct' : 'Incorrect'}. ${correct ? actions[item].feedback : actions[item].wrongFeedback}`);
+  updateScore();
+}
+
+function updateScore() {
+  const right = sorterCorrect.filter(Boolean).length;
+  document.getElementById('sorter-score').textContent = `Score: ${right} / ${actions.length}`;
+}
+
+function resetSorter() {
+  sorterAnswered = new Array(actions.length).fill(false);
+  sorterCorrect  = new Array(actions.length).fill(false);
+  renderSorter();
+  announce('Part 2 reset.');
+}
+
+// ── TABS ───────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  ['map','sorter'].forEach(t => {
+    document.getElementById(`panel-${t}`).classList.toggle('active', t === tab);
+    document.getElementById(`tab-${t}`).setAttribute('aria-selected', t === tab ? 'true' : 'false');
+  });
+}
+
+function announce(msg) {
+  const el = document.getElementById('live-announce');
+  el.textContent = '';
+  setTimeout(() => { el.textContent = msg; }, 50);
+}
+
+renderStepMap();
+renderSorter();
+</script>
+</body>
+</html>
