@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Levels of Measurement</title>
+<style>
+  :root {
+    color-scheme: light;
+    --teal:#1A6B72; --teal-lt:#D6ECED;
+    --gold:#B07D2A; --gold-lt:#FEF3DC;
+    --purple:#5B3A8E; --purple-lt:#EDE6F7;
+    --red:#9B2335; --red-lt:#FBDDE0;
+    --nom:#1A6B72; --ord:#2A8A6B; --int:#5B3A8E; --rat:#B07D2A;
+    --border:#CCCCCC; --gray:#F4F4F4; --white:#fff; --text:#1A1A1A;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,sans-serif;font-size:15px;color:var(--text);background:#fff;padding:20px;max-width:860px;margin:0 auto}
+  h1{font-size:1.3rem;color:var(--teal);border-bottom:3px solid var(--teal);padding-bottom:8px;margin-bottom:6px}
+  .subtitle{font-size:.88rem;color:#555;margin-bottom:20px}
+
+  .tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+  .tab-btn{padding:8px 18px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.9rem;font-weight:bold;transition:background .15s}
+  .tab-btn:hover{background:var(--teal-lt)}
+  .tab-btn[aria-selected="true"]{background:var(--teal);color:#fff}
+  .tab-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .tab-panel{display:none}.tab-panel.active{display:block}
+
+  .instructions{background:var(--teal-lt);border-left:4px solid var(--teal);padding:12px 16px;border-radius:4px;margin-bottom:20px;font-size:.9rem}
+  .instructions strong{color:var(--teal)}
+
+  /* CLASSIFIER */
+  .classifier-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+  @media(max-width:540px){.classifier-grid{grid-template-columns:1fr}}
+
+  .drop-zone{border:2px dashed var(--border);border-radius:8px;padding:12px;min-height:160px}
+  .dz-label{font-size:.82rem;font-weight:bold;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;padding:6px 10px;border-radius:4px;color:#fff;display:inline-block}
+  .dz-nom{background:var(--nom)}.dz-ord{background:var(--ord)}.dz-int{background:var(--int)}.dz-rat{background:var(--rat)}
+
+  .variable-pool{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+  .var-chip{
+    padding:7px 12px;border:2px solid var(--border);border-radius:20px;
+    background:#fff;cursor:pointer;font-size:.85rem;transition:all .15s;
+    color:var(--text);user-select:none;
+  }
+  .var-chip:hover{border-color:var(--teal);background:var(--teal-lt)}
+  .var-chip:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .var-chip.placed{opacity:.4;pointer-events:none}
+
+  .drop-zone .var-chip{margin-bottom:4px;cursor:default}
+  .drop-zone .var-chip.correct{border-color:var(--nom);background:var(--teal-lt);color:var(--teal)}
+  .drop-zone .var-chip.wrong{border-color:var(--red);background:var(--red-lt);color:var(--red)}
+
+  .bin-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+  .bin-btn{padding:5px 10px;border:2px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:.82rem;font-weight:bold;transition:all .15s}
+  .bin-btn:hover{border-color:var(--teal);background:var(--teal-lt)}
+  .bin-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .bin-btn.nom{border-color:var(--nom);color:var(--nom)}
+  .bin-btn.ord{border-color:var(--ord);color:var(--ord)}
+  .bin-btn.int{border-color:var(--int);color:var(--int)}
+  .bin-btn.rat{border-color:var(--rat);color:var(--rat)}
+
+  .selected-var{background:var(--gold-lt);border:2px solid var(--gold);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:.9rem;display:none}
+  .selected-var.show{display:block}
+  .selected-var strong{color:var(--gold)}
+
+  /* SCENARIO QUIZ */
+  .scenario-card{border:1px solid var(--border);border-radius:6px;margin-bottom:20px;overflow:hidden}
+  .sc-header{background:var(--gray);padding:14px 16px;border-bottom:1px solid var(--border)}
+  .sc-num{font-size:.78rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+  .sc-text{font-size:.95rem;line-height:1.55}
+  .sc-choices{padding:14px 16px;display:flex;gap:8px;flex-wrap:wrap}
+  .sc-btn{
+    padding:8px 14px;border:2px solid var(--border);border-radius:4px;
+    background:#fff;cursor:pointer;font-size:.88rem;transition:all .15s;color:var(--text);
+  }
+  .sc-btn:hover:not([disabled]){border-color:var(--teal);background:var(--teal-lt)}
+  .sc-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .sc-btn.correct{border-color:var(--teal);background:var(--teal-lt);color:var(--teal);font-weight:bold}
+  .sc-btn.correct::after{content:" ✓"}
+  .sc-btn.wrong{border-color:var(--red);background:var(--red-lt);color:var(--red)}
+  .sc-btn.wrong::after{content:" ✗"}
+  .sc-btn[disabled]{cursor:default}
+  .sc-feedback{margin:0 16px 14px;padding:10px 14px;border-radius:4px;font-size:.88rem;line-height:1.5;display:none}
+  .sc-feedback.show{display:block}
+  .sc-feedback.correct{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+  .sc-feedback.wrong{background:var(--red-lt);color:#6B1020;border-left:4px solid var(--red)}
+
+  .score-row{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+  .score-badge{background:var(--teal);color:#fff;padding:5px 14px;border-radius:20px;font-weight:bold;font-size:.9rem;white-space:nowrap}
+  .reset-btn{padding:6px 14px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.88rem;font-weight:bold}
+  .reset-btn:hover{background:var(--teal-lt)}
+  .reset-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+
+<h1>Levels of Measurement: Applied Practice</h1>
+<p class="subtitle">Classify health variables and apply your knowledge to real measurement decisions.</p>
+
+<div class="tabs" role="tablist" aria-label="Activity tabs">
+  <button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-classify" id="tab-classify" onclick="switchTab('classify')">Part 1: Variable Classifier</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-quiz" id="tab-quiz" onclick="switchTab('quiz')">Part 2: Measurement Decision Scenarios</button>
+</div>
+<div class="sr-only" aria-live="polite" aria-atomic="true" id="live"></div>
+
+<!-- PART 1 -->
+<div class="tab-panel active" id="panel-classify" role="tabpanel" aria-labelledby="tab-classify">
+  <div class="instructions">
+    <strong>Directions:</strong> Click a variable chip from the pool below to select it, then click the level of measurement it belongs to. Work through all 12 variables.
+  </div>
+
+  <div class="selected-var" id="selected-display" aria-live="polite">
+    <strong>Selected:</strong> <span id="selected-text">—</span><br>
+    <small>Now click a bucket below to classify it.</small>
+  </div>
+
+  <div class="bin-btns" role="group" aria-label="Level of measurement buckets">
+    <button class="bin-btn nom" onclick="classifySelected('nominal')" id="bin-nom">Nominal</button>
+    <button class="bin-btn ord" onclick="classifySelected('ordinal')" id="bin-ord">Ordinal</button>
+    <button class="bin-btn int" onclick="classifySelected('interval')" id="bin-int">Interval</button>
+    <button class="bin-btn rat" onclick="classifySelected('ratio')" id="bin-rat">Ratio</button>
+  </div>
+
+  <div class="variable-pool" id="var-pool" role="group" aria-label="Variable chips to classify"></div>
+
+  <div class="classifier-grid" id="classifier-grid">
+    <div class="drop-zone" id="zone-nominal">
+      <div class="dz-label dz-nom">Nominal</div>
+      <div id="placed-nominal"></div>
+    </div>
+    <div class="drop-zone" id="zone-ordinal">
+      <div class="dz-label dz-ord">Ordinal</div>
+      <div id="placed-ordinal"></div>
+    </div>
+    <div class="drop-zone" id="zone-interval">
+      <div class="dz-label dz-int">Interval</div>
+      <div id="placed-interval"></div>
+    </div>
+    <div class="drop-zone" id="zone-ratio">
+      <div class="dz-label dz-rat">Ratio</div>
+      <div id="placed-ratio"></div>
+    </div>
+  </div>
+
+  <div class="score-row">
+    <div class="score-badge" id="classify-score" aria-live="polite">Classified: 0 / 12</div>
+    <button class="reset-btn" onclick="resetClassifier()">Reset Part 1</button>
+  </div>
+</div>
+
+<!-- PART 2 -->
+<div class="tab-panel" id="panel-quiz" role="tabpanel" aria-labelledby="tab-quiz">
+  <div class="instructions">
+    <strong>Directions:</strong> Each scenario describes a data collection decision. Choose the level of measurement that best applies — and read the feedback to understand why.
+  </div>
+  <div id="quiz-container"></div>
+  <div class="score-row">
+    <div class="score-badge" id="quiz-score" aria-live="polite">Score: 0 / 6</div>
+    <button class="reset-btn" onclick="resetQuiz()">Reset Part 2</button>
+  </div>
+</div>
+
+<script>
+const variables = [
+  {label:"Blood type (A, B, AB, O)", level:"nominal", feedback:"Blood types are categories with no inherent order — O is not 'more' than A. This is nominal."},
+  {label:"Self-rated health (Excellent / Good / Fair / Poor)", level:"ordinal", feedback:"These categories have a clear order, but the gap between 'Excellent' and 'Good' is not necessarily equal to the gap between 'Fair' and 'Poor'. Ordinal."},
+  {label:"Body weight in pounds", level:"ratio", feedback:"Weight has a true zero (no weight at all) and equal intervals. A person weighing 200 lbs weighs twice as much as one weighing 100 lbs. Ratio."},
+  {label:"Temperature in Fahrenheit", level:"interval", feedback:"Fahrenheit has equal intervals between degrees, but 0°F does not mean no heat. 80°F is not twice as hot as 40°F. Interval."},
+  {label:"Type of insurance (Medicaid / Medicare / Private / Uninsured)", level:"nominal", feedback:"Insurance types are categories with no inherent order or ranking. Nominal."},
+  {label:"Pain scale rating (0–10)", level:"ordinal", feedback:"A 6 is more pain than a 3, but the difference between 3 and 4 may not be the same as between 8 and 9. Pain scales are typically ordinal."},
+  {label:"Number of clinic visits in the past year", level:"ratio", feedback:"Counts have a true zero (zero visits) and equal intervals. Someone with 6 visits went twice as often as someone with 3. Ratio."},
+  {label:"Stage of tobacco use readiness (Precontemplation → Maintenance)", level:"ordinal", feedback:"The stages have a clear order but unequal or unknown intervals between them. Ordinal."},
+  {label:"Year of birth (e.g., 1985, 2001)", level:"interval", feedback:"Years have equal intervals, but the year 0 does not mean the absence of time. Ratios are not meaningful — 2000 is not 'twice as recent' as 1000. Interval."},
+  {label:"Grams of sodium consumed per day", level:"ratio", feedback:"Sodium intake has a true zero (no sodium) and equal units. Ratio."},
+  {label:"Preferred language for health communication", level:"nominal", feedback:"Language preference is a category with no order — English is not 'more' than Spanish. Nominal."},
+  {label:"Satisfaction rating (1 = Very Dissatisfied to 5 = Very Satisfied)", level:"ordinal", feedback:"Satisfaction ratings are ordered but the gaps between points are not guaranteed to be equal. Ordinal, not interval."},
+];
+
+const quizData = [
+  {
+    text:"A program evaluation team wants to track changes in participants' blood pressure readings (systolic and diastolic) over six months. Which level of measurement applies to blood pressure readings?",
+    options:["Nominal","Ordinal","Interval","Ratio"],
+    correct:3,
+    feedback:"Ratio. Blood pressure in mmHg has a true zero, equal intervals, and meaningful ratios. A reading of 140 mmHg is genuinely twice as high as 70 mmHg. This level allows computation of means and standard deviations, making it ideal for tracking change.",
+    wrongFeedback:"Blood pressure values are counts of physical pressure — they have a true zero, equal units, and meaningful ratios. That combination defines ratio-level data."
+  },
+  {
+    text:"A survey asks participants: 'How often do you exercise per week?' with response options: Never / Rarely / Sometimes / Often / Always. What level of measurement is this?",
+    options:["Nominal","Ordinal","Interval","Ratio"],
+    correct:1,
+    feedback:"Ordinal. The response options have a clear order (more frequent to less frequent), but the gaps between 'Never' and 'Rarely' vs. 'Often' and 'Always' are not equal or measurable. Median and frequency distributions are appropriate; the mean would overstate precision.",
+    wrongFeedback:"The response options clearly go from least to most frequent — so they are ordered. But can you say that the gap between 'Never' and 'Rarely' equals the gap between 'Often' and 'Always'? No. That unequal-gap property defines ordinal data."
+  },
+  {
+    text:"A health educator records which of four neighborhood clinics each patient attended: Clinic A, Clinic B, Clinic C, or Clinic D. What level of measurement is 'clinic attended'?",
+    options:["Nominal","Ordinal","Interval","Ratio"],
+    correct:0,
+    feedback:"Nominal. Clinics are named categories with no inherent order or ranking. Clinic A is not 'more' or 'better' than Clinic D — they are simply different. The appropriate analysis is frequency counts (how many visited each clinic).",
+    wrongFeedback:"Can you rank Clinic A above Clinic B in any inherent way? No — they are just different locations. Categories with no order or ranking are nominal."
+  },
+  {
+    text:"A researcher uses IQ scores to compare cognitive function across participants in a brain health program. IQ scores are standardized so that the difference between 100 and 110 equals the difference between 110 and 120. However, an IQ of 0 does not represent the complete absence of intelligence. What level is this?",
+    options:["Nominal","Ordinal","Interval","Ratio"],
+    correct:2,
+    feedback:"Interval. Equal intervals between IQ points are meaningful, but the lack of a true zero means ratios are not. You cannot say someone with an IQ of 120 is 'twice as intelligent' as someone with 60. Means and standard deviations are appropriate; ratio statements are not.",
+    wrongFeedback:"The key clue is 'equal intervals but no true zero.' Equal intervals rule out nominal and ordinal. No true zero rules out ratio. That combination — equal intervals, no true zero — defines interval data."
+  },
+  {
+    text:"A needs assessment team asks community members to identify their race/ethnicity by selecting all that apply from a list. Which level of measurement applies?",
+    options:["Nominal","Ordinal","Interval","Ratio"],
+    correct:0,
+    feedback:"Nominal. Race and ethnicity are identity categories with no inherent order or numerical value. Analysis focuses on frequency distributions and proportions across categories, not means or rankings.",
+    wrongFeedback:"Is one racial or ethnic category 'higher' or 'more than' another? No — they are different categories with no order. That defines nominal data."
+  },
+  {
+    text:"A program tracks the number of days each participant went without smoking during a 30-day challenge. What level of measurement is 'days without smoking'?",
+    options:["Nominal","Ordinal","Interval","Ratio"],
+    correct:3,
+    feedback:"Ratio. Days are counts with a true zero (zero days smoke-free), equal intervals (each day is the same unit), and meaningful ratios (20 days is twice as many as 10 days). All mathematical operations are appropriate.",
+    wrongFeedback:"Days are counts — they start at zero, have equal units, and ratios between values are meaningful. Someone with 20 smoke-free days truly has twice as many as someone with 10. That is ratio-level data."
+  },
+];
+
+// STATE
+let selectedVar = null;
+let classifyCount = 0;
+let quizAnswered = new Array(quizData.length).fill(false);
+let quizCorrect  = new Array(quizData.length).fill(false);
+
+// RENDER CLASSIFIER
+function renderClassifier() {
+  selectedVar = null;
+  classifyCount = 0;
+  document.getElementById('selected-display').classList.remove('show');
+  document.getElementById('selected-text').textContent = '—';
+  ['nominal','ordinal','interval','ratio'].forEach(l => document.getElementById(`placed-${l}`).innerHTML = '');
+
+  const pool = document.getElementById('var-pool');
+  pool.innerHTML = '';
+  variables.forEach((v,i) => {
+    const chip = document.createElement('button');
+    chip.className = 'var-chip';
+    chip.id = `vchip-${i}`;
+    chip.textContent = v.label;
+    chip.setAttribute('aria-pressed','false');
+    chip.onclick = () => selectVar(i);
+    pool.appendChild(chip);
+  });
+  updateClassifyScore();
+}
+
+function selectVar(i) {
+  if (document.getElementById(`vchip-${i}`).classList.contains('placed')) return;
+  if (selectedVar !== null) {
+    const prev = document.getElementById(`vchip-${selectedVar}`);
+    if (prev) prev.setAttribute('aria-pressed','false');
+    prev.style.background = '';
+    prev.style.borderColor = '';
+  }
+  selectedVar = i;
+  const chip = document.getElementById(`vchip-${i}`);
+  chip.setAttribute('aria-pressed','true');
+  chip.style.borderColor = 'var(--gold)';
+  chip.style.background = 'var(--gold-lt)';
+  document.getElementById('selected-text').textContent = variables[i].label;
+  document.getElementById('selected-display').classList.add('show');
+  announce(`Selected: ${variables[i].label}. Now choose a level of measurement.`);
+}
+
+function classifySelected(level) {
+  if (selectedVar === null) { announce('Please select a variable chip first.'); return; }
+  const v = variables[selectedVar];
+  const correct = v.level === level;
+  const chip = document.getElementById(`vchip-${selectedVar}`);
+  chip.classList.add('placed');
+
+  const clone = document.createElement('div');
+  clone.className = `var-chip ${correct ? 'correct' : 'wrong'}`;
+  clone.style.cursor = 'default';
+  clone.setAttribute('aria-label', `${v.label} — ${correct ? 'Correct' : 'Incorrect, correct answer: ' + v.level}`);
+  clone.innerHTML = `${v.label}<br><small style="font-size:.78rem;opacity:.85">${v.feedback}</small>`;
+  document.getElementById(`placed-${level}`).appendChild(clone);
+
+  if (!correct) {
+    // also place in correct zone
+    const fix = document.createElement('div');
+    fix.className = 'var-chip correct';
+    fix.style.cursor = 'default';
+    fix.innerHTML = `${v.label} <em>(moved here)</em><br><small style="font-size:.78rem;opacity:.85">${v.feedback}</small>`;
+    document.getElementById(`placed-${v.level}`).appendChild(fix);
+  }
+
+  classifyCount++;
+  selectedVar = null;
+  document.getElementById('selected-display').classList.remove('show');
+  announce(`${v.label}: ${correct ? 'Correct — ' + v.feedback : 'Incorrect. ' + v.feedback}`);
+  updateClassifyScore();
+}
+
+function updateClassifyScore() {
+  document.getElementById('classify-score').textContent = `Classified: ${classifyCount} / ${variables.length}`;
+}
+
+function resetClassifier() { renderClassifier(); announce('Part 1 reset.'); }
+
+// RENDER QUIZ
+function renderQuiz() {
+  const c = document.getElementById('quiz-container');
+  c.innerHTML = '';
+  quizData.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'scenario-card';
+    div.innerHTML = `
+      <div class="sc-header">
+        <div class="sc-num">Scenario ${i+1} of ${quizData.length}</div>
+        <div class="sc-text">${item.text}</div>
+      </div>
+      <fieldset style="border:none;padding:0;margin:0">
+        <legend class="sr-only">Choose the level of measurement for scenario ${i+1}</legend>
+        <div class="sc-choices">
+          ${item.options.map((o,j) => `<button class="sc-btn" id="qb-${i}-${j}" onclick="answerQuiz(${i},${j})">${o}</button>`).join('')}
+        </div>
+      </fieldset>
+      <div class="sc-feedback" id="qfb-${i}" role="alert"></div>
+    `;
+    c.appendChild(div);
+  });
+  updateQuizScore();
+}
+
+function answerQuiz(q, choice) {
+  if (quizAnswered[q]) return;
+  quizAnswered[q] = true;
+  const correct = choice === quizData[q].correct;
+  quizCorrect[q] = correct;
+  quizData[q].options.forEach((_,j) => {
+    const btn = document.getElementById(`qb-${q}-${j}`);
+    btn.disabled = true;
+    if (j === choice) btn.classList.add(correct ? 'correct' : 'wrong');
+    if (!correct && j === quizData[q].correct) btn.classList.add('correct');
+  });
+  const fb = document.getElementById(`qfb-${q}`);
+  fb.textContent = correct ? quizData[q].feedback : quizData[q].wrongFeedback;
+  fb.className = `sc-feedback show ${correct ? 'correct' : 'wrong'}`;
+  announce(`Question ${q+1}: ${correct ? 'Correct' : 'Incorrect'}. ${correct ? quizData[q].feedback : quizData[q].wrongFeedback}`);
+  updateQuizScore();
+}
+
+function updateQuizScore() {
+  document.getElementById('quiz-score').textContent = `Score: ${quizCorrect.filter(Boolean).length} / ${quizData.length}`;
+}
+
+function resetQuiz() {
+  quizAnswered = new Array(quizData.length).fill(false);
+  quizCorrect  = new Array(quizData.length).fill(false);
+  renderQuiz(); announce('Part 2 reset.');
+}
+
+function switchTab(tab) {
+  ['classify','quiz'].forEach(t => {
+    document.getElementById(`panel-${t}`).classList.toggle('active', t === tab);
+    document.getElementById(`tab-${t}`).setAttribute('aria-selected', t === tab ? 'true' : 'false');
+  });
+}
+function announce(msg) {
+  const el = document.getElementById('live'); el.textContent='';
+  setTimeout(()=>{ el.textContent=msg; },50);
+}
+
+renderClassifier();
+renderQuiz();
+</script>
+</body>
+</html>
