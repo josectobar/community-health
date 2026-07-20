@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Program Rationale Builder</title>
+<style>
+:root{
+  --surface-0:#f4f2ec; --surface-1:#faf9f5; --surface-2:#ffffff;
+  --text-primary:#1a1a18; --text-secondary:#5f5e5a; --text-muted:#8a897f;
+  --border:#e3e1d8; --border-strong:#cfcdc2;
+  --bg-accent:#e6f1fb; --border-accent:#378add; --text-accent:#185fa5;
+  --bg-danger:#fcebeb; --border-danger:#e24b4a; --text-danger:#a32d2d;
+  --text-warning:#854f0b; --text-success:#0f6e56; --radius:8px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --surface-0:#26251f; --surface-1:#302f28; --surface-2:#3a3931;
+    --text-primary:#f0efe8; --text-secondary:#c2c0b6; --text-muted:#8f8e84;
+    --border:#45443b; --border-strong:#5a5950;
+    --bg-accent:#0c447c; --border-accent:#85b7eb; --text-accent:#b5d4f4;
+    --bg-danger:#501313; --border-danger:#f09595; --text-danger:#f7c1c1;
+    --text-warning:#fac775; --text-success:#9fe1cb;
+  }
+}
+*{box-sizing:border-box;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--surface-0); color:var(--text-primary);
+  line-height:1.6; margin:0; padding:2rem 1rem;
+}
+.wrap{max-width:700px; margin:0 auto;}
+h1{font-size:22px; font-weight:500; margin:0 0 4px;}
+.sub{font-size:14px; color:var(--text-secondary); margin:0 0 1.5rem;}
+button{font-family:inherit; cursor:pointer; background:transparent; color:inherit;
+  border:0.5px solid var(--border-strong); transition:border .15s, background .15s, opacity .15s;}
+button:hover{background:var(--surface-1);}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Program rationale builder</h1>
+<p class="sub">You get one page and five minutes. Choose your audience, then pick the three arguments that actually earn the slot.</p>
+
+<div style="margin-bottom: 1.25rem;">
+  <p style="font-size: 13px; color: var(--text-secondary); margin: 0 0 8px;">You're pitching a workplace diabetes-prevention program. First, pick who you're actually writing to.</p>
+  <div id="dm-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px;">
+    <button class="dm" data-dm="ceo" style="text-align:left; padding:10px 12px; border-radius:var(--radius);">
+      <span style="display:block; font-weight:500; font-size:14px;">Hospital CEO</span>
+      <span style="display:block; font-size:12px; color:var(--text-muted);">controls budget &middot; thinks ROI</span>
+    </button>
+    <button class="dm" data-dm="hr" style="text-align:left; padding:10px 12px; border-radius:var(--radius);">
+      <span style="display:block; font-weight:500; font-size:14px;">HR director</span>
+      <span style="display:block; font-size:12px; color:var(--text-muted);">owns staff wellbeing</span>
+    </button>
+    <button class="dm" data-dm="nurse" style="text-align:left; padding:10px 12px; border-radius:var(--radius);">
+      <span style="display:block; font-weight:500; font-size:14px;">Staff nurse</span>
+      <span style="display:block; font-size:12px; color:var(--text-muted);">cares, but can't approve</span>
+    </button>
+  </div>
+  <p id="dm-note" style="font-size:12px; margin:8px 0 0; min-height:16px; color:var(--text-secondary);"></p>
+</div>
+
+<div style="display:flex; justify-content:space-between; align-items:baseline; margin:0 0 8px;">
+  <p style="font-size:13px; color:var(--text-secondary); margin:0;">Pick your three strongest arguments.</p>
+  <span id="count" style="font-size:12px; font-weight:500; color:var(--text-muted);">0 / 3 chosen</span>
+</div>
+<div id="ev-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:8px; margin-bottom:1.25rem;"></div>
+
+<div style="background:var(--surface-1); border-radius:var(--radius); padding:14px 16px;">
+  <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px;">
+    <span style="font-size:13px; color:var(--text-secondary);">How this pitch lands</span>
+    <span id="score-label" style="font-size:14px; font-weight:500;">&mdash;</span>
+  </div>
+  <div style="height:8px; background:var(--surface-0); border-radius:99px; overflow:hidden;">
+    <div id="bar" style="height:100%; width:0%; background:var(--text-muted); transition:width .25s, background .25s;"></div>
+  </div>
+  <p id="verdict" style="font-size:13px; margin:10px 0 0; color:var(--text-secondary); line-height:1.6;">A rationale exists to answer one question a decision maker always asks: why should we invest in this?</p>
+</div>
+</div>
+
+<script>
+const LIMIT=3;
+const dmData = {
+  ceo:{note:"The CEO can say yes and controls the money. They want dollars and mission fit \u2014 a heartfelt wish-list will bounce."},
+  hr:{note:"HR can champion it and owns staff wellbeing. Productivity and absenteeism land; pure clinical trend data less so."},
+  nurse:{note:"A staff nurse is a stakeholder, not a decision maker. They care, but can't release resources. No argument fixes the wrong audience."}
+};
+const pieces=[
+  {id:"local",t:"Local burden data",d:"Diabetes rates in *this* workforce",base:22,fit:{ceo:1,hr:1,nurse:1}},
+  {id:"voice",t:"What employees say they want",d:"Community-identified need",base:16,fit:{ceo:0.4,hr:1.2,nurse:1}},
+  {id:"trend",t:"State + national trend link",d:"Ties local to the bigger picture",base:12,fit:{ceo:0.7,hr:0.6,nurse:1}},
+  {id:"evidence",t:"Evidence it works",d:"The Community Guide, Cochrane",base:26,fit:{ceo:1.1,hr:1,nurse:1}},
+  {id:"roi",t:"ROI / cost-benefit numbers",d:"Absenteeism, productivity, chronic-illness cost",base:24,fit:{ceo:1.4,hr:1.3,nurse:1}},
+  {id:"mission",t:"Fit with org mission",d:"How it advances their goals",base:14,fit:{ceo:1.6,hr:1.2,nurse:1}}
+];
+let dm=null; const picked=new Set();
+const grid=document.getElementById("ev-grid");
+pieces.forEach(p=>{
+  const b=document.createElement("button");
+  b.style.cssText="text-align:left; padding:10px 12px; border-radius:var(--radius);";
+  b.innerHTML='<span style="display:block; font-weight:500; font-size:13px;">'+p.t+'</span><span style="display:block; font-size:11px; color:var(--text-muted); margin-top:2px;">'+p.d+'</span>';
+  b.onclick=function(){
+    if(picked.has(p.id)) picked.delete(p.id);
+    else{ if(picked.size>=LIMIT) return; picked.add(p.id); }
+    paint(); score();
+  };
+  b._p=p; grid.appendChild(b);
+});
+document.querySelectorAll(".dm").forEach(function(x){x.onclick=function(){dm=x.dataset.dm;
+  document.querySelectorAll(".dm").forEach(function(y){y.style.border=y===x?"2px solid var(--border-accent)":"0.5px solid var(--border-strong)";});
+  document.getElementById("dm-note").textContent=dmData[dm].note; score();};});
+function paint(){
+  const full=picked.size>=LIMIT;
+  [...grid.children].forEach(function(b){const on=picked.has(b._p.id);
+    b.style.border=on?"2px solid var(--border-accent)":"0.5px solid var(--border-strong)";
+    b.style.background=on?"var(--bg-accent)":"transparent";
+    b.style.opacity=(!on&&full)?"0.45":"1";
+    b.style.pointerEvents=(!on&&full)?"none":"auto";
+  });
+  document.getElementById("count").textContent=picked.size+" / "+LIMIT+" chosen";
+}
+function score(){
+  const bar=document.getElementById("bar"), lab=document.getElementById("score-label"), v=document.getElementById("verdict");
+  if(!dm){lab.textContent="Pick a decision maker";lab.style.color="var(--text-muted)";
+    bar.style.width="0%";bar.style.background="var(--text-muted)";
+    v.textContent="Start by choosing who holds the authority to approve this.";return;}
+  if(dm==="nurse"){lab.textContent="Wrong audience";lab.style.color="var(--text-danger)";
+    bar.style.width="18%";bar.style.background="var(--text-danger)";
+    v.textContent="However you arrange the pieces, it stalls here \u2014 a stakeholder can't release funding, staff time, or access. Redirect to someone with authority.";return;}
+  if(picked.size===0){lab.textContent="Empty page";lab.style.color="var(--text-muted)";
+    bar.style.width="0%";bar.style.background="var(--text-muted)";
+    v.textContent="Three slots. Spend them on the arguments this particular person acts on.";return;}
+  let s=0; picked.forEach(function(id){const p=pieces.find(function(x){return x.id===id;}); s+=p.base*p.fit[dm];});
+  s=Math.min(100,Math.round(s));
+  const chosen=[...picked];
+  const weakPick=chosen.find(function(id){return pieces.find(function(p){return p.id===id;}).fit[dm]<0.7;});
+  const hasWorks=picked.has("evidence"), hasRoi=picked.has("roi"), hasMission=picked.has("mission");
+  bar.style.width=s+"%";
+  let color,label,msg;
+  if(s<45){color="var(--text-warning)";label="Thin";
+    msg=weakPick?("One of these barely registers with "+(dm==="ceo"?"a CEO":"HR")+" \u2014 you spent a scarce slot on an argument they don't act on. Swap it for value they can approve.")
+      :"You picked worth-having pieces but skipped the two that persuade most: proof it works, and what it returns.";}
+  else if(s<75){color="var(--text-accent)";label="Getting there";
+    msg=weakPick?"Solid core, but one slot is soft for this audience. Trading it up would tighten the whole pitch."
+      :(!hasWorks?"Strong, but no proof-of-effectiveness \u2014 your single most persuasive card is still on the table."
+      :(!hasRoi?"Good evidence. Now give them return in cost language they can defend to a board.":"A tight, targeted three."));}
+  else{color="var(--text-success)";label="Persuasive";
+    msg=(dm==="ceo"&&hasMission&&hasRoi)?"Money, proof, and mission fit \u2014 exactly the three a CEO can approve and sustain."
+      :"You spent all three slots on arguments this person acts on. That's a rationale that survives past the first meeting.";}
+  bar.style.background=color;lab.textContent=label;lab.style.color=color;v.textContent=msg;
+}
+</script>
+</body>
+</html>
