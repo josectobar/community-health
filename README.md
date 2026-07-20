@@ -36,6 +36,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/week3-community-theories/](models/week3-community-theories/): community level theories.
 - [models/week3-theory-selection/](models/week3-theory-selection/): selecting a theory or model.
 - [models/ch4-needs-assessment/](models/ch4-needs-assessment/): needs assessment types and the asset-based lens.
+- [models/ch4-data-sources/](models/ch4-data-sources/): practice choosing primary vs. secondary and qualitative vs. quantitative data, then explore key U.S. health databases.
 
 ## Embed snippets
 
@@ -56,6 +57,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Community Level Theories" src="models/week3-community-theories/"></iframe>
 <iframe title="Selecting a Theory or Model" src="models/week3-theory-selection/"></iframe>
 <iframe title="Needs Assessment: Types, Purposes &amp; the Asset Lens" src="models/ch4-needs-assessment/"></iframe>
+<iframe title="Data Collection for Needs Assessment: Applied Decision-Making" src="models/ch4-data-sources/"></iframe>
 ```
 
 ## Files

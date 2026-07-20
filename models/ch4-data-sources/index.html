@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Data Source Decision Tool</title>
+<style>
+  :root {
+    --teal: #1A6B72;
+    --teal-light: #D6ECED;
+    --gold: #B07D2A;
+    --gold-light: #FEF3DC;
+    --purple: #5B3A8E;
+    --purple-light: #EDE6F7;
+    --red: #9B2335;
+    --red-light: #FBDDE0;
+    --gray: #F4F4F4;
+    --border: #CCCCCC;
+    --text: #1A1A1A;
+    --white: #FFFFFF;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 15px; color: var(--text); background: #fff; padding: 20px; max-width: 820px; margin: 0 auto; }
+
+  h1 { font-size: 1.3rem; color: var(--teal); border-bottom: 3px solid var(--teal); padding-bottom: 8px; margin-bottom: 6px; }
+  .subtitle { font-size: 0.88rem; color: #555; margin-bottom: 20px; }
+
+  .tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .tab-btn {
+    padding: 8px 18px; border: 2px solid var(--teal); background: #fff;
+    color: var(--teal); border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: bold;
+  }
+  .tab-btn:hover { background: var(--teal-light); }
+  .tab-btn[aria-selected="true"] { background: var(--teal); color: #fff; }
+  .tab-btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .instructions {
+    background: var(--teal-light); border-left: 4px solid var(--teal);
+    padding: 12px 16px; border-radius: 4px; margin-bottom: 20px; font-size: 0.9rem;
+  }
+  .instructions strong { color: var(--teal); }
+
+  /* Decision Tool */
+  .scenario-block {
+    border: 1px solid var(--border); border-radius: 6px; margin-bottom: 24px; overflow: hidden;
+  }
+  .scenario-header {
+    background: var(--gray); padding: 14px 16px; border-bottom: 1px solid var(--border);
+  }
+  .scenario-num { font-size: 0.78rem; font-weight: bold; color: var(--teal); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+  .scenario-text { font-size: 0.95rem; line-height: 1.55; }
+
+  .decision-steps { padding: 14px 16px; }
+  .step-label { font-size: 0.82rem; font-weight: bold; color: var(--gold); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; margin-top: 10px; }
+  .step-label:first-child { margin-top: 0; }
+
+  .choice-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+  .choice-btn {
+    padding: 7px 14px; border: 2px solid var(--border); border-radius: 4px;
+    background: #fff; cursor: pointer; font-size: 0.88rem; transition: all 0.15s;
+    color: var(--text);
+  }
+  .choice-btn:hover:not([disabled]) { border-color: var(--teal); background: var(--teal-light); }
+  .choice-btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  .choice-btn.correct { border-color: var(--teal); background: var(--teal-light); color: var(--teal); font-weight: bold; }
+  .choice-btn.correct::after { content: " ✓"; }
+  .choice-btn.wrong { border-color: var(--red); background: var(--red-light); color: var(--red); }
+  .choice-btn.wrong::after { content: " ✗"; }
+  .choice-btn[disabled] { cursor: default; }
+
+  .step-feedback {
+    font-size: 0.85rem; line-height: 1.5; padding: 8px 12px; border-radius: 4px;
+    margin-top: 4px; display: none;
+  }
+  .step-feedback.show { display: block; }
+  .step-feedback.correct { background: var(--teal-light); color: #0F4A4F; border-left: 3px solid var(--teal); }
+  .step-feedback.wrong { background: var(--red-light); color: #6B1020; border-left: 3px solid var(--red); }
+
+  /* Step 2 appears after step 1 correct */
+  .step2-area { display: none; }
+  .step2-area.visible { display: block; }
+
+  /* Final recommendation card */
+  .recommendation {
+    background: var(--purple-light); border-left: 4px solid var(--purple);
+    padding: 14px 16px; border-radius: 4px; margin-top: 10px; display: none;
+  }
+  .recommendation.show { display: block; }
+  .recommendation-label { font-size: 0.8rem; font-weight: bold; color: var(--purple); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+  .recommendation-text { font-size: 0.9rem; line-height: 1.55; }
+
+  /* DB Explorer */
+  .db-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .db-card {
+    border: 2px solid var(--border); border-radius: 6px; padding: 12px;
+    cursor: pointer; transition: all 0.15s; background: #fff;
+    text-align: left;
+  }
+  .db-card:hover { border-color: var(--teal); background: var(--teal-light); }
+  .db-card:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  .db-card[aria-pressed="true"] { border-color: var(--teal); background: var(--teal-light); }
+  .db-name { font-weight: bold; font-size: 0.88rem; color: var(--teal); margin-bottom: 4px; }
+  .db-tag { display: inline-block; font-size: 0.75rem; padding: 2px 7px; border-radius: 10px; margin-bottom: 6px; }
+  .db-tag.quant { background: var(--teal); color: #fff; }
+  .db-tag.qual { background: var(--purple); color: #fff; }
+  .db-tag.both { background: var(--gold); color: #fff; }
+  .db-short { font-size: 0.83rem; color: #444; line-height: 1.4; }
+
+  .db-detail {
+    border: 1px solid var(--border); border-radius: 6px; padding: 16px;
+    background: var(--gray); min-height: 80px; margin-bottom: 10px; display: none;
+  }
+  .db-detail.show { display: block; }
+  .db-detail-name { font-weight: bold; font-size: 1rem; color: var(--teal); margin-bottom: 4px; }
+  .db-detail-row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .detail-label { font-size: 0.8rem; font-weight: bold; color: #555; }
+  .detail-val { font-size: 0.88rem; line-height: 1.5; }
+  .db-detail-section { margin-bottom: 8px; }
+  .db-placeholder { font-size: 0.9rem; color: #888; font-style: italic; text-align: center; padding: 20px; display: block; }
+
+  .score-row { display: flex; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap; }
+  .score-badge { background: var(--teal); color: #fff; padding: 5px 14px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; white-space: nowrap; }
+  .reset-btn { padding: 6px 14px; border: 2px solid var(--teal); background: #fff; color: var(--teal); border-radius: 4px; cursor: pointer; font-size: 0.88rem; font-weight: bold; }
+  .reset-btn:hover { background: var(--teal-light); }
+  .reset-btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  .sr-only { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+</style>
+</head>
+<body>
+
+<h1>Data Collection for Needs Assessment: Applied Decision-Making</h1>
+<p class="subtitle">Practice selecting and distinguishing data types — then explore key secondary data resources.</p>
+
+<div class="tabs" role="tablist" aria-label="Activity tabs">
+  <button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-decision" id="tab-decision" onclick="switchTab('decision')">Part 1: Data Source Decision Tool</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-db" id="tab-db" onclick="switchTab('db')">Part 2: Database Explorer</button>
+</div>
+
+<div aria-live="polite" aria-atomic="true" class="sr-only" id="live-announce"></div>
+
+<!-- PART 1 -->
+<div class="tab-panel active" id="panel-decision" role="tabpanel" aria-labelledby="tab-decision">
+
+  <div class="instructions">
+    <strong>Directions:</strong> For each scenario, work through two decisions: first, would you use primary or secondary data? Then, would that data be qualitative or quantitative? After both answers, you will receive a recommended method or resource.
+  </div>
+
+  <div id="decision-scenarios"></div>
+
+  <div class="score-row">
+    <div class="score-badge" id="decision-score" aria-live="polite">Scenarios completed: 0 / 4</div>
+    <button class="reset-btn" onclick="resetDecision()">Reset Part 1</button>
+  </div>
+</div>
+
+<!-- PART 2 -->
+<div class="tab-panel" id="panel-db" role="tabpanel" aria-labelledby="tab-db">
+
+  <div class="instructions">
+    <strong>Directions:</strong> Click any database card below to explore what it measures, who uses it, and what type of data it provides. Use this to get familiar with the key U.S. health data sources you will use in practice.
+  </div>
+
+  <div class="db-detail" id="db-detail-panel" role="region" aria-label="Database details">
+    <span class="db-placeholder">Select a database card below to see details here.</span>
+  </div>
+
+  <div class="db-grid" id="db-grid-container"></div>
+</div>
+
+<script>
+// ── DECISION DATA ──────────────────────────────────────────────────────────
+const decisionData = [
+  {
+    scenario: "Your team needs to understand why Latino families in a rural county are not using the new mobile mammography unit, even though it visits the community monthly.",
+    step1: {
+      question: "Step 1: Would you use primary or secondary data for this question?",
+      options: ["Primary data", "Secondary data"],
+      correct: 0,
+      correctFeedback: "Right — primary data. No existing dataset captures why a specific local population is not using a specific local service. You need to go directly to community members to understand their perceptions, barriers, and experiences.",
+      wrongFeedback: "Secondary data won't help here. The question is about community members' lived reasons and perceptions — specific to this service and this community. That kind of 'why' question requires collecting new data directly from the people involved."
+    },
+    step2: {
+      question: "Step 2: Would that primary data be qualitative or quantitative?",
+      options: ["Qualitative", "Quantitative"],
+      correct: 0,
+      correctFeedback: "Qualitative. Understanding 'why' — the perceived barriers, cultural considerations, and community perspectives — calls for open-ended exploration through methods like focus groups or interviews, not numeric surveys.",
+      wrongFeedback: "A numeric survey would tell you how many people aren't using the service, but you already know that. To understand why, you need qualitative methods that allow community members to explain barriers and experiences in their own words."
+    },
+    recommendation: "Best method: Focus groups with community members, or key informant interviews with promotores de salud who are trusted bridges to the population. Consider also using the Nominal Group Technique if prioritizing barriers for intervention planning."
+  },
+  {
+    scenario: "A public health analyst wants to compare the rate of uninsured adults in Maricopa County to the statewide rate and to national data, and track how that rate has changed over the past five years.",
+    step1: {
+      question: "Step 1: Would you use primary or secondary data for this question?",
+      options: ["Primary data", "Secondary data"],
+      correct: 1,
+      correctFeedback: "Secondary data. This question asks for population-level rates over time — exactly the kind of data that large national surveys and administrative systems already collect and track.",
+      wrongFeedback: "Collecting your own data to track insurance rates over five years across county, state, and national levels would require enormous resources. Secondary data already captures this at scale — that is what large health surveys are designed to do."
+    },
+    step2: {
+      question: "Step 2: Would that secondary data be qualitative or quantitative?",
+      options: ["Qualitative", "Quantitative"],
+      correct: 1,
+      correctFeedback: "Quantitative. Rates, percentages, and trend data over time are numerical — that is quantitative secondary data from sources like the American Community Survey or the BRFSS.",
+      wrongFeedback: "Rates and trend comparisons are numeric data — percentages, proportions, and counts across years and geographies. That is quantitative, not qualitative."
+    },
+    recommendation: "Best resource: American Community Survey (ACS) for insurance coverage demographics, and the Behavioral Risk Factor Surveillance System (BRFSS) for state-level health insurance trend data. Both are available free at census.gov and cdc.gov/brfss."
+  },
+  {
+    scenario: "A school district wants to identify the percentage of 10th graders who have used tobacco, alcohol, or cannabis in the past 30 days — and compare their results to state norms.",
+    step1: {
+      question: "Step 1: Would you use primary or secondary data, or both?",
+      options: ["Primary data (collect it yourself)", "Secondary data (use what exists)", "Both primary and secondary"],
+      correct: 2,
+      correctFeedback: "Both. To get local 10th-grade data specific to this district, the team would conduct a survey (primary data). To compare results to state norms, they would use existing state surveillance data (secondary data). This combination is very common in school-based needs assessments.",
+      wrongFeedback: "Think about both needs here: local data (which doesn't exist yet and must be collected) and state comparison data (which already exists). That combination requires both primary and secondary data."
+    },
+    step2: {
+      question: "Step 2: What type of data is the local school survey?",
+      options: ["Qualitative", "Quantitative"],
+      correct: 1,
+      correctFeedback: "Quantitative. A survey counting how many students used substances in the past 30 days produces rates and percentages — numeric, quantitative primary data.",
+      wrongFeedback: "A survey measuring frequency of substance use produces numbers — rates and percentages. That is quantitative data, even though it was collected directly (primary) from students."
+    },
+    recommendation: "Recommended approach: Administer a locally adapted version of the Youth Risk Behavior Survey (YRBS) as your primary data tool. Then compare findings to state YRBSS data available at cdc.gov/yrbss to contextualize local rates within state norms."
+  },
+  {
+    scenario: "A community coalition wants to understand the lived experience of older adults with chronic illness who are managing care on fixed incomes — including what worries them most and how they make decisions about medications.",
+    step1: {
+      question: "Step 1: Would you use primary or secondary data?",
+      options: ["Primary data", "Secondary data"],
+      correct: 0,
+      correctFeedback: "Primary data. The question is about lived experience, decision-making logic, and personal worries — deeply personal, context-specific information that no existing database captures.",
+      wrongFeedback: "Secondary data can tell you rates of chronic illness or medication non-adherence, but it cannot tell you what worries a specific group of people or how they make personal health decisions. That requires direct engagement — primary data."
+    },
+    step2: {
+      question: "Step 2: Would that primary data be qualitative or quantitative?",
+      options: ["Qualitative", "Quantitative"],
+      correct: 0,
+      correctFeedback: "Qualitative. Questions about lived experience, worries, and decision-making processes require open-ended methods — in-depth interviews or focus groups — that allow participants to describe their reality in their own words.",
+      wrongFeedback: "Asking older adults to rate their worry level on a scale of 1–5 would give you numbers but lose the richness of their experience. Understanding 'what worries them most' and 'how they decide' calls for open-ended, qualitative methods."
+    },
+    recommendation: "Best method: In-depth qualitative interviews or a facilitated focus group specifically with older adults managing chronic illness on fixed incomes. A nominal group technique could also help the coalition understand and prioritize the specific concerns that participants identify."
+  }
+];
+
+// ── DB DATA ────────────────────────────────────────────────────────────────
+const dbData = [
+  {
+    name: "BRFSS",
+    full: "Behavioral Risk Factor Surveillance System",
+    type: "quant",
+    typeLabel: "Quantitative",
+    short: "State-level adult health behaviors & chronic conditions",
+    url: "cdc.gov/brfss",
+    measures: "Health behaviors (smoking, physical activity, diet), chronic disease prevalence, preventive service use, and health-related quality of life among U.S. adults.",
+    level: "State and sub-state (Metropolitan Statistical Areas)",
+    updated: "Annual",
+    best: "Comparing local or state health behavior rates to national benchmarks; tracking trends over time; identifying risk behavior prevalence by demographic group."
+  },
+  {
+    name: "CDC WONDER",
+    full: "CDC WONDER Database",
+    type: "quant",
+    typeLabel: "Quantitative",
+    short: "Mortality, natality, and disease surveillance data",
+    url: "wonder.cdc.gov",
+    measures: "Mortality and cause-of-death data, birth records, cancer incidence, population estimates, and environmental public health data.",
+    level: "National, state, county",
+    updated: "Varies by dataset",
+    best: "Identifying leading causes of death by geography and demographic; calculating mortality rates; comparing local death rates to state or national averages."
+  },
+  {
+    name: "County Health Rankings",
+    full: "County Health Rankings & Roadmaps",
+    type: "quant",
+    typeLabel: "Quantitative",
+    short: "Annual rankings on health outcomes & factors by county",
+    url: "countyhealthrankings.org",
+    measures: "Health outcomes (mortality, morbidity) and health factors (behaviors, clinical care, social & economic factors, physical environment) for all U.S. counties.",
+    level: "County",
+    updated: "Annual",
+    best: "Quick snapshot of how a county compares to others statewide on key health indicators; identifying priority areas across multiple health domains in a single tool."
+  },
+  {
+    name: "American Community Survey",
+    full: "American Community Survey (ACS)",
+    type: "quant",
+    typeLabel: "Quantitative",
+    short: "Demographics, housing, income & insurance coverage",
+    url: "census.gov/acs",
+    measures: "Population demographics, income and poverty levels, educational attainment, housing characteristics, health insurance coverage, and disability status.",
+    level: "National down to census tract and block group",
+    updated: "Annual (5-year estimates for small geographies)",
+    best: "Understanding the social determinants of health context for a community; identifying subpopulations; mapping poverty, insurance gaps, or housing instability at very local levels."
+  },
+  {
+    name: "YRBSS",
+    full: "Youth Risk Behavior Surveillance System",
+    type: "quant",
+    typeLabel: "Quantitative",
+    short: "Health risk behaviors among U.S. high school students",
+    url: "cdc.gov/yrbss",
+    measures: "Tobacco, alcohol, and drug use; dietary behaviors; physical activity; sexual behaviors; and unintentional injury among high school students.",
+    level: "National, state, and many local school districts",
+    updated: "Biennial",
+    best: "School or community assessments focusing on adolescent health; comparing local youth risk behavior rates to state or national norms; tracking changes in youth health behaviors over time."
+  },
+  {
+    name: "NHIS",
+    full: "National Health Interview Survey",
+    type: "quant",
+    typeLabel: "Quantitative",
+    short: "Health status, insurance & access to care nationwide",
+    url: "cdc.gov/nchs/nhis",
+    measures: "Health status, healthcare access and utilization, insurance coverage, disability, and chronic conditions across U.S. households.",
+    level: "National (and some regional estimates)",
+    updated: "Annual",
+    best: "National baseline data on healthcare access and utilization; understanding disparities in insurance coverage or chronic disease burden across demographic groups."
+  },
+  {
+    name: "Community Commons",
+    full: "Community Commons / CHNA.org",
+    type: "both",
+    typeLabel: "Mixed",
+    short: "Mapping & community health needs data tool",
+    url: "communitycommons.org",
+    measures: "Aggregates data from multiple sources including demographics, social determinants, health outcomes, and community resources into interactive maps and reports.",
+    level: "National, state, county, ZIP code",
+    updated: "Ongoing updates from source datasets",
+    best: "Generating Community Health Needs Assessment (CHNA) reports required for nonprofit hospitals; mapping social determinants overlaid with health outcomes; visualizing community assets alongside health data."
+  },
+  {
+    name: "HRSA Data Warehouse",
+    full: "Health Resources & Services Administration Data Warehouse",
+    type: "quant",
+    typeLabel: "Quantitative",
+    short: "Primary care access, workforce & FQHC locations",
+    url: "data.hrsa.gov",
+    measures: "Health Professional Shortage Areas (HPSAs), Medically Underserved Areas/Populations (MUA/P), FQHC locations and patient data, and health workforce distribution.",
+    level: "National, state, county, census tract",
+    updated: "Regular updates",
+    best: "Identifying healthcare access deserts and shortage areas; locating federally qualified health centers; documenting unmet primary care need to support grant applications or policy advocacy."
+  }
+];
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+let decState = decisionData.map(() => ({ step1done: false, step1correct: false, step2done: false, complete: false }));
+
+// ── RENDER DECISION ────────────────────────────────────────────────────────
+function renderDecision() {
+  const c = document.getElementById('decision-scenarios');
+  c.innerHTML = '';
+  decisionData.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'scenario-block';
+    div.innerHTML = `
+      <div class="scenario-header">
+        <div class="scenario-num">Scenario ${i+1} of ${decisionData.length}</div>
+        <div class="scenario-text">${item.scenario}</div>
+      </div>
+      <div class="decision-steps">
+        <div class="step-label">${item.step1.question}</div>
+        <fieldset style="border:none;padding:0;margin:0">
+          <legend class="sr-only">Step 1 for scenario ${i+1}</legend>
+          <div class="choice-row">
+            ${item.step1.options.map((o,j) => `<button class="choice-btn" id="d1-${i}-${j}" onclick="answerStep(${i},1,${j})">${o}</button>`).join('')}
+          </div>
+        </fieldset>
+        <div class="step-feedback" id="d1fb-${i}" role="alert"></div>
+
+        <div class="step2-area" id="step2-${i}">
+          <div class="step-label">${item.step2.question}</div>
+          <fieldset style="border:none;padding:0;margin:0">
+            <legend class="sr-only">Step 2 for scenario ${i+1}</legend>
+            <div class="choice-row">
+              ${item.step2.options.map((o,j) => `<button class="choice-btn" id="d2-${i}-${j}" onclick="answerStep(${i},2,${j})">${o}</button>`).join('')}
+            </div>
+          </fieldset>
+          <div class="step-feedback" id="d2fb-${i}" role="alert"></div>
+          <div class="recommendation" id="rec-${i}">
+            <div class="recommendation-label">✦ Recommended Approach</div>
+            <div class="recommendation-text" id="rec-text-${i}"></div>
+          </div>
+        </div>
+      </div>
+    `;
+    c.appendChild(div);
+  });
+  updateDecisionScore();
+}
+
+function answerStep(scen, step, choice) {
+  const item = decisionData[scen];
+  const stepData = step === 1 ? item.step1 : item.step2;
+  const stateKey = step === 1 ? 'step1done' : 'step2done';
+  if (decState[scen][stateKey]) return;
+  decState[scen][stateKey] = true;
+
+  const correct = choice === stepData.correct;
+  if (step === 1) decState[scen].step1correct = correct;
+
+  stepData.options.forEach((_, j) => {
+    const btn = document.getElementById(`d${step}-${scen}-${j}`);
+    btn.disabled = true;
+    if (j === choice) btn.classList.add(correct ? 'correct' : 'wrong');
+    if (!correct && j === stepData.correct) btn.classList.add('correct');
+  });
+
+  const fb = document.getElementById(`d${step}fb-${scen}`);
+  fb.textContent = correct ? stepData.correctFeedback : stepData.wrongFeedback;
+  fb.className = `step-feedback show ${correct ? 'correct' : 'wrong'}`;
+
+  if (step === 1) {
+    // Always reveal step 2 regardless of step 1 correctness
+    document.getElementById(`step2-${scen}`).classList.add('visible');
+  }
+
+  if (step === 2) {
+    decState[scen].complete = true;
+    const rec = document.getElementById(`rec-${scen}`);
+    document.getElementById(`rec-text-${scen}`).textContent = item.recommendation;
+    rec.classList.add('show');
+  }
+
+  announce(`Scenario ${scen+1} step ${step}: ${correct ? 'Correct' : 'Incorrect'}. ${correct ? stepData.correctFeedback : stepData.wrongFeedback}`);
+  updateDecisionScore();
+}
+
+function updateDecisionScore() {
+  const done = decState.filter(s => s.complete).length;
+  document.getElementById('decision-score').textContent = `Scenarios completed: ${done} / ${decisionData.length}`;
+}
+
+function resetDecision() {
+  decState = decisionData.map(() => ({ step1done: false, step1correct: false, step2done: false, complete: false }));
+  renderDecision();
+  announce('Part 1 reset.');
+}
+
+// ── RENDER DB EXPLORER ─────────────────────────────────────────────────────
+function renderDB() {
+  const grid = document.getElementById('db-grid-container');
+  grid.innerHTML = '';
+  dbData.forEach((db, i) => {
+    const card = document.createElement('button');
+    card.className = 'db-card';
+    card.id = `db-card-${i}`;
+    card.setAttribute('aria-pressed', 'false');
+    card.innerHTML = `
+      <div class="db-name">${db.name}</div>
+      <div><span class="db-tag ${db.type}">${db.typeLabel}</span></div>
+      <div class="db-short">${db.short}</div>
+    `;
+    card.onclick = () => showDB(i);
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showDB(i); } });
+    grid.appendChild(card);
+  });
+}
+
+let activeDB = null;
+function showDB(i) {
+  const db = dbData[i];
+  if (activeDB !== null) document.getElementById(`db-card-${activeDB}`).setAttribute('aria-pressed', 'false');
+  activeDB = i;
+  document.getElementById(`db-card-${i}`).setAttribute('aria-pressed', 'true');
+
+  const panel = document.getElementById('db-detail-panel');
+  panel.classList.add('show');
+  panel.innerHTML = `
+    <div class="db-detail-name">${db.full} (${db.name})</div>
+    <div class="db-detail-row"><span class="db-tag ${db.type}" style="font-size:0.8rem">${db.typeLabel} Data</span></div>
+    <div class="db-detail-section"><div class="detail-label">What it measures</div><div class="detail-val">${db.measures}</div></div>
+    <div class="db-detail-section"><div class="detail-label">Geographic level</div><div class="detail-val">${db.level}</div></div>
+    <div class="db-detail-section"><div class="detail-label">Update frequency</div><div class="detail-val">${db.updated}</div></div>
+    <div class="db-detail-section"><div class="detail-label">Best used for</div><div class="detail-val">${db.best}</div></div>
+    <div class="db-detail-section"><div class="detail-label">Access</div><div class="detail-val"><strong>${db.url}</strong></div></div>
+  `;
+  announce(`${db.full}. ${db.typeLabel} data. ${db.measures}`);
+}
+
+// ── TABS ───────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  ['decision','db'].forEach(t => {
+    document.getElementById(`panel-${t}`).classList.toggle('active', t === tab);
+    document.getElementById(`tab-${t}`).setAttribute('aria-selected', t === tab ? 'true' : 'false');
+  });
+}
+
+function announce(msg) {
+  const el = document.getElementById('live-announce');
+  el.textContent = '';
+  setTimeout(() => { el.textContent = msg; }, 50);
+}
+
+renderDecision();
+renderDB();
+</script>
+</body>
+</html>
