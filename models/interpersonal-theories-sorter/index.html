@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interpersonal Theories in Practice</title>
+<style>
+:root{
+  --page:#f6f4ee; --card:#ffffff; --soft:#efece3;
+  --ink:#2a2824; --muted:#6b6960; --faint:#96948a;
+  --line:#e0ddd3; --line-strong:#cbc8bc;
+  --sct:#3f6fb0; --sct-bg:#e8f0f9; --sct-ink:#234a80;
+  --cap:#c07a2a; --cap-bg:#f9efe0; --cap-ink:#875119;
+  --net:#4a9a76; --net-bg:#e5f2ec; --net-ink:#2c6349;
+  --good:#2c6349; --bad:#a3402d; --radius:8px;
+}
+*{box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--page); color:var(--ink); line-height:1.6; margin:0; padding:2rem 1rem;}
+.wrap{max-width:720px; margin:0 auto;}
+h1{font-size:22px; font-weight:600; margin:0 0 4px;}
+.sub{font-size:14px; color:var(--muted); margin:0 0 1.5rem;}
+button{font-family:inherit; cursor:pointer; background:transparent; color:inherit; transition:all .15s;}
+.legend{display:flex; flex-wrap:wrap; gap:14px; margin:0 0 1.25rem; font-size:12px; color:var(--muted);}
+.legend span{display:inline-flex; align-items:center; gap:6px;}
+.dot{width:10px; height:10px; border-radius:50%;}
+.move{background:var(--card); border:0.5px solid var(--line); border-radius:12px; padding:14px 16px; margin-bottom:12px;}
+.move p{margin:0 0 10px; font-size:14px;}
+.opts{display:grid; grid-template-columns:repeat(3,1fr); gap:8px;}
+.opt{padding:8px 6px; border:0.5px solid var(--line-strong); border-radius:var(--radius);
+  font-size:12px; font-weight:500; text-align:center;}
+.opt:hover{background:var(--soft);}
+.fb{font-size:12.5px; margin:10px 0 0; line-height:1.55; min-height:0;}
+.score-wrap{background:var(--soft); border-radius:12px; padding:14px 16px; margin-top:6px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Which theory is this move using?</h1>
+<p class="sub">One neighborhood is tackling Type 2 diabetes. Each action below leans on a different interpersonal theory. Read the move, then name the theory driving it.</p>
+
+<div class="legend">
+  <span><span class="dot" style="background:var(--sct)"></span>Social Cognitive &mdash; person, behavior, environment loop</span>
+  <span><span class="dot" style="background:var(--cap)"></span>Social Capital &mdash; trust &amp; network resources</span>
+  <span><span class="dot" style="background:var(--net)"></span>Social Network &mdash; structure of who's tied to whom</span>
+</div>
+
+<div id="moves"></div>
+
+<div class="score-wrap">
+  <div style="display:flex; justify-content:space-between; align-items:baseline;">
+    <span style="font-size:13px; color:var(--muted);">Correctly diagnosed</span>
+    <span id="score" style="font-size:15px; font-weight:600;">0 / 6</span>
+  </div>
+  <p id="closing" style="font-size:12.5px; color:var(--muted); margin:10px 0 0; line-height:1.55;">The tell is what each move acts <em>on</em>: an individual's confidence and skills (Cognitive), the resources inside relationships (Capital), or the shape of the connections themselves (Network).</p>
+</div>
+</div>
+
+<script>
+const T={sct:{label:"Social Cognitive",ink:"var(--sct-ink)",bg:"var(--sct-bg)",bd:"var(--sct)"},
+  cap:{label:"Social Capital",ink:"var(--cap-ink)",bg:"var(--cap-bg)",bd:"var(--cap)"},
+  net:{label:"Social Network",ink:"var(--net-ink)",bg:"var(--net-bg)",bd:"var(--net)"}};
+const moves=[
+  {q:"Residents watch video testimonials of neighbors who reversed their prediabetes, then set their own weekly walking goals and track them.",a:"sct",
+   why:"Observational learning plus self-regulation \u2014 both live inside the individual's own change process. That's Social Cognitive Theory."},
+  {q:"Organizers map the school and find the six most-connected students, train just them on healthy eating, and let the norms ripple outward.",a:"net",
+   why:"Targeting hubs by their structural position \u2014 who's tied to whom \u2014 rather than broadcasting to everyone. Pure Social Network Theory."},
+  {q:"A faith community starts a diabetes support group where longtime members help newcomers navigate the clinic in their shared language.",a:"cap",
+   why:"Bonding capital: trust and shared identity inside a homogeneous group become a health resource. That's Social Capital."},
+  {q:"A community health worker connects residents to a hospital system to push for culturally competent care they couldn't access alone.",a:"cap",
+   why:"Linking capital \u2014 tying community members to institutions holding power. A Social Capital move, not a network-structure one."},
+  {q:"Nurses give hands-on training so participants can actually measure carbs and use a glucometer, not just intend to.",a:"sct",
+   why:"Behavioral capability: knowledge plus the skill to perform it. Without it, confidence never becomes action. Social Cognitive."},
+  {q:"Planners rely on close family ties for support but recruit casual acquaintances to carry the program into circles the family never reaches.",a:"net",
+   why:"Strong vs. weak ties and their spread function \u2014 that's the structure of relationships. Social Network Theory (weak ties travel farthest)."}
+];
+let answered=0, correct=0;
+const box=document.getElementById("moves");
+moves.forEach(function(m,i){
+  const d=document.createElement("div"); d.className="move";
+  const opts=["sct","cap","net"].map(function(k){
+    return '<button class="opt" data-k="'+k+'">'+T[k].label+'</button>';}).join("");
+  d.innerHTML='<p><strong>Move '+(i+1)+'.</strong> '+m.q+'</p><div class="opts">'+opts+'</div><p class="fb"></p>';
+  const fb=d.querySelector(".fb");
+  d.querySelectorAll(".opt").forEach(function(btn){
+    btn.onclick=function(){
+      if(d.dataset.done) return;
+      const k=btn.dataset.k, ok=k===m.a;
+      d.dataset.done="1"; answered++;
+      d.querySelectorAll(".opt").forEach(function(b){
+        b.style.pointerEvents="none";
+        if(b.dataset.k===m.a){b.style.background=T[m.a].bg;b.style.color=T[m.a].ink;b.style.borderColor=T[m.a].bd;b.style.fontWeight="600";}
+        else if(b===btn){b.style.opacity="0.5";}
+        else{b.style.opacity="0.4";}
+      });
+      if(ok){correct++;fb.style.color="var(--good)";fb.innerHTML="\u2713 "+m.why;}
+      else{fb.style.color="var(--bad)";fb.innerHTML="Not quite. This is <strong>"+T[m.a].label+"</strong>. "+m.why;}
+      document.getElementById("score").textContent=correct+" / "+moves.length;
+      if(answered===moves.length){
+        const c=document.getElementById("closing");
+        c.style.color="var(--ink)";
+        c.innerHTML=correct===6?"All six. You're reading each move by what it acts on, not by surface topic \u2014 that's the skill."
+          :"Done. Notice the traps: linking people to a hospital sounds like \u201Cnetwork,\u201D but it's a Capital resource; recruiting acquaintances sounds social, but it's about tie <em>structure</em>. Same scenario, three different lenses.";
+      }
+    };
+  });
+  box.appendChild(d);
+});
+</script>
+</body>
+</html>

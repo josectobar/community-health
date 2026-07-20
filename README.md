@@ -38,6 +38,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/ch4-needs-assessment/](models/ch4-needs-assessment/): needs assessment types and the asset-based lens.
 - [models/ch4-data-sources/](models/ch4-data-sources/): practice choosing primary vs. secondary and qualitative vs. quantitative data, then explore key U.S. health databases.
 - [models/program-rationale-builder/](models/program-rationale-builder/): choose a decision maker and pick the three arguments that make the strongest case for a program.
+- [models/interpersonal-theories-sorter/](models/interpersonal-theories-sorter/): identify whether each community diabetes-prevention move draws on Social Cognitive, Social Capital, or Social Network theory.
 
 ## Embed snippets
 
@@ -60,6 +61,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Needs Assessment: Types, Purposes &amp; the Asset Lens" src="models/ch4-needs-assessment/"></iframe>
 <iframe title="Data Collection for Needs Assessment: Applied Decision-Making" src="models/ch4-data-sources/"></iframe>
 <iframe title="Program Rationale Builder" src="models/program-rationale-builder/"></iframe>
+<iframe title="Interpersonal Theories in Practice" src="models/interpersonal-theories-sorter/"></iframe>
 ```
 
 ## Files
