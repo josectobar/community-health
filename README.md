@@ -35,6 +35,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/week3-interpersonal-theories/](models/week3-interpersonal-theories/): interpersonal level theories.
 - [models/week3-community-theories/](models/week3-community-theories/): community level theories.
 - [models/week3-theory-selection/](models/week3-theory-selection/): selecting a theory or model.
+- [models/ch4-needs-assessment/](models/ch4-needs-assessment/): needs assessment types and the asset-based lens.
 
 ## Embed snippets
 
@@ -54,6 +55,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Interpersonal Level Theories" src="models/week3-interpersonal-theories/"></iframe>
 <iframe title="Community Level Theories" src="models/week3-community-theories/"></iframe>
 <iframe title="Selecting a Theory or Model" src="models/week3-theory-selection/"></iframe>
+<iframe title="Needs Assessment: Types, Purposes &amp; the Asset Lens" src="models/ch4-needs-assessment/"></iframe>
 ```
 
 ## Files

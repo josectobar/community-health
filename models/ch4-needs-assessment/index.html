@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Needs Assessment Explorer</title>
+<style>
+  :root {
+    --teal: #1A6B72;
+    --teal-light: #D6ECED;
+    --gold: #B07D2A;
+    --gold-light: #FEF3DC;
+    --purple: #5B3A8E;
+    --purple-light: #EDE6F7;
+    --gray: #F4F4F4;
+    --border: #CCCCCC;
+    --correct: #1A6B72;
+    --correct-bg: #D6ECED;
+    --wrong: #9B2335;
+    --wrong-bg: #FBDDE0;
+    --text: #1A1A1A;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 15px; color: var(--text); background: #fff; padding: 20px; max-width: 820px; margin: 0 auto; }
+
+  h1 { font-size: 1.3rem; color: var(--teal); border-bottom: 3px solid var(--teal); padding-bottom: 8px; margin-bottom: 6px; }
+  .subtitle { font-size: 0.88rem; color: #555; margin-bottom: 20px; }
+
+  /* Tab navigation */
+  .tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .tab-btn {
+    padding: 8px 18px; border: 2px solid var(--teal); background: #fff;
+    color: var(--teal); border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: bold;
+    transition: background 0.15s, color 0.15s;
+  }
+  .tab-btn:hover { background: var(--teal-light); }
+  .tab-btn[aria-selected="true"] { background: var(--teal); color: #fff; }
+  .tab-btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* Instructions callout */
+  .instructions {
+    background: var(--teal-light); border-left: 4px solid var(--teal);
+    padding: 12px 16px; border-radius: 4px; margin-bottom: 20px; font-size: 0.9rem;
+  }
+  .instructions strong { color: var(--teal); }
+
+  /* Scenario card */
+  .scenario-card {
+    border: 1px solid var(--border); border-radius: 6px; padding: 16px;
+    margin-bottom: 18px; background: var(--gray);
+  }
+  .scenario-num { font-size: 0.78rem; font-weight: bold; color: var(--teal); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .scenario-text { margin-bottom: 14px; line-height: 1.55; }
+
+  /* Choice buttons */
+  .choices { display: flex; gap: 8px; flex-wrap: wrap; }
+  .choice-btn {
+    padding: 8px 14px; border: 2px solid var(--border); border-radius: 4px;
+    background: #fff; cursor: pointer; font-size: 0.88rem; transition: all 0.15s;
+    color: var(--text);
+  }
+  .choice-btn:hover { border-color: var(--teal); background: var(--teal-light); }
+  .choice-btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+  .choice-btn.correct { border-color: var(--correct); background: var(--correct-bg); color: var(--correct); font-weight: bold; }
+  .choice-btn.correct::after { content: " ✓"; }
+  .choice-btn.wrong { border-color: var(--wrong); background: var(--wrong-bg); color: var(--wrong); }
+  .choice-btn.wrong::after { content: " ✗"; }
+  .choice-btn[disabled] { cursor: default; }
+
+  /* Feedback */
+  .feedback {
+    margin-top: 10px; padding: 10px 14px; border-radius: 4px; font-size: 0.88rem;
+    line-height: 1.5; display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.correct { background: var(--correct-bg); color: #0F4A4F; border-left: 4px solid var(--correct); }
+  .feedback.wrong { background: var(--wrong-bg); color: #6B1020; border-left: 4px solid var(--wrong); }
+
+  /* Score bar */
+  .score-row { display: flex; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap; }
+  .score-badge {
+    background: var(--teal); color: #fff; padding: 5px 14px; border-radius: 20px;
+    font-weight: bold; font-size: 0.9rem; white-space: nowrap;
+  }
+  .reset-btn {
+    padding: 6px 14px; border: 2px solid var(--teal); background: #fff;
+    color: var(--teal); border-radius: 4px; cursor: pointer; font-size: 0.88rem; font-weight: bold;
+  }
+  .reset-btn:hover { background: var(--teal-light); }
+  .reset-btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+  /* Flip the Frame - Part 2 */
+  .frame-card {
+    border: 1px solid var(--border); border-radius: 6px; margin-bottom: 22px;
+    overflow: hidden;
+  }
+  .deficit-banner {
+    background: #F0E8FF; border-bottom: 1px solid var(--border); padding: 12px 16px;
+  }
+  .deficit-label { font-size: 0.78rem; font-weight: bold; color: var(--purple); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .deficit-text { font-size: 0.95rem; font-style: italic; color: #333; line-height: 1.5; }
+  .flip-prompt { padding: 12px 16px; font-size: 0.88rem; font-weight: bold; color: var(--gold); background: var(--gold-light); }
+  .frame-options { padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .frame-opt {
+    padding: 10px 14px; border: 2px solid var(--border); border-radius: 4px;
+    background: #fff; cursor: pointer; font-size: 0.88rem; text-align: left; line-height: 1.45;
+    transition: all 0.15s;
+  }
+  .frame-opt:hover { border-color: var(--gold); background: var(--gold-light); }
+  .frame-opt:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
+  .frame-opt.correct { border-color: var(--correct); background: var(--correct-bg); color: #0F4A4F; font-weight: bold; }
+  .frame-opt.correct::before { content: "✓ "; }
+  .frame-opt.wrong { border-color: var(--wrong); background: var(--wrong-bg); color: #6B1020; }
+  .frame-opt.wrong::before { content: "✗ "; }
+  .frame-opt[disabled] { cursor: default; }
+  .frame-feedback { padding: 0 16px 14px; font-size: 0.88rem; line-height: 1.5; display: none; }
+  .frame-feedback.show { display: block; color: #0F4A4F; }
+
+  /* Live region */
+  .sr-only { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+</style>
+</head>
+<body>
+
+<h1>Needs Assessment: Types, Purposes &amp; the Asset Lens</h1>
+<p class="subtitle">Two interactive activities to deepen your understanding — no definitions to re-read, just applied thinking.</p>
+
+<div class="tabs" role="tablist" aria-label="Activity tabs">
+  <button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-sorter" id="tab-sorter" onclick="switchTab('sorter')">Part 1: Scenario Sorter</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-frame" id="tab-frame" onclick="switchTab('frame')">Part 2: Flip the Frame</button>
+</div>
+
+<div aria-live="polite" aria-atomic="true" class="sr-only" id="live-announce"></div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- PART 1: SCENARIO SORTER                               -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="tab-panel active" id="panel-sorter" role="tabpanel" aria-labelledby="tab-sorter">
+
+  <div class="instructions">
+    <strong>Directions:</strong> Read each scenario below and select the type of assessment being described — Community Needs Assessment (CNA), Health Impact Assessment (HIA), or Organizational Health Assessment (OHA). Use what you know about the purpose and focus of each type.
+  </div>
+
+  <div id="sorter-scenarios"></div>
+
+  <div class="score-row">
+    <div class="score-badge" id="sorter-score" aria-live="polite">Score: 0 / 5</div>
+    <button class="reset-btn" onclick="resetSorter()">Reset Part 1</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- PART 2: FLIP THE FRAME                                -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-frame" role="tabpanel" aria-labelledby="tab-frame">
+
+  <div class="instructions">
+    <strong>Directions:</strong> Each card shows a deficit-based statement — the kind of framing that focuses only on what a community lacks. Your job is to choose the asset-based reframe that captures the same situation through a community capacity lens. Only one option is the strongest reframe.
+  </div>
+
+  <div id="frame-scenarios"></div>
+
+  <div class="score-row">
+    <div class="score-badge" id="frame-score" aria-live="polite">Score: 0 / 4</div>
+    <button class="reset-btn" onclick="resetFrame()">Reset Part 2</button>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────
+
+const sorterData = [
+  {
+    scenario: "A county health department wants to understand the overall health status of residents in a rural farming community, including leading causes of death, access to healthcare, and residents' own perceptions of health priorities. They plan to use the findings to write a five-year Community Health Improvement Plan.",
+    options: ["Community Needs Assessment (CNA)", "Health Impact Assessment (HIA)", "Organizational Health Assessment (OHA)"],
+    correct: 0,
+    feedback: "Correct! This is a Community Needs Assessment — it examines the health status and needs of a defined population to guide program planning and resource decisions.",
+    wrongFeedback: "Not quite. Think about who the subject of this assessment is. They are studying the health of a population — residents of a community — and using the findings for future planning. That is the core purpose of a Community Needs Assessment."
+  },
+  {
+    scenario: "A city is planning to reroute a major highway through a predominantly low-income neighborhood. Before construction begins, a public health team is asked to analyze the potential respiratory, mental health, and noise exposure effects on residents living within a half-mile of the proposed route.",
+    options: ["Community Needs Assessment (CNA)", "Health Impact Assessment (HIA)", "Organizational Health Assessment (OHA)"],
+    correct: 1,
+    feedback: "Correct! This is a Health Impact Assessment — it evaluates the potential health consequences of a proposed project (the highway reroute) before it is implemented. The key clue is the word 'potential' — HIA is prospective.",
+    wrongFeedback: "Not quite. The critical clue here is that this assessment is about a proposed action not yet taken. The team is predicting future health effects before a decision is finalized. That prospective focus is the hallmark of a Health Impact Assessment."
+  },
+  {
+    scenario: "A nonprofit community health center is concerned about staff burnout, high turnover among case managers, and declining patient satisfaction scores. The executive director commissions a review of internal workflows, organizational culture, staff well-being, and program effectiveness.",
+    options: ["Community Needs Assessment (CNA)", "Health Impact Assessment (HIA)", "Organizational Health Assessment (OHA)"],
+    correct: 2,
+    feedback: "Correct! This is an Organizational Health Assessment — the subject of the assessment is the organization itself (its culture, staffing, and internal processes), not a community population or a proposed policy.",
+    wrongFeedback: "Not quite. Notice that the assessment is looking inward — at the health organization's own functioning, staff morale, and workflows. When the subject of the assessment is the organization rather than a community or a proposed policy, that points to an Organizational Health Assessment."
+  },
+  {
+    scenario: "A school district is considering implementing a new policy that would replace all vending machines with healthy food options and add 30 minutes of daily physical activity. A health team is asked to estimate the likely effects of this policy on student obesity rates, academic performance, and mental health before the board votes.",
+    options: ["Community Needs Assessment (CNA)", "Health Impact Assessment (HIA)", "Organizational Health Assessment (OHA)"],
+    correct: 1,
+    feedback: "Correct! This is a Health Impact Assessment. The policy has not yet been adopted, and the team is being asked to project its likely health effects before implementation — the defining feature of an HIA.",
+    wrongFeedback: "Not quite. The word 'estimate' and the phrase 'before the board votes' are important clues. The team is being asked to predict what will happen if a policy is adopted — not to describe current conditions or assess organizational functioning. That forward-looking, pre-decision analysis is the essence of an HIA."
+  },
+  {
+    scenario: "A federally qualified health center (FQHC) wants to identify unmet health needs among uninsured adults in a tri-county area. They conduct door-to-door surveys, hold focus groups, and review local hospital discharge data to identify priorities for a new mobile health unit.",
+    options: ["Community Needs Assessment (CNA)", "Health Impact Assessment (HIA)", "Organizational Health Assessment (OHA)"],
+    correct: 0,
+    feedback: "Correct! This is a Community Needs Assessment — it uses multiple data methods (surveys, focus groups, secondary data) to understand the needs of a defined population (uninsured adults in a tri-county area) and inform program decisions (a mobile health unit).",
+    wrongFeedback: "Not quite. The FQHC is gathering information about uninsured adults in the community — their health needs, experiences, and patterns. The goal is to understand population needs in order to plan a new program. That combination of population focus and program planning purpose points to a Community Needs Assessment."
+  }
+];
+
+const frameData = [
+  {
+    deficit: "The south side neighborhood has high rates of childhood obesity, poor nutrition, and limited physical activity among youth ages 8–14.",
+    prompt: "Which of these best reframes this situation through a community capacity and assets lens?",
+    options: [
+      "The south side has a serious obesity problem that requires outside intervention to fix dietary and activity habits among children.",
+      "Several youth-serving churches, a community garden, and a youth soccer league in the south side provide existing infrastructure for a nutrition and physical activity program.",
+      "Parents in the south side do not prioritize their children's health, as shown by the high obesity rates and poor dietary habits.",
+      "The south side lacks grocery stores, safe parks, and health education programs needed to support healthy youth development."
+    ],
+    correct: 1,
+    feedback: "Option B is the strongest asset-based reframe. It identifies specific existing community resources — churches, a garden, a soccer league — that can be mobilized for health programming. Asset-based thinking asks 'what is already here that we can build on?' rather than starting from absence or blame."
+  },
+  {
+    deficit: "The rural farmworker community has high rates of heat-related illness and very low rates of preventive care utilization.",
+    prompt: "Which option best captures this situation through a capacity and assets lens?",
+    options: [
+      "The farmworker community has no access to shade, breaks, or healthcare, making heat illness and low preventive care inevitable.",
+      "Farmworkers are not taking advantage of available health services, leading to preventable illness and low care utilization.",
+      "Farmworker community members have deep knowledge of heat exposure risks and a strong network of promotores de salud (community health workers) who are trusted messengers for outreach.",
+      "Local employers are responsible for heat illness due to lack of safety protocols, and legal enforcement is needed."
+    ],
+    correct: 2,
+    feedback: "Option C is the asset-based reframe. It recognizes community members' own knowledge and the existing promotores de salud network as assets that can anchor an intervention. Rather than framing the community as passive recipients of care, it centers community expertise and trusted relationships."
+  },
+  {
+    deficit: "Teen mental health crises have increased dramatically in the district. Schools report growing numbers of students with anxiety, depression, and absenteeism.",
+    prompt: "Which option reframes this through a community assets lens?",
+    options: [
+      "Teens today lack coping skills and resilience because families are less involved than in prior generations.",
+      "The district has no mental health counselors on staff and cannot address the scope of this crisis alone.",
+      "The district has trained school counselors, an active student peer support program, and community partnerships with two local behavioral health organizations that can be expanded.",
+      "Mental health services are consistently underfunded in schools, and the crisis will worsen without major new investment."
+    ],
+    correct: 2,
+    feedback: "Option C identifies concrete existing assets: trained counselors, a peer support program, and community behavioral health partnerships. An asset-based frame does not deny that a problem exists — it asks which strengths are already present that can be activated and expanded as a foundation for action."
+  },
+  {
+    deficit: "The immigrant population in the east corridor has very limited English proficiency and experiences significant barriers to accessing healthcare.",
+    prompt: "Which option best applies a community capacity lens?",
+    options: [
+      "Language barriers make it nearly impossible for the east corridor immigrant population to navigate the healthcare system without major systemic changes.",
+      "The east corridor has a vibrant network of cultural and ethnic community associations, multilingual community members, and faith institutions that serve as trusted bridges to healthcare navigation.",
+      "The east corridor immigrant population is not prioritizing health due to cultural differences and distrust of medical institutions.",
+      "Without translation services at every healthcare facility, the east corridor population will continue to experience health disparities."
+    ],
+    correct: 1,
+    feedback: "Option B reframes the situation by identifying the community's own assets: cultural associations, multilingual residents, and trusted faith institutions. These are not just nice-to-haves — they are the most effective entry points for health outreach. Asset-based thinking treats existing community networks as program infrastructure, not a gap to fill."
+  }
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let sorterAnswered = new Array(sorterData.length).fill(false);
+let sorterCorrect  = new Array(sorterData.length).fill(false);
+let frameAnswered  = new Array(frameData.length).fill(false);
+let frameCorrect   = new Array(frameData.length).fill(false);
+
+// ── RENDER SORTER ─────────────────────────────────────────────────────────
+function renderSorter() {
+  const container = document.getElementById('sorter-scenarios');
+  container.innerHTML = '';
+  sorterData.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'scenario-card';
+    div.innerHTML = `
+      <div class="scenario-num">Scenario ${i + 1} of ${sorterData.length}</div>
+      <div class="scenario-text">${item.scenario}</div>
+      <fieldset style="border:none;padding:0;margin:0" id="sorter-fs-${i}">
+        <legend class="sr-only">Select the assessment type for scenario ${i + 1}</legend>
+        <div class="choices">
+          ${item.options.map((opt, j) => `
+            <button class="choice-btn" id="s-btn-${i}-${j}" onclick="answerSorter(${i},${j})"
+              aria-pressed="false">${opt}</button>
+          `).join('')}
+        </div>
+      </fieldset>
+      <div class="feedback" id="sorter-fb-${i}" role="alert"></div>
+    `;
+    container.appendChild(div);
+  });
+  updateSorterScore();
+}
+
+function answerSorter(scen, choice) {
+  if (sorterAnswered[scen]) return;
+  sorterAnswered[scen] = true;
+  const correct = choice === sorterData[scen].correct;
+  sorterCorrect[scen] = correct;
+
+  sorterData[scen].options.forEach((_, j) => {
+    const btn = document.getElementById(`s-btn-${scen}-${j}`);
+    btn.disabled = true;
+    btn.setAttribute('aria-pressed', j === choice ? 'true' : 'false');
+    if (j === choice) btn.classList.add(correct ? 'correct' : 'wrong');
+    if (!correct && j === sorterData[scen].correct) btn.classList.add('correct');
+  });
+
+  const fb = document.getElementById(`sorter-fb-${scen}`);
+  fb.textContent = correct ? sorterData[scen].feedback : sorterData[scen].wrongFeedback;
+  fb.className = `feedback show ${correct ? 'correct' : 'wrong'}`;
+
+  announce(`Scenario ${scen + 1}: ${correct ? 'Correct' : 'Incorrect'}. ${correct ? sorterData[scen].feedback : sorterData[scen].wrongFeedback}`);
+  updateSorterScore();
+}
+
+function updateSorterScore() {
+  const total = sorterAnswered.filter(Boolean).length;
+  const right  = sorterCorrect.filter(Boolean).length;
+  document.getElementById('sorter-score').textContent = `Score: ${right} / ${sorterData.length}`;
+}
+
+function resetSorter() {
+  sorterAnswered = new Array(sorterData.length).fill(false);
+  sorterCorrect  = new Array(sorterData.length).fill(false);
+  renderSorter();
+  announce('Part 1 has been reset.');
+}
+
+// ── RENDER FRAME ──────────────────────────────────────────────────────────
+function renderFrame() {
+  const container = document.getElementById('frame-scenarios');
+  container.innerHTML = '';
+  frameData.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'frame-card';
+    div.innerHTML = `
+      <div class="deficit-banner">
+        <div class="deficit-label">Deficit-Based Statement</div>
+        <div class="deficit-text">${item.deficit}</div>
+      </div>
+      <div class="flip-prompt">${item.prompt}</div>
+      <fieldset style="border:none;padding:0;margin:0" id="frame-fs-${i}">
+        <legend class="sr-only">Choose the best asset-based reframe for statement ${i + 1}</legend>
+        <div class="frame-options">
+          ${item.options.map((opt, j) => `
+            <button class="frame-opt" id="f-btn-${i}-${j}" onclick="answerFrame(${i},${j})"
+              aria-pressed="false">${String.fromCharCode(65+j)}. ${opt}</button>
+          `).join('')}
+        </div>
+      </fieldset>
+      <div class="frame-feedback" id="frame-fb-${i}" role="alert"></div>
+    `;
+    container.appendChild(div);
+  });
+  updateFrameScore();
+}
+
+function answerFrame(card, choice) {
+  if (frameAnswered[card]) return;
+  frameAnswered[card] = true;
+  const correct = choice === frameData[card].correct;
+  frameCorrect[card] = correct;
+
+  frameData[card].options.forEach((_, j) => {
+    const btn = document.getElementById(`f-btn-${card}-${j}`);
+    btn.disabled = true;
+    btn.setAttribute('aria-pressed', j === choice ? 'true' : 'false');
+    if (j === choice) btn.classList.add(correct ? 'correct' : 'wrong');
+    if (!correct && j === frameData[card].correct) btn.classList.add('correct');
+  });
+
+  const fb = document.getElementById(`frame-fb-${card}`);
+  fb.textContent = frameData[card].feedback;
+  fb.className = 'frame-feedback show';
+
+  announce(`Card ${card + 1}: ${correct ? 'Correct' : 'Incorrect'}. ${frameData[card].feedback}`);
+  updateFrameScore();
+}
+
+function updateFrameScore() {
+  const right = frameCorrect.filter(Boolean).length;
+  document.getElementById('frame-score').textContent = `Score: ${right} / ${frameData.length}`;
+}
+
+function resetFrame() {
+  frameAnswered = new Array(frameData.length).fill(false);
+  frameCorrect  = new Array(frameData.length).fill(false);
+  renderFrame();
+  announce('Part 2 has been reset.');
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  ['sorter','frame'].forEach(t => {
+    document.getElementById(`panel-${t}`).classList.toggle('active', t === tab);
+    document.getElementById(`tab-${t}`).setAttribute('aria-selected', t === tab ? 'true' : 'false');
+  });
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────
+function announce(msg) {
+  const el = document.getElementById('live-announce');
+  el.textContent = '';
+  setTimeout(() => { el.textContent = msg; }, 50);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+renderSorter();
+renderFrame();
+</script>
+</body>
+</html>
