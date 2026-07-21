@@ -61,6 +61,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/ch13-communicator/](models/ch13-communicator/): tailor the same evaluation findings for funders, staff, community members, and policymakers.
 - [models/ch14-evaluation-sorter/](models/ch14-evaluation-sorter/): sort evaluation activities by timing and purpose into formative or summative.
 - [models/ch15-variable-counter/](models/ch15-variable-counter/): count the variables in each evaluation question to choose univariate, bivariate, or multivariate analysis.
+- [models/ch15-manage-analyze-report/](models/ch15-manage-analyze-report/): place each post-data-collection task into the manage, analyze, or report step of evaluation.
 
 ## Embed snippets
 
@@ -106,6 +107,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Audience Communicator" src="models/ch13-communicator/"></iframe>
 <iframe title="Formative or Summative?" src="models/ch14-evaluation-sorter/"></iframe>
 <iframe title="Count the Variables" src="models/ch15-variable-counter/"></iframe>
+<iframe title="Manage, Analyze, or Report?" src="models/ch15-manage-analyze-report/"></iframe>
 ```
 
 ## Files

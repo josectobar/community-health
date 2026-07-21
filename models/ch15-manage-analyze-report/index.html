@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch. 15 — Manage, Analyze, or Report?</title>
+<style>
+:root{
+  color-scheme: light;
+  --page:#f6f4ee; --card:#ffffff; --soft:#efece3;
+  --ink:#2a2824; --muted:#6b6960; --faint:#96948a;
+  --line:#e0ddd3; --line-strong:#cbc8bc;
+  --manage:#9a5a3a; --manage-bg:#f6ebe2; --manage-ink:#6d3c22;
+  --analyze:#3f6fb0; --analyze-bg:#e8f0f9; --analyze-ink:#234a80;
+  --report:#4a9a76; --report-bg:#e5f2ec; --report-ink:#2c6349;
+  --good:#2c6349; --bad:#a3402d; --radius:8px;
+}
+*{box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--page); color:var(--ink); line-height:1.6; margin:0; padding:2rem 1rem;}
+.wrap{max-width:680px; margin:0 auto;}
+h1{font-size:21px; font-weight:600; margin:0 0 4px;}
+.sub{font-size:14px; color:var(--muted); margin:0 0 1.25rem;}
+button{font-family:inherit; cursor:pointer; background:transparent; color:inherit; transition:all .15s;}
+.steps{display:flex; align-items:center; gap:8px; margin:0 0 1.25rem; font-size:12.5px; color:var(--muted); flex-wrap:wrap;}
+.step{display:inline-flex; align-items:center; gap:6px;}
+.dot{width:10px; height:10px; border-radius:50%;}
+.arrow{color:var(--faint); font-size:14px;}
+.card{background:var(--card); border:0.5px solid var(--line); border-radius:12px; padding:14px 16px; margin-bottom:12px;}
+.q{margin:0 0 10px; font-size:14px;}
+.opts{display:grid; grid-template-columns:repeat(3,1fr); gap:8px;}
+.opt{padding:9px 4px; border:0.5px solid var(--line-strong); border-radius:var(--radius); font-size:12.5px; font-weight:500; text-align:center;}
+.opt:hover{background:var(--soft);}
+.fb{font-size:12.5px; margin:10px 0 0; line-height:1.55;}
+.score-wrap{background:var(--soft); border-radius:12px; padding:14px 16px; margin-top:6px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Manage, analyze, or report?</h1>
+<p class="sub">After the data comes in, evaluation moves through three steps in order: first you <strong>manage</strong> the raw data, then you <strong>analyze</strong> it, then you <strong>report</strong> what it means. Place each task in the right step.</p>
+
+<div class="steps">
+  <span class="step"><span class="dot" style="background:var(--manage)"></span>Manage &mdash; get data ready</span>
+  <span class="arrow">&rarr;</span>
+  <span class="step"><span class="dot" style="background:var(--analyze)"></span>Analyze &mdash; make sense of it</span>
+  <span class="arrow">&rarr;</span>
+  <span class="step"><span class="dot" style="background:var(--report)"></span>Report &mdash; share &amp; use it</span>
+</div>
+
+<div id="cards"></div>
+
+<div class="score-wrap">
+  <div style="display:flex; justify-content:space-between; align-items:baseline;">
+    <span style="font-size:13px; color:var(--muted);">Placed correctly</span>
+    <span id="score" style="font-size:15px; font-weight:600;">0 / 7</span>
+  </div>
+  <p id="closing" style="font-size:12.5px; color:var(--muted); margin:10px 0 0; line-height:1.55;">Ask what job the task does: is it <em>preparing</em> raw data, <em>testing</em> what it shows, or <em>communicating</em> it to people who'll act on it?</p>
+</div>
+</div>
+
+<script>
+const T={manage:{label:"Manage",ink:"var(--manage-ink)",bg:"var(--manage-bg)",bd:"var(--manage)"},
+  analyze:{label:"Analyze",ink:"var(--analyze-ink)",bg:"var(--analyze-bg)",bd:"var(--analyze)"},
+  report:{label:"Report",ink:"var(--report-ink)",bg:"var(--report-bg)",bd:"var(--report)"}};
+const items=[
+  {q:"Building a codebook that defines what every code and variable means, so the process stays consistent.",a:"manage",
+   why:"Coding and documenting variables is data preparation \u2014 the Manage step."},
+  {q:"Catching data-entry mistakes and setting aside incomplete or unreadable responses.",a:"manage",
+   why:"Cleaning the data before any analysis. Still Manage."},
+  {q:"Using averages and percentages to summarize who participated in the program.",a:"analyze",
+   why:"Descriptive statistics summarize a group \u2014 that's the Analyze step."},
+  {q:"Running a t-test to see whether the difference between two groups could generalize to a larger population.",a:"analyze",
+   why:"Inferential statistics testing a relationship \u2014 Analyze."},
+  {q:"Writing an executive summary that leads the final report in plain language.",a:"report",
+   why:"Communicating findings clearly \u2014 the Report step."},
+  {q:"Giving key stakeholders an advance copy before presenting results to the media.",a:"report",
+   why:"A reporting courtesy that helps findings actually get used. Report."},
+  {q:"Deciding whether a statistically significant result actually matters to stakeholders in practice.",a:"analyze",
+   why:"Weighing statistical vs. practical significance is part of making sense of the numbers \u2014 Analyze."}
+];
+let answered=0, correct=0;
+const box=document.getElementById("cards");
+items.forEach(function(m,i){
+  const d=document.createElement("div"); d.className="card";
+  const opts=["manage","analyze","report"].map(function(k){return '<button class="opt" data-k="'+k+'">'+T[k].label+'</button>';}).join("");
+  d.innerHTML='<p class="q">'+(i+1)+'. '+m.q+'</p><div class="opts">'+opts+'</div><p class="fb"></p>';
+  const fb=d.querySelector(".fb");
+  d.querySelectorAll(".opt").forEach(function(btn){
+    btn.onclick=function(){
+      if(d.dataset.done) return;
+      const k=btn.dataset.k, ok=k===m.a; d.dataset.done="1"; answered++;
+      d.querySelectorAll(".opt").forEach(function(b){b.style.pointerEvents="none";
+        if(b.dataset.k===m.a){b.style.background=T[m.a].bg;b.style.color=T[m.a].ink;b.style.borderColor=T[m.a].bd;b.style.fontWeight="600";}
+        else{b.style.opacity="0.4";}});
+      if(ok){correct++;fb.style.color="var(--good)";fb.innerHTML="\u2713 "+m.why;}
+      else{fb.style.color="var(--bad)";fb.innerHTML="It's <strong>"+T[m.a].label+"</strong>. "+m.why;}
+      document.getElementById("score").textContent=correct+" / "+items.length;
+      if(answered===items.length){const c=document.getElementById("closing");c.style.color="var(--ink)";
+        c.innerHTML=correct===7?"All seven. You can see the whole arc \u2014 manage, analyze, report \u2014 which is exactly the map you'll use in HCR 335.":"Nice work. The one that trips people up: judging whether a result <em>matters</em> is part of Analyze, while the executive summary and advance copies belong to Report.";}
+    };
+  });
+  box.appendChild(d);
+});
+</script>
+</body>
+</html>
