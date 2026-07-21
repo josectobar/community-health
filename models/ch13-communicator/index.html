@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CH13 Widget 4: Audience Communicator</title>
+<style>
+:root{color-scheme:light;--teal:#1A6B72;--teal-lt:#D6ECED;--gold:#B07D2A;--gold-lt:#FEF3DC;--purple:#5B3A8E;--purple-lt:#EDE6F7;--red:#9B2335;--red-lt:#FBDDE0;--border:#CCC;--gray:#F4F4F4;--text:#1A1A1A;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;font-size:15px;color:var(--text);background:#fff;padding:20px;max-width:920px;margin:0 auto}
+h1{font-size:1.3rem;color:var(--teal);border-bottom:3px solid var(--teal);padding-bottom:8px;margin-bottom:6px}
+.subtitle{font-size:.88rem;color:#555;margin-bottom:18px}
+.instructions{background:var(--teal-lt);border-left:4px solid var(--teal);padding:12px 16px;border-radius:4px;margin-bottom:18px;font-size:.9rem}
+.instructions strong{color:var(--teal)}
+
+/* FINDINGS PANEL */
+.findings-panel{background:var(--gray);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:20px}
+.fp-title{font-size:.82rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.fp-program{font-size:.92rem;font-weight:bold;margin-bottom:6px}
+.findings-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+@media(max-width:580px){.findings-grid{grid-template-columns:1fr}}
+.finding-chip{padding:10px 12px;border-radius:6px;font-size:.83rem;line-height:1.4;border:1px solid var(--border)}
+.fc-process{background:#D6E4F7;border-color:#1A3F6B;color:#1A3F6B}
+.fc-impact{background:#D6F0E8;border-color:#2A8A6B;color:#1A4A3A}
+.fc-outcome{background:var(--red-lt);border-color:var(--red);color:var(--red)}
+.fc-label{font-size:.72rem;font-weight:bold;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;opacity:.8}
+
+/* AUDIENCE SELECTOR */
+.audience-section{margin-bottom:22px}
+.aud-title{font-size:.88rem;font-weight:bold;color:var(--text);margin-bottom:10px}
+.aud-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.aud-tab{padding:8px 14px;border:2px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:.86rem;font-weight:bold;transition:all .15s;color:var(--text)}
+.aud-tab:hover{border-color:var(--teal);background:var(--teal-lt)}
+.aud-tab:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.aud-tab.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+
+/* COMMUNICATION TASK */
+.comm-task{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:16px}
+.ct-header{background:var(--gray);padding:12px 16px;border-bottom:1px solid var(--border)}
+.ct-audience-badge{display:inline-block;padding:4px 10px;border-radius:12px;font-size:.78rem;font-weight:bold;color:#fff;margin-bottom:6px}
+.ct-context{font-size:.88rem;line-height:1.5}
+.ct-body{padding:14px 16px}
+.ct-q{font-size:.88rem;font-weight:bold;color:var(--gold);margin-bottom:10px}
+.ct-options{display:flex;flex-direction:column;gap:8px}
+.ct-opt{padding:10px 14px;border:2px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;font-size:.87rem;line-height:1.45;text-align:left;transition:all .15s;color:var(--text)}
+.ct-opt:hover:not([disabled]){border-color:var(--teal);background:var(--teal-lt)}
+.ct-opt:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.ct-opt.best{border-color:var(--teal);background:var(--teal-lt);color:var(--teal);font-weight:bold}.ct-opt.best::after{content:" ✓ Best for this audience"}
+.ct-opt.ok{border-color:var(--gold);background:var(--gold-lt);color:var(--gold)}.ct-opt.ok::after{content:" — Partially appropriate"}
+.ct-opt.poor{border-color:var(--red);background:var(--red-lt);color:var(--red)}.ct-opt.poor::after{content:" ✗ Not well suited"}
+.ct-opt[disabled]{cursor:default}
+.ct-feedback{margin-top:10px;padding:10px 14px;border-radius:4px;font-size:.87rem;line-height:1.5;display:none}
+.ct-feedback.show{display:block}
+.ct-feedback.best{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+.ct-feedback.ok{background:var(--gold-lt);color:#6B4A00;border-left:4px solid var(--gold)}
+.ct-feedback.poor{background:var(--red-lt);color:#6B1020;border-left:4px solid var(--red)}
+.ct-insight{margin-top:8px;padding:8px 12px;background:var(--purple-lt);border-radius:4px;font-size:.83rem;color:#2A0F5E;display:none}
+.ct-insight.show{display:block}
+
+/* FORMAT Q */
+.format-section{border-top:1px solid var(--border);padding:14px 16px;display:none}
+.format-section.show{display:block}
+.format-q{font-size:.88rem;font-weight:bold;color:var(--purple);margin-bottom:10px}
+.format-grid{display:flex;flex-wrap:wrap;gap:8px}
+.fmt-btn{padding:8px 14px;border:2px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:.84rem;transition:all .15s;color:var(--text)}
+.fmt-btn:hover:not([disabled]){border-color:var(--purple);background:var(--purple-lt)}
+.fmt-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.fmt-btn.fmt-best{border-color:var(--teal);background:var(--teal-lt);color:var(--teal);font-weight:bold}.fmt-btn.fmt-best::after{content:" ✓"}
+.fmt-btn.fmt-ok{border-color:var(--gold);background:var(--gold-lt)}.fmt-btn.fmt-ok::after{content:" △"}
+.fmt-btn.fmt-poor{border-color:var(--red);background:var(--red-lt);color:var(--red)}.fmt-btn.fmt-poor::after{content:" ✗"}
+.fmt-btn[disabled]{cursor:default}
+.fmt-feedback{margin-top:8px;padding:10px 14px;border-radius:4px;font-size:.86rem;line-height:1.5;display:none}
+.fmt-feedback.show{display:block}
+.fmt-feedback.best{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+.fmt-feedback.ok{background:var(--gold-lt);color:#6B4A00;border-left:4px solid var(--gold)}
+.fmt-feedback.poor{background:var(--red-lt);color:#6B1020;border-left:4px solid var(--red)}
+
+.score-row{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.score-badge{background:var(--teal);color:#fff;padding:5px 14px;border-radius:20px;font-weight:bold;font-size:.9rem;white-space:nowrap}
+.reset-btn{padding:7px 16px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.88rem;font-weight:bold}
+.reset-btn:hover{background:var(--teal-lt)}.reset-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+<h1>Audience Communicator</h1>
+<p class="subtitle">The same evaluation findings need to be communicated very differently depending on who you are talking to. Practice tailoring your message and format for each audience.</p>
+
+<div class="instructions"><strong>Directions:</strong> Study the evaluation findings below, then select an audience tab. For each audience, first choose the message approach that fits them best — then choose the communication format. Work through all four audiences.</div>
+
+<!-- FINDINGS PANEL -->
+<div class="findings-panel">
+  <div class="fp-title">Evaluation Findings — Read These First</div>
+  <div class="fp-program">Program: 6-Month Community Walking Program for Adults with Prediabetes (City Parks + Health Department Partnership)</div>
+  <div class="findings-grid">
+    <div class="finding-chip fc-process"><div class="fc-label">Process</div>Average attendance: 4.2 of 6 sessions. Three sites ran well; one site had consistent facilitator turnover. 18% of participants dropped after session 1.</div>
+    <div class="finding-chip fc-impact"><div class="fc-label">Impact</div>Mean daily steps increased 2,100 steps/day (p&lt;0.01). HbA1c improved modestly (-0.3%) among completers. Self-efficacy for exercise improved significantly.</div>
+    <div class="finding-chip fc-impact"><div class="fc-label">Impact</div>Participants with &lt;3 sessions attended showed no significant improvement. Dropout was highest among participants working evening shifts.</div>
+    <div class="finding-chip fc-outcome"><div class="fc-label">Outcome (5-yr follow-up needed)</div>Long-term diabetes incidence data not yet available. Trend data promising but inconclusive.</div>
+    <div class="finding-chip fc-process"><div class="fc-label">Process / Equity</div>Program underserved Spanish-speaking residents: only 2 of 3 Spanish-language sites were fully operational. Recruitment was lower in highest-need zip codes.</div>
+    <div class="finding-chip fc-impact"><div class="fc-label">Recommendation</div>Program shows meaningful impact for completers. Key actions: address facilitator retention at Site 4, expand Spanish-language outreach, and consider scheduling options for shift workers.</div>
+  </div>
+</div>
+
+<div class="score-row">
+  <div class="score-badge" id="score-badge" aria-live="polite">Audiences addressed: 0 / 4</div>
+  <button class="reset-btn" onclick="resetAll()">Reset All</button>
+</div>
+
+<!-- AUDIENCE TABS -->
+<div class="audience-section">
+  <div class="aud-title">Select an audience to communicate your findings to:</div>
+  <div class="aud-tabs" role="tablist" aria-label="Audience tabs">
+    <button class="aud-tab" role="tab" aria-selected="false" onclick="showAudience('funder')" id="tab-funder">Government Funder</button>
+    <button class="aud-tab" role="tab" aria-selected="false" onclick="showAudience('staff')" id="tab-staff">Program Staff</button>
+    <button class="aud-tab" role="tab" aria-selected="false" onclick="showAudience('community')" id="tab-community">Community Members</button>
+    <button class="aud-tab" role="tab" aria-selected="false" onclick="showAudience('policy')" id="tab-policy">City Policymakers</button>
+  </div>
+  <div id="audience-panel"></div>
+</div>
+
+<div class="sr-only" aria-live="polite" aria-atomic="true" id="live"></div>
+
+<script>
+const audiences = {
+  funder: {
+    label: "Government Funder",
+    color: "#1A3F6B",
+    context: "The program received a $180,000 federal grant. The program officer needs to know whether the investment produced results and whether to recommend continued or expanded funding.",
+    msgQ: "Which message approach best fits what this funder needs to know?",
+    msgOpts: [
+      {text:"Share all raw data tables, statistical outputs, and every process finding in full detail.", quality:'poor', fb:"Too much detail without synthesis. Funders need to understand the bottom line — they are not analyzing data themselves. Dense technical outputs without interpretation fail to communicate what actually happened."},
+      {text:"Lead with the headline result (meaningful impact for completers), acknowledge the equity gap and facilitator issue honestly, connect findings to program investment, and end with a clear recommendation about continued funding.", quality:'best', fb:"This is the right approach. Funders need the headline, honest disclosure of problems, a clear connection between investment and results, and explicit guidance on next steps. Balanced honesty — not overselling or hiding problems — builds the credibility that sustains long-term funder relationships."},
+      {text:"Only share the positive findings — the step count improvement and HbA1c results — to maximize the chance of continued funding.", quality:'poor', fb:"Selectively reporting only positive findings is an ethical violation and a strategic mistake. Funders often receive multiple data streams. When they discover that problems were hidden, they lose trust in the program and the evaluator permanently."},
+      {text:"Focus the entire report on the equity gap with Spanish-speaking residents and defer the outcome data until the 5-year follow-up is complete.", quality:'ok', fb:"Equity findings are important and should be featured prominently — but a funder report cannot only address one finding and defer everything else. The funder needs a complete picture now, with the equity concern clearly highlighted within it."}
+    ],
+    fmtQ: "Which format best delivers these findings to the funder?",
+    fmtOpts: [
+      {text:"Full technical evaluation report (20–30 pages) with all data, methods, and findings", quality:'ok', fb:"Full reports are appropriate for funders who require complete documentation — and this should be available. But alone, it is not sufficient. A concise executive summary should accompany or precede the full report."},
+      {text:"1–2 page executive summary with key findings, honest assessment, and specific recommendations", quality:'best', fb:"An executive summary is the primary format for government funders. It delivers the bottom line clearly and efficiently, allowing decision-makers to quickly understand what happened and what should happen next — with the full report available for those who want detail."},
+      {text:"Infographic with icons and one-sentence findings", quality:'poor', fb:"Infographics are valuable for community audiences but too simplified for a funder accountability report. Funders need enough substance to make resource decisions — more than an infographic can provide."},
+      {text:"Verbal presentation only, no written documentation", quality:'poor', fb:"Government funders require written documentation. Verbal-only reporting provides no accountability trail and leaves nothing for the funder's records."}
+    ]
+  },
+  staff: {
+    label: "Program Staff & Administrators",
+    color: "#2A8A6B",
+    context: "The facilitators, site coordinators, and program director who designed and delivered the walking program need to know what worked, what did not, and what to change in the next cycle.",
+    msgQ: "Which message approach serves program staff best?",
+    msgOpts: [
+      {text:"Share only the positive outcome data so staff feel affirmed and motivated to continue.", quality:'poor', fb:"Staff need honest feedback to improve. Sharing only positives deprives them of the information they need to address facilitator turnover at Site 4, reach shift workers, and fix the Spanish-language site gap. Selective positivity is a disservice to their professionalism."},
+      {text:"Present a statistical report focused on significance testing and effect sizes for all outcome measures.", quality:'ok', fb:"Some staff will find statistical detail useful — but leading with p-values and effect sizes may lose facilitators and coordinators who need practical, actionable insight rather than technical analysis. Statistics should support, not lead, a staff-facing communication."},
+      {text:"Connect every finding directly to a specific, actionable recommendation — what happened at Site 4, why evening shift workers dropped, what the Spanish-language site gap meant for equity, and what changes to make in cycle 2.", quality:'best', fb:"Staff need findings connected to action. They know the program from the inside — they need the evaluation to tell them specifically what to fix, why, and how. Concrete, operational recommendations transform findings into program improvement."},
+      {text:"Tell staff the program did not meet all its goals and they need to do better next time, without specifying what to change.", quality:'poor', fb:"Vague criticism without specifics is neither useful nor fair. Staff cannot improve without knowing what specifically needs changing and what evidence supports that conclusion."}
+    ],
+    fmtQ: "Which format best communicates findings to program staff?",
+    fmtOpts: [
+      {text:"Slide deck presentation with findings, process data breakdowns, and specific action recommendations — followed by open discussion", quality:'best', fb:"A presentation with discussion allows staff to engage with findings interactively, ask questions, and begin planning improvements together. Pairing each finding with a concrete recommendation makes it immediately actionable. The conversation that follows the presentation is often where the real improvement planning happens."},
+      {text:"Emailed executive summary without an opportunity for discussion", quality:'ok', fb:"A written summary is useful for reference, but staff facing operational changes need the opportunity to ask questions, push back on findings, and problem-solve together. Discussion is essential."},
+      {text:"Full technical report shared with no summary or discussion", quality:'poor', fb:"A full technical report without synthesis or context is likely to sit unread. Staff need findings packaged for their operational context, not in the format designed for external accountability."},
+      {text:"Infographic shared on the staff bulletin board", quality:'poor', fb:"Too simplified for staff who need to act on specific findings. An infographic can supplement other communication but cannot be the primary vehicle for staff learning and program improvement planning."}
+    ]
+  },
+  community: {
+    label: "Community Members & Participants",
+    color: "#9B2335",
+    context: "The people who participated in the walking program — and their neighbors who might participate in the future — deserve to know what was learned. Many are not health professionals and prefer information in plain language.",
+    msgQ: "Which message approach best serves community members?",
+    msgOpts: [
+      {text:"Share the full evaluation report — community members have a right to complete information.", quality:'ok', fb:"Community members do have a right to findings — but a 30-page technical report is inaccessible to most. The right to information means providing findings in formats people can actually use and understand, not just making a document technically available."},
+      {text:"Tell community members only what was positive, since sharing the equity gap and dropout findings might discourage future participation.", quality:'poor', fb:"This is paternalistic and dishonest. Community members, especially those who participated, deserve honest information. The equity gap with Spanish-speaking residents is particularly important for the community to know — they are the ones most affected and most capable of advocating for change."},
+      {text:"Share the key findings in plain, accessible language — what improved, what the equity gap means for the community, and what the program plans to change — in a format that respects community members' time and literacy levels.", quality:'best', fb:"Community-facing communication must prioritize accessibility: plain language, relatable framing, visual support, and explicit connection to what the findings mean for their lives and community. Including the equity finding honestly respects participants' experience and invites community engagement in improvement."},
+      {text:"Present only the statistical outputs since community members should learn to interpret data themselves.", quality:'poor', fb:"Statistical literacy cannot be assumed and should not be required for community members to access information about their own program. Accessible communication is an equity issue, not a simplification."}
+    ],
+    fmtQ: "Which format best reaches community members?",
+    fmtOpts: [
+      {text:"Peer-reviewed journal article", quality:'poor', fb:"Journal articles are written for academic and professional audiences. Community members should not have to navigate journal subscriptions and technical language to access findings from a program they participated in."},
+      {text:"Visual infographic or simple one-page summary, available in English and Spanish, shared at community locations and on social media", quality:'best', fb:"Infographics and simple summaries in community languages, distributed where community members actually are, are the most equitable and effective way to share findings with a general community audience. The Spanish-language version is particularly important given the equity gap identified in this evaluation."},
+      {text:"Community meeting presentation in plain language with time for questions and conversation", quality:'best', fb:"Community meetings allow for two-way communication — participants can respond to findings, share their perspectives, and inform the next planning cycle. This format honors the community's expertise about their own experience and turns dissemination into engagement."},
+      {text:"Email to all participants with a link to the full technical report", quality:'poor', fb:"Email reaches only those with email access and assumes a level of technical literacy. A link to a full technical report is not meaningful access for most community audiences."}
+    ]
+  },
+  policy: {
+    label: "City Policymakers",
+    color: "#5B3A8E",
+    context: "City council members and the parks department director are deciding whether to expand this program citywide and allocate $500,000 in the next budget cycle. They have limited time and need findings framed in terms of policy implications.",
+    msgQ: "Which message approach works best for city policymakers?",
+    msgOpts: [
+      {text:"Lead with effect sizes and confidence intervals, then explain what process evaluation means.", quality:'poor', fb:"Policymakers are not evaluators. Leading with technical language loses most decision-makers immediately. Findings must be translated into policy terms — what does this mean for a decision about $500,000 and citywide expansion?"},
+      {text:"Frame findings explicitly in terms of the policy question: what evidence supports expansion, what conditions would need to be in place for expansion to succeed, and what the equity gap means for a citywide rollout.", quality:'best', fb:"Policymakers need findings translated into their decision context. They are asking: should we invest $500,000 in this? What would work and what would need to change at scale? The evaluation findings must answer those specific questions — not just describe what happened."},
+      {text:"Share only findings that support expansion to maximize political will for the program.", quality:'poor', fb:"Presenting only favorable findings to policymakers is an ethical violation and a long-term credibility risk. When problems emerge during a citywide rollout that were known from the evaluation but not disclosed, decision-makers and the public lose trust in both the program and those who presented the findings."},
+      {text:"Share a detailed program description and the full technical report so policymakers can draw their own conclusions.", quality:'ok', fb:"A full report should be available on request — but policymakers rarely have time to read 30-page technical documents. A concise policy brief that synthesizes findings and explicitly states implications for the policy decision they face is far more useful."}
+    ],
+    fmtQ: "Which format best serves city policymakers?",
+    fmtOpts: [
+      {text:"2–4 page policy brief with key findings, explicit policy implications, and specific recommendations about expansion conditions", quality:'best', fb:"A policy brief is the format designed specifically for this audience. It translates evaluation evidence into policy language, states implications clearly, and gives decision-makers what they need in the time they have available."},
+      {text:"10-minute verbal presentation at a council meeting, with a one-page summary handout", quality:'best', fb:"Council presentations with supporting handouts are an effective format for busy decision-makers. A clear, well-practiced presentation that leads with the policy question and ends with explicit recommendations can be very persuasive — especially when visual data supports key points."},
+      {text:"Full 30-page evaluation report submitted to council", quality:'ok', fb:"Full reports should be submitted as supporting documentation — but should not be the primary vehicle for communicating with policymakers. Most council members will not read a 30-page technical document before voting."},
+      {text:"Infographic shared on the city's social media channels", quality:'poor', fb:"Infographics reach general public audiences, not specific decision-makers in a policy context. Policymakers need substantive, documented evidence — not a social media graphic — to justify a $500,000 budget decision."}
+    ]
+  }
+};
+
+let audState = {};
+Object.keys(audiences).forEach(k => { audState[k] = { msgDone:false, fmtDone:false, complete:false }; });
+let completedCount = 0;
+
+function showAudience(key) {
+  Object.keys(audiences).forEach(k => {
+    document.getElementById(`tab-${k}`).classList.toggle('active', k===key);
+    document.getElementById(`tab-${k}`).setAttribute('aria-selected', k===key?'true':'false');
+  });
+  renderAudiencePanel(key);
+}
+
+function renderAudiencePanel(key) {
+  const aud = audiences[key];
+  const s = audState[key];
+  const panel = document.getElementById('audience-panel');
+
+  const msgAnswered = s.msgDone;
+  const fmtReady = s.msgDone;
+
+  panel.innerHTML = `
+    <div class="comm-task">
+      <div class="ct-header">
+        <div class="ct-audience-badge" style="background:${aud.color}">${aud.label}</div>
+        <div class="ct-context">${aud.context}</div>
+      </div>
+      <div class="ct-body">
+        <div class="ct-q">${aud.msgQ}</div>
+        <fieldset style="border:none;padding:0;margin:0"><legend class="sr-only">Message approach for ${aud.label}</legend>
+        <div class="ct-options">
+          ${aud.msgOpts.map((o,j)=>`<button class="ct-opt" id="msg-${key}-${j}" onclick="answerMsg('${key}',${j})">${o.text}</button>`).join('')}
+        </div></fieldset>
+        <div class="ct-feedback" id="msgfb-${key}" role="alert"></div>
+        <div class="ct-insight" id="msgins-${key}"></div>
+      </div>
+      <div class="format-section" id="fmt-section-${key}">
+        <div class="format-q">${aud.fmtQ}</div>
+        <fieldset style="border:none;padding:0;margin:0"><legend class="sr-only">Format for ${aud.label}</legend>
+        <div class="format-grid">
+          ${aud.fmtOpts.map((o,j)=>`<button class="fmt-btn" id="fmt-${key}-${j}" onclick="answerFmt('${key}',${j})">${o.text}</button>`).join('')}
+        </div></fieldset>
+        <div class="fmt-feedback" id="fmtfb-${key}" role="alert"></div>
+      </div>
+    </div>`;
+
+  if (msgAnswered) restoreMsg(key);
+  if (fmtReady) document.getElementById(`fmt-section-${key}`).classList.add('show');
+  if (s.fmtDone) restoreFmt(key);
+}
+
+function answerMsg(key, choice) {
+  const s = audState[key]; if (s.msgDone) return;
+  s.msgDone = true;
+  const aud = audiences[key];
+  const opt = aud.msgOpts[choice];
+  aud.msgOpts.forEach((_,j) => {
+    const btn = document.getElementById(`msg-${key}-${j}`);
+    btn.disabled = true; btn.classList.add(aud.msgOpts[j].quality);
+  });
+  const fb = document.getElementById(`msgfb-${key}`);
+  fb.textContent = opt.fb; fb.className = `ct-feedback show ${opt.quality}`;
+  // Show audience insight
+  const insights = {
+    funder:"Funder insight: Funders value honesty and clear ROI. They will discover hidden problems — and when they do, trust is gone. Lead with results, acknowledge challenges, and show you have a plan.",
+    staff:"Staff insight: Your colleagues know the program better than anyone. They need findings that help them solve real operational problems — not encouragement, not criticism, but specific and actionable information.",
+    community:"Community insight: The people who gave their time and data to this program deserve honest, accessible findings. Plain language, visual support, and findings in their language are non-negotiable for equity.",
+    policy:"Policy insight: Policymakers are making resource decisions, not reading research. Your job is to translate findings into policy terms: what should be funded, what conditions matter, and what the equity gap means at scale."
+  };
+  const ins = document.getElementById(`msgins-${key}`);
+  ins.textContent = insights[key]; ins.classList.add('show');
+  document.getElementById(`fmt-section-${key}`).classList.add('show');
+  announce(`Message approach selected for ${aud.label}: ${opt.quality}.`);
+}
+
+function answerFmt(key, choice) {
+  const s = audState[key]; if (s.fmtDone) return;
+  const aud = audiences[key];
+  const opt = aud.fmtOpts[choice];
+  aud.fmtOpts.forEach((_,j) => {
+    const btn = document.getElementById(`fmt-${key}-${j}`); if(btn){ btn.disabled=true; btn.classList.add(`fmt-${aud.fmtOpts[j].quality}`); }
+  });
+  const fb = document.getElementById(`fmtfb-${key}`);
+  fb.textContent = opt.fb; fb.className = `fmt-feedback show ${opt.quality}`;
+  if (!s.complete) { s.complete = true; s.fmtDone = true; completedCount++; }
+  document.getElementById('score-badge').textContent = `Audiences addressed: ${completedCount} / 4`;
+  announce(`Format selected for ${aud.label}: ${opt.quality}.`);
+}
+
+function restoreMsg(key) {
+  const aud = audiences[key];
+  aud.msgOpts.forEach((_,j) => {
+    const btn = document.getElementById(`msg-${key}-${j}`);
+    if(btn) { btn.disabled=true; btn.classList.add(aud.msgOpts[j].quality); }
+  });
+  const insights = {
+    funder:"Funder insight: Funders value honesty and clear ROI. They will discover hidden problems — and when they do, trust is gone. Lead with results, acknowledge challenges, and show you have a plan.",
+    staff:"Staff insight: Your colleagues know the program better than anyone. They need findings that help them solve real operational problems — not encouragement, not criticism, but specific and actionable information.",
+    community:"Community insight: The people who gave their time and data to this program deserve honest, accessible findings. Plain language, visual support, and findings in their language are non-negotiable for equity.",
+    policy:"Policy insight: Policymakers are making resource decisions, not reading research. Your job is to translate findings into policy terms: what should be funded, what conditions matter, and what the equity gap means at scale."
+  };
+  document.getElementById(`msgins-${key}`).textContent = insights[key];
+  document.getElementById(`msgins-${key}`).classList.add('show');
+}
+
+function restoreFmt(key) {
+  const aud = audiences[key];
+  aud.fmtOpts.forEach((_,j) => {
+    const btn = document.getElementById(`fmt-${key}-${j}`);
+    if(btn) { btn.disabled=true; btn.classList.add(`fmt-${aud.fmtOpts[j].quality}`); }
+  });
+}
+
+function resetAll() {
+  completedCount = 0;
+  Object.keys(audiences).forEach(k => { audState[k] = { msgDone:false, fmtDone:false, complete:false }; });
+  ['funder','staff','community','policy'].forEach(k => {
+    document.getElementById(`tab-${k}`).classList.remove('active');
+    document.getElementById(`tab-${k}`).setAttribute('aria-selected','false');
+  });
+  document.getElementById('audience-panel').innerHTML = '';
+  document.getElementById('score-badge').textContent = 'Audiences addressed: 0 / 4';
+  announce('Reset.');
+}
+
+function announce(msg) { const el=document.getElementById('live'); el.textContent=''; setTimeout(()=>{el.textContent=msg;},50); }
+</script>
+</body>
+</html>

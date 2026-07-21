@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CH13 Widget 3: Ethical Review Simulation</title>
+<style>
+:root{color-scheme:light;--teal:#1A6B72;--teal-lt:#D6ECED;--gold:#B07D2A;--gold-lt:#FEF3DC;--purple:#5B3A8E;--purple-lt:#EDE6F7;--red:#9B2335;--red-lt:#FBDDE0;--border:#CCC;--gray:#F4F4F4;--text:#1A1A1A;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;font-size:15px;color:var(--text);background:#fff;padding:20px;max-width:900px;margin:0 auto}
+h1{font-size:1.3rem;color:var(--teal);border-bottom:3px solid var(--teal);padding-bottom:8px;margin-bottom:6px}
+.subtitle{font-size:.88rem;color:#555;margin-bottom:18px}
+.instructions{background:var(--teal-lt);border-left:4px solid var(--teal);padding:12px 16px;border-radius:4px;margin-bottom:18px;font-size:.9rem}
+.instructions strong{color:var(--teal)}
+
+/* PROPOSAL CARDS */
+.proposal-card{border:2px solid var(--border);border-radius:8px;margin-bottom:26px;overflow:hidden}
+.proposal-header{padding:14px 16px;border-bottom:1px solid var(--border);background:var(--gray)}
+.proposal-num{font-size:.76rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.proposal-title{font-size:1rem;font-weight:bold;color:var(--text);margin-bottom:4px}
+.proposal-subtitle{font-size:.82rem;color:#666}
+
+.proposal-body{padding:14px 16px}
+.proposal-text{font-size:.9rem;line-height:1.7;margin-bottom:14px;background:#fafafa;padding:12px 14px;border-radius:6px;border:1px solid var(--border)}
+
+/* FLAG SELECTOR */
+.flag-label{font-size:.85rem;font-weight:bold;color:var(--gold);margin-bottom:8px}
+.flag-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.flag-chip{padding:7px 13px;border:2px solid var(--border);border-radius:20px;background:#fff;cursor:pointer;font-size:.83rem;transition:all .15s;color:var(--text);user-select:none}
+.flag-chip:hover:not(.locked){border-color:var(--gold);background:var(--gold-lt)}
+.flag-chip:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.flag-chip.flagged{border-color:var(--red);background:var(--red-lt);color:var(--red);font-weight:bold}
+.flag-chip.locked{cursor:default}
+.flag-chip.correct-flag{border-color:var(--teal);background:var(--teal-lt);color:var(--teal)}
+.flag-chip.missed-flag{border-color:var(--red);background:var(--red-lt);color:var(--red);font-style:italic}
+.flag-chip.false-flag{border-color:var(--border);background:var(--gold-lt);color:var(--gold-dark)}
+
+.submit-btn{padding:8px 18px;background:var(--teal);color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:.88rem;font-weight:bold;margin-top:4px}
+.submit-btn:hover{background:#145a60}.submit-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.submit-btn[disabled]{background:#aaa;cursor:default}
+
+.result-section{margin-top:14px;display:none}
+.result-section.show{display:block}
+.concern-item{padding:10px 14px;border-radius:6px;margin-bottom:8px;font-size:.87rem;line-height:1.5}
+.concern-item.correct{background:var(--teal-lt);border-left:4px solid var(--teal);color:#0F4A4F}
+.concern-item.missed{background:var(--red-lt);border-left:4px solid var(--red);color:#6B1020}
+.concern-item.false-positive{background:var(--gold-lt);border-left:4px solid var(--gold);color:#6B4A00}
+.no-concern{padding:10px 14px;border-radius:6px;background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal);font-size:.87rem}
+.recommendation{margin-top:10px;padding:10px 14px;background:var(--purple-lt);border-left:4px solid var(--purple);border-radius:4px;font-size:.86rem;line-height:1.5;color:#2A0F5E}
+.recommendation strong{color:var(--purple)}
+
+/* SCORE */
+.score-row{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.score-badge{background:var(--teal);color:#fff;padding:5px 14px;border-radius:20px;font-weight:bold;font-size:.9rem;white-space:nowrap}
+.reset-btn{padding:7px 16px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.88rem;font-weight:bold}
+.reset-btn:hover{background:var(--teal-lt)}.reset-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.irb-note{background:var(--purple-lt);border-left:4px solid var(--purple);padding:10px 14px;border-radius:4px;font-size:.85rem;margin-bottom:18px;color:#2A0F5E}
+.irb-note strong{color:var(--purple)}
+.sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+<h1>Ethical Review Simulation</h1>
+<p class="subtitle">You are on a program evaluation ethics review panel. Read each evaluation proposal and flag any ethical concerns — then see what the panel identified.</p>
+
+<div class="instructions"><strong>Directions:</strong> Each card describes an evaluation proposal. Click the ethical principles you think are being violated, then click Submit Review. You may flag none, one, or multiple principles. After submitting, you'll see the panel's findings and recommended actions.</div>
+
+<div class="irb-note"><strong>Ethical principles to know:</strong> (1) Do no harm to participants. (2) Do not delay needed services. (3) Informed consent — participants must know and agree. (4) Protect confidentiality and anonymity. (5) Use IRB oversight when required.</div>
+
+<div class="score-row">
+  <div class="score-badge" id="score-badge" aria-live="polite">Reviews submitted: 0 / 5</div>
+  <button class="reset-btn" onclick="resetAll()">Reset All</button>
+</div>
+
+<div id="proposals-container"></div>
+<div class="sr-only" aria-live="polite" aria-atomic="true" id="live"></div>
+
+<script>
+const principles = [
+  "Do no harm",
+  "Do not delay services",
+  "Informed consent",
+  "Protect confidentiality/anonymity",
+  "IRB oversight needed"
+];
+
+const proposals = [
+  {
+    title: "Proposal 1: Workplace Stress Study",
+    subtitle: "Mid-sized hospital system, 400 employees",
+    text: "The evaluation team plans to survey all hospital employees about their stress levels, burnout symptoms, and personal coping behaviors. Surveys will be linked to employee ID numbers so results can be tracked over time. The HR department will have full access to the identified dataset to inform performance management decisions. Employees will be told the survey is for 'wellness planning purposes' and that participation is voluntary — but it will be administered during a mandatory all-staff meeting, and managers will receive department-level results that may allow identification of individual respondents in small teams.",
+    concerns: [0, 2, 3], // principles violated
+    concernExplains: [
+      {p:0, text:"Harm: Linking health and stress data to employee IDs and sharing it with HR for performance management creates real risk of professional harm. Employees may face adverse consequences based on disclosed health information."},
+      {p:2, text:"Informed consent: Employees are told the survey is for 'wellness planning' but not told that HR will access identified data or that it could affect performance decisions. This misrepresents the actual purpose and use of the data."},
+      {p:3, text:"Confidentiality: Identified data accessible to HR violates confidentiality. Additionally, sharing department-level results to small teams may allow individual identification — a de facto confidentiality breach."}
+    ],
+    noHarm: null,
+    recommendation: "Recommendation: Re-collect data without employee ID linkage (anonymously), limit access strictly to evaluation staff, clearly disclose all data uses in a genuine consent process, and ensure report aggregation levels prevent identification of individuals in small departments."
+  },
+  {
+    title: "Proposal 2: Community Nutrition RCT",
+    subtitle: "Food access program, low-income urban neighborhood",
+    text: "A research team is conducting a randomized controlled trial of a new community nutrition program. Half of eligible participants will be randomly assigned to receive the program immediately; the other half will be placed on a 12-month waitlist as the control group. All participants have been screened and identified as experiencing food insecurity with inadequate fruit and vegetable intake. The team argues that withholding the intervention from the control group is justified because it produces the cleanest evidence about program effectiveness.",
+    concerns: [1], // delay services
+    concernExplains: [
+      {p:1, text:"Delay of services: Withholding a potentially beneficial nutrition program from food-insecure participants for 12 months solely to create a clean control group is ethically problematic. When participants have an identified unmet health need, delaying services for methodological reasons requires serious ethical justification. A 12-month delay may cause real harm to vulnerable participants."}
+    ],
+    noHarm: null,
+    recommendation: "Recommendation: Consider a stepped-wedge design or a waitlist control with meaningful interim support, rather than a 12-month full denial of services. The evaluation should not impose health burdens on already-vulnerable participants for the sake of research rigor."
+  },
+  {
+    title: "Proposal 3: Teen Mental Health Survey — School",
+    subtitle: "Public middle school, 6th–8th grade students",
+    text: "A school district plans to administer a mental health screening instrument to all students in grades 6–8 to assess the prevalence of anxiety and depression symptoms. Parental consent letters will be sent home, with a checkbox for parents to opt out if they do not want their child to participate. Students who do not return a form will be assumed to have passive consent and will complete the survey. Survey results will be stored in a password-protected school counseling database. Students whose scores indicate significant distress will be referred to the school counselor for follow-up.",
+    concerns: [2],
+    concernExplains: [
+      {p:2, text:"Informed consent: Passive consent — assuming agreement when no form is returned — is not genuine informed consent, especially when minor children's mental health information is involved. Many families may not have received or read the letter, have language barriers, or may not understand what they are agreeing to by default. Particularly for sensitive health data about minors, active opt-in consent from parents and assent from students is the appropriate standard."}
+    ],
+    noHarm: null,
+    recommendation: "Recommendation: Require active opt-in consent from parents (signed return) and assent from students before administering any mental health screening to minors. Provide consent materials in all languages used in the school community. Do not administer to students without a returned, signed consent form."
+  },
+  {
+    title: "Proposal 4: Community Health Fair Blood Draw",
+    subtitle: "Annual neighborhood health fair, mixed adult population",
+    text: "A university research team wants to collect blood samples from health fair attendees to study biomarkers related to cardiovascular risk. Attendees who agree to participate will be asked to sign a detailed 4-page informed consent document explaining the study's purpose, procedures, risks (including bruising, lightheadedness), and how samples will be stored and used. Participants will receive a $15 gift card. Blood draws will be conducted by trained phlebotomists. All samples will be de-identified before analysis and stored in a secure biorepository. The research protocol has been reviewed and approved by the university's Institutional Review Board.",
+    concerns: [], // No concerns — this one is ethical
+    concernExplains: [],
+    noHarm: "This proposal meets ethical standards. Participants receive full informed consent for an invasive procedure (blood draw), the consent document explains risks clearly, blood draws are conducted by trained staff, samples are de-identified to protect privacy, and IRB approval was obtained before any data collection. The incentive is modest and non-coercive.",
+    recommendation: "No changes required. This evaluation proposal demonstrates sound ethical practice across all five principles."
+  },
+  {
+    title: "Proposal 5: HIV Prevention Program Evaluation",
+    subtitle: "Community-based organization, high-risk adult population",
+    text: "A community health organization evaluates their HIV prevention program by collecting participants' names, HIV status, sexual behavior data, and drug use history. Data is stored in an Excel spreadsheet on a shared network drive accessible to all staff in the office, including administrative and facilities personnel. The evaluation report, written for a government funder, includes a table with data broken down by city neighborhood and racial/ethnic group — in some cases showing results for groups of three to five people, making individual identification possible. Participants were told at enrollment that 'data may be shared for reporting purposes' but received no further information.",
+    concerns: [0, 2, 3],
+    concernExplains: [
+      {p:0, text:"Harm: Exposing HIV status and drug use history through inadequate data security creates serious risk of stigma, discrimination, and even legal harm. This is among the most sensitive health data that exists and requires maximum security protocols."},
+      {p:2, text:"Informed consent: Telling participants that 'data may be shared for reporting purposes' is not sufficient consent for the collection and use of highly sensitive health and behavioral data. Participants must be informed specifically about what is collected, how it is stored, who can access it, and how it will be reported."},
+      {p:3, text:"Confidentiality: An Excel spreadsheet on a shared drive accessible to all staff — including non-clinical personnel — is a serious confidentiality failure. Furthermore, reporting data for groups of 3–5 people makes individual identification possible, destroying effective anonymization."}
+    ],
+    noHarm: null,
+    recommendation: "Recommendation: Immediately secure the data in a password-protected, access-controlled system limited to evaluation personnel only. Redesign the consent process to fully disclose data use. In all reports, aggregate small-cell data to prevent identification. Consider using participant codes rather than names. Consult with a privacy officer about HIPAA compliance."
+  }
+];
+
+let submittedCount = 0;
+let selected = proposals.map(() => new Set());
+let submitted = proposals.map(() => false);
+
+function renderAll() {
+  submittedCount = 0;
+  selected = proposals.map(() => new Set());
+  submitted = proposals.map(() => false);
+  const c = document.getElementById('proposals-container'); c.innerHTML = '';
+  proposals.forEach((p, i) => {
+    const div = document.createElement('div'); div.className = 'proposal-card';
+    div.innerHTML = `
+      <div class="proposal-header">
+        <div class="proposal-num">Proposal ${i+1} of ${proposals.length}</div>
+        <div class="proposal-title">${p.title}</div>
+        <div class="proposal-subtitle">${p.subtitle}</div>
+      </div>
+      <div class="proposal-body">
+        <div class="proposal-text">${p.text}</div>
+        <div class="flag-label">Flag any ethical concerns you see — click to select, click again to deselect:</div>
+        <div class="flag-grid" id="flags-${i}">
+          ${principles.map((pr, j) => `<button class="flag-chip" id="flag-${i}-${j}" onclick="toggleFlag(${i},${j})" aria-pressed="false">${pr}</button>`).join('')}
+        </div>
+        <button class="submit-btn" id="submit-${i}" onclick="submitReview(${i})">Submit Review</button>
+        <div class="result-section" id="result-${i}" role="alert"></div>
+      </div>`;
+    c.appendChild(div);
+  });
+  document.getElementById('score-badge').textContent = `Reviews submitted: 0 / ${proposals.length}`;
+}
+
+function toggleFlag(pi, fi) {
+  if (submitted[pi]) return;
+  const chip = document.getElementById(`flag-${pi}-${fi}`);
+  if (selected[pi].has(fi)) {
+    selected[pi].delete(fi);
+    chip.classList.remove('flagged');
+    chip.setAttribute('aria-pressed', 'false');
+  } else {
+    selected[pi].add(fi);
+    chip.classList.add('flagged');
+    chip.setAttribute('aria-pressed', 'true');
+  }
+}
+
+function submitReview(pi) {
+  if (submitted[pi]) return;
+  submitted[pi] = true;
+  submittedCount++;
+  const p = proposals[pi];
+  const userFlags = selected[pi];
+  const correctFlags = new Set(p.concerns);
+
+  // Lock chips and color them
+  principles.forEach((_, fi) => {
+    const chip = document.getElementById(`flag-${pi}-${fi}`);
+    chip.classList.add('locked'); chip.disabled = true;
+    const userFlagged = userFlags.has(fi);
+    const shouldFlag = correctFlags.has(fi);
+    if (userFlagged && shouldFlag) chip.classList.add('correct-flag');
+    else if (!userFlagged && shouldFlag) chip.classList.add('missed-flag');
+    else if (userFlagged && !shouldFlag) chip.classList.add('false-flag');
+    chip.classList.remove('flagged');
+  });
+  document.getElementById(`submit-${pi}`).disabled = true;
+
+  // Build result
+  const rs = document.getElementById(`result-${pi}`);
+  let html = '';
+
+  if (p.noHarm) {
+    html += `<div class="no-concern">✓ No ethical concerns identified — this proposal is well-designed. ${p.noHarm}</div>`;
+    const missed = [...correctFlags].filter(f => !userFlags.has(f));
+    const falsePos = [...userFlags].filter(f => !correctFlags.has(f));
+    if (falsePos.length > 0) html += `<div class="concern-item false-positive">You flagged "${principles[falsePos[0]]}" — but this proposal actually handles this correctly. Read the proposal again to see why this principle is satisfied.</div>`;
+  } else {
+    // Show correctly identified concerns
+    [...correctFlags].forEach(fi => {
+      const found = userFlags.has(fi);
+      const explain = p.concernExplains.find(x => x.p === fi);
+      html += `<div class="concern-item ${found ? 'correct' : 'missed'}">
+        ${found ? '✓ Correctly flagged' : '✗ Missed'}: <strong>${principles[fi]}</strong><br>${explain ? explain.text : ''}
+      </div>`;
+    });
+    // Show false positives
+    [...userFlags].filter(f => !correctFlags.has(f)).forEach(fi => {
+      html += `<div class="concern-item false-positive">⚠ Not a concern here: <strong>${principles[fi]}</strong> — This principle is not violated by this proposal as described.</div>`;
+    });
+  }
+
+  html += `<div class="recommendation"><strong>Panel recommendation:</strong> ${p.recommendation}</div>`;
+  rs.innerHTML = html;
+  rs.classList.add('show');
+  document.getElementById('score-badge').textContent = `Reviews submitted: ${submittedCount} / ${proposals.length}`;
+  announce(`Proposal ${pi+1} review submitted.`);
+}
+
+function resetAll() {
+  renderAll();
+  announce('Reset.');
+}
+function announce(msg) { const el = document.getElementById('live'); el.textContent = ''; setTimeout(() => { el.textContent = msg; }, 50); }
+
+renderAll();
+</script>
+</body>
+</html>

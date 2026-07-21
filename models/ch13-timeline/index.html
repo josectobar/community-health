@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CH13 Widget 1: Evaluation Timeline Builder</title>
+<style>
+:root{color-scheme:light;--teal:#1A6B72;--teal-lt:#D6ECED;--gold:#B07D2A;--gold-lt:#FEF3DC;--purple:#5B3A8E;--purple-lt:#EDE6F7;--red:#9B2335;--red-lt:#FBDDE0;--border:#CCC;--gray:#F4F4F4;--text:#1A1A1A;
+  --before:#1A3F6B;--before-lt:#D6E4F7;--during:#2A8A6B;--during-lt:#D6F0E8;--after:#9B2335;--after-lt:#FBDDE0;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;font-size:15px;color:var(--text);background:#fff;padding:20px;max-width:900px;margin:0 auto}
+h1{font-size:1.3rem;color:var(--teal);border-bottom:3px solid var(--teal);padding-bottom:8px;margin-bottom:6px}
+.subtitle{font-size:.88rem;color:#555;margin-bottom:18px}
+.instructions{background:var(--teal-lt);border-left:4px solid var(--teal);padding:12px 16px;border-radius:4px;margin-bottom:16px;font-size:.9rem}
+.instructions strong{color:var(--teal)}
+
+/* TIMELINE VISUAL */
+.timeline{display:flex;align-items:stretch;gap:0;margin-bottom:20px;border-radius:8px;overflow:hidden;border:2px solid var(--border)}
+.tl-phase{flex:1;padding:12px 10px;text-align:center;border-right:2px solid var(--border);position:relative}
+.tl-phase:last-child{border-right:none}
+.tl-phase-label{font-size:.78rem;font-weight:bold;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;padding:4px 8px;border-radius:4px;color:#fff;display:inline-block}
+.lbl-before{background:var(--before)}.lbl-during{background:var(--during)}.lbl-after{background:var(--after)}
+.tl-desc{font-size:.76rem;color:#555;margin-bottom:8px;line-height:1.3}
+.drop-zone{min-height:80px;border:2px dashed var(--border);border-radius:6px;padding:6px;background:#fafafa;transition:background .15s}
+.drop-zone.over{background:var(--teal-lt);border-color:var(--teal)}
+.placed-chip{padding:6px 10px;border-radius:6px;font-size:.79rem;margin-bottom:5px;cursor:pointer;line-height:1.35;border:1px solid transparent}
+.placed-chip:hover{opacity:.75}
+.placed-chip.correct{background:var(--teal-lt);color:var(--teal);border-color:var(--teal)}
+.placed-chip.wrong{background:var(--red-lt);color:var(--red);border-color:var(--red)}
+.placed-chip.unchecked{background:#fff;color:var(--text);border-color:var(--border)}
+
+/* CHIP POOL */
+.pool-label{font-size:.8rem;font-weight:bold;color:#555;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.chip-pool{display:flex;flex-wrap:wrap;gap:8px;min-height:52px;padding:10px;border:2px dashed var(--border);border-radius:6px;background:#fafafa;margin-bottom:16px}
+.chip{padding:7px 12px;border:2px solid var(--border);border-radius:6px;background:#fff;cursor:grab;font-size:.82rem;user-select:none;transition:all .15s;line-height:1.3;color:var(--text)}
+.chip:hover{border-color:var(--teal);background:var(--teal-lt)}
+.chip.dragging{opacity:.35}
+
+.action-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.check-btn{padding:9px 20px;background:var(--teal);color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:.9rem;font-weight:bold}
+.check-btn:hover{background:#145a60}.check-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.reset-btn{padding:8px 16px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.88rem;font-weight:bold}
+.reset-btn:hover{background:var(--teal-lt)}.reset-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.score-badge{background:var(--teal);color:#fff;padding:5px 14px;border-radius:20px;font-weight:bold;font-size:.9rem;white-space:nowrap}
+
+.result-panel{padding:12px 16px;border-radius:6px;margin-top:10px;font-size:.88rem;line-height:1.6;display:none}
+.result-panel.show{display:block}
+.result-panel.great{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+.result-panel.partial{background:var(--gold-lt);color:#6B4A00;border-left:4px solid var(--gold)}
+
+.detail-box{margin-top:14px;border:1px solid var(--border);border-radius:6px;overflow:hidden;display:none}
+.detail-box.show{display:block}
+.detail-row{display:flex;border-bottom:1px solid var(--border);font-size:.83rem;line-height:1.4}
+.detail-row:last-child{border-bottom:none}
+.dr-phase{padding:8px 10px;min-width:80px;font-weight:bold;color:#fff;font-size:.76rem;text-transform:uppercase;display:flex;align-items:center;justify-content:center;text-align:center}
+.dr-action{padding:8px 12px;flex:1;background:#fff}
+.dr-why{padding:8px 12px;flex:2;font-size:.8rem;color:#444;border-left:1px solid var(--border)}
+
+.sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+<h1>Evaluation Timeline Builder</h1>
+<p class="subtitle">A complete evaluation plan has actions before the program starts, during implementation, and after it ends. Drag each evaluation action to the right phase on the timeline.</p>
+
+<div class="instructions"><strong>Directions:</strong> Drag each action chip from the pool into the correct timeline phase — Before, During, or After. Click a placed chip to return it to the pool. Click Check when done to see your score and explanations.</div>
+
+<!-- TIMELINE -->
+<div class="timeline" role="region" aria-label="Timeline phases">
+  <div class="tl-phase">
+    <div class="tl-phase-label lbl-before">Before</div>
+    <div class="tl-desc">Program planning & design phase</div>
+    <div class="drop-zone" id="zone-before" aria-label="Drop zone: Before program"></div>
+  </div>
+  <div class="tl-phase">
+    <div class="tl-phase-label lbl-during">During</div>
+    <div class="tl-desc">Implementation & monitoring phase</div>
+    <div class="drop-zone" id="zone-during" aria-label="Drop zone: During program"></div>
+  </div>
+  <div class="tl-phase">
+    <div class="tl-phase-label lbl-after">After</div>
+    <div class="tl-desc">Summative & dissemination phase</div>
+    <div class="drop-zone" id="zone-after" aria-label="Drop zone: After program"></div>
+  </div>
+</div>
+
+<div class="pool-label">Evaluation actions — drag into the timeline above</div>
+<div class="chip-pool" id="chip-pool" aria-label="Evaluation action chips"></div>
+
+<div class="action-row">
+  <button class="check-btn" onclick="checkTimeline()">Check My Timeline</button>
+  <div class="score-badge" id="score-badge" aria-live="polite">Placed: 0 / 10</div>
+  <button class="reset-btn" onclick="resetTimeline()">Reset</button>
+</div>
+
+<div class="result-panel" id="result-panel" role="alert"></div>
+<div class="detail-box" id="detail-box" role="region" aria-label="Answer explanations"></div>
+
+<div class="sr-only" aria-live="polite" aria-atomic="true" id="live"></div>
+
+<script>
+const actions = [
+  {id:'a1', label:'Write program goals and objectives in measurable terms', zone:'before', why:'Measurable goals must exist before the program starts — they define what the evaluation will measure. You cannot evaluate what you have not defined.'},
+  {id:'a2', label:'Collect baseline data from participants before any sessions begin', zone:'before', why:'Baseline data is the "before" snapshot that makes comparison possible. Without it, you cannot show change — only where people ended up.'},
+  {id:'a3', label:'Design the evaluation plan including data collection methods and instruments', zone:'before', why:'Evaluation design decisions must happen before implementation. Choosing instruments, sampling approaches, and analysis plans after the fact severely limits what you can learn.'},
+  {id:'a4', label:'Submit evaluation procedures to the IRB for review', zone:'before', why:'IRB review must happen before data collection begins when human subjects research is involved. You cannot retroactively obtain approval for procedures already completed.'},
+  {id:'a5', label:'Track attendance and session completion for each participant', zone:'during', why:'Attendance is process/monitoring data collected throughout implementation — not before or after. It documents whether the program reached its intended participants.'},
+  {id:'a6', label:'Document any deviations from the original program design', zone:'during', why:'Program deviations must be documented as they happen, during implementation. Deviations recorded after the fact are incomplete and unreliable.'},
+  {id:'a7', label:'Conduct formative evaluation to identify problems and make mid-course adjustments', zone:'during', why:'Formative evaluation happens during the program specifically so adjustments can be made while there is still time to improve. Post-program formative evaluation cannot change what already happened.'},
+  {id:'a8', label:'Administer post-program surveys to measure changes in knowledge and behavior', zone:'after', why:'Post-program instruments measure what changed as a result of participation. They are administered after the program ends to capture the effect.'},
+  {id:'a9', label:'Analyze all collected data and write the summative evaluation report', zone:'after', why:'Summative evaluation synthesizes all program data after implementation to assess overall effectiveness and value.'},
+  {id:'a10', label:'Share findings with community members, funders, and the broader field', zone:'after', why:'Dissemination happens after findings are produced. Sharing before analysis is complete would mean sharing incomplete or misleading results.'},
+];
+
+const phaseColors = {before:'var(--before)', during:'var(--during)', after:'var(--after)'};
+let placed = {}; // actionId -> zone
+let dragId = null;
+
+function renderTimeline() {
+  placed = {};
+  ['before','during','after'].forEach(z => document.getElementById(`zone-${z}`).innerHTML = '');
+  setupZones();
+  const pool = document.getElementById('chip-pool');
+  pool.innerHTML = '';
+  actions.forEach(a => pool.appendChild(makeChip(a)));
+  document.getElementById('result-panel').classList.remove('show');
+  document.getElementById('detail-box').classList.remove('show');
+  updateScore();
+}
+
+function makeChip(a) {
+  const el = document.createElement('div');
+  el.className = 'chip'; el.id = `chip-${a.id}`;
+  el.textContent = a.label; el.draggable = true;
+  el.addEventListener('dragstart', e => { dragId = a.id; el.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
+  el.addEventListener('dragend', () => el.classList.remove('dragging'));
+  return el;
+}
+
+function setupZones() {
+  ['before','during','after'].forEach(zone => {
+    const z = document.getElementById(`zone-${zone}`);
+    z.addEventListener('dragover', e => { e.preventDefault(); z.classList.add('over'); });
+    z.addEventListener('dragleave', () => z.classList.remove('over'));
+    z.addEventListener('drop', e => { e.preventDefault(); z.classList.remove('over'); dropAction(zone); });
+  });
+}
+
+function dropAction(zone) {
+  if (!dragId) return;
+  if (placed[dragId]) document.querySelector(`[data-id="${dragId}"]`)?.remove();
+  placed[dragId] = zone;
+  const a = actions.find(x => x.id === dragId);
+  const pl = document.createElement('div');
+  pl.className = 'placed-chip unchecked'; pl.setAttribute('data-id', dragId);
+  pl.textContent = a.label; pl.title = 'Click to return to pool';
+  pl.onclick = () => returnToPool(a.id);   // a.id, not dragId (cleared below)
+  document.getElementById(`zone-${zone}`).appendChild(pl);
+  document.getElementById(`chip-${dragId}`).style.display = 'none';
+  dragId = null;
+  updateScore();
+}
+
+function returnToPool(id) {
+  document.querySelector(`[data-id="${id}"]`)?.remove();
+  delete placed[id];
+  document.getElementById(`chip-${id}`).style.display = '';
+  updateScore();
+  document.getElementById('result-panel').classList.remove('show');
+  document.getElementById('detail-box').classList.remove('show');
+}
+
+function checkTimeline() {
+  let correct = 0;
+  actions.forEach(a => {
+    const pl = document.querySelector(`[data-id="${a.id}"]`);
+    if (pl) {
+      const ok = placed[a.id] === a.zone;
+      pl.className = `placed-chip ${ok ? 'correct' : 'wrong'}`;
+      if (ok) correct++;
+    }
+  });
+  const n = Object.keys(placed).length;
+  const rp = document.getElementById('result-panel');
+  rp.textContent = correct === actions.length
+    ? `All ${actions.length} correct! You correctly mapped evaluation actions across the full program timeline — from building in measurable objectives before launch, to monitoring during implementation, to summative analysis and dissemination after.`
+    : `${correct} of ${n} placed correctly. Remember: before = planning and design (goals, baseline, IRB); during = monitoring and formative work (attendance, deviations, mid-course adjustments); after = summative analysis and dissemination.`;
+  rp.className = `result-panel show ${correct === actions.length ? 'great' : 'partial'}`;
+
+  // Build explanation table
+  const db = document.getElementById('detail-box');
+  db.innerHTML = '<div style="padding:8px 12px;background:var(--gray);font-size:.8rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.04em">Why each action belongs where it does</div>';
+  ['before','during','after'].forEach(zone => {
+    const zActions = actions.filter(a => a.zone === zone);
+    zActions.forEach(a => {
+      const row = document.createElement('div');
+      row.className = 'detail-row';
+      row.innerHTML = `<div class="dr-phase" style="background:${phaseColors[zone]}">${zone}</div><div class="dr-action">${a.label}</div><div class="dr-why">${a.why}</div>`;
+      db.appendChild(row);
+    });
+  });
+  db.classList.add('show');
+  announce(`${correct} of ${n} correct.`);
+}
+
+function updateScore() {
+  document.getElementById('score-badge').textContent = `Placed: ${Object.keys(placed).length} / ${actions.length}`;
+}
+
+function resetTimeline() { renderTimeline(); announce('Timeline reset.'); }
+function announce(msg) { const el = document.getElementById('live'); el.textContent = ''; setTimeout(() => { el.textContent = msg; }, 50); }
+
+renderTimeline();
+</script>
+</body>
+</html>

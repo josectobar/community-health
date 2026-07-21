@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CH13 Widget 2: Evaluation Type Diagnostic</title>
+<style>
+:root{color-scheme:light;--teal:#1A6B72;--teal-lt:#D6ECED;--gold:#B07D2A;--gold-lt:#FEF3DC;--purple:#5B3A8E;--purple-lt:#EDE6F7;--red:#9B2335;--red-lt:#FBDDE0;--process:#1A3F6B;--process-lt:#D6E4F7;--impact:#2A8A6B;--impact-lt:#D6F0E8;--outcome:#9B2335;--outcome-lt:#FBDDE0;--border:#CCC;--gray:#F4F4F4;--text:#1A1A1A;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;font-size:15px;color:var(--text);background:#fff;padding:20px;max-width:900px;margin:0 auto}
+h1{font-size:1.3rem;color:var(--teal);border-bottom:3px solid var(--teal);padding-bottom:8px;margin-bottom:6px}
+.subtitle{font-size:.88rem;color:#555;margin-bottom:18px}
+.instructions{background:var(--teal-lt);border-left:4px solid var(--teal);padding:12px 16px;border-radius:4px;margin-bottom:18px;font-size:.9rem}
+.instructions strong{color:var(--teal)}
+
+/* QUESTION CARDS */
+.q-card{border:1px solid var(--border);border-radius:8px;margin-bottom:22px;overflow:hidden}
+.q-header{background:var(--gray);padding:14px 16px;border-bottom:1px solid var(--border)}
+.q-num{font-size:.76rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.q-scenario{font-size:.93rem;line-height:1.6;margin-bottom:10px}
+.q-question-label{font-size:.82rem;font-weight:bold;color:#555;margin-bottom:10px;font-style:italic}
+
+/* BRANCH STEPS */
+.branch-step{padding:12px 16px;border-top:1px solid var(--border);display:none}
+.branch-step.active{display:block}
+.branch-q{font-size:.88rem;font-weight:bold;color:var(--gold);margin-bottom:10px}
+.branch-opts{display:flex;flex-direction:column;gap:7px}
+.b-opt{padding:10px 14px;border:2px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:.87rem;line-height:1.4;text-align:left;transition:all .15s;color:var(--text)}
+.b-opt:hover:not([disabled]){border-color:var(--teal);background:var(--teal-lt)}
+.b-opt:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.b-opt.selected{border-color:var(--gold);background:var(--gold-lt);font-weight:bold}
+.b-opt[disabled]{cursor:default}
+
+/* RESULT REVEAL */
+.result-reveal{padding:14px 16px;border-top:2px solid var(--border);display:none}
+.result-reveal.show{display:block}
+.eval-type-badge{display:inline-block;padding:6px 14px;border-radius:20px;font-weight:bold;font-size:.9rem;color:#fff;margin-bottom:10px}
+.badge-process{background:var(--process)}.badge-impact{background:var(--impact)}.badge-outcome{background:var(--outcome)}.badge-formative{background:var(--purple)}
+.result-explain{font-size:.88rem;line-height:1.55;margin-bottom:8px}
+.result-key{font-size:.83rem;color:#555;font-style:italic;padding:8px 12px;background:var(--gray);border-radius:4px;border-left:3px solid var(--border)}
+
+/* COMPARISON TABLE at end */
+.compare-table{width:100%;border-collapse:collapse;margin-top:20px;font-size:.84rem}
+.compare-table th{background:var(--teal);color:#fff;padding:8px 12px;text-align:left}
+.compare-table td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+.compare-table tr:nth-child(even) td{background:var(--gray)}
+.compare-table .type-cell{font-weight:bold}
+.ct-process{color:var(--process)}.ct-impact{color:var(--impact)}.ct-outcome{color:var(--outcome)}.ct-formative{color:var(--purple)}
+
+.progress-row{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.prog-badge{background:var(--teal);color:#fff;padding:5px 14px;border-radius:20px;font-weight:bold;font-size:.9rem}
+.reset-btn{padding:7px 16px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.88rem;font-weight:bold}
+.reset-btn:hover{background:var(--teal-lt)}.reset-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.show-table-btn{padding:7px 16px;background:var(--purple);color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:.88rem;font-weight:bold}
+.show-table-btn:hover{background:#4A2F7A}.show-table-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+<h1>Evaluation Type Diagnostic Tool</h1>
+<p class="subtitle">Work through branching questions to determine which type of evaluation best answers a given program question.</p>
+<div class="instructions"><strong>Directions:</strong> Each card gives you a program question a team needs to answer. Work through the diagnostic questions to identify whether it calls for Process, Impact, Outcome, or Formative evaluation — and why.</div>
+
+<div class="progress-row">
+  <div class="prog-badge" id="prog-badge" aria-live="polite">Completed: 0 / 5</div>
+  <button class="reset-btn" onclick="resetAll()">Reset All</button>
+  <button class="show-table-btn" onclick="toggleTable()">Show Comparison Table</button>
+</div>
+
+<div id="q-container"></div>
+
+<table class="compare-table" id="compare-table" style="display:none" role="region" aria-label="Evaluation type comparison">
+  <thead><tr><th>Type</th><th>When it happens</th><th>What it measures</th><th>Key question it answers</th></tr></thead>
+  <tbody>
+    <tr><td class="type-cell ct-formative">Formative</td><td>Before or during</td><td>Quality of program design and materials; participant reactions during implementation</td><td>How can we improve the program while it is still developing or running?</td></tr>
+    <tr><td class="type-cell ct-process">Process</td><td>At end, using data collected during</td><td>Whether the program was delivered as planned — attendance, fidelity, reach</td><td>Did we do what we said we would do?</td></tr>
+    <tr><td class="type-cell ct-impact">Impact</td><td>After (short to mid-term)</td><td>Intermediate changes — knowledge, attitudes, skills, behavior</td><td>Did participants change in the ways we expected?</td></tr>
+    <tr><td class="type-cell ct-outcome">Outcome</td><td>After (long-term)</td><td>Endpoints — disease rates, mortality, population health indicators</td><td>Did population health actually improve?</td></tr>
+  </tbody>
+</table>
+
+<div class="sr-only" aria-live="polite" aria-atomic="true" id="live"></div>
+
+<script>
+const questions = [
+  {
+    num: 1,
+    scenario: "A health department asks: 'Our smoking cessation program ran for six months. We want to know whether participants who completed at least four sessions were more likely to have quit smoking at the six-month follow-up than those who attended fewer sessions.' What type of evaluation answers this?",
+    steps: [
+      {
+        q: "Is this question about how the program was delivered — attendance, fidelity, activities completed?",
+        opts: ["Yes — it is mainly about delivery and implementation", "No — it is about what changed in participants"],
+        next: [
+          { type: 'process', label: 'Process Evaluation', badgeClass: 'badge-process',
+            explain: "If yes — process evaluation tracks attendance and implementation fidelity. But read more carefully: this question is comparing what happened to people based on attendance, not just documenting attendance. Move to the next branch.",
+            subq: "Actually — the question compares outcomes by attendance level. Does it measure a change in health behavior (quitting smoking)?",
+            subopts: ["Yes — quitting smoking is a behavior change", "No — it is just counting attendees"],
+            subfinal: [
+              { type: 'impact', label: 'Impact Evaluation', badgeClass: 'badge-impact',
+                explain: 'Impact Evaluation. Quitting smoking is a behavioral change — an intermediate measure that occurs after the program. Comparing quit rates by session attendance is an impact evaluation question. It goes beyond documenting what happened to asking what changed.',
+                key: 'Key distinction: Process evaluation documents what the program did. Impact evaluation measures what changed in participants as a result.'},
+              { type: 'process', label: 'Process Evaluation', badgeClass: 'badge-process',
+                explain: 'Process evaluation documents delivery — but this question is comparing behavioral outcomes across attendance groups. That makes it an impact question.',
+                key: 'Tip: When a question compares what happened to participants (quitting smoking) based on program dose (sessions attended), that is impact evaluation.'}
+            ]
+          },
+          { type: 'impact', label: 'Impact Evaluation', badgeClass: 'badge-impact',
+            explain: 'Impact Evaluation. Quitting smoking is a behavioral change — an intermediate measure that occurs in the months following program participation. Comparing quit rates by attendance level is a classic impact evaluation question.',
+            key: 'Impact evaluation measures intermediate changes — in knowledge, attitudes, skills, or behavior — that are expected to occur relatively soon after the program. Quitting smoking is behavioral change, not a long-term population health endpoint.'}
+        ]
+      }
+    ]
+  },
+  {
+    num: 2,
+    scenario: "A program team is preparing to launch a new teen mental health awareness curriculum. Before finalizing it, they share a draft with 15 students and ask whether the content feels relevant, whether the language resonates, and whether anything seems confusing or off-putting. They use the feedback to revise the curriculum before launch.",
+    steps: [
+      {
+        q: "Is the program already running, or is this happening before or during early development?",
+        opts: ["Before launch — still developing the program", "After the program — looking at what it achieved"],
+        next: [
+          null, // branch 0 leads to direct result
+          null   // branch 1 leads to different result
+        ],
+        results: [
+          { type: 'formative', label: 'Formative Evaluation', badgeClass: 'badge-formative',
+            explain: 'Formative Evaluation. Gathering feedback from the priority population before a program launches — to improve quality before full implementation — is formative evaluation. It is assessment-oriented and improvement-focused, not effectiveness-measuring.',
+            key: 'Formative evaluation happens before or during a program and asks: how can we make this better? It is the only evaluation type that can change a program before it goes live.'},
+          { type: 'impact', label: 'Impact Evaluation', badgeClass: 'badge-impact',
+            explain: 'Actually, re-read the scenario — this is happening before launch, not after. Gathering participant feedback to revise a program before implementation is formative evaluation.',
+            key: 'Formative evaluation can occur before launch (testing materials with a sample) or during early implementation (making mid-course corrections). Both forms share the goal of improving the program, not measuring its final effectiveness.'}
+        ]
+      }
+    ]
+  },
+  {
+    num: 3,
+    scenario: "Five years after a county-wide cardiovascular health initiative, the health department examines age-adjusted mortality rates from heart disease in the target zip codes and compares them to similar zip codes that did not receive the program.",
+    steps: [
+      {
+        q: "Is this measuring delivery of the program, or a change in people or in health status?",
+        opts: ["Delivery — what the program did and how it ran", "A change — in people or in population health"],
+        next: [null, null],
+        results: [
+          { type: 'process', label: 'Process Evaluation', badgeClass: 'badge-process',
+            explain: 'Not quite — process evaluation tracks program delivery, like attendance and session fidelity. This scenario measures what happened to mortality rates in the population, not what happened during implementation. Try again.',
+            key: 'Process evaluation asks: did we do what we said we would do? It uses implementation data, not health outcome data.'},
+          { type: null, label: null, badgeClass: null, explain: '', key: '', followq: true }
+        ],
+        followq: {
+          q: "Is this measuring intermediate change (knowledge, behavior) or a long-term endpoint (disease rates, mortality)?",
+          opts: ["Intermediate — behavior or knowledge change shortly after the program", "Long-term endpoint — disease rates or mortality years later"],
+          results: [
+            { type: 'impact', label: 'Impact Evaluation', badgeClass: 'badge-impact',
+              explain: 'Not quite — mortality rates measured five years after a program are a long-term health endpoint, not a near-term behavior change. That is outcome territory.',
+              key: 'Impact evaluation measures intermediate changes that occur relatively soon after participation: knowledge gained, attitudes shifted, behaviors adopted. Mortality rates over five years are in the outcome domain.'},
+            { type: 'outcome', label: 'Outcome Evaluation', badgeClass: 'badge-outcome',
+              explain: 'Outcome Evaluation. Mortality rates are the ultimate endpoint — a long-term population health measure. Comparing mortality between zip codes that did and did not receive the program is a classic outcome evaluation design.',
+              key: 'Outcome evaluation measures the endpoints the program was ultimately designed to affect: reduced disease, injury, or death at the population level. These measures take years to appear and require comparison to similar populations that did not receive the intervention.'}
+          ]
+        }
+      }
+    ]
+  },
+  {
+    num: 4,
+    scenario: "A coordinator reviews records from the first six months of a community walking program and finds that average attendance was 3.8 of 6 sessions, that one of three sites consistently ran sessions 20 minutes short, and that 22% of registered participants never completed session one.",
+    steps: [
+      {
+        q: "What is this evaluation measuring?",
+        opts: ["Whether participants changed — in knowledge, behavior, or health", "Whether the program was delivered as planned — attendance, fidelity, reach"],
+        next: [null, null],
+        results: [
+          { type: 'impact', label: 'Impact Evaluation', badgeClass: 'badge-impact',
+            explain: 'Not quite — none of the data described measures participant change. Attendance counts, session length, and dropout rates are implementation data, not outcome data.',
+            key: 'Ask yourself: is the data about what happened TO participants (change in knowledge, behavior, health) or about what happened WITH the program (who showed up, what was delivered)? This scenario describes program delivery data.'},
+          { type: 'process', label: 'Process Evaluation', badgeClass: 'badge-process',
+            explain: 'Process Evaluation. Attendance rates, session fidelity, and dropout patterns are all implementation data — they describe what happened during the program, not what changed in participants. Using that data at the end of a program to assess delivery is process evaluation.',
+            key: 'Process evaluation answers: did we deliver the program as planned? It synthesizes monitoring data — attendance logs, fidelity checks, session notes — into a picture of what actually happened during implementation, for better or worse.'}
+        ]
+      }
+    ]
+  },
+  {
+    num: 5,
+    scenario: "A youth nutrition program administers a 20-item knowledge test and a dietary self-efficacy scale to all participants at enrollment and again at the final session. The team compares pre- and post-scores to see what changed.",
+    steps: [
+      {
+        q: "Is this measuring program delivery, participant change, or long-term health endpoints?",
+        opts: ["Program delivery — attendance, fidelity, reach", "Participant change — knowledge, skills, attitudes, or behavior", "Long-term endpoints — disease rates, hospitalizations, mortality"],
+        next: [null, null, null],
+        results: [
+          { type: 'process', label: 'Process Evaluation', badgeClass: 'badge-process',
+            explain: 'Not quite — knowledge tests and self-efficacy scales measure what changed in participants, not how the program was delivered. Process evaluation uses attendance logs and fidelity data, not pre/post tests.',
+            key: 'Pre/post instruments measure change in participants — knowledge, attitudes, skills. That is the domain of impact evaluation, not process.'},
+          { type: 'impact', label: 'Impact Evaluation', badgeClass: 'badge-impact',
+            explain: 'Impact Evaluation. Pre- and post-measures of knowledge and self-efficacy measure intermediate changes in participants — exactly what impact evaluation is designed to capture. Changes in nutrition knowledge and confidence to make healthy food choices are intermediate outcomes expected to lead to behavior and health changes over time.',
+            key: 'Impact evaluation uses pre/post designs to measure whether participants changed in knowledge, attitudes, skills, or behavior. These are intermediate measures — the bridge between what the program did (process) and what ultimately happens to population health (outcome).'},
+          { type: 'outcome', label: 'Outcome Evaluation', badgeClass: 'badge-outcome',
+            explain: 'Not quite — a knowledge test and self-efficacy scale are not measuring long-term health endpoints like disease rates or hospitalization. Outcome evaluation measures what ultimately happens to population health over years, not what participants know or believe at program completion.',
+            key: 'Long-term health endpoints (disease, injury, death) are the domain of outcome evaluation. Knowledge and self-efficacy measured at program end are intermediate measures — impact territory.'}
+        ]
+      }
+    ]
+  }
+];
+
+let completedCount = 0;
+let tableVisible = false;
+const state = questions.map(() => ({ stepIdx: 0, done: false, path: [] }));
+
+function renderAll() {
+  completedCount = 0;
+  questions.forEach((q,i) => { state[i] = { stepIdx:0, done:false, path:[] }; });
+  const c = document.getElementById('q-container'); c.innerHTML = '';
+  questions.forEach((q,i) => {
+    const div = document.createElement('div'); div.className = 'q-card'; div.id = `qcard-${i}`;
+    div.innerHTML = `
+      <div class="q-header">
+        <div class="q-num">Question ${q.num} of ${questions.length}</div>
+        <div class="q-scenario">${q.scenario}</div>
+      </div>
+      <div id="steps-${i}"></div>
+      <div class="result-reveal" id="result-${i}" role="alert"></div>`;
+    c.appendChild(div);
+    renderStep(i);
+  });
+  updateProgress();
+}
+
+function renderStep(qi) {
+  const q = questions[qi];
+  const s = state[qi];
+  const stepsDiv = document.getElementById(`steps-${qi}`);
+  stepsDiv.innerHTML = '';
+
+  const step = q.steps[s.stepIdx];
+  const stepDiv = document.createElement('div');
+  stepDiv.className = 'branch-step active';
+  stepDiv.innerHTML = `<div class="branch-q">${step.q}</div>
+    <fieldset style="border:none;padding:0;margin:0"><legend class="sr-only">Question ${q.num} step ${s.stepIdx+1}</legend>
+    <div class="branch-opts">${step.opts.map((o,j) => `<button class="b-opt" id="bopt-${qi}-${j}" onclick="answerStep(${qi},${j})">${o}</button>`).join('')}
+    </div></fieldset>`;
+  stepsDiv.appendChild(stepDiv);
+}
+
+function answerStep(qi, choice) {
+  const q = questions[qi];
+  const s = state[qi];
+  if (s.done) return;
+  s.path.push(choice);
+
+  const step = q.steps[s.stepIdx];
+  step.opts.forEach((_,j) => { const b = document.getElementById(`bopt-${qi}-${j}`); b.disabled = true; if(j===choice) b.classList.add('selected'); });
+
+  // Handle different question structures
+  if (step.results) {
+    const result = step.results[choice];
+    if (result && result.followq) {
+      // Need a follow-up question
+      renderFollowQ(qi, step.followq);
+    } else {
+      showResult(qi, result);
+    }
+  } else {
+    // Handle next branches
+    const branch = step.next[choice];
+    if (branch && branch.subq) {
+      // Show sub-question
+      renderSubQ(qi, branch);
+    } else if (branch) {
+      showResult(qi, branch);
+    } else {
+      // Direct result from next array
+      const result = step.next[choice] || (q.steps[s.stepIdx].results && q.steps[s.stepIdx].results[choice]);
+      showResult(qi, result);
+    }
+  }
+}
+
+function renderFollowQ(qi, fq) {
+  const stepsDiv = document.getElementById(`steps-${qi}`);
+  const fqDiv = document.createElement('div');
+  fqDiv.className = 'branch-step active';
+  fqDiv.innerHTML = `<div class="branch-q">${fq.q}</div>
+    <fieldset style="border:none;padding:0;margin:0"><legend class="sr-only">Follow-up question</legend>
+    <div class="branch-opts">${fq.opts.map((o,j)=>`<button class="b-opt" id="fopt-${qi}-${j}" onclick="answerFollowQ(${qi},${j},'fq')">${o}</button>`).join('')}
+    </div></fieldset>`;
+  stepsDiv.appendChild(fqDiv);
+}
+
+function answerFollowQ(qi, choice, type) {
+  const q = questions[qi];
+  const s = state[qi];
+  if (s.done) return;
+  const step = q.steps[s.stepIdx];
+  const fq = step.followq;
+  fq.opts.forEach((_,j) => { const b = document.getElementById(`fopt-${qi}-${j}`); b.disabled=true; if(j===choice) b.classList.add('selected'); });
+  showResult(qi, fq.results[choice]);
+}
+
+function renderSubQ(qi, branch) {
+  const stepsDiv = document.getElementById(`steps-${qi}`);
+  const sqDiv = document.createElement('div');
+  sqDiv.className = 'branch-step active';
+  sqDiv.innerHTML = `<div style="padding:8px 14px;background:var(--purple-lt);border-radius:4px;margin-bottom:8px;font-size:.86rem;color:#3A1F6B">${branch.explain}</div>
+    <div class="branch-q">${branch.subq}</div>
+    <fieldset style="border:none;padding:0;margin:0"><legend class="sr-only">Sub-question</legend>
+    <div class="branch-opts">${branch.subopts.map((o,j)=>`<button class="b-opt" id="sqopt-${qi}-${j}" onclick="answerSubQ(${qi},${j},${JSON.stringify(branch.subfinal).replace(/"/g,'&quot;')})">${o}</button>`).join('')}
+    </div></fieldset>`;
+  stepsDiv.appendChild(sqDiv);
+}
+
+function answerSubQ(qi, choice, subfinal) {
+  const s = state[qi]; if (s.done) return;
+  subfinal.forEach((_,j) => { const b=document.getElementById(`sqopt-${qi}-${j}`); if(b) b.disabled=true; const btn=document.getElementById(`sqopt-${qi}-${j}`); if(btn&&j===choice) btn.classList.add('selected'); });
+  showResult(qi, subfinal[choice]);
+}
+
+function showResult(qi, result) {
+  if (!result) return;
+  const s = state[qi]; s.done = true;
+  const rDiv = document.getElementById(`result-${qi}`);
+  rDiv.innerHTML = `<div class="eval-type-badge ${result.badgeClass || 'badge-process'}">${result.label || result.type}</div>
+    <div class="result-explain">${result.explain}</div>
+    <div class="result-key">${result.key || ''}</div>`;
+  rDiv.classList.add('show');
+  completedCount++;
+  updateProgress();
+  announce(`Question ${qi+1}: ${result.label}`);
+}
+
+function updateProgress() {
+  document.getElementById('prog-badge').textContent = `Completed: ${completedCount} / ${questions.length}`;
+}
+
+function resetAll() { renderAll(); announce('Reset.'); }
+function toggleTable() {
+  tableVisible = !tableVisible;
+  document.getElementById('compare-table').style.display = tableVisible ? 'table' : 'none';
+  document.querySelector('.show-table-btn').textContent = tableVisible ? 'Hide Comparison Table' : 'Show Comparison Table';
+}
+function announce(msg) { const el=document.getElementById('live'); el.textContent=''; setTimeout(()=>{el.textContent=msg;},50); }
+
+renderAll();
+</script>
+</body>
+</html>

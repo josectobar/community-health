@@ -55,6 +55,10 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/ch12-ethics/](models/ch12-ethics/): work ethical dilemmas in two steps, then run a sustainability self-assessment on a program facing grant expiry.
 - [models/ch12-implementation/](models/ch12-implementation/): sort program actions into pilot, phasing in, or total implementation, then match team behaviors to development stages.
 - [models/ch12-monitoring/](models/ch12-monitoring/): diagnose monitoring problems by category, then test privacy and recordkeeping knowledge with true or false reasoning.
+- [models/ch13-timeline/](models/ch13-timeline/): drag evaluation actions into the before, during, and after phases of a program timeline.
+- [models/ch13-diagnostic/](models/ch13-diagnostic/): work branching questions to identify whether a program question calls for process, impact, outcome, or formative evaluation.
+- [models/ch13-ethics/](models/ch13-ethics/): sit on an ethics review panel and flag the ethical concerns in five evaluation proposals.
+- [models/ch13-communicator/](models/ch13-communicator/): tailor the same evaluation findings for funders, staff, community members, and policymakers.
 
 ## Embed snippets
 
@@ -94,6 +98,10 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Ethics, Legal Responsibility, and Sustainability" src="models/ch12-ethics/"></iframe>
 <iframe title="Implementation Planning: Rollout Phases and Team Development" src="models/ch12-implementation/"></iframe>
 <iframe title="Monitoring and Recordkeeping: Problem Solving and Privacy Decisions" src="models/ch12-monitoring/"></iframe>
+<iframe title="Evaluation Timeline Builder" src="models/ch13-timeline/"></iframe>
+<iframe title="Evaluation Type Diagnostic Tool" src="models/ch13-diagnostic/"></iframe>
+<iframe title="Ethical Review Simulation" src="models/ch13-ethics/"></iframe>
+<iframe title="Audience Communicator" src="models/ch13-communicator/"></iframe>
 ```
 
 ## Files
