@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Getting In and Getting Organized</title>
+<style>
+  :root{
+    color-scheme: light;
+    --teal:#1A6B72;--teal-lt:#D6ECED;--gold:#B07D2A;--gold-lt:#FEF3DC;
+    --purple:#5B3A8E;--purple-lt:#EDE6F7;--red:#9B2335;--red-lt:#FBDDE0;
+    --border:#CCCCCC;--gray:#F4F4F4;--text:#1A1A1A;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,sans-serif;font-size:15px;color:var(--text);background:#fff;padding:20px;max-width:860px;margin:0 auto}
+  h1{font-size:1.3rem;color:var(--teal);border-bottom:3px solid var(--teal);padding-bottom:8px;margin-bottom:6px}
+  .subtitle{font-size:.88rem;color:#555;margin-bottom:20px}
+  .tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+  .tab-btn{padding:8px 18px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.9rem;font-weight:bold}
+  .tab-btn:hover{background:var(--teal-lt)}
+  .tab-btn[aria-selected="true"]{background:var(--teal);color:#fff}
+  .tab-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .tab-panel{display:none}.tab-panel.active{display:block}
+  .instructions{background:var(--teal-lt);border-left:4px solid var(--teal);padding:12px 16px;border-radius:4px;margin-bottom:20px;font-size:.9rem}
+  .instructions strong{color:var(--teal)}
+  .s-card{border:1px solid var(--border);border-radius:6px;margin-bottom:22px;overflow:hidden}
+  .s-header{background:var(--gray);padding:14px 16px;border-bottom:1px solid var(--border)}
+  .s-num{font-size:.78rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+  .s-text{font-size:.95rem;line-height:1.6}
+  .s-prompt{padding:10px 16px;background:var(--gold-lt);font-size:.88rem;font-weight:bold;color:var(--gold);border-bottom:1px solid var(--border)}
+  .s-choices{padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+  .s-btn{padding:9px 14px;border:2px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:.88rem;line-height:1.4;text-align:left;transition:all .15s;color:var(--text)}
+  .s-btn:hover:not([disabled]){border-color:var(--teal);background:var(--teal-lt)}
+  .s-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .s-btn.correct{border-color:var(--teal);background:var(--teal-lt);color:var(--teal);font-weight:bold}
+  .s-btn.correct::after{content:" ✓"}
+  .s-btn.wrong{border-color:var(--red);background:var(--red-lt);color:var(--red)}
+  .s-btn.wrong::after{content:" ✗"}
+  .s-btn[disabled]{cursor:default}
+  .s-feedback{margin:0 16px 14px;padding:10px 14px;border-radius:4px;font-size:.88rem;line-height:1.5;display:none}
+  .s-feedback.show{display:block}
+  .s-feedback.correct{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+  .s-feedback.wrong{background:var(--red-lt);color:#6B1020;border-left:4px solid var(--red)}
+
+  /* ASSET CLASSIFIER */
+  .asset-pool{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .asset-chip{padding:8px 13px;border:2px solid var(--border);border-radius:20px;background:#fff;cursor:pointer;font-size:.84rem;transition:all .15s;color:var(--text)}
+  .asset-chip:hover:not(.placed){border-color:var(--teal);background:var(--teal-lt)}
+  .asset-chip.selected{border-color:var(--gold);background:var(--gold-lt)}
+  .asset-chip.placed{opacity:.4;pointer-events:none}
+  .asset-chip:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .asset-sel-display{background:var(--gold-lt);border:2px solid var(--gold);border-radius:8px;padding:9px 13px;margin-bottom:10px;font-size:.88rem;display:none}
+  .asset-sel-display.show{display:block}
+  .asset-sel-display strong{color:var(--gold)}
+  .asset-bin-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+  .asset-bin-btn{padding:8px 14px;border:2px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:.86rem;font-weight:bold;transition:all .15s}
+  .asset-bin-btn.pri{border-color:var(--teal);color:var(--teal)}.asset-bin-btn.pri:hover{background:var(--teal-lt)}
+  .asset-bin-btn.sec{border-color:var(--purple);color:var(--purple)}.asset-bin-btn.sec:hover{background:var(--purple-lt)}
+  .asset-bin-btn.pot{border-color:var(--gold);color:var(--gold)}.asset-bin-btn.pot:hover{background:var(--gold-lt)}
+  .asset-bin-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .asset-drop-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+  @media(max-width:580px){.asset-drop-grid{grid-template-columns:1fr}}
+  .asset-zone{border:2px dashed var(--border);border-radius:8px;padding:10px;min-height:100px}
+  .az-label{font-size:.78rem;font-weight:bold;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;padding:4px 8px;border-radius:4px;color:#fff;display:inline-block}
+  .az-pri{background:var(--teal)}.az-sec{background:var(--purple)}.az-pot{background:var(--gold)}
+  .apl-chip{padding:5px 9px;border-radius:12px;font-size:.8rem;margin-bottom:4px;display:inline-block;margin-right:3px;line-height:1.3}
+  .apl-chip.correct{background:var(--teal-lt);color:var(--teal);border:1px solid var(--teal)}
+  .apl-chip.wrong{background:var(--red-lt);color:var(--red);border:1px solid var(--red)}
+
+  .score-row{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+  .score-badge{background:var(--teal);color:#fff;padding:5px 14px;border-radius:20px;font-weight:bold;font-size:.9rem;white-space:nowrap}
+  .reset-btn{padding:6px 14px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.88rem;font-weight:bold}
+  .reset-btn:hover{background:var(--teal-lt)}
+  .reset-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+<h1>Getting In and Getting Organized: Applied Scenarios</h1>
+<p class="subtitle">Apply what you know about entry, participation roles, and community asset categories.</p>
+
+<div class="tabs" role="tablist" aria-label="Activity tabs">
+  <button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-steps" id="tab-steps" onclick="switchTab('steps')">Part 1: What Should Happen Next?</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-assets" id="tab-assets" onclick="switchTab('assets')">Part 2: Asset Classifier</button>
+</div>
+<div class="sr-only" aria-live="polite" aria-atomic="true" id="live"></div>
+
+<!-- PART 1 -->
+<div class="tab-panel active" id="panel-steps" role="tabpanel" aria-labelledby="tab-steps">
+  <div class="instructions">
+    <strong>Directions:</strong> Each scenario presents a situation from the early stages of community organizing. Choose the response that best reflects good practice for that stage of the process.
+  </div>
+  <div id="steps-container"></div>
+  <div class="score-row">
+    <div class="score-badge" id="steps-score" aria-live="polite">Score: 0 / 6</div>
+    <button class="reset-btn" onclick="resetSteps()">Reset Part 1</button>
+  </div>
+</div>
+
+<!-- PART 2 -->
+<div class="tab-panel" id="panel-assets" role="tabpanel" aria-labelledby="tab-assets">
+  <div class="instructions">
+    <strong>Directions:</strong> Community assets fall into three categories: Primary (local and community-controlled), Secondary (in the community but controlled by outsiders), and Potential (outside the community and outside community control). Click a chip, then classify it.
+  </div>
+  <div class="asset-sel-display" id="asset-sel-display" aria-live="polite">
+    <strong>Selected:</strong> <span id="asset-sel-text">—</span><br>
+    <small>Now click a bucket below.</small>
+  </div>
+  <div class="asset-bin-row" role="group" aria-label="Asset category buckets">
+    <button class="asset-bin-btn pri" onclick="classifyAsset('primary')">Primary</button>
+    <button class="asset-bin-btn sec" onclick="classifyAsset('secondary')">Secondary</button>
+    <button class="asset-bin-btn pot" onclick="classifyAsset('potential')">Potential</button>
+  </div>
+  <div class="asset-pool" id="asset-pool" role="group" aria-label="Asset chips"></div>
+  <div class="asset-drop-grid">
+    <div class="asset-zone"><div class="az-label az-pri">Primary</div><div id="placed-primary"></div></div>
+    <div class="asset-zone"><div class="az-label az-sec">Secondary</div><div id="placed-secondary"></div></div>
+    <div class="asset-zone"><div class="az-label az-pot">Potential</div><div id="placed-potential"></div></div>
+  </div>
+  <div class="score-row">
+    <div class="score-badge" id="asset-score" aria-live="polite">Classified: 0 / 9</div>
+    <button class="reset-btn" onclick="resetAssets()">Reset Part 2</button>
+  </div>
+</div>
+
+<script>
+const stepsData = [
+  {
+    text:"A state health department analyst reviews county-level data and identifies a rural community with very high rates of uncontrolled hypertension. She wants to design an intervention but has no prior relationship with the community. Her supervisor suggests she start by reaching out to the county health officer and the administrator of the local rural health clinic.",
+    prompt:"Why is this a good first step?",
+    options:[
+      "A. The county health officer and clinic administrator are gatekeepers who control access to the community's political climate and can help the analyst gain entry respectfully",
+      "B. The county health officer and clinic administrator can provide the analyst with a list of community members to survey immediately",
+      "C. Reaching out to officials first is required by state law before any community health intervention",
+      "D. The analyst should skip this step and go directly to community members, since gatekeepers are often obstacles"
+    ],
+    correct:0,
+    feedback:"Option A is correct. The county health officer and clinic administrator are gatekeepers — people who have existing relationships and credibility in the community. Approaching them first respects the community's existing power structure and begins the process of gaining entry on the community's terms, not the analyst's.",
+    wrongFeedback:"Gatekeepers are not bureaucratic obstacles — they are the people who hold community trust and credibility. Approaching them first is how an outside organization begins to earn entry into a community. Option A correctly identifies their role."
+  },
+  {
+    text:"A community health worker named Rosa has been working in her own neighborhood for 12 years and has deep relationships with residents. She notices that several elderly neighbors have fallen in the past six months and suspects unsafe home conditions are a bigger problem than anyone realizes. She starts talking to neighbors and finds that others have noticed the same pattern.",
+    prompt:"What type of community organizing is beginning here?",
+    options:[
+      "A. Top-down organizing, because a health professional identified the problem",
+      "B. Grassroots organizing, because recognition came from within the community through a trusted community member",
+      "C. Social planning, because data is being collected about falls",
+      "D. External organizing, because Rosa works for a health organization"
+    ],
+    correct:1,
+    feedback:"Option B is correct. Rosa is a community member herself with deep roots in the neighborhood. The recognition of the problem came from her lived proximity to it — not from an outside agency's data. That internal, community-driven recognition is the definition of grassroots organizing.",
+    wrongFeedback:"Rosa is not an outside professional parachuting in — she has lived and worked in this community for 12 years and noticed the problem through personal proximity. Problem recognition that comes from within the community, driven by someone with genuine community roots, is grassroots organizing."
+  },
+  {
+    text:"A newly formed coalition addressing youth mental health has a core team of five deeply committed members who are doing most of the work. Three additional people attend meetings when they can. A local pediatrician who cares about the issue cannot attend meetings but has agreed to let the coalition use her name in communications and has donated $500.",
+    prompt:"Which participation role best describes the pediatrician?",
+    options:[
+      "A. Executive participant",
+      "B. Active participant",
+      "C. Occasional participant",
+      "D. Supporting participant"
+    ],
+    correct:3,
+    feedback:"Supporting participant. The pediatrician is contributing in indirect ways — her name lends credibility to the coalition and her donation provides resources — without being directly involved in the day-to-day work. That indirect but valuable contribution is the defining characteristic of a supporting participant.",
+    wrongFeedback:"The pediatrician is not attending meetings or doing hands-on work. She is contributing her name and money — valuable, but indirect. Contributors who provide resources or credibility without active involvement are supporting participants."
+  },
+  {
+    text:"An outside nonprofit wants to launch a diabetes prevention program in a Native American community. A program officer says: 'We know what works for diabetes prevention — we should just implement our evidence-based curriculum and get tribal members to attend.' A community health advisor pushes back on this approach.",
+    prompt:"What is the core problem with the program officer's approach?",
+    options:[
+      "A. Evidence-based curricula are never effective in Native communities",
+      "B. The approach assumes the community should adapt to the program rather than the program adapting to the community — it skips gaining entry and ignores cultural humility",
+      "C. Diabetes prevention is not an appropriate focus for tribal communities",
+      "D. The program officer should wait until invited by the tribal government before even proposing the program"
+    ],
+    correct:1,
+    feedback:"Option B identifies the core problem. Assuming an existing curriculum can simply be implemented without relationship-building, community input, or cultural adaptation violates the foundational principles of community organizing — especially gaining entry and cultural humility. The community's context, values, and voice must shape how any program is designed and delivered.",
+    wrongFeedback:"The problem is not about curriculum quality or timing — it is about posture. The program officer is treating the community as a passive recipient of an outside solution rather than as the authority on its own context and needs. That approach skips the entire process of gaining entry and practicing cultural humility."
+  },
+  {
+    text:"A community coalition has been organizing for four months. A health department representative offers to join the coalition and immediately suggests that the coalition should apply for a federal grant she knows about, restructure its leadership to meet the grant's requirements, and shift its focus to the health department's priority areas. Several longtime community members feel uneasy but are not sure how to respond.",
+    prompt:"What principle of community organizing is at risk here?",
+    options:[
+      "A. The coalition should always accept government funding when offered",
+      "B. The principle that self-imposed, community-developed change has more meaning and permanence — outside entities should support, not redirect, the community's own priorities",
+      "C. The principle that organizing should never involve government partners",
+      "D. The rule that coalitions cannot restructure their leadership once formed"
+    ],
+    correct:1,
+    feedback:"Option B identifies the principle at risk. The health department representative is subtly redirecting the coalition's priorities, structure, and focus toward external interests. Community organizing principles hold that the community's own priorities must lead — outside partners can support and resource, but should not redirect. The community members' unease is a signal worth heeding.",
+    wrongFeedback:"This is not about whether government partners are appropriate — they can be valuable. The issue is that the representative is proposing changes to the coalition's structure and priorities to serve external interests. Community organizing holds that community-defined priorities must stay at the center, and that outside parties support rather than redirect."
+  },
+  {
+    text:"A planning team is assessing a neighborhood to prepare for a health promotion initiative. They review hospital data, census demographics, and school health records — all showing significant health disparities. A community member on the team says: 'This tells us what's wrong. But what do we actually have here? Who are the connectors? What's already working?' The team decides to expand its assessment.",
+    prompt:"What approach is the community member advocating for?",
+    options:[
+      "A. Replacing the needs assessment with a satisfaction survey",
+      "B. Dismissing the data because it does not reflect the community's lived experience",
+      "C. Adding asset mapping to the assessment — identifying community strengths and capacities alongside needs",
+      "D. Hiring an outside consultant to conduct the full assessment independently"
+    ],
+    correct:2,
+    feedback:"Option C is correct. The community member is pushing the team beyond a deficit-only lens by asking what the community already has — connectors, working programs, informal leaders. This is the heart of asset mapping: documenting community strengths and capacities alongside needs to build a fuller, more actionable picture.",
+    wrongFeedback:"The community member is not dismissing data or calling for a new survey — she is expanding the assessment's scope. She wants to know what the community already has, not just what it lacks. That positive, capacity-focused counterpart to needs assessment is asset mapping."
+  },
+];
+
+const assetData = [
+  {label:"A block captain who has checked on elderly neighbors for 15 years", correct:"primary", feedback:"Primary. An individual community member with skills, relationships, and a long history of local action is a primary building block — locally rooted and directly under community control."},
+  {label:"A federal Supplemental Nutrition Assistance Program (SNAP) office located in another county", correct:"potential", feedback:"Potential. A federal program administered outside the community and controlled by a federal agency is a potential building block — it can benefit community members but requires advocacy and navigation to access."},
+  {label:"A resident-run mutual aid network that distributes food every Saturday", correct:"primary", feedback:"Primary. A community-controlled, volunteer-run organization operating entirely within the neighborhood is a primary building block — the most locally rooted and directly accessible type of community asset."},
+  {label:"A public hospital serving the neighborhood but governed by a city health authority", correct:"secondary", feedback:"Secondary. The hospital is physically in the community and serves residents, but it is governed and controlled by a city authority — not by community members. That makes it a secondary building block."},
+  {label:"A state health department grant program for rural wellness initiatives", correct:"potential", feedback:"Potential. State grant programs are located and controlled outside the community. Accessing them requires an application process and meeting outside criteria. These are potential building blocks — significant but not directly under community control."},
+  {label:"A church with an active health ministry staffed by congregation members", correct:"primary", feedback:"Primary. A faith-based organization rooted in the neighborhood, staffed by community members, and operating under community governance is a primary building block. Its local roots and community control make it one of the most reliable assets."},
+  {label:"A public elementary school in the neighborhood, administered by the school district", correct:"secondary", feedback:"Secondary. The school is located within the community and serves community children, but it is administered by a district authority outside the community's direct control. Access and partnership require working through that external administration."},
+  {label:"A community health worker training program offered by the county health department", correct:"secondary", feedback:"Secondary. County programs are typically located in or accessible to communities but governed by county authorities — not by the community itself. Participation requires working within the county's structure and timeline."},
+  {label:"A group of retired teachers and nurses who live in the neighborhood and want to volunteer", correct:"primary", feedback:"Primary. Individual skills, knowledge, and willingness to contribute are individual assets — primary building blocks directly available to the community. These residents bring professional expertise that the community can mobilize without external permission or funding."},
+];
+
+let stepsAnswered = new Array(stepsData.length).fill(false);
+let stepsCorrect  = new Array(stepsData.length).fill(false);
+let selectedAsset = null;
+let assetCount = 0;
+let assetCorrect = 0;
+
+function renderSteps() {
+  stepsAnswered.fill(false); stepsCorrect.fill(false);
+  const c = document.getElementById('steps-container');
+  c.innerHTML='';
+  stepsData.forEach((item,i)=>{
+    const div=document.createElement('div');
+    div.className='s-card';
+    div.innerHTML=`
+      <div class="s-header">
+        <div class="s-num">Scenario ${i+1} of ${stepsData.length}</div>
+        <div class="s-text">${item.text}</div>
+      </div>
+      <div class="s-prompt">${item.prompt}</div>
+      <fieldset style="border:none;padding:0;margin:0">
+        <legend class="sr-only">Answer for scenario ${i+1}</legend>
+        <div class="s-choices">
+          ${item.options.map((o,j)=>`<button class="s-btn" id="st-${i}-${j}" onclick="answerStep(${i},${j})">${o}</button>`).join('')}
+        </div>
+      </fieldset>
+      <div class="s-feedback" id="stfb-${i}" role="alert"></div>
+    `;
+    c.appendChild(div);
+  });
+  document.getElementById('steps-score').textContent=`Score: 0 / ${stepsData.length}`;
+}
+
+function answerStep(q,choice){
+  if(stepsAnswered[q]) return;
+  stepsAnswered[q]=true;
+  const ok=choice===stepsData[q].correct;
+  stepsCorrect[q]=ok;
+  stepsData[q].options.forEach((_,j)=>{
+    const btn=document.getElementById(`st-${q}-${j}`);
+    btn.disabled=true;
+    if(j===choice) btn.classList.add(ok?'correct':'wrong');
+    if(!ok&&j===stepsData[q].correct) btn.classList.add('correct');
+  });
+  const fb=document.getElementById(`stfb-${q}`);
+  fb.textContent=ok?stepsData[q].feedback:stepsData[q].wrongFeedback;
+  fb.className=`s-feedback show ${ok?'correct':'wrong'}`;
+  announce(`Scenario ${q+1}: ${ok?'Correct':'Incorrect'}.`);
+  document.getElementById('steps-score').textContent=`Score: ${stepsCorrect.filter(Boolean).length} / ${stepsData.length}`;
+}
+
+function resetSteps(){renderSteps();announce('Part 1 reset.');}
+
+function renderAssets(){
+  selectedAsset=null;assetCount=0;assetCorrect=0;
+  document.getElementById('asset-sel-display').classList.remove('show');
+  document.getElementById('asset-sel-text').textContent='—';
+  ['primary','secondary','potential'].forEach(b=>document.getElementById(`placed-${b}`).innerHTML='');
+  const pool=document.getElementById('asset-pool');
+  pool.innerHTML='';
+  assetData.forEach((item,i)=>{
+    const chip=document.createElement('button');
+    chip.className='asset-chip';
+    chip.id=`ac-${i}`;
+    chip.textContent=item.label;
+    chip.setAttribute('aria-pressed','false');
+    chip.onclick=()=>selectAsset(i);
+    pool.appendChild(chip);
+  });
+  document.getElementById('asset-score').textContent=`Classified: 0 / ${assetData.length}`;
+}
+
+function selectAsset(i){
+  if(document.getElementById(`ac-${i}`).classList.contains('placed')) return;
+  if(selectedAsset!==null){
+    const prev=document.getElementById(`ac-${selectedAsset}`);
+    if(prev){prev.classList.remove('selected');prev.setAttribute('aria-pressed','false');}
+  }
+  selectedAsset=i;
+  const chip=document.getElementById(`ac-${i}`);
+  chip.classList.add('selected');
+  chip.setAttribute('aria-pressed','true');
+  document.getElementById('asset-sel-text').textContent=assetData[i].label;
+  document.getElementById('asset-sel-display').classList.add('show');
+  announce(`Selected: ${assetData[i].label}. Choose a category.`);
+}
+
+function classifyAsset(bucket){
+  if(selectedAsset===null){announce('Select a chip first.');return;}
+  const item=assetData[selectedAsset];
+  const ok=item.correct===bucket;
+  assetCount++;
+  if(ok) assetCorrect++;
+
+  const chip=document.getElementById(`ac-${selectedAsset}`);
+  chip.classList.add('placed');
+
+  const placed=document.createElement('div');
+  placed.className=`apl-chip ${ok?'correct':'wrong'}`;
+  placed.innerHTML=`${item.label}<br><small style="font-size:.75rem;opacity:.85">${item.feedback}</small>`;
+  document.getElementById(`placed-${bucket}`).appendChild(placed);
+
+  if(!ok){
+    const fix=document.createElement('div');
+    fix.className='apl-chip correct';
+    fix.innerHTML=`${item.label} <em>(moved here)</em><br><small style="font-size:.75rem;opacity:.85">${item.feedback}</small>`;
+    document.getElementById(`placed-${item.correct}`).appendChild(fix);
+  }
+
+  announce(`${item.label}: ${ok?'Correct':'Incorrect'}. ${item.feedback}`);
+  selectedAsset=null;
+  document.getElementById('asset-sel-display').classList.remove('show');
+  document.getElementById('asset-score').textContent=`Classified: ${assetCorrect} / ${assetData.length}`;
+}
+
+function resetAssets(){renderAssets();announce('Part 2 reset.');}
+
+function switchTab(tab){
+  ['steps','assets'].forEach(t=>{
+    document.getElementById(`panel-${t}`).classList.toggle('active',t===tab);
+    document.getElementById(`tab-${t}`).setAttribute('aria-selected',t===tab?'true':'false');
+  });
+}
+function announce(msg){
+  const el=document.getElementById('live');el.textContent='';
+  setTimeout(()=>{el.textContent=msg;},50);
+}
+
+renderSteps();
+renderAssets();
+</script>
+</body>
+</html>
