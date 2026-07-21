@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CH8 Widget 3: Adopt, Adapt, Create</title>
+<style>
+:root{color-scheme:light;--teal:#1A6B72;--teal-lt:#D6ECED;--gold:#B07D2A;--gold-lt:#FEF3DC;--purple:#5B3A8E;--purple-lt:#EDE6F7;--red:#9B2335;--red-lt:#FBDDE0;--border:#CCC;--gray:#F4F4F4;--text:#1A1A1A;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;font-size:15px;color:var(--text);background:#fff;padding:20px;max-width:900px;margin:0 auto}
+h1{font-size:1.3rem;color:var(--teal);border-bottom:3px solid var(--teal);padding-bottom:8px;margin-bottom:6px}
+.subtitle{font-size:.88rem;color:#555;margin-bottom:20px}
+.tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.tab-btn{padding:8px 18px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.9rem;font-weight:bold}
+.tab-btn:hover{background:var(--teal-lt)}.tab-btn[aria-selected="true"]{background:var(--teal);color:#fff}
+.tab-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.instructions{background:var(--teal-lt);border-left:4px solid var(--teal);padding:12px 16px;border-radius:4px;margin-bottom:16px;font-size:.9rem}
+.instructions strong{color:var(--teal)}
+
+/* DECISION TREE */
+.dt-scenario{background:var(--gray);border:1px solid var(--border);border-radius:6px;padding:14px;margin-bottom:14px}
+.dt-s-num{font-size:.76rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.dt-s-text{font-size:.93rem;line-height:1.6;margin-bottom:12px}
+.dt-question{font-size:.88rem;font-weight:bold;color:var(--gold);margin-bottom:8px}
+.dt-options{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.dt-opt{padding:8px 16px;border:2px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:.88rem;transition:all .15s;color:var(--text);font-weight:bold}
+.dt-opt:hover:not([disabled]){border-color:var(--teal);background:var(--teal-lt)}
+.dt-opt:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.dt-opt.selected{border-color:var(--teal);background:var(--teal-lt);color:var(--teal)}
+.dt-opt[disabled]{cursor:default}
+.dt-followup{margin-top:10px;padding:10px 14px;background:var(--purple-lt);border-left:4px solid var(--purple);border-radius:4px;font-size:.88rem;line-height:1.5;display:none}
+.dt-followup.show{display:block}
+.dt-final{margin-top:8px;padding:10px 14px;border-radius:4px;font-size:.88rem;line-height:1.5;display:none}
+.dt-final.show{display:block}
+.dt-final.adopt{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+.dt-final.adapt{background:var(--gold-lt);color:#6B4A00;border-left:4px solid var(--gold)}
+.dt-final.create{background:var(--purple-lt);color:#3A1F6B;border-left:4px solid var(--purple)}
+
+/* MATCH GAME */
+.match-layout{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:560px){.match-layout{grid-template-columns:1fr}}
+.match-col h3{font-size:.82rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.match-card{border:2px solid var(--border);border-radius:6px;padding:10px 13px;margin-bottom:8px;cursor:pointer;font-size:.86rem;line-height:1.45;transition:all .15s;background:#fff;text-align:left;width:100%}
+.match-card:hover:not([disabled]):not(.matched){border-color:var(--teal);background:var(--teal-lt)}
+.match-card:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.match-card.selected{border-color:var(--gold);background:var(--gold-lt)}
+.match-card.matched.correct{border-color:var(--teal);background:var(--teal-lt);opacity:.75;cursor:default}
+.match-card.matched.wrong{border-color:var(--red);background:var(--red-lt);opacity:.75;cursor:default}
+.match-card[disabled]{cursor:default}
+.match-fb{background:var(--gray);border-radius:6px;padding:12px 14px;font-size:.88rem;line-height:1.5;margin-bottom:12px;min-height:48px}
+.match-fb.correct{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+.match-fb.wrong{background:var(--red-lt);color:#6B1020;border-left:4px solid var(--red)}
+
+.score-row{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+.score-badge{background:var(--teal);color:#fff;padding:5px 14px;border-radius:20px;font-weight:bold;font-size:.9rem;white-space:nowrap}
+.reset-btn{padding:6px 14px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.88rem;font-weight:bold}
+.reset-btn:hover{background:var(--teal-lt)}.reset-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+<h1>Adopt, Adapt, or Create — and Diagnosing What Went Wrong</h1>
+<p class="subtitle">Work through branching decisions about intervention approach, then match real failure scenarios to the correct limitation type.</p>
+<div class="tabs" role="tablist" aria-label="Tabs">
+  <button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-dt" id="tab-dt" onclick="switchTab('dt')">Part 1: Adopt, Adapt, or Create?</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-match" id="tab-match" onclick="switchTab('match')">Part 2: Match the Limitation</button>
+</div>
+<div class="sr-only" aria-live="polite" aria-atomic="true" id="live"></div>
+
+<div class="tab-panel active" id="panel-dt" role="tabpanel" aria-labelledby="tab-dt">
+  <div class="instructions"><strong>Directions:</strong> Each scenario gives you information about a planning team's situation. Answer the branching questions to arrive at the right approach — Adopt, Adapt, or Create.</div>
+  <div id="dt-container"></div>
+  <div class="score-row">
+    <div class="score-badge" id="dt-score" aria-live="polite">Completed: 0 / 4</div>
+    <button class="reset-btn" onclick="resetDT()">Reset Part 1</button>
+  </div>
+</div>
+
+<div class="tab-panel" id="panel-match" role="tabpanel" aria-labelledby="tab-match">
+  <div class="instructions"><strong>Directions:</strong> Select a failure scenario on the left, then click the matching limitation type on the right. Each scenario has one correct match.</div>
+  <div class="match-fb" id="match-fb" role="alert">Select a failure scenario to begin.</div>
+  <div class="match-layout">
+    <div><h3>Failure Scenarios</h3><div id="match-left"></div></div>
+    <div><h3>Limitation Types</h3><div id="match-right"></div></div>
+  </div>
+  <div class="score-row">
+    <div class="score-badge" id="match-score" aria-live="polite">Matched: 0 / 5</div>
+    <button class="reset-btn" onclick="resetMatch()">Reset Part 2</button>
+  </div>
+</div>
+
+<script>
+// DECISION TREE
+const dtScenarios = [
+  {
+    num:1,
+    text:"A county health department finds a CDC-recommended walking program for adults with arthritis. It has strong evidence from multiple settings, was tested with populations similar to theirs, and their facilities and budget match what the program requires.",
+    q1:"Does sufficient evidence exist and does it match your population and setting?",
+    q1opts:["Yes — strong evidence, similar population, similar resources","No — evidence is weak or the population/setting don't match"],
+    q1branch:[
+      {followup:"Since evidence is strong and context matches, is there any specific element that doesn't fit your situation?", q2opts:["No — everything fits; we can use it as designed","Yes — one or two elements need modification"],
+       q2branch:[
+        {final:"adopt",msg:"Adopt. All five adoption criteria are met: evidence is strong, population is similar, multiple settings, resources match, context matches. Use the program as designed and preserve fidelity."},
+        {final:"adapt",msg:"Adapt. Strong evidence exists, but a specific mismatch (language, cultural context, setting, timing) means a targeted adaptation is needed before implementation."}
+       ]
+      },
+      {followup:"If evidence is weak or context is very different, is there an existing program you could substantially rework?", q2opts:["Yes — a program exists but needs significant reworking","No — nothing suitable exists"],
+       q2branch:[
+        {final:"adapt",msg:"Adapt. The gap between the existing evidence and your context is too large for direct adoption, but substantial reworking can preserve the theoretical core while changing what doesn't fit."},
+        {final:"create",msg:"Create. When no existing intervention adequately fits your population, problem, and context, building something new — grounded in theory and evaluated rigorously — is the right path."}
+       ]
+      }
+    ]
+  },
+  {
+    num:2,
+    text:"A team wants to address postpartum depression among recent Somali immigrant mothers. They find a peer support group model tested entirely with white, English-speaking suburban women. The theoretical model (peer support for postpartum mental health) is sound, but the population and cultural context differ substantially.",
+    q1:"Is there solid evidence for the intervention's core approach?",
+    q1opts:["Yes — the peer support model has good evidence","No — the evidence is very weak"],
+    q1branch:[
+      {followup:"The evidence is solid for the approach — but does the population and context match well enough to adopt as-is?", q2opts:["Yes — close enough to adopt directly","No — language, culture, and context differ too much"],
+       q2branch:[
+        {final:"adopt",msg:"Adopt. If the population and context truly match, you can use the program as designed. But review the scenario again — substantial differences in language, culture, and context usually point to adaptation."},
+        {final:"adapt",msg:"Correct — Adapt. The peer support model has theoretical merit, but language, cultural norms around mental health, and facilitation styles need significant reworking. The core mechanism stays; everything else gets adapted for Somali immigrant mothers."}
+       ]
+      },
+      {followup:"If the evidence is very weak, is there any existing program worth reworking?", q2opts:["Yes — something exists but needs major work","No — nothing relevant exists"],
+       q2branch:[
+        {final:"adapt",msg:"Adapt — cautiously. Even weak evidence from an existing program gives you something to build on, but you will need to treat the adapted version as essentially new and evaluate it rigorously."},
+        {final:"create",msg:"Create. No sufficient evidence and no suitable existing program means you start from scratch — with strong theory, community input, a pilot test, and a built-in evaluation plan."}
+       ]
+      }
+    ]
+  },
+  {
+    num:3,
+    text:"A planning team wants to support LGBTQ+ youth experiencing housing instability. After an extensive search, they find no existing intervention that addresses mental health and housing navigation simultaneously for this specific population.",
+    q1:"Does a suitable evidence-based intervention exist for this population and problem?",
+    q1opts:["Yes — we found something","No — nothing adequately fits this population and problem"],
+    q1branch:[
+      {followup:"If something exists, does it match closely enough to adopt or partially adapt?", q2opts:["Closely enough to adopt","Needs significant changes"],
+       q2branch:[
+        {final:"adopt",msg:"Adopt — if the evidence and fit are truly strong. But recheck: the combination of mental health + housing navigation + LGBTQ+ youth is highly specific. Make sure the evidence actually covers this population."},
+        {final:"adapt",msg:"Adapt. Something exists but the gaps are significant enough to require systematic modification. Preserve the theoretical core, change what doesn't fit, and plan to evaluate the adapted version."}
+       ]
+      },
+      {followup:"Since nothing adequate exists, is there a related approach you could significantly rework?", q2opts:["Yes — a related program could be substantially reworked","No — we need to build from scratch"],
+       q2branch:[
+        {final:"adapt",msg:"Adapt (substantially). Even if no program directly addresses this population, a related evidence-based approach — adapted extensively through community co-design — is better than starting from nothing."},
+        {final:"create",msg:"Create. When the health problem, population, and context together have no existing match, building something new is necessary. Ground it in theory, co-design with the community, pilot it, and evaluate rigorously from the start."}
+       ]
+      }
+    ]
+  },
+  {
+    num:4,
+    text:"A school district finds a strong evidence-based social-emotional learning program for middle schoolers. Population demographics match, evidence is solid across multiple states, and resources align. The only mismatch: the program uses 50-minute class periods and the district uses 40-minute periods.",
+    q1:"Is there strong evidence and good population/context fit overall?",
+    q1opts:["Yes — evidence and fit are strong overall","No — major gaps exist"],
+    q1branch:[
+      {followup:"A single logistical element doesn't fit (session length). Does this one mismatch require rebuilding the whole program?", q2opts:["No — targeted adjustment is enough","Yes — this mismatch changes everything"],
+       q2branch:[
+        {final:"adapt",msg:"Adapt — and only what needs changing. A targeted adaptation to session timing preserves the evidence-based core while fitting the district's schedule. The key is to change the container, not the content, and to protect the program's active ingredients."},
+        {final:"create",msg:"Reconsider. A single scheduling mismatch does not justify building a new program from scratch when strong evidence exists. Targeted adaptation is more appropriate here than full creation."}
+       ]
+      },
+      {followup:"If major gaps exist, is there anything suitable to work from?", q2opts:["Something to rework substantially","Nothing suitable exists"],
+       q2branch:[
+        {final:"adapt",msg:"Adapt. Even with major gaps, an existing program with some evidence gives you a foundation. Systematic adaptation that preserves theoretical mechanisms while changing what doesn't fit is the next step."},
+        {final:"create",msg:"Create. Major gaps and no suitable existing program mean you build from scratch — theoretically grounded, community-informed, piloted, and evaluated."}
+       ]
+      }
+    ]
+  },
+];
+
+let dtState = dtScenarios.map(() => ({q1:null,q2:null,done:false}));
+
+function renderDT(){
+  dtState = dtScenarios.map(()=>({q1:null,q2:null,done:false}));
+  const c=document.getElementById('dt-container');c.innerHTML='';
+  dtScenarios.forEach((s,i)=>{
+    const div=document.createElement('div');div.className='dt-scenario';div.id=`dt-s-${i}`;
+    div.innerHTML=`<div class="dt-s-num">Scenario ${s.num} of ${dtScenarios.length}</div><div class="dt-s-text">${s.text}</div>
+      <div class="dt-question">${s.q1}</div>
+      <div class="dt-options">${s.q1opts.map((o,j)=>`<button class="dt-opt" id="dq1-${i}-${j}" onclick="answerDT(${i},1,${j})">${o}</button>`).join('')}</div>
+      <div class="dt-followup" id="dtf-${i}"></div>
+      <div class="dt-final" id="dtfin-${i}" role="alert"></div>`;
+    c.appendChild(div);
+  });
+  document.getElementById('dt-score').textContent=`Completed: 0 / ${dtScenarios.length}`;
+}
+
+function answerDT(si,step,choice){
+  const s=dtScenarios[si];const state=dtState[si];
+  if(step===1){
+    if(state.q1!==null)return;state.q1=choice;
+    document.getElementById(`dq1-${si}-${choice}`).classList.add('selected');
+    [0,1].forEach(j=>{if(j!==choice)document.getElementById(`dq1-${si}-${j}`).disabled=true;});
+    const branch=s.q1branch[choice];
+    const fup=document.getElementById(`dtf-${si}`);
+    fup.innerHTML=`<div style="font-size:.88rem;font-weight:bold;color:var(--purple);margin-bottom:8px">${branch.followup}</div><div class="dt-options">${branch.q2opts.map((o,j)=>`<button class="dt-opt" id="dq2-${si}-${j}" onclick="answerDT(${si},2,${j})">${o}</button>`).join('')}</div>`;
+    fup.classList.add('show');
+  } else {
+    if(state.q2!==null)return;state.q2=choice;state.done=true;
+    document.getElementById(`dq2-${si}-${choice}`).classList.add('selected');
+    [0,1].forEach(j=>{if(j!==choice){const b=document.getElementById(`dq2-${si}-${j}`);if(b)b.disabled=true;}});
+    const result=dtScenarios[si].q1branch[state.q1].q2branch[choice];
+    const fin=document.getElementById(`dtfin-${si}`);
+    fin.textContent=result.msg;fin.className=`dt-final show ${result.final}`;
+    announce(`Scenario ${si+1}: ${result.final.toUpperCase()}. ${result.msg}`);
+    document.getElementById('dt-score').textContent=`Completed: ${dtState.filter(s=>s.done).length} / ${dtScenarios.length}`;
+  }
+}
+function resetDT(){renderDT();announce('Part 1 reset.');}
+
+// MATCH GAME
+const matchData=[
+  {id:'m1',scenario:"A tobacco cessation app sends daily nudges to quit. Six months later, 80% of participants have deleted the app. Exit interviews reveal the notifications were annoying, the app crashed frequently, and the interface was confusing for older adults.",type:"Technology/engineering limitation",feedback:"Technology must be reliable, easy to use, and acceptable to the people it is designed for. Frequent crashes, confusing design, and unwanted notifications are all technology/engineering failures — not knowledge or policy gaps."},
+  {id:'m2',scenario:"A city passes a no-idling ordinance requiring drivers to turn off engines in school zones. Two years later, idling rates are unchanged. A review shows that 60% of parents are unaware of the law and police have issued zero fines.",type:"Policy/enforcement limitation",feedback:"For policy strategies to change behavior, people must know the rule exists and believe there is a real chance of being caught. Zero enforcement and low awareness eliminate both conditions — making the policy effective in name only."},
+  {id:'m3',scenario:"A worksite offers a one-hour lunch-and-learn on stress management with a handout listing five coping tips. Three months later, employee stress levels and absenteeism are unchanged.",type:"Education-based limitation",feedback:"Education strategies require more than a single session and a handout. People must be exposed, understand, believe the information is relevant, have the resources to act, and be reinforced over time. One hour rarely changes behavior on its own."},
+  {id:'m4',scenario:"A community cancer screening van correctly identifies 88% of people with early-stage cancer as positive — but also flags 22% of cancer-free participants as positive, leading to costly and anxiety-inducing unnecessary follow-up procedures.",type:"Technology/engineering limitation — specificity failure",feedback:"This is a technology/engineering issue specifically related to specificity — the tool's ability to correctly identify true negatives. High false-positive rates mean the tool is not specific enough, causing real harm through unnecessary procedures and anxiety."},
+  {id:'m5',scenario:"A diabetes prevention education program gives participants detailed knowledge of glycemic index, carbohydrate counting, and healthy meal planning. Post-test knowledge scores are excellent. But 70% of participants live in a food desert with no grocery store within 3 miles and report being unable to apply what they learned.",type:"Education-based limitation",feedback:"Knowledge is present but action is blocked by structural barriers — no food access. Education strategies fail when people understand but lack the resources, environment, or support to act. Knowledge alone is not enough when the environment works against change."},
+];
+
+const limTypes=["Technology/engineering limitation","Policy/enforcement limitation","Education-based limitation","Technology/engineering limitation — specificity failure"];
+let selectedScenario=null, matchCount=0, matchCorrect=0;
+let matchedIds=new Set();
+
+function renderMatch(){
+  selectedScenario=null;matchCount=0;matchCorrect=0;matchedIds=new Set();
+  document.getElementById('match-fb').textContent='Select a failure scenario to begin.';
+  document.getElementById('match-fb').className='match-fb';
+
+  const leftOrder=[...matchData].sort(()=>Math.random()-.5);
+  const rightTypes=[...new Set(matchData.map(d=>d.type))].sort(()=>Math.random()-.5);
+
+  const left=document.getElementById('match-left');left.innerHTML='';
+  leftOrder.forEach(d=>{
+    const btn=document.createElement('button');btn.className='match-card';btn.id=`ml-${d.id}`;btn.setAttribute('data-id',d.id);
+    btn.textContent=d.scenario;btn.onclick=()=>selectScenario(d.id);left.appendChild(btn);
+  });
+
+  const right=document.getElementById('match-right');right.innerHTML='';
+  rightTypes.forEach(t=>{
+    const btn=document.createElement('button');btn.className='match-card';btn.id=`mr-${t.replace(/[^a-z]/gi,'_')}`;btn.setAttribute('data-type',t);
+    btn.textContent=t;btn.onclick=()=>selectType(t);right.appendChild(btn);
+  });
+  document.getElementById('match-score').textContent=`Matched: 0 / ${matchData.length}`;
+}
+
+function selectScenario(id){
+  if(document.getElementById(`ml-${id}`).classList.contains('matched'))return;
+  document.querySelectorAll('#match-left .match-card').forEach(b=>b.classList.remove('selected'));
+  selectedScenario=id;
+  document.getElementById(`ml-${id}`).classList.add('selected');
+  announce(`Scenario selected. Now choose a limitation type on the right.`);
+}
+
+function selectType(type){
+  if(!selectedScenario){announce('Select a scenario first.');return;}
+  const d=matchData.find(x=>x.id===selectedScenario);
+  const ok=d.type===type;
+  matchCount++;if(ok)matchCorrect++;
+
+  document.getElementById(`ml-${selectedScenario}`).classList.remove('selected');
+  document.getElementById(`ml-${selectedScenario}`).classList.add('matched',ok?'correct':'wrong');
+  document.getElementById(`ml-${selectedScenario}`).disabled=true;
+
+  matchedIds.add(selectedScenario);
+  // A type stays available until every scenario that uses it has been matched.
+  function refreshType(t){
+    const btn=document.getElementById(`mr-${t.replace(/[^a-z]/gi,'_')}`);
+    if(!btn)return;
+    const remaining=matchData.filter(x=>x.type===t&&!matchedIds.has(x.id)).length;
+    if(remaining===0){btn.classList.add('matched','correct');btn.disabled=true;}
+  }
+  if(!ok){
+    const wrongBtn=document.getElementById(`mr-${type.replace(/[^a-z]/gi,'_')}`);
+    if(wrongBtn){wrongBtn.classList.add('wrong');setTimeout(()=>wrongBtn.classList.remove('wrong'),900);}
+  }
+  refreshType(type); refreshType(d.type);
+
+  const fb=document.getElementById('match-fb');
+  fb.textContent=ok?`✓ Correct! ${d.feedback}`:`✗ Not quite. "${d.scenario.substring(0,60)}..." matches "${d.type}". ${d.feedback}`;
+  fb.className=`match-fb ${ok?'correct':'wrong'}`;
+  announce(fb.textContent);
+  selectedScenario=null;
+  document.getElementById('match-score').textContent=`Matched: ${matchCorrect} / ${matchData.length}`;
+}
+
+function resetMatch(){renderMatch();announce('Part 2 reset.');}
+function switchTab(t){['dt','match'].forEach(x=>{document.getElementById(`panel-${x}`).classList.toggle('active',x===t);document.getElementById(`tab-${x}`).setAttribute('aria-selected',x===t?'true':'false');});}
+function announce(msg){const el=document.getElementById('live');el.textContent='';setTimeout(()=>{el.textContent=msg;},50);}
+renderDT();renderMatch();
+</script>
+</body>
+</html>
