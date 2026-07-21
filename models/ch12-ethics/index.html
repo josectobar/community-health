@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CH12 Widget 6: Ethics and Sustainability</title>
+<style>
+:root{color-scheme:light;--teal:#1A6B72;--teal-lt:#D6ECED;--gold:#B07D2A;--gold-lt:#FEF3DC;--purple:#5B3A8E;--purple-lt:#EDE6F7;--red:#9B2335;--red-lt:#FBDDE0;--border:#CCC;--gray:#F4F4F4;--text:#1A1A1A;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;font-size:15px;color:var(--text);background:#fff;padding:20px;max-width:900px;margin:0 auto}
+h1{font-size:1.3rem;color:var(--teal);border-bottom:3px solid var(--teal);padding-bottom:8px;margin-bottom:6px}
+.subtitle{font-size:.88rem;color:#555;margin-bottom:20px}
+.tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.tab-btn{padding:8px 18px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.9rem;font-weight:bold}
+.tab-btn:hover{background:var(--teal-lt)}.tab-btn[aria-selected="true"]{background:var(--teal);color:#fff}
+.tab-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.instructions{background:var(--teal-lt);border-left:4px solid var(--teal);padding:12px 16px;border-radius:4px;margin-bottom:16px;font-size:.9rem}
+.instructions strong{color:var(--teal)}
+
+/* ETHICS — two-step: spot the problem then recommend action */
+.eth-card{border:1px solid var(--border);border-radius:6px;margin-bottom:22px;overflow:hidden}
+.eth-header{background:var(--gray);padding:14px 16px;border-bottom:1px solid var(--border)}
+.eth-num{font-size:.76rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.eth-text{font-size:.93rem;line-height:1.6}
+.eth-step{padding:12px 16px;border-top:1px solid var(--border)}
+.eth-q{font-size:.88rem;font-weight:bold;color:var(--gold);margin-bottom:8px}
+.eth-opts{display:flex;flex-direction:column;gap:7px}
+.eth-opt{padding:9px 14px;border:2px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:.87rem;line-height:1.4;text-align:left;transition:all .15s;color:var(--text)}
+.eth-opt:hover:not([disabled]){border-color:var(--teal);background:var(--teal-lt)}
+.eth-opt:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.eth-opt.correct{border-color:var(--teal);background:var(--teal-lt);color:var(--teal);font-weight:bold}.eth-opt.correct::after{content:" ✓"}
+.eth-opt.wrong{border-color:var(--red);background:var(--red-lt);color:var(--red)}.eth-opt.wrong::after{content:" ✗"}
+.eth-opt[disabled]{cursor:default}
+.eth-fb{margin-top:8px;padding:10px 14px;border-radius:4px;font-size:.88rem;line-height:1.5;display:none}
+.eth-fb.show{display:block}
+.eth-fb.correct{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+.eth-fb.wrong{background:var(--red-lt);color:#6B1020;border-left:4px solid var(--red)}
+.eth-step2{display:none;border-top:1px solid var(--border);padding:12px 16px}
+.eth-step2.show{display:block}
+.eth-step2 .eth-opts{display:flex;flex-direction:column;gap:7px}
+
+/* SUSTAINABILITY SELF-ASSESSMENT */
+.sust-intro{background:var(--gray);border:1px solid var(--border);border-radius:6px;padding:14px;margin-bottom:14px;font-size:.92rem;line-height:1.6}
+.sust-intro strong{color:var(--teal)}
+.sust-domain{border:1px solid var(--border);border-radius:6px;margin-bottom:14px;overflow:hidden}
+.sust-domain-header{padding:10px 14px;font-weight:bold;font-size:.9rem;color:#fff;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.sust-domain-header .toggle{font-size:1rem;transition:transform .2s}
+.sust-domain.open .toggle{transform:rotate(180deg)}
+.sust-domain-body{display:none;padding:12px 14px;border-top:1px solid var(--border)}
+.sust-domain.open .sust-domain-body{display:block}
+.sust-rating{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.sust-rating label{font-size:.88rem;font-weight:bold;color:var(--text);min-width:80px}
+.rating-btns{display:flex;gap:6px}
+.r-btn{padding:5px 12px;border:2px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:.84rem;font-weight:bold;transition:all .15s;color:var(--text)}
+.r-btn:hover{border-color:var(--teal);background:var(--teal-lt)}
+.r-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.r-btn.r1.active{background:#FBDDE0;border-color:var(--red);color:var(--red)}
+.r-btn.r2.active{background:#FEF3DC;border-color:var(--gold);color:var(--gold)}
+.r-btn.r3.active{background:var(--teal-lt);border-color:var(--teal);color:var(--teal)}
+.sust-q{font-size:.87rem;line-height:1.5;color:#333;margin-bottom:10px}
+.sust-tip{font-size:.82rem;color:#555;font-style:italic;background:#fafafa;padding:6px 10px;border-radius:4px;border-left:3px solid var(--border)}
+.sust-summary{margin-top:16px;padding:14px;border-radius:6px;border:1px solid var(--border);display:none}
+.sust-summary.show{display:block}
+.sust-summary h3{font-size:.95rem;font-weight:bold;color:var(--teal);margin-bottom:10px}
+.sust-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.sust-bar-label{font-size:.82rem;min-width:140px;color:var(--text)}
+.sust-bar-track{flex:1;background:#eee;border-radius:4px;height:14px;overflow:hidden}
+.sust-bar-fill{height:100%;border-radius:4px;transition:width .4s}
+.sust-overall{margin-top:12px;padding:10px 14px;border-radius:4px;font-size:.88rem;font-weight:bold}
+.sust-btn{margin-top:12px;padding:9px 20px;background:var(--teal);color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:.9rem;font-weight:bold}
+.sust-btn:hover{background:#145a60}.sust-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+.score-row{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+.score-badge{background:var(--teal);color:#fff;padding:5px 14px;border-radius:20px;font-weight:bold;font-size:.9rem;white-space:nowrap}
+.reset-btn{padding:6px 14px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.88rem;font-weight:bold}
+.reset-btn:hover{background:var(--teal-lt)}.reset-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+<h1>Ethics, Legal Responsibility, and Sustainability</h1>
+<p class="subtitle">Work through ethical dilemmas in two steps, then apply a sustainability self-assessment to a real program scenario.</p>
+<div class="tabs" role="tablist" aria-label="Tabs">
+  <button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-eth" id="tab-eth" onclick="switchTab('eth')">Part 1: Ethical Dilemmas</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-sust" id="tab-sust" onclick="switchTab('sust')">Part 2: Sustainability Check</button>
+</div>
+<div class="sr-only" aria-live="polite" aria-atomic="true" id="live"></div>
+
+<div class="tab-panel active" id="panel-eth" role="tabpanel" aria-labelledby="tab-eth">
+  <div class="instructions"><strong>Directions:</strong> Each scenario presents an ethical situation. First, identify which principle is most at stake. Then answer a follow-up question about what the right action is.</div>
+  <div id="eth-container"></div>
+  <div class="score-row">
+    <div class="score-badge" id="eth-score" aria-live="polite">Completed: 0 / 4</div>
+    <button class="reset-btn" onclick="resetEth()">Reset Part 1</button>
+  </div>
+</div>
+
+<div class="tab-panel" id="panel-sust" role="tabpanel" aria-labelledby="tab-sust">
+  <div class="instructions"><strong>Directions:</strong> A community health coalition has been running a diabetes prevention program for two years on a single federal grant ending in 6 months. Rate each sustainability domain for this program, then click Generate Assessment to see the overall picture and key action areas.</div>
+  <div class="sust-intro"><strong>Program context:</strong> A 3-year federal grant funds staff salaries, supplies, and site costs. The program serves 120 participants per year at 3 community sites. A local hospital is a partner. Community members love the program. No plan for post-grant funding exists. The lead organization is small with limited administrative capacity. Evaluation data shows strong outcomes.</div>
+  <div id="sust-domains"></div>
+  <button class="sust-btn" onclick="generateSustAssessment()">Generate Sustainability Assessment</button>
+  <div class="sust-summary" id="sust-summary" role="region" aria-label="Sustainability assessment results"></div>
+</div>
+
+<script>
+const ethScenarios=[
+  {
+    num:1,
+    text:"A worksite wellness program requires employees to complete biometric screenings to receive a 15% reduction in their health insurance premium. Employees who decline the screening pay higher premiums. Several employees object that they do not want to share health data with their employer, but feel financially unable to refuse.",
+    q1:"Which ethical principle is most directly at stake?",
+    q1opts:["Beneficence — the program risks harming employees","Respect for Persons — the financial penalty creates economic coercion that undermines genuinely voluntary participation","Justice — the premium reduction is distributed unfairly across income levels","All three equally"],
+    q1correct:1,
+    q1fb_correct:"Respect for Persons. Autonomy — the right to make one's own decisions without coercion — is the core issue. When a financial penalty makes refusal feel impossible for lower-wage employees, participation is no longer truly voluntary. This compromises the ethical foundation of informed consent.",
+    q1fb_wrong:"The financial pressure is the clue. Employees 'feel financially unable to refuse' — that describes coercion, which directly violates the autonomy component of Respect for Persons.",
+    q2:"What is the most ethically sound response?",
+    q2opts:["Keep the policy — it incentivizes healthy behavior","Make screening participation voluntary and offer the same premium reduction for other wellness activities","Remove all financial incentives from the wellness program","Report the program to the health department"],
+    q2correct:1,
+    q2fb_correct:"Making participation voluntary and offering alternative pathways to the premium benefit removes the coercive element while preserving the wellness goal. It honors employee autonomy without abandoning the program's purpose.",
+    q2fb_wrong:"Keeping coercive elements intact violates the principle of Respect for Persons. Removing all incentives is unnecessary — the goal is to make participation genuinely voluntary. Voluntariness, not the incentive itself, is the ethical requirement."
+  },
+  {
+    num:2,
+    text:"A diabetes education program discovers that its printed materials contain a medication dosing error — advising a dose that could be dangerous for participants with kidney disease. The materials have been distributed to 180 participants. The program director considers not correcting the error to avoid embarrassment and potential liability.",
+    q1:"Which principle most directly demands immediate action?",
+    q1opts:["Justice — participants are being treated unfairly","Respect for Persons — participants need accurate information to make informed decisions","Beneficence/non-maleficence — participants may be harmed by acting on the incorrect information; withholding correction could cause real injury","All three equally"],
+    q1correct:2,
+    q1fb_correct:"Beneficence and non-maleficence. The obligation to avoid harm is the most urgent principle here. Participants with kidney disease may be at direct risk if they follow the incorrect dosing. Choosing organizational reputation over participant safety is an explicit ethical violation.",
+    q1fb_wrong:"All three principles matter, but the most urgent is preventing harm. People may be taking a dangerous dose right now. The obligation to do good and avoid harm (Beneficence/non-maleficence) demands immediate correction.",
+    q2:"What must the program do?",
+    q2opts:["Wait to see if anyone reports a problem before acting","Notify affected participants immediately, provide corrected information, and document what happened","Quietly update future materials without notifying current participants","Consult a lawyer before notifying anyone"],
+    q2correct:1,
+    q2fb_correct:"Immediate notification and correction is required. Waiting is not an ethical option when participants may be actively harming themselves. Documentation protects the program and demonstrates responsible practice. Transparency, even when uncomfortable, is the ethical path.",
+    q2fb_wrong:"Waiting or staying quiet while participants may be following a dangerous instruction is not ethically defensible. Beneficence demands immediate action: notify, correct, document."
+  },
+  {
+    num:3,
+    text:"A free community health screening program is available at three locations. Two are in well-resourced neighborhoods with easy parking and extended hours. The third serves the neighborhood with the highest disease burden but offers only two hours on a Tuesday morning — when most working residents cannot attend — and has no interpreter services despite a majority Spanish-speaking population.",
+    q1:"Which principle is most at stake?",
+    q1opts:["Beneficence — the program isn't helping the highest-need community","Respect for Persons — residents' autonomy is limited by practical barriers","Justice — program benefits are not distributed equitably; the community with the most need is receiving the least accessible service","Technology/engineering limitation — the program needs better scheduling software"],
+    q1correct:2,
+    q1fb_correct:"Justice. The principle of justice requires equitable distribution of program benefits. When structural decisions — location hours, interpreter services — systematically disadvantage the community with the greatest need, the program is unjust regardless of intent.",
+    q1fb_wrong:"The problem isn't knowledge or technology — it's structural inequity. The community with the most health need receives the hardest-to-access service. Fairness in how program benefits are distributed is the domain of Justice.",
+    q2:"What change would most directly address the justice concern?",
+    q2opts:["Add Spanish-language materials at all three sites","Provide interpreter services and expand hours at the highest-need site to match access offered at the other locations","Close the two well-resourced sites and consolidate at the highest-need location","Add a fourth site in a different neighborhood"],
+    q2correct:1,
+    q2fb_correct:"Providing interpreter services and expanding hours at the highest-need site directly addresses the access inequity. Justice doesn't require identical services everywhere — it requires that access is equitable relative to need. The community with the highest burden deserves the most accessible service.",
+    q2fb_wrong:"Adding materials alone doesn't solve the scheduling barrier. Closing other sites reduces total reach. The justice-centered solution is to bring the service level at the highest-need site up to match the others — or beyond, given the greater need."
+  },
+  {
+    num:4,
+    text:"A volunteer at a teen sexual health program overhears a 16-year-old participant tell a friend that she is being pressured by an older boyfriend for sex and is scared. The volunteer is uncertain whether this rises to a mandatory reporting threshold and considers ignoring it to 'stay in their lane.'",
+    q1:"Which principle most clearly applies here?",
+    q1opts:["Justice — the teen is not being treated fairly","Beneficence — the obligation to protect a participant from potential harm applies regardless of mandatory reporting thresholds","Respect for Persons — the volunteer should respect the teen's privacy and not act","None — this is a legal issue, not an ethical one"],
+    q1correct:1,
+    q1fb_correct:"Beneficence. The obligation to protect a participant from harm doesn't start and stop at mandatory reporting thresholds. A program working with minors has an affirmative duty to ensure participant safety. Actively choosing to ignore a potential safety concern is a failure of beneficence.",
+    q1fb_wrong:"Privacy and legal status are real considerations, but they don't override the obligation to act when a minor may be at risk. Beneficence — doing good and avoiding harm — applies here regardless of whether mandatory reporting is technically triggered.",
+    q2:"What is the appropriate next step for the volunteer?",
+    q2opts:["Do nothing — it is not their responsibility","Immediately confront the boyfriend","Report what was overheard to the program supervisor or designated protection officer so it can be assessed by someone with appropriate authority and training","Ask the teen directly in front of the group what is happening"],
+    q2correct:2,
+    q2fb_correct:"Escalating to a supervisor or protection officer is the right move. Volunteers should not investigate or confront on their own — but they should not stay silent either. Bringing information to someone with appropriate authority and training is how programs protect participants while respecting role boundaries.",
+    q2fb_wrong:"Doing nothing leaves a potentially at-risk minor without support. Confronting the boyfriend independently is outside the volunteer's role. Asking publicly would be harmful. The appropriate path is to bring what was heard to the supervisor immediately."
+  },
+];
+
+let ethState=ethScenarios.map(()=>({step1done:false,step2done:false,done:false}));
+
+function renderEth(){
+  ethState=ethScenarios.map(()=>({step1done:false,step2done:false,done:false}));
+  const c=document.getElementById('eth-container');c.innerHTML='';
+  ethScenarios.forEach((s,i)=>{
+    const div=document.createElement('div');div.className='eth-card';
+    div.innerHTML=`<div class="eth-header"><div class="eth-num">Scenario ${s.num} of ${ethScenarios.length}</div><div class="eth-text">${s.text}</div></div>
+      <div class="eth-step">
+        <div class="eth-q">Step 1: ${s.q1}</div>
+        <fieldset style="border:none;padding:0;margin:0"><legend class="sr-only">Step 1 for scenario ${i+1}</legend>
+          <div class="eth-opts">${s.q1opts.map((o,j)=>`<button class="eth-opt" id="e1-${i}-${j}" onclick="answerEth(${i},1,${j})">${o}</button>`).join('')}</div>
+        </fieldset>
+        <div class="eth-fb" id="e1fb-${i}" role="alert"></div>
+      </div>
+      <div class="eth-step2" id="estep2-${i}">
+        <div class="eth-q">Step 2: ${s.q2}</div>
+        <fieldset style="border:none;padding:0;margin:0"><legend class="sr-only">Step 2 for scenario ${i+1}</legend>
+          <div class="eth-opts">${s.q2opts.map((o,j)=>`<button class="eth-opt" id="e2-${i}-${j}" onclick="answerEth(${i},2,${j})">${o}</button>`).join('')}</div>
+        </fieldset>
+        <div class="eth-fb" id="e2fb-${i}" role="alert"></div>
+      </div>`;
+    c.appendChild(div);
+  });
+  document.getElementById('eth-score').textContent=`Completed: 0 / ${ethScenarios.length}`;
+}
+
+function answerEth(si,step,choice){
+  const s=ethScenarios[si];const state=ethState[si];
+  if(step===1){
+    if(state.step1done)return;state.step1done=true;
+    const ok=choice===s.q1correct;
+    s.q1opts.forEach((_,j)=>{const b=document.getElementById(`e1-${si}-${j}`);b.disabled=true;if(j===choice)b.classList.add(ok?'correct':'wrong');if(!ok&&j===s.q1correct)b.classList.add('correct');});
+    const fb=document.getElementById(`e1fb-${si}`);
+    fb.textContent=ok?`✓ ${s.q1fb_correct}`:`✗ ${s.q1fb_wrong}`;fb.className=`eth-fb show ${ok?'correct':'wrong'}`;
+    document.getElementById(`estep2-${si}`).classList.add('show');
+    announce(`Scenario ${si+1} Step 1: ${ok?'Correct':'Incorrect'}.`);
+  } else {
+    if(state.step2done)return;state.step2done=true;state.done=true;
+    const ok=choice===s.q2correct;
+    s.q2opts.forEach((_,j)=>{const b=document.getElementById(`e2-${si}-${j}`);b.disabled=true;if(j===choice)b.classList.add(ok?'correct':'wrong');if(!ok&&j===s.q2correct)b.classList.add('correct');});
+    const fb=document.getElementById(`e2fb-${si}`);
+    fb.textContent=ok?`✓ ${s.q2fb_correct}`:`✗ ${s.q2fb_wrong}`;fb.className=`eth-fb show ${ok?'correct':'wrong'}`;
+    announce(`Scenario ${si+1} Step 2: ${ok?'Correct':'Incorrect'}.`);
+    document.getElementById('eth-score').textContent=`Completed: ${ethState.filter(s=>s.done).length} / ${ethScenarios.length}`;
+  }
+}
+function resetEth(){renderEth();announce('Part 1 reset.');}
+
+// SUSTAINABILITY SELF-ASSESSMENT
+const sustDomains=[
+  {id:'political',label:'Political Support',color:'#1A6B72',q:'Do decision-makers and organizational leaders actively champion this program?',tip:'This program has community support but no identified internal champion who can advocate for continued funding.'},
+  {id:'stakeholder',label:'Stakeholder Engagement',color:'#2A8A6B',q:'Are community members and partners actively invested in the program continuing?',tip:'Community members love the program and the hospital partner is engaged — stakeholder engagement is a strength.'},
+  {id:'funding',label:'Financial Planning',color:'#B07D2A',q:'Does the program have a diversified funding plan beyond the current grant?',tip:'No post-grant funding plan exists. This is the most critical vulnerability for this program right now.'},
+  {id:'capacity',label:'Organizational Capacity',color:'#5B3A8E',q:'Does the organization have the infrastructure and staffing capacity to sustain the program?',tip:'The lead organization is small with limited administrative capacity — a real risk to sustainability.'},
+  {id:'evaluation',label:'Program Evaluation',color:'#1A3F6B',q:'Is there ongoing evidence that the program produces meaningful outcomes?',tip:'Strong outcome data exists — this is a real asset for making the case to future funders.'},
+  {id:'communications',label:'Communications',color:'#9B2335',q:'Is there a clear, compelling narrative about the program\'s value that reaches key audiences?',tip:'Community love for the program is strong, but whether that has been documented and communicated to potential funders is unclear.'},
+];
+
+const ratings={};
+function renderSustDomains(){
+  const c=document.getElementById('sust-domains');c.innerHTML='';
+  sustDomains.forEach(d=>{
+    ratings[d.id]=null;
+    const div=document.createElement('div');div.className='sust-domain';
+    div.innerHTML=`<div class="sust-domain-header" style="background:${d.color}" onclick="toggleDomain(this)" role="button" tabindex="0" aria-expanded="false">
+        <span>${d.label}</span><span class="toggle" aria-hidden="true">▼</span>
+      </div>
+      <div class="sust-domain-body">
+        <div class="sust-q">${d.q}</div>
+        <div class="sust-rating">
+          <label>Strength:</label>
+          <div class="rating-btns" role="group" aria-label="Rate ${d.label}">
+            <button class="r-btn r1" id="r-${d.id}-1" onclick="setRating('${d.id}',1)">Weak</button>
+            <button class="r-btn r2" id="r-${d.id}-2" onclick="setRating('${d.id}',2)">Moderate</button>
+            <button class="r-btn r3" id="r-${d.id}-3" onclick="setRating('${d.id}',3)">Strong</button>
+          </div>
+        </div>
+        <div class="sust-tip">💡 ${d.tip}</div>
+      </div>`;
+    c.appendChild(div);
+  });
+  document.getElementById('sust-summary').classList.remove('show');
+}
+
+function toggleDomain(header){
+  const domain=header.closest('.sust-domain');
+  domain.classList.toggle('open');
+  header.setAttribute('aria-expanded',domain.classList.contains('open')?'true':'false');
+}
+
+function setRating(id,val){
+  ratings[id]=val;
+  [1,2,3].forEach(v=>{const b=document.getElementById(`r-${id}-${v}`);b.classList.toggle(`r${v}`,false);b.classList.toggle('active',false);});
+  const btn=document.getElementById(`r-${id}-${val}`);btn.classList.add(`r${val}`,'active');
+}
+
+function generateSustAssessment(){
+  const unrated=sustDomains.filter(d=>ratings[d.id]===null);
+  if(unrated.length>0){
+    alert(`Please rate all 6 domains first. Missing: ${unrated.map(d=>d.label).join(', ')}`);return;
+  }
+  const summary=document.getElementById('sust-summary');
+  const total=Object.values(ratings).reduce((a,b)=>a+b,0);
+  const max=sustDomains.length*3;
+  const pct=Math.round((total/max)*100);
+  let overall='';let color='';
+  if(pct>=80){overall='Strong sustainability foundation — keep building partnerships and funding diversification.';color=var_teal;}
+  else if(pct>=55){overall='Moderate sustainability capacity — key gaps need attention before the grant ends.';color=var_gold;}
+  else{overall='Significant sustainability risks — immediate planning is needed to prevent program loss at grant end.';color='#9B2335';}
+
+  const bars=sustDomains.map(d=>{
+    const r=ratings[d.id];const pct2=Math.round((r/3)*100);
+    const barColor=r===1?'#9B2335':r===2?'#B07D2A':'#1A6B72';
+    return `<div class="sust-bar-row"><div class="sust-bar-label">${d.label}</div><div class="sust-bar-track"><div class="sust-bar-fill" style="width:${pct2}%;background:${barColor}"></div></div><span style="font-size:.82rem;min-width:28px">${r===1?'Weak':r===2?'Moderate':'Strong'}</span></div>`;
+  }).join('');
+
+  const weakDomains=sustDomains.filter(d=>ratings[d.id]===1).map(d=>d.label);
+  const actionText=weakDomains.length>0?`<div style="margin-top:10px;padding:10px 14px;background:#FBDDE0;border-radius:4px;font-size:.87rem;color:#6B1020;border-left:4px solid #9B2335"><strong>Priority actions needed:</strong> ${weakDomains.join(', ')}. These are the most urgent gaps for this program's sustainability.</div>`:'';
+
+  summary.innerHTML=`<h3>Sustainability Assessment — Overall: ${pct}%</h3>${bars}
+    <div class="sust-overall" style="background:${pct>=80?'var(--teal-lt)':pct>=55?'var(--gold-lt)':'#FBDDE0'};color:${pct>=80?'#0F4A4F':pct>=55?'#6B4A00':'#6B1020'};border-left:4px solid ${pct>=80?'#1A6B72':pct>=55?'#B07D2A':'#9B2335'}">${overall}</div>
+    ${actionText}
+    <p style="margin-top:10px;font-size:.85rem;color:#555">For this specific program, Financial Planning is the most critical gap — with no post-grant plan and 6 months remaining, this should be the immediate focus regardless of other domain ratings.</p>`;
+  summary.classList.add('show');
+  announce(`Assessment generated. Overall sustainability: ${pct}%. ${overall}`);
+}
+
+function switchTab(t){['eth','sust'].forEach(x=>{document.getElementById(`panel-${x}`).classList.toggle('active',x===t);document.getElementById(`tab-${x}`).setAttribute('aria-selected',x===t?'true':'false');});}
+function announce(msg){const el=document.getElementById('live');el.textContent='';setTimeout(()=>{el.textContent=msg;},50);}
+const var_teal='#1A6B72';const var_gold='#B07D2A';
+renderEth();renderSustDomains();
+</script>
+</body>
+</html>
