@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Segmentation and the Marketing Mix</title>
+<style>
+  :root{
+    color-scheme: light;
+    --teal:#1A6B72;--teal-lt:#D6ECED;--gold:#B07D2A;--gold-lt:#FEF3DC;
+    --purple:#5B3A8E;--purple-lt:#EDE6F7;--red:#9B2335;--red-lt:#FBDDE0;
+    --border:#CCCCCC;--gray:#F4F4F4;--text:#1A1A1A;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,sans-serif;font-size:15px;color:var(--text);background:#fff;padding:20px;max-width:860px;margin:0 auto}
+  h1{font-size:1.3rem;color:var(--teal);border-bottom:3px solid var(--teal);padding-bottom:8px;margin-bottom:6px}
+  .subtitle{font-size:.88rem;color:#555;margin-bottom:20px}
+  .tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+  .tab-btn{padding:8px 18px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.9rem;font-weight:bold}
+  .tab-btn:hover{background:var(--teal-lt)}
+  .tab-btn[aria-selected="true"]{background:var(--teal);color:#fff}
+  .tab-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .tab-panel{display:none}.tab-panel.active{display:block}
+  .instructions{background:var(--teal-lt);border-left:4px solid var(--teal);padding:12px 16px;border-radius:4px;margin-bottom:20px;font-size:.9rem}
+  .instructions strong{color:var(--teal)}
+
+  /* SEGMENT EVALUATOR */
+  .seg-card{border:1px solid var(--border);border-radius:6px;margin-bottom:22px;overflow:hidden}
+  .seg-header{background:var(--gray);padding:14px 16px;border-bottom:1px solid var(--border)}
+  .seg-num{font-size:.78rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+  .seg-text{font-size:.95rem;line-height:1.6}
+  .seg-prompt{padding:10px 16px;background:var(--gold-lt);font-size:.88rem;font-weight:bold;color:var(--gold);border-bottom:1px solid var(--border)}
+  .seg-choices{padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+  .seg-btn{padding:9px 14px;border:2px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:.88rem;line-height:1.4;text-align:left;transition:all .15s;color:var(--text)}
+  .seg-btn:hover:not([disabled]){border-color:var(--teal);background:var(--teal-lt)}
+  .seg-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .seg-btn.correct{border-color:var(--teal);background:var(--teal-lt);color:var(--teal);font-weight:bold}
+  .seg-btn.correct::after{content:" ✓"}
+  .seg-btn.wrong{border-color:var(--red);background:var(--red-lt);color:var(--red)}
+  .seg-btn.wrong::after{content:" ✗"}
+  .seg-btn[disabled]{cursor:default}
+  .seg-feedback{margin:0 16px 14px;padding:10px 14px;border-radius:4px;font-size:.88rem;line-height:1.5;display:none}
+  .seg-feedback.show{display:block}
+  .seg-feedback.correct{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+  .seg-feedback.wrong{background:var(--red-lt);color:#6B1020;border-left:4px solid var(--red)}
+
+  /* 4Ps SPOTTER */
+  .p-card{border:1px solid var(--border);border-radius:6px;margin-bottom:22px;overflow:hidden}
+  .p-header{background:var(--gray);padding:14px 16px;border-bottom:1px solid var(--border)}
+  .p-num{font-size:.78rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+  .p-text{font-size:.95rem;line-height:1.6}
+  .p-prompt{padding:10px 16px;background:var(--gold-lt);font-size:.88rem;font-weight:bold;color:var(--gold);border-bottom:1px solid var(--border)}
+  .p-choices{padding:14px 16px;display:flex;gap:8px;flex-wrap:wrap}
+  .p-btn{padding:9px 16px;border:2px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:.9rem;font-weight:bold;transition:all .15s;color:var(--text)}
+  .p-btn:hover:not([disabled]){border-color:var(--teal);background:var(--teal-lt)}
+  .p-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .p-btn.correct{border-color:var(--teal);background:var(--teal-lt);color:var(--teal)}
+  .p-btn.correct::after{content:" ✓"}
+  .p-btn.wrong{border-color:var(--red);background:var(--red-lt);color:var(--red)}
+  .p-btn.wrong::after{content:" ✗"}
+  .p-btn[disabled]{cursor:default}
+  .p-feedback{margin:0 16px 14px;padding:10px 14px;border-radius:4px;font-size:.88rem;line-height:1.5;display:none}
+  .p-feedback.show{display:block}
+  .p-feedback.correct{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+  .p-feedback.wrong{background:var(--red-lt);color:#6B1020;border-left:4px solid var(--red)}
+
+  .score-row{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+  .score-badge{background:var(--teal);color:#fff;padding:5px 14px;border-radius:20px;font-weight:bold;font-size:.9rem;white-space:nowrap}
+  .reset-btn{padding:6px 14px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.88rem;font-weight:bold}
+  .reset-btn:hover{background:var(--teal-lt)}
+  .reset-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+<h1>Segmentation and the Marketing Mix: Applied Practice</h1>
+<p class="subtitle">Evaluate segment quality using the five criteria, then identify which of the 4 Ps is at work in real program decisions.</p>
+
+<div class="tabs" role="tablist" aria-label="Activity tabs">
+  <button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-seg" id="tab-seg" onclick="switchTab('seg')">Part 1: Segment Evaluator</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-4p" id="tab-4p" onclick="switchTab('4p')">Part 2: Spot the P</button>
+</div>
+<div class="sr-only" aria-live="polite" aria-atomic="true" id="live"></div>
+
+<!-- PART 1 -->
+<div class="tab-panel active" id="panel-seg" role="tabpanel" aria-labelledby="tab-seg">
+  <div class="instructions">
+    <strong>Directions:</strong> Each scenario describes a problem a planning team is having with their chosen segment. Identify which of the five segment quality criteria (Measurable, Substantial, Accessible, Differentiable, Actionable) is being violated.
+  </div>
+  <div id="seg-container"></div>
+  <div class="score-row">
+    <div class="score-badge" id="seg-score" aria-live="polite">Score: 0 / 5</div>
+    <button class="reset-btn" onclick="resetSeg()">Reset Part 1</button>
+  </div>
+</div>
+
+<!-- PART 2 -->
+<div class="tab-panel" id="panel-4p" role="tabpanel" aria-labelledby="tab-4p">
+  <div class="instructions">
+    <strong>Directions:</strong> Each scenario describes a specific decision a health program planning team is making. Identify which of the 4 Ps — Product, Price, Place, or Promotion — that decision belongs to.
+  </div>
+  <div id="fourp-container"></div>
+  <div class="score-row">
+    <div class="score-badge" id="fourp-score" aria-live="polite">Score: 0 / 8</div>
+    <button class="reset-btn" onclick="resetFourP()">Reset Part 2</button>
+  </div>
+</div>
+
+<script>
+const segData = [
+  {
+    text:"A planning team wants to target 'people who feel vaguely stressed sometimes' as their segment for a mental health promotion program. When they try to identify how many people fit this description or find data about them, they realize there is no way to measure or count this group.",
+    prompt:"Which segment quality criterion is this segment failing?",
+    options:["Measurable","Substantial","Accessible","Differentiable","Actionable"],
+    correct:0,
+    feedback:"Measurable. A segment must be defined by characteristics you can actually measure. 'Vaguely stressed sometimes' is too subjective and undefined to quantify. A better-defined segment — such as adults with a PHQ-4 score above a threshold, or adults reporting 3+ stressors in the past month — would be measurable.",
+    wrongFeedback:"The problem here is not size, reach, or program capacity — it is that the team cannot measure or count the people in this group. When you cannot measure a segment's defining characteristic, you cannot study it, track it, or reach it deliberately. That is a measurability problem."
+  },
+  {
+    text:"A rural health coalition identifies a highly specific segment: left-handed adults over age 80 who live alone and have a diagnosed fear of needles. They want to design a vaccination outreach program for this group. Their county has four people who meet all these criteria.",
+    prompt:"Which criterion is most clearly not being met?",
+    options:["Measurable","Substantial","Accessible","Differentiable","Actionable"],
+    correct:1,
+    feedback:"Substantial. A segment must be large enough to justify designing and delivering a program specifically for it. A segment of four people in an entire county does not meet this threshold. The team should broaden their segment — perhaps to all adults over 80 with needle anxiety, or all homebound elderly adults — to make the effort worthwhile.",
+    wrongFeedback:"This segment is actually measurable and probably reachable. The issue is scale: four people does not justify the time, money, and resources required to design a dedicated program. A segment needs to be large enough to make that investment worthwhile — that is the substantiality criterion."
+  },
+  {
+    text:"A program team identifies undocumented farmworkers in a rural county as their target segment for a heat illness prevention program. When they try to recruit participants, they find they have no way to reach this population — no contact lists exist, no organizations serve them, and community members are not willing to engage with an unfamiliar organization.",
+    prompt:"Which criterion is failing here?",
+    options:["Measurable","Substantial","Accessible","Differentiable","Actionable"],
+    correct:2,
+    feedback:"Accessible. Even a well-defined and sizeable segment is not useful if you cannot reach them through available channels. This team needs to first build trust and community partnerships before this segment becomes accessible — perhaps through a community health worker with existing relationships in the farmworker community.",
+    wrongFeedback:"The segment exists and is large enough — the problem is that the team has no pathway to reach them. When you cannot connect with your intended segment through any available channel, accessibility is the criterion being violated."
+  },
+  {
+    text:"A health team defines two segments for their physical activity program: 'adults who do not currently exercise' and 'adults who do not exercise regularly.' After reviewing their formative research, they realize these two groups have nearly identical characteristics, motivations, and barriers — and would respond to exactly the same program design.",
+    prompt:"Which criterion suggests these should not be treated as separate segments?",
+    options:["Measurable","Substantial","Accessible","Differentiable","Actionable"],
+    correct:3,
+    feedback:"Differentiable. For two segments to be worth treating separately, they must be meaningfully different in ways that would lead to different program strategies. If both groups share the same characteristics and would respond to the same approach, separating them adds complexity without adding value.",
+    wrongFeedback:"Both segments are measurable, large, reachable, and could be served — the issue is that they are essentially the same group. When two segments would respond identically to the same program, they are not differentiated enough to justify separate strategies."
+  },
+  {
+    text:"A planning team identifies older adults with limited English proficiency and multiple chronic conditions as an ideal priority segment for a care coordination program. However, after reviewing their organization's staffing, budget, and partnerships, they realize they have no bilingual staff, no transportation resources, and no clinical partners who serve this population.",
+    prompt:"Which criterion is this segment failing for this organization right now?",
+    options:["Measurable","Substantial","Accessible","Differentiable","Actionable"],
+    correct:4,
+    feedback:"Actionable. A segment may be perfectly defined, reachable, and in genuine need — but if your organization does not currently have the capacity, resources, or partnerships to design and deliver a program that serves them well, the segment is not actionable right now. This does not mean the team should abandon this group; it means they need to build capacity first.",
+    wrongFeedback:"This segment is measurable, substantial, and the health need is real. The barrier is the organization's own capacity — no bilingual staff, no transportation, no clinical partners. When you cannot build a program that genuinely serves a segment given your current resources and partnerships, that is an actionability problem."
+  },
+];
+
+const fourPData = [
+  {
+    text:"A team designing a diabetes prevention program decides to offer three options for how participants can engage: weekly in-person group sessions at a community center, a self-paced online version, and a hybrid option combining both. All three options cover the same content.",
+    prompt:"Which of the 4 Ps does this decision primarily reflect?",
+    options:["Product","Price","Place","Promotion"],
+    correct:2,
+    feedback:"Place. This decision is about where and how participants access the program — in person, online, or both. Offering multiple access formats reduces the barriers associated with location, schedule, and transportation. That is a place strategy.",
+    wrongFeedback:"The content (what is being offered) stays the same across all three options — only the access format changes. Decisions about where and how people access a program are Place decisions."
+  },
+  {
+    text:"A community health program promoting physical activity designs its campaign materials entirely around the message that 'Exercise gives you more energy for the people you love' — targeting parents who said in focus groups that family time, not personal health, is their top priority.",
+    prompt:"Which P does this message strategy reflect?",
+    options:["Product","Price","Place","Promotion"],
+    correct:3,
+    feedback:"Promotion. This is a communication strategy specifically designed around what motivates the priority population — in this case, the desire to be present and energetic for their families. The message was shaped by formative research (focus groups) and speaks to what the audience actually values. That is effective promotion.",
+    wrongFeedback:"Nothing about the program itself changed — the team is deciding how to talk about it. Crafting messages based on what motivates the priority population is a Promotion decision."
+  },
+  {
+    text:"A tobacco cessation program discovers through formative research that many participants are reluctant to join because they are afraid of being judged by others for needing help quitting. The program responds by creating a private, one-on-one coaching format instead of a group session.",
+    prompt:"Which P is the program primarily addressing?",
+    options:["Product","Price","Place","Promotion"],
+    correct:1,
+    feedback:"Price. The fear of judgment is a social and emotional cost — a non-financial price that was preventing people from participating. By redesigning the program to eliminate that cost (switching from group to private sessions), the team lowered the price and made the exchange more feasible.",
+    wrongFeedback:"No money is involved here. The barrier was social discomfort — the fear of being seen or judged. In social marketing, social and emotional costs are a form of price. Redesigning the program to remove that cost is a Price decision."
+  },
+  {
+    text:"A community health team adds a mobile health unit that brings blood pressure screenings directly to barbershops, laundromats, and churches in a neighborhood instead of requiring residents to travel to a clinic.",
+    prompt:"Which P does this represent?",
+    options:["Product","Price","Place","Promotion"],
+    correct:2,
+    feedback:"Place. Bringing the service directly into spaces where the community already spends time is a classic place strategy. It removes access barriers and meets people where they are — the core principle of good place decisions in health promotion.",
+    wrongFeedback:"The service being offered (blood pressure screening) has not changed. What changed is where and how people access it. Taking a service to the community instead of asking the community to come to the service is a Place decision."
+  },
+  {
+    text:"A nutrition program decides to offer a free bag of groceries to participants who complete each session, in response to feedback that people cannot afford to buy the healthy foods demonstrated in the cooking classes.",
+    prompt:"Which P is the program adjusting?",
+    options:["Product","Price","Place","Promotion"],
+    correct:1,
+    feedback:"Price. The financial barrier to buying healthy foods was a real cost preventing participants from applying what they learned. Providing the groceries directly reduces that financial price and makes the exchange more equitable. This is a price strategy.",
+    wrongFeedback:"The program is responding to a cost — specifically the financial cost of purchasing the foods demonstrated in class. When a program adds something (like free groceries) to offset a barrier or reduce cost for participants, that is a Price adjustment."
+  },
+  {
+    text:"A sexual health program develops an interactive mobile app where teenagers can anonymously ask questions about contraception and STI prevention and receive evidence-based answers. The app was built based on focus group findings that teens wanted a private, judgment-free way to get information.",
+    prompt:"Which P does the app itself represent?",
+    options:["Product","Price","Place","Promotion"],
+    correct:0,
+    feedback:"Product. The app is the thing being offered — the service that delivers a benefit the priority population values (accurate, private health information with no fear of judgment). The fact that it was designed based on what teens said they wanted is consumer orientation in action.",
+    wrongFeedback:"Think about what is actually being offered here. The app is a service — something participants use to receive a health benefit. The thing a program offers that provides value to the priority population is the Product."
+  },
+  {
+    text:"A health department creates a series of short, culturally tailored videos in Spanish featuring community members — not actors — talking about why they got tested for diabetes and what the experience was like. The videos are shared through WhatsApp groups and local Spanish-language radio.",
+    prompt:"Which P do the videos and their distribution represent?",
+    options:["Product","Price","Place","Promotion"],
+    correct:3,
+    feedback:"Promotion. This is a communication strategy — the health department is using culturally relevant messengers, a familiar language, and channels the priority population actually uses (WhatsApp, Spanish-language radio) to spread the word about diabetes testing. That is promotion built around the audience's preferences.",
+    wrongFeedback:"No new service is being offered here, and no cost or access point is changing. The team is deciding how to communicate — through whom, in what language, and via which channels. Communicating about a program using channels and messengers the priority population trusts is a Promotion decision."
+  },
+  {
+    text:"A worksite wellness program initially required employees to complete a 30-minute fitness assessment with a trainer before being allowed to use the on-site gym. After low enrollment, the team removed this requirement, allowing employees to start using the gym immediately with no prior assessment.",
+    prompt:"Which P did removing the assessment requirement address?",
+    options:["Product","Price","Place","Promotion"],
+    correct:1,
+    feedback:"Price. The mandatory assessment was a non-financial cost — it created friction, required scheduling, felt like a test, and added steps before employees could access what they wanted. Removing it lowered the price of participation by eliminating a barrier that was getting in the way of the exchange.",
+    wrongFeedback:"The gym did not move and no new communication campaign was launched. The team removed a step that was making it harder to participate. When a program removes a requirement, inconvenience, or obstacle that was keeping people from engaging, that is a Price reduction."
+  },
+];
+
+let segAnswered = new Array(segData.length).fill(false);
+let segCorrect  = new Array(segData.length).fill(false);
+let fourPAnswered = new Array(fourPData.length).fill(false);
+let fourPCorrect  = new Array(fourPData.length).fill(false);
+
+function renderSeg() {
+  segAnswered.fill(false); segCorrect.fill(false);
+  const c = document.getElementById('seg-container');
+  c.innerHTML = '';
+  segData.forEach((item,i) => {
+    const div = document.createElement('div');
+    div.className = 'seg-card';
+    div.innerHTML = `
+      <div class="seg-header">
+        <div class="seg-num">Scenario ${i+1} of ${segData.length}</div>
+        <div class="seg-text">${item.text}</div>
+      </div>
+      <div class="seg-prompt">${item.prompt}</div>
+      <fieldset style="border:none;padding:0;margin:0">
+        <legend class="sr-only">Segment criterion for scenario ${i+1}</legend>
+        <div class="seg-choices">
+          ${item.options.map((o,j)=>`<button class="seg-btn" id="sg-${i}-${j}" onclick="answerSeg(${i},${j})">${o}</button>`).join('')}
+        </div>
+      </fieldset>
+      <div class="seg-feedback" id="sgfb-${i}" role="alert"></div>
+    `;
+    c.appendChild(div);
+  });
+  document.getElementById('seg-score').textContent=`Score: 0 / ${segData.length}`;
+}
+
+function answerSeg(q,choice) {
+  if(segAnswered[q]) return;
+  segAnswered[q]=true;
+  const ok=choice===segData[q].correct;
+  segCorrect[q]=ok;
+  segData[q].options.forEach((_,j)=>{
+    const btn=document.getElementById(`sg-${q}-${j}`);
+    btn.disabled=true;
+    if(j===choice) btn.classList.add(ok?'correct':'wrong');
+    if(!ok&&j===segData[q].correct) btn.classList.add('correct');
+  });
+  const fb=document.getElementById(`sgfb-${q}`);
+  fb.textContent=ok?segData[q].feedback:segData[q].wrongFeedback;
+  fb.className=`seg-feedback show ${ok?'correct':'wrong'}`;
+  announce(`Scenario ${q+1}: ${ok?'Correct':'Incorrect'}.`);
+  document.getElementById('seg-score').textContent=`Score: ${segCorrect.filter(Boolean).length} / ${segData.length}`;
+}
+
+function resetSeg() { renderSeg(); announce('Part 1 reset.'); }
+
+function renderFourP() {
+  fourPAnswered.fill(false); fourPCorrect.fill(false);
+  const c = document.getElementById('fourp-container');
+  c.innerHTML = '';
+  fourPData.forEach((item,i) => {
+    const div = document.createElement('div');
+    div.className = 'p-card';
+    div.innerHTML = `
+      <div class="p-header">
+        <div class="p-num">Scenario ${i+1} of ${fourPData.length}</div>
+        <div class="p-text">${item.text}</div>
+      </div>
+      <div class="p-prompt">${item.prompt}</div>
+      <fieldset style="border:none;padding:0;margin:0">
+        <legend class="sr-only">Which P for scenario ${i+1}</legend>
+        <div class="p-choices">
+          ${item.options.map((o,j)=>`<button class="p-btn" id="pb-${i}-${j}" onclick="answerFourP(${i},${j})">${o}</button>`).join('')}
+        </div>
+      </fieldset>
+      <div class="p-feedback" id="pfb-${i}" role="alert"></div>
+    `;
+    c.appendChild(div);
+  });
+  document.getElementById('fourp-score').textContent=`Score: 0 / ${fourPData.length}`;
+}
+
+function answerFourP(q,choice) {
+  if(fourPAnswered[q]) return;
+  fourPAnswered[q]=true;
+  const ok=choice===fourPData[q].correct;
+  fourPCorrect[q]=ok;
+  fourPData[q].options.forEach((_,j)=>{
+    const btn=document.getElementById(`pb-${q}-${j}`);
+    btn.disabled=true;
+    if(j===choice) btn.classList.add(ok?'correct':'wrong');
+    if(!ok&&j===fourPData[q].correct) btn.classList.add('correct');
+  });
+  const fb=document.getElementById(`pfb-${q}`);
+  fb.textContent=ok?fourPData[q].feedback:fourPData[q].wrongFeedback;
+  fb.className=`p-feedback show ${ok?'correct':'wrong'}`;
+  announce(`Scenario ${q+1}: ${ok?'Correct':'Incorrect'}.`);
+  document.getElementById('fourp-score').textContent=`Score: ${fourPCorrect.filter(Boolean).length} / ${fourPData.length}`;
+}
+
+function resetFourP() { renderFourP(); announce('Part 2 reset.'); }
+
+function switchTab(tab) {
+  ['seg','4p'].forEach(t=>{
+    document.getElementById(`panel-${t}`).classList.toggle('active',t===tab);
+    document.getElementById(`tab-${t}`).setAttribute('aria-selected',t===tab?'true':'false');
+  });
+}
+function announce(msg){
+  const el=document.getElementById('live');el.textContent='';
+  setTimeout(()=>{el.textContent=msg;},50);
+}
+
+renderSeg();
+renderFourP();
+</script>
+</body>
+</html>
