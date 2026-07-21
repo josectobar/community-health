@@ -43,6 +43,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/ch5-measurement/](models/ch5-measurement/): classify health variables as nominal, ordinal, interval, or ratio, then apply the levels to real measurement decisions.
 - [models/ch5-reliability-validity/](models/ch5-reliability-validity/): diagnose which type of reliability or validity failed in real measurement scenarios, then match each type to its definition.
 - [models/ch5-sampling/](models/ch5-sampling/): choose the best sampling method for a research goal, then identify methods from real-world descriptions.
+- [models/ch9-marketing/](models/ch9-marketing/): identify the exchange participants make in health promotion scenarios, then name what a program truly competes against.
 
 ## Embed snippets
 
@@ -70,6 +71,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Levels of Measurement: Applied Practice" src="models/ch5-measurement/"></iframe>
 <iframe title="Reliability and Validity: Diagnosing Data Quality" src="models/ch5-reliability-validity/"></iframe>
 <iframe title="Sampling Methods: Selection Strategy Practice" src="models/ch5-sampling/"></iframe>
+<iframe title="Marketing in Health Promotion: Applying the Concepts" src="models/ch9-marketing/"></iframe>
 ```
 
 ## Files

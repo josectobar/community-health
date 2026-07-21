@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Marketing in Health Promotion</title>
+<style>
+  :root{
+    color-scheme: light;
+    --teal:#1A6B72;--teal-lt:#D6ECED;--gold:#B07D2A;--gold-lt:#FEF3DC;
+    --purple:#5B3A8E;--purple-lt:#EDE6F7;--red:#9B2335;--red-lt:#FBDDE0;
+    --border:#CCCCCC;--gray:#F4F4F4;--text:#1A1A1A;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,sans-serif;font-size:15px;color:var(--text);background:#fff;padding:20px;max-width:860px;margin:0 auto}
+  h1{font-size:1.3rem;color:var(--teal);border-bottom:3px solid var(--teal);padding-bottom:8px;margin-bottom:6px}
+  .subtitle{font-size:.88rem;color:#555;margin-bottom:20px}
+  .tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+  .tab-btn{padding:8px 18px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.9rem;font-weight:bold}
+  .tab-btn:hover{background:var(--teal-lt)}
+  .tab-btn[aria-selected="true"]{background:var(--teal);color:#fff}
+  .tab-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .tab-panel{display:none}.tab-panel.active{display:block}
+  .instructions{background:var(--teal-lt);border-left:4px solid var(--teal);padding:12px 16px;border-radius:4px;margin-bottom:20px;font-size:.9rem}
+  .instructions strong{color:var(--teal)}
+
+  /* EXCHANGE BUILDER */
+  .scenario-block{border:1px solid var(--border);border-radius:6px;margin-bottom:24px;overflow:hidden}
+  .scen-header{background:var(--gray);padding:14px 16px;border-bottom:1px solid var(--border)}
+  .scen-num{font-size:.78rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+  .scen-text{font-size:.95rem;line-height:1.6}
+  .exchange-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--border)}
+  @media(max-width:540px){.exchange-grid{grid-template-columns:1fr}}
+  .exchange-col{padding:14px 16px}
+  .exchange-col:first-child{border-right:1px solid var(--border)}
+  .col-label{font-size:.8rem;font-weight:bold;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;color:var(--teal)}
+  .option-btn{
+    display:block;width:100%;text-align:left;padding:8px 12px;border:2px solid var(--border);
+    border-radius:4px;background:#fff;cursor:pointer;font-size:.86rem;line-height:1.4;
+    margin-bottom:6px;transition:all .15s;color:var(--text);
+  }
+  .option-btn:hover:not([disabled]){border-color:var(--teal);background:var(--teal-lt)}
+  .option-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .option-btn.correct{border-color:var(--teal);background:var(--teal-lt);color:var(--teal);font-weight:bold}
+  .option-btn.correct::after{content:" ✓"}
+  .option-btn.wrong{border-color:var(--red);background:var(--red-lt);color:var(--red)}
+  .option-btn.wrong::after{content:" ✗"}
+  .option-btn[disabled]{cursor:default}
+  .exch-feedback{padding:12px 16px;font-size:.88rem;line-height:1.5;border-top:1px solid var(--border);display:none}
+  .exch-feedback.show{display:block}
+  .exch-feedback.correct{background:var(--teal-lt);color:#0F4A4F}
+  .exch-feedback.wrong{background:var(--red-lt);color:#6B1020}
+
+  /* COMPETITION */
+  .comp-card{border:1px solid var(--border);border-radius:6px;margin-bottom:22px;overflow:hidden}
+  .comp-header{background:var(--gray);padding:14px 16px;border-bottom:1px solid var(--border)}
+  .comp-num{font-size:.78rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+  .comp-text{font-size:.95rem;line-height:1.6}
+  .comp-prompt{padding:10px 16px;background:var(--gold-lt);font-size:.88rem;font-weight:bold;color:var(--gold);border-bottom:1px solid var(--border)}
+  .comp-choices{padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+  .comp-btn{
+    padding:9px 14px;border:2px solid var(--border);border-radius:4px;
+    background:#fff;cursor:pointer;font-size:.88rem;line-height:1.4;text-align:left;transition:all .15s;color:var(--text);
+  }
+  .comp-btn:hover:not([disabled]){border-color:var(--teal);background:var(--teal-lt)}
+  .comp-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .comp-btn.correct{border-color:var(--teal);background:var(--teal-lt);color:var(--teal);font-weight:bold}
+  .comp-btn.correct::after{content:" ✓"}
+  .comp-btn.wrong{border-color:var(--red);background:var(--red-lt);color:var(--red)}
+  .comp-btn.wrong::after{content:" ✗"}
+  .comp-btn[disabled]{cursor:default}
+  .comp-feedback{margin:0 16px 14px;padding:10px 14px;border-radius:4px;font-size:.88rem;line-height:1.5;display:none}
+  .comp-feedback.show{display:block}
+  .comp-feedback.correct{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+  .comp-feedback.wrong{background:var(--red-lt);color:#6B1020;border-left:4px solid var(--red)}
+
+  .score-row{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+  .score-badge{background:var(--teal);color:#fff;padding:5px 14px;border-radius:20px;font-weight:bold;font-size:.9rem;white-space:nowrap}
+  .reset-btn{padding:6px 14px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.88rem;font-weight:bold}
+  .reset-btn:hover{background:var(--teal-lt)}
+  .reset-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+<h1>Marketing in Health Promotion: Applying the Concepts</h1>
+<p class="subtitle">Practice identifying exchange elements and competition in real health promotion scenarios.</p>
+
+<div class="tabs" role="tablist" aria-label="Activity tabs">
+  <button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-exchange" id="tab-exchange" onclick="switchTab('exchange')">Part 1: Exchange Process Builder</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-comp" id="tab-comp" onclick="switchTab('comp')">Part 2: Identify the Competition</button>
+</div>
+<div class="sr-only" aria-live="polite" aria-atomic="true" id="live"></div>
+
+<!-- PART 1 -->
+<div class="tab-panel active" id="panel-exchange" role="tabpanel" aria-labelledby="tab-exchange">
+  <div class="instructions">
+    <strong>Directions:</strong> Each scenario describes a health promotion situation. For each one, identify (A) what the participant is giving up and (B) what benefit they are receiving. Choose the best answer for each side of the exchange.
+  </div>
+  <div id="exchange-container"></div>
+  <div class="score-row">
+    <div class="score-badge" id="exchange-score" aria-live="polite">Score: 0 / 10</div>
+    <button class="reset-btn" onclick="resetExchange()">Reset Part 1</button>
+  </div>
+</div>
+
+<!-- PART 2 -->
+<div class="tab-panel" id="panel-comp" role="tabpanel" aria-labelledby="tab-comp">
+  <div class="instructions">
+    <strong>Directions:</strong> In social marketing, competition is anything a person might choose instead of the behavior a program promotes. Read each scenario and identify what the health program is really competing against.
+  </div>
+  <div id="comp-container"></div>
+  <div class="score-row">
+    <div class="score-badge" id="comp-score" aria-live="polite">Score: 0 / 5</div>
+    <button class="reset-btn" onclick="resetComp()">Reset Part 2</button>
+  </div>
+</div>
+
+<script>
+const exchangeData = [
+  {
+    scenario:"A community health clinic offers free 6-week diabetes prevention classes on weekday evenings. Participants must attend at least 4 of the 6 sessions to complete the program.",
+    giveOptions:["Paying a registration fee","Giving up two evenings per week for six weeks","Traveling to a different city","Sharing their medical records publicly"],
+    giveCorrect:1,
+    giveFeedback:"Correct. The main cost here is time — two evenings a week for six weeks. In social marketing, non-financial costs like time and convenience are often the most significant barriers to participation.",
+    giveWrong:"Think about what a working adult with family responsibilities actually has to sacrifice to attend evening classes twice a week for six weeks. The cost here is time, not money.",
+    getOptions:["A free gym membership","Skills and knowledge to prevent or delay diabetes","A guaranteed diabetes diagnosis","A prescription medication covered by insurance"],
+    getCorrect:1,
+    getFeedback:"Correct. The core benefit — the reason someone would give up their evenings — is gaining the skills and knowledge to prevent or delay a serious health condition. That is what makes the exchange worthwhile.",
+    getWrong:"The program is not giving out gym memberships or prescriptions. The benefit being offered is something participants take with them: the knowledge and skills to manage their health. That is the value they receive in exchange for their time."
+  },
+  {
+    scenario:"A worksite wellness program installs a walking trail around the building perimeter and encourages employees to take a 15-minute walk during their lunch break instead of eating at their desks.",
+    giveOptions:["Their lunch hour social time or rest time","Their annual leave days","A portion of their paycheck","Their parking spot"],
+    giveCorrect:0,
+    giveFeedback:"Correct. Lunchtime is often the only real break in a workday — people use it to decompress, eat, socialize, or catch up on personal tasks. Giving up that unstructured time to walk is the real cost of this exchange.",
+    giveWrong:"The program is free and on-site, so financial cost is minimal. Think about what lunchtime actually means to an employee — it may be their only mental break, social time, or moment to handle personal matters. That is what they are being asked to trade.",
+    getOptions:["A raise in salary","Physical activity, stress relief, and an energy boost for the afternoon","A free parking space","Permission to leave work early"],
+    getCorrect:1,
+    getFeedback:"Correct. The benefits on offer are physical activity during a sedentary workday, stress relief, and the energy boost that often follows movement. These are meaningful benefits that many employees would value — if they believe the trade is worth it.",
+    getWrong:"This program does not offer pay or parking. The benefits it provides are about health and energy — something participants get to keep for themselves during and after the workday."
+  },
+  {
+    scenario:"A community health center promotes annual flu vaccinations at a pop-up event held at a neighborhood grocery store on a Saturday morning. The vaccination is free.",
+    giveOptions:["The cost of the vaccine","About 20 minutes of their Saturday morning and mild discomfort from the shot","A two-week recovery period","Their privacy — results are shared publicly"],
+    giveCorrect:1,
+    giveFeedback:"Correct. Even when a service is free, there are still costs — in this case, the time to stop and wait, and the minor discomfort of an injection. These small costs still factor into whether someone chooses to participate.",
+    giveWrong:"The vaccine is free, so financial cost is removed. But 'free' does not mean costless. Consider the minor but real costs: giving up a few minutes of your Saturday and accepting the brief discomfort of a needle.",
+    getOptions:["Guaranteed immunity from all illness","Protection from the flu and reduced risk of spreading it to vulnerable family members","A cash payment for participating","A year's supply of vitamins"],
+    getCorrect:1,
+    getFeedback:"Correct. The benefit is protection from a seasonal illness and the peace of mind that comes with reducing the risk to oneself and to others — particularly vulnerable family members. For many people, that second benefit (protecting others) is even more motivating than self-protection.",
+    getWrong:"No vaccine guarantees total immunity, and there is no cash reward here. The benefit being offered is real but modest: reduced likelihood of getting the flu and reduced risk of passing it to people you care about."
+  },
+];
+
+const compData = [
+  {
+    text:"A health department launches a campaign encouraging adults to replace one sugary drink per day with water. The campaign uses posters in community centers and a social media presence.",
+    prompt:"What is this program most directly competing against?",
+    options:[
+      "A. Other health departments running similar campaigns",
+      "B. The taste, availability, habit, and heavy advertising of sugary drinks — all of which make them the default choice for many people",
+      "C. The fact that water is more expensive than soda in most stores",
+      "D. A lack of awareness that sugary drinks are unhealthy"
+    ],
+    correct:1,
+    feedback:"Option B is the real competition. Soda and sweetened drinks are widely available, heavily marketed, taste good to many people, and are deeply embedded in daily routines and social settings. A poster campaign is competing against all of that — not just a knowledge gap. Pretending the competition is only about information would lead to a weak strategy.",
+    wrongFeedback:"The competition in social marketing is not other organizations — it is the behaviors, products, and habits that the priority population currently chooses. For a water-vs-soda campaign, the competition is everything that makes sugary drinks the default: taste, habit, availability, and billions of dollars in advertising."
+  },
+  {
+    text:"A community coalition promotes 30 minutes of daily physical activity for working parents of young children. They create a website with workout videos and tips.",
+    prompt:"What is the most realistic competition this program faces?",
+    options:[
+      "A. Other exercise programs and fitness apps targeting the same audience",
+      "B. Time scarcity, exhaustion after work, childcare responsibilities, and the appeal of rest during the only free moments in the day",
+      "C. Parents not knowing that physical activity is important for their health",
+      "D. Lack of access to a gym membership"
+    ],
+    correct:1,
+    feedback:"Option B is correct. Working parents of young children face real structural barriers: very little free time, physical and mental exhaustion, and caregiving demands that leave almost no space for personal health behaviors. The program is competing against these realities — not just other fitness apps or a lack of information.",
+    wrongFeedback:"Think about the actual daily life of a working parent. After work, school pickup, dinner, and bedtime routines, what is left? Exhaustion, and maybe 30 minutes of personal time. The program is competing against the powerful appeal of just resting — and against the very real constraints of time and caregiving."
+  },
+  {
+    text:"A county health program promotes tobacco cessation among adults who smoke, offering free nicotine replacement therapy and phone-based counseling.",
+    prompt:"Which answer best captures the full picture of what this program is competing against?",
+    options:[
+      "A. Other tobacco cessation programs in the same county",
+      "B. The cost of nicotine replacement products",
+      "C. Addiction, stress relief, social bonding with other smokers, identity, and the immediate discomfort of withdrawal",
+      "D. Lack of knowledge about the health risks of smoking"
+    ],
+    correct:2,
+    feedback:"Option C captures the real competition. Tobacco use is sustained by physical addiction, but also by the genuine stress relief it provides, the social dimension of smoking with others, its role in some people's sense of identity, and the very real discomfort of withdrawal. A cessation program is competing against all of these — not just a lack of information or the product cost.",
+    wrongFeedback:"Most people who smoke know it is harmful — knowledge is rarely the barrier. The competition here is far more complex: addiction, the real stress-relief function that smoking serves, the social rituals around it, and the discomfort of change. That is what a cessation program needs to address."
+  },
+  {
+    text:"A school-based program promotes healthy breakfast habits among middle school students, distributing information about the importance of eating breakfast and offering a free grab-and-go option at school.",
+    prompt:"What does this program most realistically compete against?",
+    options:[
+      "A. Other school nutrition programs",
+      "B. Tight morning schedules, lack of appetite early in the day, social norms that make skipping breakfast seem normal, and the appeal of sleeping a few extra minutes",
+      "C. Students not having access to information about healthy eating",
+      "D. Parents who discourage breakfast eating"
+    ],
+    correct:1,
+    feedback:"Option B reflects the real competition. Middle schoolers face tight morning schedules, some genuinely do not feel hungry early in the day, peer norms may make eating breakfast seem unnecessary, and the 10 extra minutes of sleep often feels more valuable than eating. The program is competing against all of these — which is exactly why the grab-and-go format is a smart place strategy.",
+    wrongFeedback:"Students are not skipping breakfast because they lack information about its importance. Think about what mornings actually look like for a middle schooler: time pressure, sleep deprivation, and social influences all compete with the program's goal."
+  },
+  {
+    text:"A public health campaign promotes sun safety behaviors — wearing sunscreen and protective clothing — among outdoor construction workers.",
+    prompt:"What is this campaign most directly competing against?",
+    options:[
+      "A. Other sun safety campaigns targeting the same population",
+      "B. Heat discomfort from wearing extra clothing, workplace norms where sun protection is seen as unnecessary or unmasculine, time pressure during the workday, and distrust of chemical products on skin",
+      "C. Lack of knowledge that sun exposure causes skin cancer",
+      "D. The cost of sunscreen and protective clothing"],
+    correct:1,
+    feedback:"Option B captures the layered competition. Long sleeves feel hot in summer heat. Applying sunscreen takes time out of a busy workday. Workplace culture may treat sun protection as unnecessary or even as a sign of weakness. Some workers distrust chemical products. The campaign is competing against all of these barriers — not just knowledge gaps or product cost.",
+    wrongFeedback:"Most outdoor workers know sun exposure carries risks. The competition is not a knowledge gap — it is the real physical discomfort, social norms, time constraints, and cultural attitudes that make sun protection feel impractical or unnecessary in the flow of a workday."
+  },
+];
+
+// STATE
+let exchState = exchangeData.map(()=>({gDone:false,gCorrect:false,bDone:false,bCorrect:false}));
+let compAnswered = new Array(compData.length).fill(false);
+let compCorrect  = new Array(compData.length).fill(false);
+
+function renderExchange() {
+  exchState = exchangeData.map(()=>({gDone:false,gCorrect:false,bDone:false,bCorrect:false}));
+  const c = document.getElementById('exchange-container');
+  c.innerHTML = '';
+  exchangeData.forEach((item,i) => {
+    const div = document.createElement('div');
+    div.className = 'scenario-block';
+    div.innerHTML = `
+      <div class="scen-header">
+        <div class="scen-num">Scenario ${i+1} of ${exchangeData.length}</div>
+        <div class="scen-text">${item.scenario}</div>
+      </div>
+      <div class="exchange-grid">
+        <div class="exchange-col">
+          <div class="col-label">A — What is the participant giving up?</div>
+          <fieldset style="border:none;padding:0;margin:0">
+            <legend class="sr-only">What is given up in scenario ${i+1}</legend>
+            ${item.giveOptions.map((o,j)=>`<button class="option-btn" id="eg-${i}-${j}" onclick="answerExch(${i},'give',${j})">${o}</button>`).join('')}
+          </fieldset>
+          <div id="egfb-${i}" style="margin-top:6px;font-size:.85rem;line-height:1.4;display:none" role="alert"></div>
+        </div>
+        <div class="exchange-col">
+          <div class="col-label">B — What benefit are they receiving?</div>
+          <fieldset style="border:none;padding:0;margin:0">
+            <legend class="sr-only">What is received in scenario ${i+1}</legend>
+            ${item.getOptions.map((o,j)=>`<button class="option-btn" id="eb-${i}-${j}" onclick="answerExch(${i},'get',${j})">${o}</button>`).join('')}
+          </fieldset>
+          <div id="ebfb-${i}" style="margin-top:6px;font-size:.85rem;line-height:1.4;display:none" role="alert"></div>
+        </div>
+      </div>
+      <div class="exch-feedback" id="exchfb-${i}" role="alert"></div>
+    `;
+    c.appendChild(div);
+  });
+  updateExchScore();
+}
+
+function answerExch(i, side, choice) {
+  const state = exchState[i];
+  const item = exchangeData[i];
+  if (side === 'give') {
+    if (state.gDone) return;
+    state.gDone = true;
+    const ok = choice === item.giveCorrect;
+    state.gCorrect = ok;
+    item.giveOptions.forEach((_,j) => {
+      const btn = document.getElementById(`eg-${i}-${j}`);
+      btn.disabled = true;
+      if (j === choice) btn.classList.add(ok ? 'correct' : 'wrong');
+      if (!ok && j === item.giveCorrect) btn.classList.add('correct');
+    });
+    const fb = document.getElementById(`egfb-${i}`);
+    fb.textContent = ok ? item.giveFeedback : item.giveWrong;
+    fb.style.display = 'block';
+    fb.style.color = ok ? '#0F4A4F' : '#6B1020';
+    fb.style.background = ok ? 'var(--teal-lt)' : 'var(--red-lt)';
+    fb.style.padding = '8px 10px';
+    fb.style.borderRadius = '4px';
+  } else {
+    if (state.bDone) return;
+    state.bDone = true;
+    const ok = choice === item.getCorrect;
+    state.bCorrect = ok;
+    item.getOptions.forEach((_,j) => {
+      const btn = document.getElementById(`eb-${i}-${j}`);
+      btn.disabled = true;
+      if (j === choice) btn.classList.add(ok ? 'correct' : 'wrong');
+      if (!ok && j === item.getCorrect) btn.classList.add('correct');
+    });
+    const fb = document.getElementById(`ebfb-${i}`);
+    fb.textContent = ok ? item.getFeedback : item.getWrong;
+    fb.style.display = 'block';
+    fb.style.color = ok ? '#0F4A4F' : '#6B1020';
+    fb.style.background = ok ? 'var(--teal-lt)' : 'var(--red-lt)';
+    fb.style.padding = '8px 10px';
+    fb.style.borderRadius = '4px';
+  }
+  announce(`Scenario ${i+1} ${side === 'give' ? 'Part A' : 'Part B'}: ${(side==='give'?state.gCorrect:state.bCorrect) ? 'Correct' : 'Incorrect'}.`);
+  updateExchScore();
+}
+
+function updateExchScore() {
+  const total = exchState.reduce((acc,s)=>{
+    if(s.gCorrect) acc++; if(s.bCorrect) acc++; return acc;
+  }, 0);
+  document.getElementById('exchange-score').textContent = `Score: ${total} / ${exchangeData.length * 2}`;
+}
+
+function resetExchange() { renderExchange(); announce('Part 1 reset.'); }
+
+function renderComp() {
+  compAnswered.fill(false); compCorrect.fill(false);
+  const c = document.getElementById('comp-container');
+  c.innerHTML = '';
+  compData.forEach((item,i) => {
+    const div = document.createElement('div');
+    div.className = 'comp-card';
+    div.innerHTML = `
+      <div class="comp-header">
+        <div class="comp-num">Scenario ${i+1} of ${compData.length}</div>
+        <div class="comp-text">${item.text}</div>
+      </div>
+      <div class="comp-prompt">${item.prompt}</div>
+      <fieldset style="border:none;padding:0;margin:0">
+        <legend class="sr-only">Competition for scenario ${i+1}</legend>
+        <div class="comp-choices">
+          ${item.options.map((o,j)=>`<button class="comp-btn" id="cb-${i}-${j}" onclick="answerComp(${i},${j})">${o}</button>`).join('')}
+        </div>
+      </fieldset>
+      <div class="comp-feedback" id="cfb-${i}" role="alert"></div>
+    `;
+    c.appendChild(div);
+  });
+  document.getElementById('comp-score').textContent = `Score: 0 / ${compData.length}`;
+}
+
+function answerComp(q,choice) {
+  if(compAnswered[q]) return;
+  compAnswered[q]=true;
+  const ok = choice===compData[q].correct;
+  compCorrect[q]=ok;
+  compData[q].options.forEach((_,j)=>{
+    const btn=document.getElementById(`cb-${q}-${j}`);
+    btn.disabled=true;
+    if(j===choice) btn.classList.add(ok?'correct':'wrong');
+    if(!ok&&j===compData[q].correct) btn.classList.add('correct');
+  });
+  const fb=document.getElementById(`cfb-${q}`);
+  fb.textContent=ok?compData[q].feedback:compData[q].wrongFeedback;
+  fb.className=`comp-feedback show ${ok?'correct':'wrong'}`;
+  announce(`Scenario ${q+1}: ${ok?'Correct':'Incorrect'}. ${ok?compData[q].feedback:compData[q].wrongFeedback}`);
+  document.getElementById('comp-score').textContent=`Score: ${compCorrect.filter(Boolean).length} / ${compData.length}`;
+}
+
+function resetComp() { renderComp(); announce('Part 2 reset.'); }
+
+function switchTab(tab) {
+  ['exchange','comp'].forEach(t=>{
+    document.getElementById(`panel-${t}`).classList.toggle('active',t===tab);
+    document.getElementById(`tab-${t}`).setAttribute('aria-selected',t===tab?'true':'false');
+  });
+}
+function announce(msg){
+  const el=document.getElementById('live');el.textContent='';
+  setTimeout(()=>{el.textContent=msg;},50);
+}
+
+renderExchange();
+renderComp();
+</script>
+</body>
+</html>
