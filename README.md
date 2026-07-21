@@ -59,6 +59,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/ch13-diagnostic/](models/ch13-diagnostic/): work branching questions to identify whether a program question calls for process, impact, outcome, or formative evaluation.
 - [models/ch13-ethics/](models/ch13-ethics/): sit on an ethics review panel and flag the ethical concerns in five evaluation proposals.
 - [models/ch13-communicator/](models/ch13-communicator/): tailor the same evaluation findings for funders, staff, community members, and policymakers.
+- [models/ch14-evaluation-sorter/](models/ch14-evaluation-sorter/): sort evaluation activities by timing and purpose into formative or summative.
 
 ## Embed snippets
 
@@ -102,6 +103,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Evaluation Type Diagnostic Tool" src="models/ch13-diagnostic/"></iframe>
 <iframe title="Ethical Review Simulation" src="models/ch13-ethics/"></iframe>
 <iframe title="Audience Communicator" src="models/ch13-communicator/"></iframe>
+<iframe title="Formative or Summative?" src="models/ch14-evaluation-sorter/"></iframe>
 ```
 
 ## Files

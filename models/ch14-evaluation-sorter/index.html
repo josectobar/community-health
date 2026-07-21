@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch. 14 — Formative or Summative?</title>
+<style>
+:root{
+  color-scheme: light;
+  --page:#f6f4ee; --card:#ffffff; --soft:#efece3;
+  --ink:#2a2824; --muted:#6b6960; --faint:#96948a;
+  --line:#e0ddd3; --line-strong:#cbc8bc;
+  --form:#3f6fb0; --form-bg:#e8f0f9; --form-ink:#234a80;
+  --summ:#9a5a3a; --summ-bg:#f6ebe2; --summ-ink:#6d3c22;
+  --good:#2c6349; --bad:#a3402d; --radius:8px;
+}
+*{box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--page); color:var(--ink); line-height:1.6; margin:0; padding:2rem 1rem;}
+.wrap{max-width:680px; margin:0 auto;}
+h1{font-size:21px; font-weight:600; margin:0 0 4px;}
+.sub{font-size:14px; color:var(--muted); margin:0 0 1.25rem;}
+button{font-family:inherit; cursor:pointer; background:transparent; color:inherit; transition:all .15s;}
+.legend{display:flex; gap:16px; margin:0 0 1.25rem; font-size:12.5px; color:var(--muted); flex-wrap:wrap;}
+.legend span{display:inline-flex; align-items:center; gap:6px;}
+.dot{width:10px; height:10px; border-radius:50%;}
+.card{background:var(--card); border:0.5px solid var(--line); border-radius:12px; padding:14px 16px; margin-bottom:12px;}
+.card p{margin:0 0 10px; font-size:14px;}
+.opts{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+.opt{padding:9px 6px; border:0.5px solid var(--line-strong); border-radius:var(--radius); font-size:13px; font-weight:500;}
+.opt:hover{background:var(--soft);}
+.fb{font-size:12.5px; margin:10px 0 0; line-height:1.55;}
+.score-wrap{background:var(--soft); border-radius:12px; padding:14px 16px; margin-top:6px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Formative or summative?</h1>
+<p class="sub">The difference is all about <em>timing and purpose</em>. Formative happens before or during a program to <strong>improve</strong> it; summative happens at the end to <strong>judge</strong> it. Sort each activity.</p>
+
+<div class="legend">
+  <span><span class="dot" style="background:var(--form)"></span>Formative &mdash; improve, while there's still time</span>
+  <span><span class="dot" style="background:var(--summ)"></span>Summative &mdash; judge the results at the end</span>
+</div>
+
+<div id="cards"></div>
+
+<div class="score-wrap">
+  <div style="display:flex; justify-content:space-between; align-items:baseline;">
+    <span style="font-size:13px; color:var(--muted);">Sorted correctly</span>
+    <span id="score" style="font-size:15px; font-weight:600;">0 / 6</span>
+  </div>
+  <p id="closing" style="font-size:12.5px; color:var(--muted); margin:10px 0 0; line-height:1.55;">Ask yourself: could this still change how the program runs? If yes, it's formative. If it's drawing a final conclusion, it's summative.</p>
+</div>
+</div>
+
+<script>
+const T={form:{label:"Formative",ink:"var(--form-ink)",bg:"var(--form-bg)",bd:"var(--form)"},
+  summ:{label:"Summative",ink:"var(--summ-ink)",bg:"var(--summ-bg)",bd:"var(--summ)"}};
+const items=[
+  {q:"Pretesting your brochure with a few members of the priority population before printing thousands of copies.",a:"form",
+   why:"You're testing to fix problems while there's still time \u2014 classic formative."},
+  {q:"Measuring whether diabetes rates in the community dropped two years after the program ended.",a:"summ",
+   why:"A final judgment of long-term outcome, after the fact. Summative."},
+  {q:"Running a small pilot version of the program to see what breaks before the full launch.",a:"form",
+   why:"Pilot testing is done to improve the design before full rollout \u2014 formative."},
+  {q:"Writing the end-of-grant report that tells funders what the program ultimately achieved.",a:"summ",
+   why:"Drawing conclusions about results at the end \u2014 summative, tied to formal reporting."},
+  {q:"Checking mid-program whether participants actually understand the handouts, so you can revise them.",a:"form",
+   why:"It happens during the program and can still change course. Formative."},
+  {q:"Comparing the treatment and control groups' final blood-pressure numbers to judge the program's impact.",a:"summ",
+   why:"A formal end comparison to judge impact \u2014 summative."}
+];
+let answered=0, correct=0;
+const box=document.getElementById("cards");
+items.forEach(function(m,i){
+  const d=document.createElement("div"); d.className="card";
+  const opts=["form","summ"].map(function(k){return '<button class="opt" data-k="'+k+'">'+T[k].label+'</button>';}).join("");
+  d.innerHTML='<p>'+(i+1)+'. '+m.q+'</p><div class="opts">'+opts+'</div><p class="fb"></p>';
+  const fb=d.querySelector(".fb");
+  d.querySelectorAll(".opt").forEach(function(btn){
+    btn.onclick=function(){
+      if(d.dataset.done) return;
+      const k=btn.dataset.k, ok=k===m.a; d.dataset.done="1"; answered++;
+      d.querySelectorAll(".opt").forEach(function(b){b.style.pointerEvents="none";
+        if(b.dataset.k===m.a){b.style.background=T[m.a].bg;b.style.color=T[m.a].ink;b.style.borderColor=T[m.a].bd;b.style.fontWeight="600";}
+        else{b.style.opacity="0.4";}});
+      if(ok){correct++;fb.style.color="var(--good)";fb.innerHTML="\u2713 "+m.why;}
+      else{fb.style.color="var(--bad)";fb.innerHTML="Actually <strong>"+T[m.a].label+"</strong>. "+m.why;}
+      document.getElementById("score").textContent=correct+" / "+items.length;
+      if(answered===items.length){const c=document.getElementById("closing");c.style.color="var(--ink)";
+        c.innerHTML=correct===6?"Six for six. You've got the timing-and-purpose distinction down cold.":"Nice work. The trap is that both can involve measuring \u2014 what matters is <em>why</em>: to improve (formative) or to judge (summative).";}
+    };
+  });
+  box.appendChild(d);
+});
+</script>
+</body>
+</html>
