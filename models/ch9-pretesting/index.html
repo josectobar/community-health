@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Pretesting and Continuous Monitoring</title>
+<style>
+  :root{
+    color-scheme: light;
+    --teal:#1A6B72;--teal-lt:#D6ECED;--gold:#B07D2A;--gold-lt:#FEF3DC;
+    --purple:#5B3A8E;--purple-lt:#EDE6F7;--red:#9B2335;--red-lt:#FBDDE0;
+    --border:#CCCCCC;--gray:#F4F4F4;--text:#1A1A1A;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,sans-serif;font-size:15px;color:var(--text);background:#fff;padding:20px;max-width:860px;margin:0 auto}
+  h1{font-size:1.3rem;color:var(--teal);border-bottom:3px solid var(--teal);padding-bottom:8px;margin-bottom:6px}
+  .subtitle{font-size:.88rem;color:#555;margin-bottom:20px}
+  .tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+  .tab-btn{padding:8px 18px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.9rem;font-weight:bold}
+  .tab-btn:hover{background:var(--teal-lt)}
+  .tab-btn[aria-selected="true"]{background:var(--teal);color:#fff}
+  .tab-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .tab-panel{display:none}.tab-panel.active{display:block}
+  .instructions{background:var(--teal-lt);border-left:4px solid var(--teal);padding:12px 16px;border-radius:4px;margin-bottom:20px;font-size:.9rem}
+  .instructions strong{color:var(--teal)}
+
+  .s-card{border:1px solid var(--border);border-radius:6px;margin-bottom:22px;overflow:hidden}
+  .s-header{background:var(--gray);padding:14px 16px;border-bottom:1px solid var(--border)}
+  .s-num{font-size:.78rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+  .s-text{font-size:.95rem;line-height:1.6}
+  .s-prompt{padding:10px 16px;background:var(--gold-lt);font-size:.88rem;font-weight:bold;color:var(--gold);border-bottom:1px solid var(--border)}
+  .s-choices{padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+  .s-btn{padding:9px 14px;border:2px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:.88rem;line-height:1.4;text-align:left;transition:all .15s;color:var(--text)}
+  .s-btn:hover:not([disabled]){border-color:var(--teal);background:var(--teal-lt)}
+  .s-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .s-btn.correct{border-color:var(--teal);background:var(--teal-lt);color:var(--teal);font-weight:bold}
+  .s-btn.correct::after{content:" ✓"}
+  .s-btn.wrong{border-color:var(--red);background:var(--red-lt);color:var(--red)}
+  .s-btn.wrong::after{content:" ✗"}
+  .s-btn[disabled]{cursor:default}
+  .s-feedback{margin:0 16px 14px;padding:10px 14px;border-radius:4px;font-size:.88rem;line-height:1.5;display:none}
+  .s-feedback.show{display:block}
+  .s-feedback.correct{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+  .s-feedback.wrong{background:var(--red-lt);color:#6B1020;border-left:4px solid var(--red)}
+
+  .score-row{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+  .score-badge{background:var(--teal);color:#fff;padding:5px 14px;border-radius:20px;font-weight:bold;font-size:.9rem;white-space:nowrap}
+  .reset-btn{padding:6px 14px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.88rem;font-weight:bold}
+  .reset-btn:hover{background:var(--teal-lt)}
+  .reset-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+<h1>Pretesting and Continuous Monitoring: Applied Judgment</h1>
+<p class="subtitle">Identify what is being pretested and when monitoring should step in — without repeating what you already read.</p>
+
+<div class="tabs" role="tablist" aria-label="Activity tabs">
+  <button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-phase" id="tab-phase" onclick="switchTab('phase')">Part 1: What Stage Is This?</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-monitor" id="tab-monitor" onclick="switchTab('monitor')">Part 2: Pretest or Monitor?</button>
+</div>
+<div class="sr-only" aria-live="polite" aria-atomic="true" id="live"></div>
+
+<!-- PART 1 -->
+<div class="tab-panel active" id="panel-phase" role="tabpanel" aria-labelledby="tab-phase">
+  <div class="instructions">
+    <strong>Directions:</strong> Each scenario describes a health program team getting feedback from their priority population. Decide whether this is Pretest Phase 1 (testing the product concept), Pretest Phase 2 (testing messages and materials), or Continuous Monitoring (ongoing feedback during implementation).
+  </div>
+  <div id="phase-container"></div>
+  <div class="score-row">
+    <div class="score-badge" id="phase-score" aria-live="polite">Score: 0 / 7</div>
+    <button class="reset-btn" onclick="resetPhase()">Reset Part 1</button>
+  </div>
+</div>
+
+<!-- PART 2 -->
+<div class="tab-panel" id="panel-monitor" role="tabpanel" aria-labelledby="tab-monitor">
+  <div class="instructions">
+    <strong>Directions:</strong> Each scenario describes a situation where a program team needs feedback. Decide whether they should use pretesting (before launch) or continuous monitoring (during implementation) — and identify the key reason why.
+  </div>
+  <div id="monitor-container"></div>
+  <div class="score-row">
+    <div class="score-badge" id="monitor-score" aria-live="polite">Score: 0 / 5</div>
+    <button class="reset-btn" onclick="resetMonitor()">Reset Part 2</button>
+  </div>
+</div>
+
+<script>
+const phaseData = [
+  {
+    text:"A public health team has drafted a 30-second video ad encouraging adults to get a colorectal cancer screening. Before releasing it, they show the video to 12 adults from their priority population and ask: 'Did you understand the message? Did anything feel confusing or off-putting? Would this make you want to learn more about getting screened?'",
+    prompt:"What stage of quality-checking is this?",
+    options:["Pretest Phase 1 — Testing the product concept","Pretest Phase 2 — Testing messages and materials","Continuous monitoring during implementation"],
+    correct:1,
+    feedback:"Pretest Phase 2. The team is testing a specific promotional material (the video ad) before launch — checking whether the message lands clearly and motivates action with the priority population. Phase 2 is specifically about testing communication materials, not the program design itself.",
+    wrongFeedback:"The program has not launched yet, and the team is testing a communication tool — a video ad — not the program itself. Getting feedback on a promotional material before release is Phase 2 pretesting."
+  },
+  {
+    text:"A diabetes prevention program has been running for two months. The program coordinator starts calling participants who dropped out after the first week to ask what made them stop coming, and surveys current participants monthly about what is and is not working for them.",
+    prompt:"What stage is this?",
+    options:["Pretest Phase 1 — Testing the product concept","Pretest Phase 2 — Testing messages and materials","Continuous monitoring during implementation"],
+    correct:2,
+    feedback:"Continuous monitoring. The program is already running and the team is actively collecting real-time feedback from participants during implementation — including from people who dropped out. This is the hallmark of continuous monitoring: ongoing feedback collection while the program is live.",
+    wrongFeedback:"This is not pretesting — the program has already launched and is two months in. Collecting feedback from active and former participants while the program is running, in order to improve it in real time, is continuous monitoring."
+  },
+  {
+    text:"Before finalizing the design of a new mobile mammography unit program, a planning team holds three focus groups with women ages 40–65 from the target community. They share a brief description of the planned program and ask: 'Would something like this be useful to you? What would make you more or less likely to use it? What concerns would you have?'",
+    prompt:"What stage is this?",
+    options:["Pretest Phase 1 — Testing the product concept","Pretest Phase 2 — Testing messages and materials","Continuous monitoring during implementation"],
+    correct:0,
+    feedback:"Pretest Phase 1. The team is testing the program concept — the idea and design — before anything has been built or launched. They are asking whether the product as planned would actually appeal to and work for the priority population. This is exactly what Phase 1 pretesting is for.",
+    wrongFeedback:"No materials or messages are being tested here — just the program idea itself. Sharing a program concept with the priority population before building it, to see if the design matches their needs and preferences, is Phase 1 pretesting."
+  },
+  {
+    text:"A nutrition education program has been delivering cooking demonstrations at a community center for three months. After each session, the coordinator informally chats with participants about what they liked, what was confusing, and whether the recipes fit their lives. This feedback is logged and reviewed monthly.",
+    prompt:"What stage is this?",
+    options:["Pretest Phase 1 — Testing the product concept","Pretest Phase 2 — Testing messages and materials","Continuous monitoring during implementation"],
+    correct:2,
+    feedback:"Continuous monitoring. The program is live and running, and the team is systematically collecting ongoing participant feedback after each session. Even informal feedback that is logged and reviewed consistently becomes a form of continuous monitoring — it gives planners real-time data on what is working and what needs adjustment.",
+    wrongFeedback:"The program has been running for three months. Collecting and reviewing participant reactions session by session while the program is in progress is continuous monitoring, not pretesting."
+  },
+  {
+    text:"A smoking cessation program has developed two different versions of a brochure with different headlines and images. They ask 20 current smokers from the priority population to review both versions and rate which feels more relevant, trustworthy, and motivating.",
+    prompt:"What stage is this?",
+    options:["Pretest Phase 1 — Testing the product concept","Pretest Phase 2 — Testing messages and materials","Continuous monitoring during implementation"],
+    correct:1,
+    feedback:"Pretest Phase 2. The team is comparing two versions of a promotional material — a brochure — before the program launches. Testing messages and materials with the priority population before release to see which resonates better is a classic Phase 2 pretesting activity.",
+    wrongFeedback:"The program has not launched yet, and the team is testing two versions of a specific communication material — the brochure. Comparing alternative message formats or visual designs with the priority population before launch is Phase 2 pretesting."
+  },
+  {
+    text:"A new community fitness program has been operating for six weeks. The program manager notices that only 3 out of 30 registered participants are showing up consistently. She sets up brief exit interviews at the end of each session to understand why attendance is low and what would make it easier for people to come regularly.",
+    prompt:"What stage is this?",
+    options:["Pretest Phase 1 — Testing the product concept","Pretest Phase 2 — Testing messages and materials","Continuous monitoring during implementation"],
+    correct:2,
+    feedback:"Continuous monitoring. The program is running and a problem — low attendance — has emerged. The manager is collecting real-time feedback during implementation to identify the cause and make adjustments. This is exactly the kind of problem that continuous monitoring is designed to catch and address before more participants are lost.",
+    wrongFeedback:"The program is already running — six weeks in — and the team is responding to a real-time problem (low attendance) by gathering participant feedback. Acting on problems during implementation through ongoing feedback collection is continuous monitoring."
+  },
+  {
+    text:"Before launching a new teen mental health awareness campaign, a school health team shares draft social media posts with a group of 15 high school students and asks whether the posts feel relevant, whether the language sounds like something teens would actually say, and whether there is anything that might cause them to scroll past without engaging.",
+    prompt:"What stage is this?",
+    options:["Pretest Phase 1 — Testing the product concept","Pretest Phase 2 — Testing messages and materials","Continuous monitoring during implementation"],
+    correct:1,
+    feedback:"Pretest Phase 2. The team is testing specific promotional materials — social media posts — with the priority population (teens) before the campaign launches. Checking whether the language, tone, and format of communication materials will actually reach and engage the audience is Phase 2 pretesting.",
+    wrongFeedback:"The campaign has not launched yet, and the team is specifically testing communication materials — social media posts — with the people they are meant to reach. Getting feedback on messages and materials before release is Pretest Phase 2."
+  },
+];
+
+const monitorData = [
+  {
+    text:"A county health department is planning to launch a new mobile health screening event series next month. They have developed flyers in English and Spanish to promote the events. Before printing 5,000 copies, the communications coordinator wants to make sure the flyers are clear, culturally appropriate, and likely to motivate attendance among the Spanish-speaking priority population.",
+    prompt:"Should the team use pretesting or continuous monitoring here?",
+    options:[
+      "Pretesting — because the flyers have not been released yet and feedback now can prevent a costly mistake",
+      "Continuous monitoring — because the program is about to launch",
+      "Neither — flyer feedback is not worth the time before a program this size",
+      "Both simultaneously"
+    ],
+    correct:0,
+    feedback:"Pretesting is the right choice. The flyers have not been distributed yet — getting feedback from the priority population before printing 5,000 copies is exactly what pretesting is for. This is Phase 2 pretesting (materials testing), and catching a problem now is far cheaper than reprinting thousands of flyers after launch.",
+    wrongFeedback:"The program has not launched and the flyers have not been released. Any time you are gathering feedback on materials or program concepts before they go out to the priority population, that is pretesting — not monitoring."
+  },
+  {
+    text:"A community health worker program has been running for four months. The program director recently heard through informal channels that some participants are confused about what services they are eligible for, and that a few community health workers feel their caseloads are too high to serve clients well. She wants to collect formal feedback to understand how widespread these issues are.",
+    prompt:"Which approach fits this situation?",
+    options:[
+      "Pretesting — because the program design needs to be reconsidered",
+      "Continuous monitoring — because the program is live and real problems are emerging during implementation",
+      "Pretesting Phase 1 — because the product concept needs to be retested",
+      "Neither — anecdotal concerns do not require formal feedback"
+    ],
+    correct:1,
+    feedback:"Continuous monitoring. The program is four months in and real problems are surfacing during implementation — participant confusion and worker overload. Continuous monitoring is designed precisely for this situation: formally collecting feedback while a program is running so problems can be identified and corrected before they get worse.",
+    wrongFeedback:"The program is already running and problems are emerging in real time. The right tool for catching and addressing issues during implementation — before they undermine the program — is continuous monitoring."
+  },
+  {
+    text:"A planning team is developing a new workplace stress management program for hospital staff. They have a draft program design but have not yet built any materials or scheduled any sessions. They want to know whether the proposed format — four one-hour lunchtime workshops — actually fits into the lives of the nurses and technicians they hope to reach.",
+    prompt:"What should the team do?",
+    options:[
+      "Continuous monitoring — start the program and adjust based on attendance",
+      "Pretest Phase 2 — test the promotional materials with staff",
+      "Pretest Phase 1 — share the program concept with the priority population and get feedback before building it out",
+      "Skip feedback at this stage and pilot the program with a small group"
+    ],
+    correct:2,
+    feedback:"Pretest Phase 1. The program has not been built yet — the team only has a concept. Sharing the draft design with nurses and technicians before building materials or scheduling sessions is exactly what Phase 1 is for: finding out whether the product concept fits the priority population's lives before investing in full development.",
+    wrongFeedback:"Nothing has been built or launched yet — just a concept. Getting feedback on a program idea before designing materials or running sessions is Pretest Phase 1. Starting the program and adjusting later wastes resources and loses participants who drop out early."
+  },
+  {
+    text:"A sexual health program for college students has been running for one semester. Halfway through, the program coordinator notices that very few students are using the anonymous question submission feature in the program's app, even though formative research suggested students wanted exactly this. She wants to understand why the feature is being ignored.",
+    prompt:"Which approach is appropriate?",
+    options:[
+      "Pretesting — because the app feature needs to be redesigned before students use it",
+      "Continuous monitoring — the program is live and a specific feature is not working as expected; feedback during implementation can identify the reason",
+      "Pretest Phase 2 — test a new version of the feature with a focus group",
+      "No feedback needed — low usage means students are not interested"
+    ],
+    correct:1,
+    feedback:"Continuous monitoring. The program is running and a specific component is not working as expected. Continuous monitoring gathers real-time feedback during implementation to understand why something is falling short — in this case, why students are not using a feature they said they wanted. That insight can then guide a mid-program adjustment.",
+    wrongFeedback:"The app is already live and in students' hands. Gathering feedback about why a specific feature is underused during an active program — to make a mid-course adjustment — is continuous monitoring."
+  },
+  {
+    text:"A health department has drafted three different taglines for a new hand hygiene campaign aimed at parents of young children. They cannot decide which tagline will be most motivating and memorable for this audience. The campaign has not launched yet.",
+    prompt:"What should they do?",
+    options:[
+      "Continuous monitoring — launch all three versions simultaneously and track which performs best",
+      "Pretest Phase 1 — share the campaign concept with parents to see if hand hygiene is the right focus",
+      "Pretest Phase 2 — test the three taglines with members of the priority population before choosing one",
+      "Choose the tagline the team likes best and move forward"
+    ],
+    correct:2,
+    feedback:"Pretest Phase 2. The campaign has not launched, and the team is deciding between competing message options. Testing specific taglines — promotional messages — with the priority population before the campaign goes live is exactly what Phase 2 pretesting is designed to do. The answer should come from parents, not from internal team preference.",
+    wrongFeedback:"The campaign has not launched and the team is deciding between promotional messages. Comparing message options with the actual priority population before release — to choose the one that resonates most — is Pretest Phase 2."
+  },
+];
+
+let phaseAnswered = new Array(phaseData.length).fill(false);
+let phaseCorrect  = new Array(phaseData.length).fill(false);
+let monitorAnswered = new Array(monitorData.length).fill(false);
+let monitorCorrect  = new Array(monitorData.length).fill(false);
+
+function renderCards(data, containerId, prefix, answeredArr, correctArr, scoreId, answerFn) {
+  answeredArr.fill(false); correctArr.fill(false);
+  const c = document.getElementById(containerId);
+  c.innerHTML = '';
+  data.forEach((item,i) => {
+    const div = document.createElement('div');
+    div.className = 's-card';
+    div.innerHTML = `
+      <div class="s-header">
+        <div class="s-num">Scenario ${i+1} of ${data.length}</div>
+        <div class="s-text">${item.text}</div>
+      </div>
+      <div class="s-prompt">${item.prompt}</div>
+      <fieldset style="border:none;padding:0;margin:0">
+        <legend class="sr-only">Answer for scenario ${i+1}</legend>
+        <div class="s-choices">
+          ${item.options.map((o,j)=>`<button class="s-btn" id="${prefix}-${i}-${j}" onclick="${answerFn}(${i},${j})">${o}</button>`).join('')}
+        </div>
+      </fieldset>
+      <div class="s-feedback" id="${prefix}fb-${i}" role="alert"></div>
+    `;
+    c.appendChild(div);
+  });
+  document.getElementById(scoreId).textContent = `Score: 0 / ${data.length}`;
+}
+
+function answerGeneric(q, choice, data, answered, correct, prefix, scoreId) {
+  if(answered[q]) return;
+  answered[q]=true;
+  const ok=choice===data[q].correct;
+  correct[q]=ok;
+  data[q].options.forEach((_,j)=>{
+    const btn=document.getElementById(`${prefix}-${q}-${j}`);
+    btn.disabled=true;
+    if(j===choice) btn.classList.add(ok?'correct':'wrong');
+    if(!ok&&j===data[q].correct) btn.classList.add('correct');
+  });
+  const fb=document.getElementById(`${prefix}fb-${q}`);
+  fb.textContent=ok?data[q].feedback:data[q].wrongFeedback;
+  fb.className=`s-feedback show ${ok?'correct':'wrong'}`;
+  announce(`Scenario ${q+1}: ${ok?'Correct':'Incorrect'}.`);
+  document.getElementById(scoreId).textContent=`Score: ${correct.filter(Boolean).length} / ${data.length}`;
+}
+
+function answerPhase(q,c){ answerGeneric(q,c,phaseData,phaseAnswered,phaseCorrect,'ph','phase-score'); }
+function answerMonitor(q,c){ answerGeneric(q,c,monitorData,monitorAnswered,monitorCorrect,'mo','monitor-score'); }
+
+function resetPhase(){
+  renderCards(phaseData,'phase-container','ph',phaseAnswered,phaseCorrect,'phase-score','answerPhase');
+  announce('Part 1 reset.');
+}
+function resetMonitor(){
+  renderCards(monitorData,'monitor-container','mo',monitorAnswered,monitorCorrect,'monitor-score','answerMonitor');
+  announce('Part 2 reset.');
+}
+
+function switchTab(tab){
+  ['phase','monitor'].forEach(t=>{
+    document.getElementById(`panel-${t}`).classList.toggle('active',t===tab);
+    document.getElementById(`tab-${t}`).setAttribute('aria-selected',t===tab?'true':'false');
+  });
+}
+function announce(msg){
+  const el=document.getElementById('live');el.textContent='';
+  setTimeout(()=>{el.textContent=msg;},50);
+}
+
+renderCards(phaseData,'phase-container','ph',phaseAnswered,phaseCorrect,'phase-score','answerPhase');
+renderCards(monitorData,'monitor-container','mo',monitorAnswered,monitorCorrect,'monitor-score','answerMonitor');
+</script>
+</body>
+</html>
