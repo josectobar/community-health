@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>From Priorities to Sustainability</title>
+<style>
+  :root{
+    color-scheme: light;
+    --teal:#1A6B72;--teal-lt:#D6ECED;--gold:#B07D2A;--gold-lt:#FEF3DC;
+    --purple:#5B3A8E;--purple-lt:#EDE6F7;--red:#9B2335;--red-lt:#FBDDE0;
+    --border:#CCCCCC;--gray:#F4F4F4;--text:#1A1A1A;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,sans-serif;font-size:15px;color:var(--text);background:#fff;padding:20px;max-width:860px;margin:0 auto}
+  h1{font-size:1.3rem;color:var(--teal);border-bottom:3px solid var(--teal);padding-bottom:8px;margin-bottom:6px}
+  .subtitle{font-size:.88rem;color:#555;margin-bottom:20px}
+  .tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+  .tab-btn{padding:8px 18px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.9rem;font-weight:bold}
+  .tab-btn:hover{background:var(--teal-lt)}
+  .tab-btn[aria-selected="true"]{background:var(--teal);color:#fff}
+  .tab-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .tab-panel{display:none}.tab-panel.active{display:block}
+  .instructions{background:var(--teal-lt);border-left:4px solid var(--teal);padding:12px 16px;border-radius:4px;margin-bottom:20px;font-size:.9rem}
+  .instructions strong{color:var(--teal)}
+  .s-card{border:1px solid var(--border);border-radius:6px;margin-bottom:22px;overflow:hidden}
+  .s-header{background:var(--gray);padding:14px 16px;border-bottom:1px solid var(--border)}
+  .s-num{font-size:.78rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+  .s-text{font-size:.95rem;line-height:1.6}
+  .s-prompt{padding:10px 16px;background:var(--gold-lt);font-size:.88rem;font-weight:bold;color:var(--gold);border-bottom:1px solid var(--border)}
+  .s-choices{padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+  .s-btn{padding:9px 14px;border:2px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:.88rem;line-height:1.4;text-align:left;transition:all .15s;color:var(--text)}
+  .s-btn:hover:not([disabled]){border-color:var(--teal);background:var(--teal-lt)}
+  .s-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .s-btn.correct{border-color:var(--teal);background:var(--teal-lt);color:var(--teal);font-weight:bold}
+  .s-btn.correct::after{content:" ✓"}
+  .s-btn.wrong{border-color:var(--red);background:var(--red-lt);color:var(--red)}
+  .s-btn.wrong::after{content:" ✗"}
+  .s-btn[disabled]{cursor:default}
+  .s-feedback{margin:0 16px 14px;padding:10px 14px;border-radius:4px;font-size:.88rem;line-height:1.5;display:none}
+  .s-feedback.show{display:block}
+  .s-feedback.correct{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+  .s-feedback.wrong{background:var(--red-lt);color:#6B1020;border-left:4px solid var(--red)}
+
+  /* RESOURCE SPOTTER */
+  .res-choices{padding:14px 16px;display:flex;gap:8px;flex-wrap:wrap}
+  .res-btn{padding:9px 18px;border:2px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:.9rem;font-weight:bold;transition:all .15s;color:var(--text)}
+  .res-btn:hover:not([disabled]){border-color:var(--teal);background:var(--teal-lt)}
+  .res-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .res-btn.correct{border-color:var(--teal);background:var(--teal-lt);color:var(--teal)}
+  .res-btn.correct::after{content:" ✓"}
+  .res-btn.wrong{border-color:var(--red);background:var(--red-lt);color:var(--red)}
+  .res-btn.wrong::after{content:" ✗"}
+  .res-btn[disabled]{cursor:default}
+
+  .score-row{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+  .score-badge{background:var(--teal);color:#fff;padding:5px 14px;border-radius:20px;font-weight:bold;font-size:.9rem;white-space:nowrap}
+  .reset-btn{padding:6px 14px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.88rem;font-weight:bold}
+  .reset-btn:hover{background:var(--teal-lt)}
+  .reset-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+<h1>From Priorities to Sustainability: Decision Scenarios</h1>
+<p class="subtitle">Apply your knowledge of the later steps — prioritization, strategy, resources, evaluation, and sustainability.</p>
+
+<div class="tabs" role="tablist" aria-label="Activity tabs">
+  <button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-decisions" id="tab-decisions" onclick="switchTab('decisions')">Part 1: What Is the Right Move?</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-resources" id="tab-resources" onclick="switchTab('resources')">Part 2: Horizontal or Vertical?</button>
+</div>
+<div class="sr-only" aria-live="polite" aria-atomic="true" id="live"></div>
+
+<!-- PART 1 -->
+<div class="tab-panel active" id="panel-decisions" role="tabpanel" aria-labelledby="tab-decisions">
+  <div class="instructions">
+    <strong>Directions:</strong> Each scenario presents a decision point in the later stages of community organizing. Choose the response that best reflects good practice.
+  </div>
+  <div id="decisions-container"></div>
+  <div class="score-row">
+    <div class="score-badge" id="decisions-score" aria-live="polite">Score: 0 / 6</div>
+    <button class="reset-btn" onclick="resetDecisions()">Reset Part 1</button>
+  </div>
+</div>
+
+<!-- PART 2 -->
+<div class="tab-panel" id="panel-resources" role="tabpanel" aria-labelledby="tab-resources">
+  <div class="instructions">
+    <strong>Directions:</strong> During implementation, community organizers draw on horizontal resources (partnerships within or across the community — local organizations, residents, businesses) and vertical resources (connections above the community level — government, foundations, state or federal agencies). Read each scenario and classify the resource being used.
+  </div>
+  <div id="resources-container"></div>
+  <div class="score-row">
+    <div class="score-badge" id="resources-score" aria-live="polite">Score: 0 / 7</div>
+    <button class="reset-btn" onclick="resetResources()">Reset Part 2</button>
+  </div>
+</div>
+
+<script>
+const decisionsData = [
+  {
+    text:"A coalition has been discussing health priorities for three months. Two large hospital systems on the coalition each want the group to focus on their own service areas and patient populations. Smaller community organizations and resident representatives are concerned that the hospitals' priorities reflect institutional interests more than community need. The facilitator calls a vote — but the hospital systems have more votes because they have more member organizations.",
+    prompt:"What is the core problem with this situation?",
+    options:[
+      "A. Hospitals should not be members of community coalitions",
+      "B. The voting structure allows larger, better-resourced organizations to override the priorities of community members most affected by the problem — undermining community ownership of the process",
+      "C. Three months is too long to spend on priority-setting",
+      "D. The facilitator should have prevented hospitals from joining until the priorities were set"
+    ],
+    correct:1,
+    feedback:"Option B identifies the core problem. Community organizing principles hold that those most affected by a problem must have a meaningful voice in setting priorities. A voting structure that gives institutional power to the best-resourced members can effectively silence the community members the organizing effort is supposed to serve.",
+    wrongFeedback:"The issue is not about who can join the coalition — it is about whose voice carries weight in determining priorities. When larger institutions can outvote community members on what the community's priorities should be, the organizing process loses its community-driven foundation."
+  },
+  {
+    text:"A neighborhood coalition has been working on lead exposure prevention for two years and has achieved significant reductions in blood lead levels among children under five in the area. The lead remediation grant that funded most of the work is ending. A coalition member says: 'Our work is done.' Another member pushes back.",
+    prompt:"Why is the second member right to push back?",
+    options:[
+      "A. The work is never truly done in community organizing — all health problems recur",
+      "B. Sustainability means building the community's long-term capacity so that the work continues beyond any single grant or program cycle — the coalition's relationships, skills, and structures are assets worth preserving",
+      "C. The coalition is legally required to continue until the health disparity is entirely eliminated",
+      "D. They should immediately start a new grant application to continue funding"
+    ],
+    correct:1,
+    feedback:"Option B is correct. Sustainability is about more than continuing a program — it is about preserving and building on the community relationships, skills, and organizational structures that the coalition developed. These are assets the community now has. Declaring the work done when a grant ends risks losing all of that.",
+    wrongFeedback:"The concern is not that health problems always recur — it is that sustainability means maintaining the capacity the coalition built, not just the program it funded. The relationships, trained members, and organizational infrastructure are themselves community assets worth protecting."
+  },
+  {
+    text:"A community coalition evaluates its three-year childhood obesity prevention program and finds that overall rates improved — but that the improvement was concentrated in long-term residents while recently arrived immigrant families showed no change. The evaluation team recommends declaring success and closing out the program.",
+    prompt:"What should the coalition do instead?",
+    options:[
+      "A. Accept the evaluation results — partial success is still success",
+      "B. Loop back to an earlier step — the finding about immigrant families reveals a gap in the organizing effort that needs to be addressed, not ignored",
+      "C. Commission a new evaluation with different metrics that show better results for all groups",
+      "D. Transfer responsibility for immigrant families to a different organization"
+    ],
+    correct:1,
+    feedback:"Option B reflects the cyclical nature of community organizing. Evaluation findings that reveal a subgroup was not reached should trigger a return to earlier steps — re-examining who was organized, how the program was delivered, and what barriers immigrant families faced. Looping back is not failure; it is how the process improves.",
+    wrongFeedback:"Declaring partial success and closing out leaves a whole population behind. Community organizing is a cyclical process: when evaluation reveals that the effort did not reach everyone it should have, the right response is to loop back and address the gap — not to close the loop."
+  },
+  {
+    text:"A community task force working on opioid overdose prevention has narrowed its focus to three possible strategies: a community naloxone distribution program, a youth education campaign in schools, and an advocacy effort to expand Medicaid coverage for addiction treatment. The task force must choose which to pursue first.",
+    prompt:"Which criterion should most directly guide their choice?",
+    options:[
+      "A. Which strategy has the most scientific evidence behind it nationally",
+      "B. Which strategy the task force members personally believe in most strongly",
+      "C. Which strategy the community has identified as its top priority AND is most winnable given the task force's current resources, relationships, and political context",
+      "D. Which strategy will satisfy the funder's reporting requirements most easily"
+    ],
+    correct:2,
+    feedback:"Option C correctly applies two key criteria from the community organizing process: the priority must come from the community, and it must be winnable — realistic to achieve given what the task force currently has available. Scientific evidence and personal conviction matter, but they do not replace community ownership and feasibility.",
+    wrongFeedback:"Scientific evidence is useful, but the community organizing process holds that community-identified priorities and realistic feasibility must guide first choices. A strategy the community does not own and that the task force cannot realistically implement will not produce lasting change."
+  },
+  {
+    text:"A coalition has just completed a six-month formative evaluation of its new community health worker program and found that workers feel unsupported, training was insufficient, and the referral system they rely on is not functioning. The program has not yet reached half its intended participants.",
+    prompt:"What type of evaluation is this and what should the coalition do with the findings?",
+    options:[
+      "A. Summative evaluation — use the findings to write the final report",
+      "B. Formative evaluation — use the findings to make real-time improvements before more participants are affected and the program falls further short of its goals",
+      "C. Process evaluation — document the findings but wait until the program ends to act on them",
+      "D. Needs assessment — return to the beginning and start the planning process over"
+    ],
+    correct:1,
+    feedback:"Option B is correct. This is formative evaluation — conducted during implementation to identify problems while they can still be fixed. Finding that workers feel unsupported and the referral system is broken at the six-month mark is exactly the kind of information formative evaluation is designed to surface. Acting on it now protects participants and improves outcomes.",
+    wrongFeedback:"This evaluation happened during implementation — not at the end. Evaluation conducted while a program is running, with the purpose of making mid-course corrections, is formative evaluation. Its findings should be used to improve the program now, not filed away for a final report."
+  },
+  {
+    text:"A community coalition successfully advocated for a new mental health crisis center in their neighborhood after two years of organizing. The center opens and the coalition's founding organizer moves to another city. Several coalition members suggest disbanding since 'we got what we came for.'",
+    prompt:"What does good sustainability practice suggest the coalition should do?",
+    options:[
+      "A. Disband — the goal was achieved and the work is done",
+      "B. Immediately start a new campaign to avoid losing momentum",
+      "C. Take time to document what was built — relationships, skills, processes — and intentionally plan how to sustain the community's organizing capacity for future needs",
+      "D. Wait to see if a new crisis emerges before deciding"
+    ],
+    correct:2,
+    feedback:"Option C reflects thoughtful sustainability practice. The coalition built real capacity — relationships, skills, political credibility, and organizational knowledge — over two years. Sustaining that capacity does not mean running a constant campaign; it means intentionally preserving what was built so it can be activated for the community's next need.",
+    wrongFeedback:"Disbanding loses everything the coalition built beyond the single goal it achieved. Good sustainability practice means preserving the organizing capacity — the relationships, skills, and structures — so the community retains the ability to act collectively in the future. That capacity is itself a community asset."
+  },
+];
+
+const resourcesData = [
+  {
+    text:"A coalition implementing a community health worker program recruits volunteers from three neighborhood churches, who agree to host program sessions in their fellowship halls.",
+    prompt:"What type of resource is being used?",
+    options:["Horizontal","Vertical"],
+    correct:0,
+    feedback:"Horizontal. The coalition is drawing on relationships with local faith communities — organizations operating at the same community level. Volunteer recruitment and space-sharing between neighborhood groups are classic horizontal resources.",
+    wrongFeedback:"The churches are neighborhood organizations operating at the same community level as the coalition. Resources that come from partnerships within or across the community — not from government or outside funders above the community level — are horizontal resources."
+  },
+  {
+    text:"A neighborhood health coalition receives a $150,000 grant from the state health department to fund a two-year diabetes prevention initiative.",
+    prompt:"What type of resource is this?",
+    options:["Horizontal","Vertical"],
+    correct:1,
+    feedback:"Vertical. State government funding comes from an entity above the community level. Grants, contracts, and policy support from government agencies are vertical resources — significant but tied to external conditions, timelines, and reporting requirements.",
+    wrongFeedback:"The state health department operates above the community level — it is not a neighborhood partner. Funding that comes down from government agencies or other entities outside and above the community is a vertical resource."
+  },
+  {
+    text:"A community organizing coalition partners with the local high school to recruit student volunteers for their weekend health fair, and the school's parent-teacher association helps spread the word.",
+    prompt:"What type of resource is this?",
+    options:["Horizontal","Vertical"],
+    correct:0,
+    feedback:"Horizontal. The high school and parent-teacher association are local institutions operating at the same community level. Even though the school is administered by an external district, the partnership here is with the local school and its parent community — a horizontal relationship.",
+    wrongFeedback:"The coalition is working with the local school and its parent community — neighborhood-level partners. Relationships between community-level organizations, even when one is an institution, are horizontal resources when the partnership is locally rooted."
+  },
+  {
+    text:"A rural health coalition successfully lobbies their congressional representative to include rural maternal health funding in a federal appropriations bill.",
+    prompt:"What type of resource does this represent?",
+    options:["Horizontal","Vertical"],
+    correct:1,
+    feedback:"Vertical. Engaging a congressional representative to influence federal legislation and funding is a vertical resource strategy — it involves advocacy directed at an entity far above the community level that controls significant resources through formal political processes.",
+    wrongFeedback:"A congressional representative and the federal appropriations process are far above the community level. Influencing policies and funding decisions at the federal level through political advocacy is a vertical resource strategy."
+  },
+  {
+    text:"A community coalition organizes a neighborhood clean-up and mural project, with residents, local business owners, and a neighborhood association all contributing labor, supplies, and organizational support.",
+    prompt:"What type of resource is being mobilized?",
+    options:["Horizontal","Vertical"],
+    correct:0,
+    feedback:"Horizontal. Residents, local businesses, and a neighborhood association are all community-level actors. Mobilizing labor, supplies, and organizational capacity from within the community through mutual partnerships is the essence of horizontal resource development.",
+    wrongFeedback:"All of the contributors here — residents, business owners, neighborhood association — are operating at the same community level. Pooling resources from community-level partners is horizontal resource mobilization."
+  },
+  {
+    text:"A community health coalition applies to a national foundation for a three-year grant to fund their food access program, and the foundation awards $200,000 contingent on the coalition meeting annual reporting benchmarks.",
+    prompt:"What type of resource is this?",
+    options:["Horizontal","Vertical"],
+    correct:1,
+    feedback:"Vertical. A national foundation is an outside entity above the community level. Foundation grants — like government grants — are vertical resources. The conditions attached (annual benchmarks) are a typical feature of vertical resources, which carry external requirements.",
+    wrongFeedback:"A national foundation is not a community-level partner — it is an outside institution with its own requirements and priorities. Funding from entities above the community level, whether government or philanthropic, is a vertical resource."
+  },
+  {
+    text:"After a coalition member's presentation at a local community college, nursing students begin volunteering at community health screenings each semester as part of a service-learning requirement — providing skilled labor the coalition could not otherwise afford.",
+    prompt:"What type of resource does this represent?",
+    options:["Horizontal","Vertical"],
+    correct:0,
+    feedback:"Horizontal. A local community college is a community-level institution, and the nursing students are community members contributing labor through a mutual arrangement. Even though the college is not under direct community control, the partnership is locally rooted and mutually beneficial — a horizontal resource relationship.",
+    wrongFeedback:"The community college is a local institution and the nursing students are community members. A partnership with a local educational institution that provides skilled community labor is a horizontal resource — rooted in community relationships, not in outside funding or policy."
+  },
+];
+
+let decisionsAnswered = new Array(decisionsData.length).fill(false);
+let decisionsCorrect  = new Array(decisionsData.length).fill(false);
+let resourcesAnswered = new Array(resourcesData.length).fill(false);
+let resourcesCorrect  = new Array(resourcesData.length).fill(false);
+
+function renderCards(data, containerId, prefix, answered, correct, scoreId, answerFn, useResLayout) {
+  answered.fill(false); correct.fill(false);
+  const c = document.getElementById(containerId);
+  c.innerHTML='';
+  data.forEach((item,i)=>{
+    const div=document.createElement('div');
+    div.className='s-card';
+    const choicesClass = useResLayout ? 'res-choices' : 's-choices';
+    const btnClass = useResLayout ? 'res-btn' : 's-btn';
+    div.innerHTML=`
+      <div class="s-header">
+        <div class="s-num">Scenario ${i+1} of ${data.length}</div>
+        <div class="s-text">${item.text}</div>
+      </div>
+      <div class="s-prompt">${item.prompt}</div>
+      <fieldset style="border:none;padding:0;margin:0">
+        <legend class="sr-only">Answer for scenario ${i+1}</legend>
+        <div class="${choicesClass}">
+          ${item.options.map((o,j)=>`<button class="${btnClass}" id="${prefix}-${i}-${j}" onclick="${answerFn}(${i},${j})">${o}</button>`).join('')}
+        </div>
+      </fieldset>
+      <div class="s-feedback" id="${prefix}fb-${i}" role="alert"></div>
+    `;
+    c.appendChild(div);
+  });
+  document.getElementById(scoreId).textContent=`Score: 0 / ${data.length}`;
+}
+
+function answerGeneric(q, choice, data, answered, correct, prefix, scoreId) {
+  if(answered[q]) return;
+  answered[q]=true;
+  const ok=choice===data[q].correct;
+  correct[q]=ok;
+  data[q].options.forEach((_,j)=>{
+    const btn=document.getElementById(`${prefix}-${q}-${j}`);
+    btn.disabled=true;
+    if(j===choice) btn.classList.add(ok?'correct':'wrong');
+    if(!ok&&j===data[q].correct) btn.classList.add('correct');
+  });
+  const fb=document.getElementById(`${prefix}fb-${q}`);
+  fb.textContent=ok?data[q].feedback:data[q].wrongFeedback;
+  fb.className=`s-feedback show ${ok?'correct':'wrong'}`;
+  announce(`Scenario ${q+1}: ${ok?'Correct':'Incorrect'}.`);
+  document.getElementById(scoreId).textContent=`Score: ${correct.filter(Boolean).length} / ${data.length}`;
+}
+
+function answerDecision(q,c){answerGeneric(q,c,decisionsData,decisionsAnswered,decisionsCorrect,'dc','decisions-score');}
+function answerResource(q,c){answerGeneric(q,c,resourcesData,resourcesAnswered,resourcesCorrect,'rc','resources-score');}
+
+function resetDecisions(){
+  renderCards(decisionsData,'decisions-container','dc',decisionsAnswered,decisionsCorrect,'decisions-score','answerDecision',false);
+  announce('Part 1 reset.');
+}
+function resetResources(){
+  renderCards(resourcesData,'resources-container','rc',resourcesAnswered,resourcesCorrect,'resources-score','answerResource',true);
+  announce('Part 2 reset.');
+}
+
+function switchTab(tab){
+  ['decisions','resources'].forEach(t=>{
+    document.getElementById(`panel-${t}`).classList.toggle('active',t===tab);
+    document.getElementById(`tab-${t}`).setAttribute('aria-selected',t===tab?'true':'false');
+  });
+}
+function announce(msg){
+  const el=document.getElementById('live');el.textContent='';
+  setTimeout(()=>{el.textContent=msg;},50);
+}
+
+renderCards(decisionsData,'decisions-container','dc',decisionsAnswered,decisionsCorrect,'decisions-score','answerDecision',false);
+renderCards(resourcesData,'resources-container','rc',resourcesAnswered,resourcesCorrect,'resources-score','answerResource',true);
+</script>
+</body>
+</html>
