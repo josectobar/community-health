@@ -41,6 +41,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/interpersonal-theories-sorter/](models/interpersonal-theories-sorter/): identify whether each community diabetes-prevention move draws on Social Cognitive, Social Capital, or Social Network theory.
 - [models/ch4-six-steps/](models/ch4-six-steps/): explore each step of the needs assessment process, then sort real actions into the right step.
 - [models/ch5-measurement/](models/ch5-measurement/): classify health variables as nominal, ordinal, interval, or ratio, then apply the levels to real measurement decisions.
+- [models/ch5-reliability-validity/](models/ch5-reliability-validity/): diagnose which type of reliability or validity failed in real measurement scenarios, then match each type to its definition.
 
 ## Embed snippets
 
@@ -66,6 +67,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Interpersonal Theories in Practice" src="models/interpersonal-theories-sorter/"></iframe>
 <iframe title="The Six Steps of a Community Health Needs Assessment" src="models/ch4-six-steps/"></iframe>
 <iframe title="Levels of Measurement: Applied Practice" src="models/ch5-measurement/"></iframe>
+<iframe title="Reliability and Validity: Diagnosing Data Quality" src="models/ch5-reliability-validity/"></iframe>
 ```
 
 ## Files

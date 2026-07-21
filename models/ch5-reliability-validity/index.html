@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Reliability and Validity</title>
+<style>
+  :root{
+    color-scheme: light;
+    --teal:#1A6B72;--teal-lt:#D6ECED;--gold:#B07D2A;--gold-lt:#FEF3DC;
+    --purple:#5B3A8E;--purple-lt:#EDE6F7;--red:#9B2335;--red-lt:#FBDDE0;
+    --border:#CCCCCC;--gray:#F4F4F4;--text:#1A1A1A;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,sans-serif;font-size:15px;color:var(--text);background:#fff;padding:20px;max-width:860px;margin:0 auto}
+  h1{font-size:1.3rem;color:var(--teal);border-bottom:3px solid var(--teal);padding-bottom:8px;margin-bottom:6px}
+  .subtitle{font-size:.88rem;color:#555;margin-bottom:20px}
+
+  .tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+  .tab-btn{padding:8px 18px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.9rem;font-weight:bold}
+  .tab-btn:hover{background:var(--teal-lt)}
+  .tab-btn[aria-selected="true"]{background:var(--teal);color:#fff}
+  .tab-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .tab-panel{display:none}.tab-panel.active{display:block}
+
+  .instructions{background:var(--teal-lt);border-left:4px solid var(--teal);padding:12px 16px;border-radius:4px;margin-bottom:20px;font-size:.9rem}
+  .instructions strong{color:var(--teal)}
+
+  /* WHAT WENT WRONG */
+  .case-card{border:1px solid var(--border);border-radius:6px;margin-bottom:22px;overflow:hidden}
+  .case-header{background:var(--gray);padding:14px 16px;border-bottom:1px solid var(--border)}
+  .case-num{font-size:.78rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+  .case-text{font-size:.95rem;line-height:1.6}
+  .flaw-prompt{padding:10px 16px;font-size:.88rem;font-weight:bold;color:var(--gold);background:var(--gold-lt);border-bottom:1px solid var(--border)}
+  .case-choices{padding:14px 16px;display:flex;gap:8px;flex-wrap:wrap}
+  .case-btn{
+    padding:8px 13px;border:2px solid var(--border);border-radius:4px;
+    background:#fff;cursor:pointer;font-size:.84rem;transition:all .15s;color:var(--text);text-align:left;line-height:1.3;
+  }
+  .case-btn:hover:not([disabled]){border-color:var(--teal);background:var(--teal-lt)}
+  .case-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .case-btn.correct{border-color:var(--teal);background:var(--teal-lt);color:var(--teal);font-weight:bold}
+  .case-btn.correct::after{content:" ✓"}
+  .case-btn.wrong{border-color:var(--red);background:var(--red-lt);color:var(--red)}
+  .case-btn.wrong::after{content:" ✗"}
+  .case-btn[disabled]{cursor:default}
+  .case-feedback{margin:0 16px 14px;padding:10px 14px;border-radius:4px;font-size:.88rem;line-height:1.5;display:none}
+  .case-feedback.show{display:block}
+  .case-feedback.correct{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+  .case-feedback.wrong{background:var(--red-lt);color:#6B1020;border-left:4px solid var(--red)}
+
+  /* MATCH THE TYPE */
+  .match-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:560px){.match-layout{grid-template-columns:1fr}}
+
+  .definitions-col h3,.types-col h3{font-size:.88rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+  .def-card{
+    border:2px solid var(--border);border-radius:6px;padding:10px 14px;
+    margin-bottom:8px;cursor:pointer;transition:all .15s;background:#fff;
+    font-size:.88rem;line-height:1.45;text-align:left;width:100%;
+  }
+  .def-card:hover:not([disabled]):not(.matched){border-color:var(--teal);background:var(--teal-lt)}
+  .def-card:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .def-card.selected{border-color:var(--gold);background:var(--gold-lt)}
+  .def-card.matched.correct{border-color:var(--teal);background:var(--teal-lt);opacity:.7;cursor:default}
+  .def-card.matched.wrong{border-color:var(--red);background:var(--red-lt);opacity:.7;cursor:default}
+  .def-card[disabled]{cursor:default}
+
+  .type-btn{
+    display:block;width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:6px;
+    margin-bottom:8px;cursor:pointer;font-size:.88rem;font-weight:bold;
+    background:#fff;transition:all .15s;text-align:left;color:var(--text);
+  }
+  .type-btn:hover:not([disabled]){border-color:var(--purple);background:var(--purple-lt)}
+  .type-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .type-btn.matched.correct{border-color:var(--teal);background:var(--teal-lt);cursor:default}
+  .type-btn.matched.wrong{border-color:var(--red);background:var(--red-lt);cursor:default}
+  .type-btn[disabled]{cursor:default}
+
+  .match-feedback{background:var(--gray);border-radius:6px;padding:14px 16px;margin-bottom:14px;font-size:.88rem;line-height:1.5;min-height:50px}
+  .match-feedback.correct{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+  .match-feedback.wrong{background:var(--red-lt);color:#6B1020;border-left:4px solid var(--red)}
+
+  .score-row{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+  .score-badge{background:var(--teal);color:#fff;padding:5px 14px;border-radius:20px;font-weight:bold;font-size:.9rem;white-space:nowrap}
+  .reset-btn{padding:6px 14px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.88rem;font-weight:bold}
+  .reset-btn:hover{background:var(--teal-lt)}
+  .reset-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+
+<h1>Reliability and Validity: Diagnosing Data Quality</h1>
+<p class="subtitle">Apply concepts to realistic scenarios — without re-reading definitions.</p>
+
+<div class="tabs" role="tablist" aria-label="Activity tabs">
+  <button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-wrong" id="tab-wrong" onclick="switchTab('wrong')">Part 1: What Went Wrong?</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-match" id="tab-match" onclick="switchTab('match')">Part 2: Match the Type</button>
+</div>
+<div class="sr-only" aria-live="polite" aria-atomic="true" id="live"></div>
+
+<!-- PART 1 -->
+<div class="tab-panel active" id="panel-wrong" role="tabpanel" aria-labelledby="tab-wrong">
+  <div class="instructions">
+    <strong>Directions:</strong> Each scenario describes a data quality problem. Identify which type of reliability or validity was compromised.
+  </div>
+  <div id="wrong-container"></div>
+  <div class="score-row">
+    <div class="score-badge" id="wrong-score" aria-live="polite">Score: 0 / 7</div>
+    <button class="reset-btn" onclick="resetWrong()">Reset Part 1</button>
+  </div>
+</div>
+
+<!-- PART 2 -->
+<div class="tab-panel" id="panel-match" role="tabpanel" aria-labelledby="tab-match">
+  <div class="instructions">
+    <strong>Directions:</strong> Select a definition card on the left, then click the matching reliability or validity type on the right. Work through all 8 pairs.
+  </div>
+  <div class="match-feedback" id="match-fb" role="alert">Select a definition to begin.</div>
+  <div class="match-layout">
+    <div class="definitions-col">
+      <h3>Definitions</h3>
+      <div id="def-col"></div>
+    </div>
+    <div class="types-col">
+      <h3>Types</h3>
+      <div id="type-col"></div>
+    </div>
+  </div>
+  <div class="score-row">
+    <div class="score-badge" id="match-score" aria-live="polite">Matched: 0 / 8</div>
+    <button class="reset-btn" onclick="resetMatch()">Reset Part 2</button>
+  </div>
+</div>
+
+<script>
+const wrongData = [
+  {
+    text:"Two trained observers watch the same recorded focus group and independently score participants' level of engagement using a structured rubric. Observer 1 rates 14 out of 20 participants as 'highly engaged'; Observer 2 rates only 6 of the same 20 as 'highly engaged.' The two scores diverge significantly despite using the same tool.",
+    prompt:"Which type of reliability was compromised?",
+    options:["Rater (inter-rater) reliability","Equivalence reliability","Face validity","Content validity","Criterion-related validity"],
+    correct:0,
+    feedback:"Rater (inter-rater) reliability was compromised. Two raters using the same instrument on the same data should produce similar results. The large discrepancy suggests the rubric's criteria are ambiguous, rater training was insufficient, or both.",
+    wrongFeedback:"Two different observers scored the same behavior very differently using the same tool — that is a consistency problem between raters. The type of reliability concerned with consistency across observers is rater (inter-rater) reliability."
+  },
+  {
+    text:"A health program develops a Spanish-language version of its health knowledge quiz for bilingual participants and an English version for English-speaking participants. When program staff compare scores across language groups, they discover the Spanish version is significantly harder than the English version, making cross-group comparisons meaningless.",
+    prompt:"Which type of reliability was not achieved?",
+    options:["Rater reliability","Equivalence (parallel forms) reliability","Construct validity","Sensitivity","Predictive validity"],
+    correct:1,
+    feedback:"Equivalence (parallel forms) reliability was not achieved. When two versions of an instrument are used interchangeably, they must measure the same construct with comparable difficulty. A discrepancy in difficulty makes results from the two forms incomparable.",
+    wrongFeedback:"The problem is that two different versions of the same instrument produced non-comparable results. When alternate forms of a measurement tool do not yield equivalent results, that is a failure of equivalence reliability."
+  },
+  {
+    text:"A new survey claims to measure 'community resilience,' but expert reviewers note it only includes questions about individual coping behaviors and completely omits items on social networks, institutional resources, community history, and environmental factors — all recognized dimensions of resilience.",
+    prompt:"Which validity type is missing?",
+    options:["Face validity","Content validity","Criterion-related validity","Rater reliability","Sensitivity"],
+    correct:1,
+    feedback:"Content validity is missing. The survey fails to cover the full domain of the construct it claims to measure — it only captures one dimension (individual coping) while omitting several others (social, institutional, environmental). Content validity requires comprehensive coverage of all meaningful dimensions.",
+    wrongFeedback:"The issue is not whether the survey looks relevant — it's that it only covers part of what 'community resilience' actually means. Missing important dimensions of a construct is a content validity problem."
+  },
+  {
+    text:"A brief 3-item screening tool for anxiety is administered alongside the validated GAD-7 scale to the same group of 200 adults. The correlation between the brief tool's scores and GAD-7 scores is only r = 0.21, indicating weak agreement between the new tool and the accepted gold standard.",
+    prompt:"Which validity type is most directly threatened?",
+    options:["Face validity","Content validity","Criterion-related (concurrent) validity","Construct validity","Specificity"],
+    correct:2,
+    feedback:"Criterion-related (concurrent) validity is threatened. When a new instrument is validated against an accepted gold standard administered at the same time, a weak correlation means the new tool does not measure the same thing as the established measure — undermining concurrent validity.",
+    wrongFeedback:"The researchers compared their new tool to a gold standard administered at the same time. That comparison tests whether scores on the new tool match scores on an accepted criterion — that's concurrent criterion-related validity."
+  },
+  {
+    text:"A community health screening event uses a blood glucose test that correctly identifies 9 out of 10 people with diabetes as diabetic. However, it also flags 3 out of 10 people without diabetes as diabetic. The program is frustrated by the number of unnecessary follow-up referrals.",
+    prompt:"The program is experiencing a problem with which measurement property?",
+    options:["Rater reliability","Sensitivity","Specificity","Face validity","Equivalence reliability"],
+    correct:2,
+    feedback:"Specificity is the issue. The tool is sensitive (it catches 90% of true cases) but not specific enough — it produces too many false positives, flagging 30% of non-diabetic individuals as diabetic. High specificity means the tool correctly identifies true negatives and avoids unnecessary flags.",
+    wrongFeedback:"The tool is good at catching real cases (high sensitivity) but bad at ruling out non-cases — it is producing too many false positives. The property that measures how well a tool correctly identifies true negatives is specificity."
+  },
+  {
+    text:"A program evaluation team designs a survey to measure 'health self-efficacy' — participants' belief in their ability to manage their own health. When results come in, the self-efficacy scores do not correlate with actual health behaviors (exercise, medication adherence, diet) as theory predicts they should, and they also correlate just as strongly with income as with health behavior — which makes no theoretical sense.",
+    prompt:"Which validity type is most compromised?",
+    options:["Face validity","Equivalence reliability","Construct validity","Criterion-related validity","Sensitivity"],
+    correct:2,
+    feedback:"Construct validity is compromised. A valid self-efficacy measure should correlate with behaviors it theoretically predicts (convergent validity) and should not correlate with unrelated constructs like income (discriminant validity). Both failures together indicate a construct validity problem.",
+    wrongFeedback:"The instrument fails in two ways: it doesn't correlate with things it should (health behaviors) and it correlates with something it shouldn't (income). Both of these are aspects of construct validity — the instrument is not capturing the theoretical construct of self-efficacy as it should."
+  },
+  {
+    text:"A community health program administers a mental health screening tool to identify adults at risk for depression. The tool catches only 60% of people who later receive a clinical depression diagnosis — missing 40% of true cases. The public health team is concerned about the people slipping through.",
+    prompt:"Which measurement property is most directly insufficient?",
+    options:["Specificity","Rater reliability","Face validity","Sensitivity","Content validity"],
+    correct:3,
+    feedback:"Sensitivity is insufficient. Sensitivity measures how well a screening tool identifies true positive cases. At 60%, this tool misses 40% of people who actually have depression — in public health screening, where missing cases can mean delayed treatment, high sensitivity is critical.",
+    wrongFeedback:"The concern is that many people who truly have depression are not being identified by the tool. The property that measures a tool's ability to correctly detect true positive cases is sensitivity."
+  },
+];
+
+const matchData = [
+  {def:"Consistency between two observers scoring the same behavior with the same tool",type:"Rater (Inter-Rater) Reliability",feedback:"When two different people rate the same event using the same instrument and get similar results, that is rater or inter-rater reliability."},
+  {def:"Consistency between two different versions of the same instrument",type:"Equivalence Reliability",feedback:"When alternate forms of a tool (e.g., Form A and Form B, or English and Spanish versions) yield comparable results, the tool has equivalence reliability."},
+  {def:"Whether an instrument looks like it measures what it claims to measure, based on surface inspection",type:"Face Validity",feedback:"Face validity is the most basic form — it simply asks whether the instrument appears relevant to the construct. It is necessary but not sufficient for full validity."},
+  {def:"Whether an instrument covers all meaningful dimensions of the construct it claims to measure",type:"Content Validity",feedback:"Content validity requires that the full domain of a construct is represented — not just some dimensions. Expert review is the standard method for assessing it."},
+  {def:"Whether scores on a new instrument correlate with scores on an accepted gold standard administered at the same time",type:"Criterion-Related (Concurrent) Validity",feedback:"Concurrent validity compares a new tool to an established gold standard administered simultaneously. Strong correlation supports the new tool's validity."},
+  {def:"Whether a measure captures a theoretical, unobservable construct through both convergent and discriminant evidence",type:"Construct Validity",feedback:"Construct validity is the most comprehensive type — it examines whether an instrument captures an abstract theoretical concept by correlating with related measures and not correlating with unrelated ones."},
+  {def:"The proportion of people with a condition that the screening tool correctly identifies as positive",type:"Sensitivity",feedback:"Sensitivity = true positive rate. A highly sensitive tool catches most true cases and is prioritized when missing a case has serious consequences."},
+  {def:"The proportion of people without a condition that the screening tool correctly identifies as negative",type:"Specificity",feedback:"Specificity = true negative rate. A highly specific tool avoids false positives and is prioritized when unnecessary treatment or stigma is a major concern."},
+];
+
+// WRONG STATE
+let wrongAnswered = new Array(wrongData.length).fill(false);
+let wrongCorrect  = new Array(wrongData.length).fill(false);
+
+function renderWrong() {
+  const c = document.getElementById('wrong-container');
+  c.innerHTML = '';
+  wrongData.forEach((item,i) => {
+    const div = document.createElement('div');
+    div.className = 'case-card';
+    div.innerHTML = `
+      <div class="case-header">
+        <div class="case-num">Case ${i+1} of ${wrongData.length}</div>
+        <div class="case-text">${item.text}</div>
+      </div>
+      <div class="flaw-prompt">${item.prompt}</div>
+      <fieldset style="border:none;padding:0;margin:0">
+        <legend class="sr-only">Answer for case ${i+1}</legend>
+        <div class="case-choices">
+          ${item.options.map((o,j)=>`<button class="case-btn" id="wb-${i}-${j}" onclick="answerWrong(${i},${j})">${o}</button>`).join('')}
+        </div>
+      </fieldset>
+      <div class="case-feedback" id="wfb-${i}" role="alert"></div>
+    `;
+    c.appendChild(div);
+  });
+  updateWrongScore();
+}
+
+function answerWrong(q,choice) {
+  if (wrongAnswered[q]) return;
+  wrongAnswered[q] = true;
+  const correct = choice === wrongData[q].correct;
+  wrongCorrect[q] = correct;
+  wrongData[q].options.forEach((_,j) => {
+    const btn = document.getElementById(`wb-${q}-${j}`);
+    btn.disabled = true;
+    if (j === choice) btn.classList.add(correct ? 'correct' : 'wrong');
+    if (!correct && j === wrongData[q].correct) btn.classList.add('correct');
+  });
+  const fb = document.getElementById(`wfb-${q}`);
+  fb.textContent = correct ? wrongData[q].feedback : wrongData[q].wrongFeedback;
+  fb.className = `case-feedback show ${correct ? 'correct' : 'wrong'}`;
+  announce(`Case ${q+1}: ${correct ? 'Correct' : 'Incorrect'}. ${correct ? wrongData[q].feedback : wrongData[q].wrongFeedback}`);
+  updateWrongScore();
+}
+
+function updateWrongScore() {
+  document.getElementById('wrong-score').textContent = `Score: ${wrongCorrect.filter(Boolean).length} / ${wrongData.length}`;
+}
+
+function resetWrong() {
+  wrongAnswered = new Array(wrongData.length).fill(false);
+  wrongCorrect  = new Array(wrongData.length).fill(false);
+  renderWrong(); announce('Part 1 reset.');
+}
+
+// MATCH STATE
+let selectedDef = null;
+let matchedCount = 0;
+let matchedCorrect = 0;
+
+function renderMatch() {
+  selectedDef = null; matchedCount = 0; matchedCorrect = 0;
+  document.getElementById('match-fb').textContent = 'Select a definition to begin.';
+  document.getElementById('match-fb').className = 'match-feedback';
+
+  // Shuffle definitions display order
+  const defOrder = matchData.map((_,i)=>i).sort(()=>Math.random()-.5);
+  const typeOrder = matchData.map((_,i)=>i).sort(()=>Math.random()-.5);
+
+  const defCol = document.getElementById('def-col');
+  defCol.innerHTML = '';
+  defOrder.forEach(i => {
+    const btn = document.createElement('button');
+    btn.className = 'def-card';
+    btn.id = `def-${i}`;
+    btn.setAttribute('data-idx', i);
+    btn.setAttribute('aria-pressed','false');
+    btn.textContent = matchData[i].def;
+    btn.onclick = () => selectDef(i);
+    defCol.appendChild(btn);
+  });
+
+  const typeCol = document.getElementById('type-col');
+  typeCol.innerHTML = '';
+  typeOrder.forEach(i => {
+    const btn = document.createElement('button');
+    btn.className = 'type-btn';
+    btn.id = `type-${i}`;
+    btn.setAttribute('data-idx', i);
+    btn.textContent = matchData[i].type;
+    btn.onclick = () => selectType(i);
+    typeCol.appendChild(btn);
+  });
+  updateMatchScore();
+}
+
+function selectDef(i) {
+  if (document.getElementById(`def-${i}`).classList.contains('matched')) return;
+  if (selectedDef !== null) document.getElementById(`def-${selectedDef}`).classList.remove('selected');
+  selectedDef = i;
+  document.getElementById(`def-${i}`).classList.add('selected');
+  document.getElementById(`def-${i}`).setAttribute('aria-pressed','true');
+  announce(`Definition selected: ${matchData[i].def}. Now choose the matching type.`);
+}
+
+function selectType(typeIdx) {
+  if (document.getElementById(`type-${typeIdx}`).classList.contains('matched')) return;
+  if (selectedDef === null) { announce('Please select a definition first.'); return; }
+
+  const correct = selectedDef === typeIdx;
+  matchedCount++;
+  if (correct) matchedCorrect++;
+
+  document.getElementById(`def-${selectedDef}`).classList.remove('selected');
+  document.getElementById(`def-${selectedDef}`).setAttribute('aria-pressed','false');
+  document.getElementById(`def-${selectedDef}`).classList.add('matched', correct ? 'correct' : 'wrong');
+  document.getElementById(`def-${selectedDef}`).disabled = true;
+
+  document.getElementById(`type-${typeIdx}`).classList.add('matched', correct ? 'correct' : 'wrong');
+  document.getElementById(`type-${typeIdx}`).disabled = true;
+
+  if (!correct) {
+    // mark correct type too
+    document.getElementById(`type-${selectedDef}`).classList.add('matched','correct');
+    document.getElementById(`type-${selectedDef}`).disabled = true;
+  }
+
+  const fb = document.getElementById('match-fb');
+  fb.textContent = correct ? `✓ Correct! ${matchData[selectedDef].feedback}` : `✗ Not quite. ${matchData[selectedDef].def} matches "${matchData[selectedDef].type}". ${matchData[selectedDef].feedback}`;
+  fb.className = `match-feedback ${correct ? 'correct' : 'wrong'}`;
+
+  announce(fb.textContent);
+  selectedDef = null;
+  updateMatchScore();
+}
+
+function updateMatchScore() {
+  document.getElementById('match-score').textContent = `Matched: ${matchedCorrect} / ${matchData.length}`;
+}
+
+function resetMatch() { renderMatch(); announce('Part 2 reset.'); }
+
+function switchTab(tab) {
+  ['wrong','match'].forEach(t => {
+    document.getElementById(`panel-${t}`).classList.toggle('active', t === tab);
+    document.getElementById(`tab-${t}`).setAttribute('aria-selected', t === tab ? 'true' : 'false');
+  });
+}
+function announce(msg) {
+  const el = document.getElementById('live'); el.textContent='';
+  setTimeout(()=>{ el.textContent=msg; },50);
+}
+
+renderWrong();
+renderMatch();
+</script>
+</body>
+</html>
