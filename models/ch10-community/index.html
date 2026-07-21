@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Community and Community Organizing</title>
+<style>
+  :root{
+    color-scheme: light;
+    --teal:#1A6B72;--teal-lt:#D6ECED;--gold:#B07D2A;--gold-lt:#FEF3DC;
+    --purple:#5B3A8E;--purple-lt:#EDE6F7;--red:#9B2335;--red-lt:#FBDDE0;
+    --border:#CCCCCC;--gray:#F4F4F4;--text:#1A1A1A;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,sans-serif;font-size:15px;color:var(--text);background:#fff;padding:20px;max-width:860px;margin:0 auto}
+  h1{font-size:1.3rem;color:var(--teal);border-bottom:3px solid var(--teal);padding-bottom:8px;margin-bottom:6px}
+  .subtitle{font-size:.88rem;color:#555;margin-bottom:20px}
+  .tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+  .tab-btn{padding:8px 18px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.9rem;font-weight:bold}
+  .tab-btn:hover{background:var(--teal-lt)}
+  .tab-btn[aria-selected="true"]{background:var(--teal);color:#fff}
+  .tab-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .tab-panel{display:none}.tab-panel.active{display:block}
+  .instructions{background:var(--teal-lt);border-left:4px solid var(--teal);padding:12px 16px;border-radius:4px;margin-bottom:20px;font-size:.9rem}
+  .instructions strong{color:var(--teal)}
+
+  .s-card{border:1px solid var(--border);border-radius:6px;margin-bottom:22px;overflow:hidden}
+  .s-header{background:var(--gray);padding:14px 16px;border-bottom:1px solid var(--border)}
+  .s-num{font-size:.78rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+  .s-text{font-size:.95rem;line-height:1.6}
+  .s-prompt{padding:10px 16px;background:var(--gold-lt);font-size:.88rem;font-weight:bold;color:var(--gold);border-bottom:1px solid var(--border)}
+  .s-choices{padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+  .s-btn{padding:9px 14px;border:2px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:.88rem;line-height:1.4;text-align:left;transition:all .15s;color:var(--text)}
+  .s-btn:hover:not([disabled]){border-color:var(--teal);background:var(--teal-lt)}
+  .s-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .s-btn.correct{border-color:var(--teal);background:var(--teal-lt);color:var(--teal);font-weight:bold}
+  .s-btn.correct::after{content:" ✓"}
+  .s-btn.wrong{border-color:var(--red);background:var(--red-lt);color:var(--red)}
+  .s-btn.wrong::after{content:" ✗"}
+  .s-btn[disabled]{cursor:default}
+  .s-feedback{margin:0 16px 14px;padding:10px 14px;border-radius:4px;font-size:.88rem;line-height:1.5;display:none}
+  .s-feedback.show{display:block}
+  .s-feedback.correct{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+  .s-feedback.wrong{background:var(--red-lt);color:#6B1020;border-left:4px solid var(--red)}
+
+  /* SORTER */
+  .sorter-pool{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+  .sorter-chip{padding:8px 14px;border:2px solid var(--border);border-radius:20px;background:#fff;cursor:pointer;font-size:.86rem;transition:all .15s;color:var(--text)}
+  .sorter-chip:hover:not(.placed){border-color:var(--teal);background:var(--teal-lt)}
+  .sorter-chip.selected{border-color:var(--gold);background:var(--gold-lt)}
+  .sorter-chip.placed{opacity:.4;pointer-events:none}
+  .sorter-chip:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .selected-display{background:var(--gold-lt);border:2px solid var(--gold);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:.9rem;display:none}
+  .selected-display.show{display:block}
+  .selected-display strong{color:var(--gold)}
+  .bin-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+  .bin-btn{padding:9px 20px;border:2px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:.9rem;font-weight:bold;transition:all .15s}
+  .bin-btn.org{border-color:var(--teal);color:var(--teal)}
+  .bin-btn.org:hover{background:var(--teal-lt)}
+  .bin-btn.bld{border-color:var(--purple);color:var(--purple)}
+  .bin-btn.bld:hover{background:var(--purple-lt)}
+  .bin-btn.both{border-color:var(--gold);color:var(--gold)}
+  .bin-btn.both:hover{background:var(--gold-lt)}
+  .bin-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .drop-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+  @media(max-width:600px){.drop-grid{grid-template-columns:1fr}}
+  .drop-zone{border:2px dashed var(--border);border-radius:8px;padding:10px;min-height:120px}
+  .dz-label{font-size:.8rem;font-weight:bold;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;padding:5px 8px;border-radius:4px;color:#fff;display:inline-block}
+  .dz-org{background:var(--teal)}.dz-bld{background:var(--purple)}.dz-both{background:var(--gold)}
+  .placed-chip{padding:6px 10px;border-radius:14px;font-size:.82rem;margin-bottom:5px;display:inline-block;margin-right:4px;line-height:1.35}
+  .placed-chip.correct{background:var(--teal-lt);color:var(--teal);border:1px solid var(--teal)}
+  .placed-chip.wrong{background:var(--red-lt);color:var(--red);border:1px solid var(--red)}
+
+  .score-row{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+  .score-badge{background:var(--teal);color:#fff;padding:5px 14px;border-radius:20px;font-weight:bold;font-size:.9rem;white-space:nowrap}
+  .reset-btn{padding:6px 14px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.88rem;font-weight:bold}
+  .reset-btn:hover{background:var(--teal-lt)}
+  .reset-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+<h1>Community and Community Organizing: Applying the Concepts</h1>
+<p class="subtitle">Identify community elements in real situations, then distinguish between organizing and building approaches.</p>
+
+<div class="tabs" role="tablist" aria-label="Activity tabs">
+  <button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-elements" id="tab-elements" onclick="switchTab('elements')">Part 1: Which Element Is This?</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-sorter" id="tab-sorter" onclick="switchTab('sorter')">Part 2: Organizing or Building?</button>
+</div>
+<div class="sr-only" aria-live="polite" aria-atomic="true" id="live"></div>
+
+<!-- PART 1 -->
+<div class="tab-panel active" id="panel-elements" role="tabpanel" aria-labelledby="tab-elements">
+  <div class="instructions">
+    <strong>Directions:</strong> Each scenario describes something happening in a community. Identify which of the six community elements it best illustrates: Membership, Common Symbol Systems, Shared Values and Norms, Mutual Influence, Shared Needs and Commitment, or Shared Emotional Connection.
+  </div>
+  <div id="elements-container"></div>
+  <div class="score-row">
+    <div class="score-badge" id="elements-score" aria-live="polite">Score: 0 / 6</div>
+    <button class="reset-btn" onclick="resetElements()">Reset Part 1</button>
+  </div>
+</div>
+
+<!-- PART 2 -->
+<div class="tab-panel" id="panel-sorter" role="tabpanel" aria-labelledby="tab-sorter">
+  <div class="instructions">
+    <strong>Directions:</strong> Click a chip to select it, then click a bucket to classify it as Community Organizing (problem-focused, advocacy for change), Community Building (asset-focused, strengthening capacity), or Both.
+  </div>
+  <div class="selected-display" id="sorter-selected-display" aria-live="polite">
+    <strong>Selected:</strong> <span id="sorter-selected-text">—</span><br>
+    <small>Now click a bucket below.</small>
+  </div>
+  <div class="bin-row" role="group" aria-label="Classification buckets">
+    <button class="bin-btn org" onclick="classifySelected('organizing')">Community Organizing</button>
+    <button class="bin-btn bld" onclick="classifySelected('building')">Community Building</button>
+    <button class="bin-btn both" onclick="classifySelected('both')">Both</button>
+  </div>
+  <div class="sorter-pool" id="sorter-pool" role="group" aria-label="Activity chips"></div>
+  <div class="drop-grid">
+    <div class="drop-zone"><div class="dz-label dz-org">Community Organizing</div><div id="placed-organizing"></div></div>
+    <div class="drop-zone"><div class="dz-label dz-bld">Community Building</div><div id="placed-building"></div></div>
+    <div class="drop-zone"><div class="dz-label dz-both">Both</div><div id="placed-both"></div></div>
+  </div>
+  <div class="score-row">
+    <div class="score-badge" id="sorter-score" aria-live="polite">Classified: 0 / 8</div>
+    <button class="reset-btn" onclick="resetSorter()">Reset Part 2</button>
+  </div>
+</div>
+
+<script>
+const elementsData = [
+  {
+    text:"Every year on the Day of the Dead, families in a Mexican-American neighborhood gather at the community garden to build ofrendas and share food. New residents are welcomed into the tradition and taught its meaning by long-time community members.",
+    prompt:"Which community element does this best illustrate?",
+    options:["Membership","Common Symbol Systems","Shared Values and Norms","Mutual Influence","Shared Needs and Commitment","Shared Emotional Connection"],
+    correct:1,
+    feedback:"Common Symbol Systems. The Day of the Dead tradition — with its specific rituals, objects, and ceremonies — is a shared symbol system that communicates identity, continuity, and belonging within this community. Transmitting it to new residents reinforces community cohesion.",
+    wrongFeedback:"Think about what is actually being shared here: a specific ritual, its objects, and its meaning — a ceremony passed from long-timers to newcomers. That transmission of culturally meaningful rituals and practices is what Common Symbol Systems describes."
+  },
+  {
+    text:"After a longtime community health worker retires, several families she served begin attending city council meetings to advocate for her position to be refilled — something none of them had done before. Her influence on them over the years led them to become advocates themselves.",
+    prompt:"Which element is best illustrated here?",
+    options:["Membership","Common Symbol Systems","Shared Values and Norms","Mutual Influence","Shared Needs and Commitment","Shared Emotional Connection"],
+    correct:3,
+    feedback:"Mutual Influence. The community health worker influenced families over years, and those families — shaped by her presence — are now influencing city policy. Community members both shape and are shaped by each other over time. That back-and-forth impact is mutual influence.",
+    wrongFeedback:"Notice that influence moved in both directions over time: the health worker shaped the families, and their relationship with her shaped them into advocates who are now influencing community decisions. That bidirectional, ongoing shaping of each other is Mutual Influence."
+  },
+  {
+    text:"Residents of a neighborhood with a history of flooding, disinvestment, and industrial contamination gather every year for a community dinner. Older residents share stories of what the neighborhood looked like 40 years ago and what they fought for together. Younger residents say these gatherings help them understand who they are and why the community keeps showing up.",
+    prompt:"Which element does this best illustrate?",
+    options:["Membership","Common Symbol Systems","Shared Values and Norms","Mutual Influence","Shared Needs and Commitment","Shared Emotional Connection"],
+    correct:5,
+    feedback:"Shared Emotional Connection. This gathering is specifically about connecting through common history, shared struggle, and mutual support across generations. The sense of knowing where you come from and feeling bonded to others through that history is the essence of shared emotional connection.",
+    wrongFeedback:"The gathering centers on shared history, collective struggle, and the emotional bond that comes from having gone through difficult things together. Connecting people through common history and mutual support across generations is Shared Emotional Connection."
+  },
+  {
+    text:"Parents in a neighborhood consistently agree that children should be supervised when playing outside and that adults should intervene if they see a child alone or in trouble — even children they do not personally know. This expectation is never written down anywhere, but everyone seems to understand and follow it.",
+    prompt:"Which element does this describe?",
+    options:["Membership","Common Symbol Systems","Shared Values and Norms","Mutual Influence","Shared Needs and Commitment","Shared Emotional Connection"],
+    correct:2,
+    feedback:"Shared Values and Norms. An unwritten but widely understood expectation about how community members should behave toward each other's children is a norm — part of the shared value system that guides behavior within this community without needing to be formally stated.",
+    wrongFeedback:"This is about an unspoken but widely shared expectation — a standard of behavior that community members hold in common without it ever being written down. Informal shared standards of behavior that guide community life are Shared Values and Norms."
+  },
+  {
+    text:"Several families in a rural community notice that the nearest emergency room is over 60 miles away and that three neighbors have died from delayed emergency care in the past two years. Community members begin pooling money to support a volunteer EMT program and attending county health board meetings together.",
+    prompt:"Which element is most clearly driving their collective action?",
+    options:["Membership","Common Symbol Systems","Shared Values and Norms","Mutual Influence","Shared Needs and Commitment","Shared Emotional Connection"],
+    correct:4,
+    feedback:"Shared Needs and Commitment. Community members have identified a common, urgent need — emergency medical access — and are collectively committing resources and time to address it together. That combination of shared need and collective action to meet it is exactly what this element describes.",
+    wrongFeedback:"These residents share a specific, concrete need (emergency medical access) and are responding to it together by pooling resources and taking collective action. Acting together to meet a shared need is Shared Needs and Commitment."
+  },
+  {
+    text:"A Somali immigrant community in a mid-sized city has formed a soccer league, a mosque, and a cultural association. Members of the community consistently describe feeling 'at home' with each other in ways they do not feel elsewhere in the city — a sense that they belong here.",
+    prompt:"Which element does this most directly reflect?",
+    options:["Membership","Common Symbol Systems","Shared Values and Norms","Mutual Influence","Shared Needs and Commitment","Shared Emotional Connection"],
+    correct:0,
+    feedback:"Membership. The feeling of belonging — of being recognized and accepted as part of a group, of feeling 'at home' among these particular people — is the core of membership as a community element. The organizations they have built serve as structures that reinforce and sustain that belonging.",
+    wrongFeedback:"The key phrase is 'feeling at home' — a sense of identity and belonging that is specific to this group. That feeling of being recognized and accepted as part of something is Membership."
+  },
+];
+
+const sorterData = [
+  {label:"Residents petition the city to close a polluting factory near their school", correct:"organizing", feedback:"Community Organizing. This is advocacy for a specific change — pressure on an outside institution to stop causing harm. It starts from a problem and uses collective action to demand a solution."},
+  {label:"A neighborhood maps all the community gardens, mutual aid networks, and informal caregivers on a single block", correct:"building", feedback:"Community Building. Asset mapping — identifying and documenting existing community strengths — is a foundational community building activity. It starts from what is already there, not from what is wrong."},
+  {label:"A coalition forms to both advocate for a new clinic and train resident health navigators", correct:"both", feedback:"Both. Advocating for a new clinic is organizing (problem-focused, change-seeking). Training resident health navigators is building (capacity development). Many real-world efforts combine both."},
+  {label:"A task force of residents and organizations drafts and presents a health equity resolution to the county board", correct:"organizing", feedback:"Community Organizing. Drafting and advocating for a policy resolution is a collective advocacy action aimed at institutional change — the heart of community organizing."},
+  {label:"A community identifies and connects retired nurses, teachers, and tradespeople who are willing to volunteer their skills for health programs", correct:"building", feedback:"Community Building. Identifying and connecting individual assets — skills and knowledge that already exist in the community — is a classic community building and asset-mapping activity."},
+  {label:"A coalition organizes a march to demand restored funding for a community health center while simultaneously training a new cohort of community health workers", correct:"both", feedback:"Both. The march is organizing — collective pressure for a policy change. The health worker training is building — developing long-term community capacity. Strong coalitions often do both simultaneously."},
+  {label:"A faith community starts a health ministry that connects congregation members with chronic disease management resources they already trust", correct:"building", feedback:"Community Building. This effort builds on an existing asset (the faith community's trust and networks) to strengthen health capacity — without needing to fix a specific problem first."},
+  {label:"Parents organize to reverse a school district decision to eliminate the school nurse position", correct:"organizing", feedback:"Community Organizing. This is a response to a specific threat — an institutional decision the community wants to change. Mobilizing to reverse that decision is community organizing in its most direct form."},
+];
+
+let elemAnswered = new Array(elementsData.length).fill(false);
+let elemCorrect  = new Array(elementsData.length).fill(false);
+let selectedChip = null;
+let sortCount    = 0;
+let sortCorrect  = 0;
+
+// ELEMENTS
+function renderElements() {
+  elemAnswered.fill(false); elemCorrect.fill(false);
+  const c = document.getElementById('elements-container');
+  c.innerHTML = '';
+  elementsData.forEach((item,i) => {
+    const div = document.createElement('div');
+    div.className = 's-card';
+    div.innerHTML = `
+      <div class="s-header">
+        <div class="s-num">Scenario ${i+1} of ${elementsData.length}</div>
+        <div class="s-text">${item.text}</div>
+      </div>
+      <div class="s-prompt">${item.prompt}</div>
+      <fieldset style="border:none;padding:0;margin:0">
+        <legend class="sr-only">Answer for scenario ${i+1}</legend>
+        <div class="s-choices">
+          ${item.options.map((o,j)=>`<button class="s-btn" id="el-${i}-${j}" onclick="answerElem(${i},${j})">${o}</button>`).join('')}
+        </div>
+      </fieldset>
+      <div class="s-feedback" id="elfb-${i}" role="alert"></div>
+    `;
+    c.appendChild(div);
+  });
+  document.getElementById('elements-score').textContent=`Score: 0 / ${elementsData.length}`;
+}
+
+function answerElem(q,choice) {
+  if(elemAnswered[q]) return;
+  elemAnswered[q]=true;
+  const ok=choice===elementsData[q].correct;
+  elemCorrect[q]=ok;
+  elementsData[q].options.forEach((_,j)=>{
+    const btn=document.getElementById(`el-${q}-${j}`);
+    btn.disabled=true;
+    if(j===choice) btn.classList.add(ok?'correct':'wrong');
+    if(!ok&&j===elementsData[q].correct) btn.classList.add('correct');
+  });
+  const fb=document.getElementById(`elfb-${q}`);
+  fb.textContent=ok?elementsData[q].feedback:elementsData[q].wrongFeedback;
+  fb.className=`s-feedback show ${ok?'correct':'wrong'}`;
+  announce(`Scenario ${q+1}: ${ok?'Correct':'Incorrect'}.`);
+  document.getElementById('elements-score').textContent=`Score: ${elemCorrect.filter(Boolean).length} / ${elementsData.length}`;
+}
+
+function resetElements() { renderElements(); announce('Part 1 reset.'); }
+
+// SORTER
+function renderSorter() {
+  selectedChip=null; sortCount=0; sortCorrect=0;
+  document.getElementById('sorter-selected-display').classList.remove('show');
+  document.getElementById('sorter-selected-text').textContent='—';
+  ['organizing','building','both'].forEach(b=>document.getElementById(`placed-${b}`).innerHTML='');
+  const pool=document.getElementById('sorter-pool');
+  pool.innerHTML='';
+  sorterData.forEach((item,i)=>{
+    const chip=document.createElement('button');
+    chip.className='sorter-chip';
+    chip.id=`sc-${i}`;
+    chip.textContent=item.label;
+    chip.setAttribute('aria-pressed','false');
+    chip.onclick=()=>selectChip(i);
+    pool.appendChild(chip);
+  });
+  document.getElementById('sorter-score').textContent=`Classified: 0 / ${sorterData.length}`;
+}
+
+function selectChip(i) {
+  if(document.getElementById(`sc-${i}`).classList.contains('placed')) return;
+  if(selectedChip!==null) {
+    const prev=document.getElementById(`sc-${selectedChip}`);
+    if(prev){prev.classList.remove('selected');prev.setAttribute('aria-pressed','false');}
+  }
+  selectedChip=i;
+  const chip=document.getElementById(`sc-${i}`);
+  chip.classList.add('selected');
+  chip.setAttribute('aria-pressed','true');
+  document.getElementById('sorter-selected-text').textContent=sorterData[i].label;
+  document.getElementById('sorter-selected-display').classList.add('show');
+  announce(`Selected: ${sorterData[i].label}. Now choose a bucket.`);
+}
+
+function classifySelected(bucket) {
+  if(selectedChip===null){announce('Select a chip first.');return;}
+  const item=sorterData[selectedChip];
+  const ok=item.correct===bucket;
+  sortCount++;
+  if(ok) sortCorrect++;
+
+  const chip=document.getElementById(`sc-${selectedChip}`);
+  chip.classList.add('placed');
+
+  const placed=document.createElement('div');
+  placed.className=`placed-chip ${ok?'correct':'wrong'}`;
+  placed.innerHTML=`${item.label}<br><small style="font-size:.78rem;opacity:.85">${item.feedback}</small>`;
+  document.getElementById(`placed-${bucket}`).appendChild(placed);
+
+  if(!ok){
+    const fix=document.createElement('div');
+    fix.className='placed-chip correct';
+    fix.innerHTML=`${item.label} <em>(moved here)</em><br><small style="font-size:.78rem;opacity:.85">${item.feedback}</small>`;
+    document.getElementById(`placed-${item.correct}`).appendChild(fix);
+  }
+
+  announce(`${item.label}: ${ok?'Correct':'Incorrect'}. ${item.feedback}`);
+  selectedChip=null;
+  document.getElementById('sorter-selected-display').classList.remove('show');
+  document.getElementById('sorter-score').textContent=`Classified: ${sortCorrect} / ${sorterData.length}`;
+}
+
+function resetSorter(){renderSorter();announce('Part 2 reset.');}
+
+function switchTab(tab){
+  ['elements','sorter'].forEach(t=>{
+    document.getElementById(`panel-${t}`).classList.toggle('active',t===tab);
+    document.getElementById(`tab-${t}`).setAttribute('aria-selected',t===tab?'true':'false');
+  });
+}
+function announce(msg){
+  const el=document.getElementById('live');el.textContent='';
+  setTimeout(()=>{el.textContent=msg;},50);
+}
+
+renderElements();
+renderSorter();
+</script>
+</body>
+</html>

@@ -46,6 +46,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/ch9-marketing/](models/ch9-marketing/): identify the exchange participants make in health promotion scenarios, then name what a program truly competes against.
 - [models/ch9-segmentation/](models/ch9-segmentation/): diagnose which segment quality criterion a target segment violates, then identify which of the 4 Ps a program decision reflects.
 - [models/ch9-pretesting/](models/ch9-pretesting/): distinguish pretest phase 1, phase 2, and continuous monitoring, then choose the right feedback approach for each situation.
+- [models/ch10-community/](models/ch10-community/): identify the six elements of community in real scenarios, then sort activities into community organizing, community building, or both.
 
 ## Embed snippets
 
@@ -76,6 +77,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Marketing in Health Promotion: Applying the Concepts" src="models/ch9-marketing/"></iframe>
 <iframe title="Segmentation and the Marketing Mix: Applied Practice" src="models/ch9-segmentation/"></iframe>
 <iframe title="Pretesting and Continuous Monitoring: Applied Judgment" src="models/ch9-pretesting/"></iframe>
+<iframe title="Community and Community Organizing: Applying the Concepts" src="models/ch10-community/"></iframe>
 ```
 
 ## Files
