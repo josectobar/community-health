@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CH8 Widget 2: Strategy Types</title>
+<style>
+:root{color-scheme:light;--teal:#1A6B72;--teal-lt:#D6ECED;--gold:#B07D2A;--gold-lt:#FEF3DC;--purple:#5B3A8E;--purple-lt:#EDE6F7;--red:#9B2335;--red-lt:#FBDDE0;--border:#CCC;--gray:#F4F4F4;--text:#1A1A1A;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;font-size:15px;color:var(--text);background:#fff;padding:20px;max-width:900px;margin:0 auto}
+h1{font-size:1.3rem;color:var(--teal);border-bottom:3px solid var(--teal);padding-bottom:8px;margin-bottom:6px}
+.subtitle{font-size:.88rem;color:#555;margin-bottom:20px}
+.tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.tab-btn{padding:8px 18px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.9rem;font-weight:bold}
+.tab-btn:hover{background:var(--teal-lt)}.tab-btn[aria-selected="true"]{background:var(--teal);color:#fff}
+.tab-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.instructions{background:var(--teal-lt);border-left:4px solid var(--teal);padding:12px 16px;border-radius:4px;margin-bottom:16px;font-size:.9rem}
+.instructions strong{color:var(--teal)}
+
+/* FLIP CARDS */
+.flip-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:580px){.flip-grid{grid-template-columns:repeat(2,1fr)}}
+.flip-card{perspective:900px;height:150px;cursor:pointer}
+.flip-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.flip-card.flipped .flip-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:8px;padding:12px;display:flex;align-items:center;justify-content:center;text-align:center;border:2px solid var(--border)}
+.flip-front{background:#fff;font-size:.88rem;line-height:1.4;color:var(--text)}
+.flip-back{background:var(--teal);color:#fff;font-size:.82rem;line-height:1.45;transform:rotateY(180deg)}
+.flip-card:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:8px}
+.flip-card .flip-front .tag{font-size:.7rem;font-weight:bold;text-transform:uppercase;color:#fff;padding:2px 8px;border-radius:8px;margin-bottom:6px;display:inline-block}
+.flip-hint{font-size:.78rem;color:#888;text-align:center;margin-bottom:12px}
+.fc-score{font-size:.88rem;color:var(--teal);font-weight:bold;margin-bottom:12px}
+
+/* HIP PYRAMID MATCHER */
+.hip-scenario{background:var(--gray);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:14px}
+.hip-s-num{font-size:.76rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.hip-s-text{font-size:.93rem;line-height:1.6;margin-bottom:10px}
+.hip-levels{display:flex;flex-direction:column;gap:6px}
+.hip-lvl{padding:8px 14px;border:2px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:.86rem;line-height:1.35;transition:all .15s;text-align:left;color:var(--text)}
+.hip-lvl:hover:not([disabled]){border-color:var(--teal);background:var(--teal-lt)}
+.hip-lvl:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.hip-lvl.correct{border-color:var(--teal);background:var(--teal-lt);color:var(--teal);font-weight:bold}.hip-lvl.correct::after{content:" ✓"}
+.hip-lvl.wrong{border-color:var(--red);background:var(--red-lt);color:var(--red)}.hip-lvl.wrong::after{content:" ✗"}
+.hip-lvl[disabled]{cursor:default}
+.hip-fb{margin-top:8px;padding:10px 14px;border-radius:4px;font-size:.87rem;line-height:1.5;display:none}
+.hip-fb.show{display:block}
+.hip-fb.correct{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+.hip-fb.wrong{background:var(--red-lt);color:#6B1020;border-left:4px solid var(--red)}
+
+.score-row{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+.score-badge{background:var(--teal);color:#fff;padding:5px 14px;border-radius:20px;font-weight:bold;font-size:.9rem;white-space:nowrap}
+.reset-btn{padding:6px 14px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.88rem;font-weight:bold}
+.reset-btn:hover{background:var(--teal-lt)}.reset-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+<h1>Strategy Types and the Health Impact Pyramid</h1>
+<p class="subtitle">Flip cards to match real examples to strategy types, then place interventions on the Health Impact Pyramid.</p>
+<div class="tabs" role="tablist" aria-label="Tabs">
+  <button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-flip" id="tab-flip" onclick="switchTab('flip')">Part 1: Strategy Flip Cards</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-hip" id="tab-hip" onclick="switchTab('hip')">Part 2: Health Impact Pyramid</button>
+</div>
+<div class="sr-only" aria-live="polite" aria-atomic="true" id="live"></div>
+
+<div class="tab-panel active" id="panel-flip" role="tabpanel" aria-labelledby="tab-flip">
+  <div class="instructions"><strong>Directions:</strong> Each card shows a real health program action. Click the card to flip it and reveal which of the six strategy types it represents and why. Try to guess before you flip!</div>
+  <p class="flip-hint">Click any card to flip it — guess the strategy type first!</p>
+  <div class="flip-grid" id="flip-grid"></div>
+  <div class="score-row">
+    <div class="fc-score" id="flip-count" aria-live="polite">Cards flipped: 0 / 6</div>
+    <button class="reset-btn" onclick="resetFlip()">Reset Cards</button>
+  </div>
+</div>
+
+<div class="tab-panel" id="panel-hip" role="tabpanel" aria-labelledby="tab-hip">
+  <div class="instructions"><strong>Directions:</strong> The Health Impact Pyramid has five levels. For each intervention below, select where it sits on the pyramid. Think about how many people it reaches and how much individual effort it requires.</div>
+  <div id="hip-container"></div>
+  <div class="score-row">
+    <div class="score-badge" id="hip-score" aria-live="polite">Score: 0 / 5</div>
+    <button class="reset-btn" onclick="resetHIP()">Reset Part 2</button>
+  </div>
+</div>
+
+<script>
+const flipCards = [
+  {front:"A health department airs 30-second radio spots on Spanish-language stations reminding adults about free blood pressure screenings at local barbershops.",back:"Health Communication. Radio is a mass media channel — it reaches a broad audience with a health message. The goal is to inform and influence decisions, not teach a skill or change a law.",tag:"Communication",tagColor:"#1A6B72"},
+  {front:"A city ordinance requires all restaurants with more than 20 seats to post calorie counts on menus, with fines for noncompliance.",back:"Health Policy/Enforcement. This is a mandated, regulated strategy adopted by an authoritative body (the city). Compliance is expected and backed by enforcement.",tag:"Policy/Enforcement",tagColor:"#5B3A8E"},
+  {front:"A nonprofit runs a six-week workshop where low-income adults learn to cook healthy meals on a budget, practice reading nutrition labels, and set weekly food goals.",back:"Health Education. Structured, active learning with skill-building and repeated practice sessions is health education — it goes beyond one-way information to build knowledge and real-world skills.",tag:"Health Education",tagColor:"#2A8A6B"},
+  {front:"A city installs protected bike lanes, adds crosswalks with pedestrian signals, and places benches along a walking route through a low-income neighborhood.",back:"Environmental Change. These physical modifications change the built environment to make active transportation easier and safer — without requiring any individual to change their mind or motivation.",tag:"Environmental Change",tagColor:"#B07D2A"},
+  {front:"A mobile health van offers free blood glucose screenings, flu vaccines, and referrals to a federally qualified health center at a weekly farmers' market.",back:"Health-Related Community Service. Providing direct health services — screenings, vaccines, referrals — to reduce access barriers is a community service strategy. Critically, referrals must include follow-up.",tag:"Community Service",tagColor:"#1A3F6B"},
+  {front:"Residents organize a campaign, collect signatures from 1,200 community members, and present air quality data to the city council to demand emissions controls on a nearby factory.",back:"Health Advocacy & Mobilization. Community members are using collective voice and data to advocate for structural change. This builds community power — not just individual behavior change.",tag:"Advocacy/Mobilization",tagColor:"#9B2335"},
+];
+
+let flippedCount = 0;
+function renderFlip() {
+  flippedCount = 0;
+  const grid = document.getElementById('flip-grid');
+  grid.innerHTML = '';
+  flipCards.forEach((c,i) => {
+    const card = document.createElement('div');
+    card.className = 'flip-card'; card.tabIndex = 0;
+    card.setAttribute('aria-label', `Card ${i+1}: ${c.front}. Press Enter to flip.`);
+    card.innerHTML = `
+      <div class="flip-inner">
+        <div class="flip-front"><div>
+          <span class="tag" style="background:${c.tagColor}">&nbsp;</span><br>${c.front}
+        </div></div>
+        <div class="flip-back">${c.back}</div>
+      </div>`;
+    card.onclick = () => toggleFlip(card, i);
+    card.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleFlip(card,i);} });
+    grid.appendChild(card);
+  });
+  document.getElementById('flip-count').textContent = 'Cards flipped: 0 / 6';
+}
+
+function toggleFlip(card, i) {
+  const wasFlipped = card.classList.contains('flipped');
+  card.classList.toggle('flipped');
+  if(!wasFlipped) { flippedCount++; } else { flippedCount--; }
+  document.getElementById('flip-count').textContent = `Cards flipped: ${flippedCount} / 6`;
+  announce(wasFlipped ? `Card ${i+1} unflipped.` : `Card ${i+1} flipped: ${flipCards[i].back}`);
+}
+function resetFlip() { renderFlip(); announce('Cards reset.'); }
+
+// HIP
+const hipData = [
+  {text:"A state minimum wage increase raises income for 400,000 low-wage workers, reducing financial stress and improving ability to afford healthy food and stable housing.",prompt:"Where does this intervention sit on the Health Impact Pyramid?",options:["Socioeconomic factors — base (broadest, most durable population impact)","Changing the context — making healthy defaults","Long-lasting protective interventions","Ongoing clinical care","Counseling and education — top (most individual effort, narrowest reach)"],correct:0,feedback:"Base level: Socioeconomic factors. Changing income conditions affects the daily life circumstances of hundreds of thousands of people simultaneously — without requiring individual behavior change. This is the highest-impact level of the pyramid.",wrongFeedback:"This intervention changes structural economic conditions that shape health across an entire population. Structural/socioeconomic interventions are the base of the pyramid — highest reach, most durable impact."},
+  {text:"A school cafeteria changes its default lunch tray so every student automatically receives a fruit serving unless they actively opt out.",prompt:"Where on the pyramid does this fall?",options:["Socioeconomic factors — base","Changing the context — making healthy defaults","Long-lasting protective interventions","Ongoing clinical care","Counseling and education — top"],correct:1,feedback:"Changing the context — making healthy defaults. The environment is redesigned so the healthy choice happens automatically for every student without individual decision-making. No one needs to be motivated or educated — the system does it for them.",wrongFeedback:"No individual education or clinical contact is required — the environment is changed so the healthy option is the automatic default. Redesigning systems so healthy behaviors happen without individual effort is the 'changing the context' level."},
+  {text:"A community health clinic runs a free childhood vaccination program, offering MMR and HPV vaccines that provide protection lasting decades.",prompt:"Where on the pyramid?",options:["Socioeconomic factors — base","Changing the context — making healthy defaults","Long-lasting protective interventions","Ongoing clinical care","Counseling and education — top"],correct:2,feedback:"Long-lasting protective interventions. A single clinical contact (the vaccine) provides decades of protection without requiring ongoing behavior change. This is highly effective at scale because the benefit persists long after the intervention.",wrongFeedback:"Vaccines provide durable protection from a single or brief clinical encounter — no ongoing behavior change is needed. Interventions that give lasting protection from minimal contact are the 'long-lasting protective' level."},
+  {text:"A certified diabetes educator meets weekly with individual patients to set personalized blood sugar goals, review progress, and troubleshoot barriers.",prompt:"Where on the pyramid does this fall?",options:["Socioeconomic factors — base","Changing the context — making healthy defaults","Long-lasting protective interventions","Ongoing clinical care","Counseling and education — top"],correct:4,feedback:"Counseling and education — the top. This is one-on-one, repeated contact that depends on sustained individual engagement and behavior change. It can be highly effective for individuals served, but it is resource-intensive and reaches fewer people per dollar than lower-level interventions.",wrongFeedback:"Weekly individual sessions require ongoing effort from both provider and patient and reach one person at a time. Individualized, repeated counseling or education is at the top of the pyramid — highest effort per person, narrowest reach."},
+  {text:"A county rezones a food desert neighborhood to allow and incentivize a full-service grocery store, making fresh produce physically and economically accessible where it was previously absent.",prompt:"Where does this fall on the pyramid?",options:["Socioeconomic factors — base","Changing the context — making healthy defaults","Long-lasting protective interventions","Ongoing clinical care","Counseling and education — top"],correct:1,feedback:"Changing the context. Rezoning restructures the physical and economic environment so accessing healthy food requires less effort, cost, and planning — it becomes the default for people in that neighborhood. This is a context-change, not a socioeconomic factor change (no income is changing).",wrongFeedback:"Rezoning changes the physical environment to make healthy food accessible — not by changing anyone's income or motivating individual behavior, but by making the healthy option actually available and reachable. That is 'changing the context.'"},
+];
+
+let hipAnswered=new Array(hipData.length).fill(false),hipCorrect=new Array(hipData.length).fill(false);
+
+function renderHIP() {
+  hipAnswered.fill(false);hipCorrect.fill(false);
+  const c=document.getElementById('hip-container');c.innerHTML='';
+  hipData.forEach((item,i)=>{
+    const div=document.createElement('div');div.className='hip-scenario';
+    div.innerHTML=`<div class="hip-s-num">Scenario ${i+1} of ${hipData.length}</div><div class="hip-s-text">${item.text}</div><div class="hip-s-prompt" style="font-size:.86rem;font-weight:bold;color:var(--gold);margin-bottom:8px">${item.prompt}</div><fieldset style="border:none;padding:0;margin:0"><legend class="sr-only">Pyramid level for scenario ${i+1}</legend><div class="hip-levels">${item.options.map((o,j)=>`<button class="hip-lvl" id="hl-${i}-${j}" onclick="answerHIP(${i},${j})">${o}</button>`).join('')}</div></fieldset><div class="hip-fb" id="hfb-${i}" role="alert"></div>`;
+    c.appendChild(div);
+  });
+  document.getElementById('hip-score').textContent=`Score: 0 / ${hipData.length}`;
+}
+
+function answerHIP(q,ch){
+  if(hipAnswered[q])return;hipAnswered[q]=true;
+  const ok=ch===hipData[q].correct;hipCorrect[q]=ok;
+  hipData[q].options.forEach((_,j)=>{const b=document.getElementById(`hl-${q}-${j}`);b.disabled=true;if(j===ch)b.classList.add(ok?'correct':'wrong');if(!ok&&j===hipData[q].correct)b.classList.add('correct');});
+  const fb=document.getElementById(`hfb-${q}`);fb.textContent=ok?hipData[q].feedback:hipData[q].wrongFeedback;fb.className=`hip-fb show ${ok?'correct':'wrong'}`;
+  announce(`Scenario ${q+1}: ${ok?'Correct':'Incorrect'}.`);
+  document.getElementById('hip-score').textContent=`Score: ${hipCorrect.filter(Boolean).length} / ${hipData.length}`;
+}
+function resetHIP(){renderHIP();announce('Part 2 reset.');}
+
+function switchTab(t){['flip','hip'].forEach(x=>{document.getElementById(`panel-${x}`).classList.toggle('active',x===t);document.getElementById(`tab-${x}`).setAttribute('aria-selected',x===t?'true':'false');});}
+function announce(msg){const el=document.getElementById('live');el.textContent='';setTimeout(()=>{el.textContent=msg;},50);}
+renderFlip();renderHIP();
+</script>
+</body>
+</html>
