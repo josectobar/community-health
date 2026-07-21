@@ -53,6 +53,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/ch8-adopt/](models/ch8-adopt/): work branching decisions about whether to adopt, adapt, or create an intervention, then match failure scenarios to limitation types.
 - [models/ch8-planning/](models/ch8-planning/): sort program components into a logic model, then arrange the five design thinking stages in order.
 - [models/ch12-ethics/](models/ch12-ethics/): work ethical dilemmas in two steps, then run a sustainability self-assessment on a program facing grant expiry.
+- [models/ch12-implementation/](models/ch12-implementation/): sort program actions into pilot, phasing in, or total implementation, then match team behaviors to development stages.
 
 ## Embed snippets
 
@@ -90,6 +91,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Adopt, Adapt, or Create - and Diagnosing What Went Wrong" src="models/ch8-adopt/"></iframe>
 <iframe title="Planning Frameworks: Build and Sequence" src="models/ch8-planning/"></iframe>
 <iframe title="Ethics, Legal Responsibility, and Sustainability" src="models/ch12-ethics/"></iframe>
+<iframe title="Implementation Planning: Rollout Phases and Team Development" src="models/ch12-implementation/"></iframe>
 ```
 
 ## Files

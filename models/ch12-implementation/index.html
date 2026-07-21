@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CH12 Widget 4: Implementation Planning</title>
+<style>
+:root{color-scheme:light;--teal:#1A6B72;--teal-lt:#D6ECED;--gold:#B07D2A;--gold-lt:#FEF3DC;--purple:#5B3A8E;--purple-lt:#EDE6F7;--red:#9B2335;--red-lt:#FBDDE0;--border:#CCC;--gray:#F4F4F4;--text:#1A1A1A;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;font-size:15px;color:var(--text);background:#fff;padding:20px;max-width:900px;margin:0 auto}
+h1{font-size:1.3rem;color:var(--teal);border-bottom:3px solid var(--teal);padding-bottom:8px;margin-bottom:6px}
+.subtitle{font-size:.88rem;color:#555;margin-bottom:20px}
+.tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.tab-btn{padding:8px 18px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.9rem;font-weight:bold}
+.tab-btn:hover{background:var(--teal-lt)}.tab-btn[aria-selected="true"]{background:var(--teal);color:#fff}
+.tab-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.instructions{background:var(--teal-lt);border-left:4px solid var(--teal);padding:12px 16px;border-radius:4px;margin-bottom:16px;font-size:.9rem}
+.instructions strong{color:var(--teal)}
+
+/* TIMELINE BUILDER */
+.tl-scenario{background:var(--gray);border:1px solid var(--border);border-radius:6px;padding:14px;margin-bottom:14px;font-size:.92rem;line-height:1.6}
+.tl-scenario strong{color:var(--teal)}
+.tl-pool-label{font-size:.8rem;font-weight:bold;color:#555;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.tl-pool{display:flex;flex-wrap:wrap;gap:8px;min-height:48px;padding:10px;border:2px dashed var(--border);border-radius:6px;background:#fafafa;margin-bottom:14px}
+.tl-chip{padding:8px 13px;border:2px solid var(--border);border-radius:6px;background:#fff;cursor:grab;font-size:.83rem;user-select:none;transition:all .15s;line-height:1.35}
+.tl-chip:hover{border-color:var(--teal);background:var(--teal-lt)}
+.tl-chip.dragging{opacity:.35}
+.tl-stages{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.tl-stage{flex:1;min-width:160px;border:2px dashed var(--border);border-radius:8px;padding:10px;min-height:100px;transition:background .15s}
+.tl-stage.over{background:var(--teal-lt);border-color:var(--teal)}
+.tl-stage-label{font-size:.76rem;font-weight:bold;text-transform:uppercase;letter-spacing:.05em;color:#fff;padding:4px 8px;border-radius:4px;display:inline-block;margin-bottom:6px}
+.ls-pilot{background:var(--teal)}.ls-phase{background:var(--gold)}.ls-total{background:var(--purple)}
+.tl-placed{padding:5px 9px;border-radius:5px;font-size:.79rem;margin-bottom:4px;display:block;cursor:pointer;border:1px solid var(--border);background:#fff;line-height:1.3}
+.tl-placed.correct{background:var(--teal-lt);color:var(--teal);border-color:var(--teal)}
+.tl-placed.wrong{background:var(--red-lt);color:var(--red);border-color:var(--red)}
+.tl-placed:hover{opacity:.75}
+.action-row{display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.check-btn{padding:9px 20px;background:var(--teal);color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:.9rem;font-weight:bold}
+.check-btn:hover{background:#145a60}.check-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.result-box{margin-top:10px;padding:10px 14px;border-radius:4px;font-size:.88rem;line-height:1.5;display:none}
+.result-box.show{display:block}
+.result-box.good{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+.result-box.partial{background:var(--gold-lt);color:#6B4A00;border-left:4px solid var(--gold)}
+
+/* TEAM STAGES MATCH */
+.ts-layout{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:560px){.ts-layout{grid-template-columns:1fr}}
+.ts-col h3{font-size:.82rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.ts-card{border:2px solid var(--border);border-radius:6px;padding:10px 13px;margin-bottom:8px;cursor:pointer;font-size:.86rem;line-height:1.45;transition:all .15s;background:#fff;text-align:left;width:100%}
+.ts-card:hover:not([disabled]):not(.matched){border-color:var(--teal);background:var(--teal-lt)}
+.ts-card:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.ts-card.selected{border-color:var(--gold);background:var(--gold-lt)}
+.ts-card.matched.correct{border-color:var(--teal);background:var(--teal-lt);opacity:.75;cursor:default}
+.ts-card.matched.wrong{border-color:var(--red);background:var(--red-lt);opacity:.75;cursor:default}
+.ts-fb{background:var(--gray);border-radius:6px;padding:12px 14px;font-size:.88rem;line-height:1.5;margin-bottom:12px;min-height:48px}
+.ts-fb.correct{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+.ts-fb.wrong{background:var(--red-lt);color:#6B1020;border-left:4px solid var(--red)}
+
+.score-row{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+.score-badge{background:var(--teal);color:#fff;padding:5px 14px;border-radius:20px;font-weight:bold;font-size:.9rem;white-space:nowrap}
+.reset-btn{padding:6px 14px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.88rem;font-weight:bold}
+.reset-btn:hover{background:var(--teal-lt)}.reset-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+<h1>Implementation Planning: Rollout Phases and Team Development</h1>
+<p class="subtitle">Sort program actions into the right rollout phase, then match team behaviors to the correct development stage.</p>
+<div class="tabs" role="tablist" aria-label="Tabs">
+  <button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-tl" id="tab-tl" onclick="switchTab('tl')">Part 1: Build the Rollout Timeline</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-ts" id="tab-ts" onclick="switchTab('ts')">Part 2: Team Development Stage Match</button>
+</div>
+<div class="sr-only" aria-live="polite" aria-atomic="true" id="live"></div>
+
+<div class="tab-panel active" id="panel-tl" role="tabpanel" aria-labelledby="tab-tl">
+  <div class="instructions"><strong>Directions:</strong> Read the program context, then drag each action into the correct rollout phase: Pilot Testing, Phasing In, or Total Implementation. Click a placed item to return it to the pool. Click Check when done.</div>
+  <div class="tl-scenario"><strong>Program:</strong> A county health department is launching a new diabetes prevention lifestyle program. They have trained four facilitators, partnered with six community sites, and developed all materials. They need to roll it out strategically to catch problems before serving all participants.</div>
+  <div class="tl-pool-label">Program actions — drag into the phase where they belong</div>
+  <div class="tl-pool" id="tl-pool"></div>
+  <div class="tl-stages">
+    <div class="tl-stage" id="ts-pilot"><div class="tl-stage-label ls-pilot">Pilot Testing</div><div id="tp-pilot"></div></div>
+    <div class="tl-stage" id="ts-phase"><div class="tl-stage-label ls-phase">Phasing In</div><div id="tp-phase"></div></div>
+    <div class="tl-stage" id="ts-total"><div class="tl-stage-label ls-total">Total Implementation</div><div id="tp-total"></div></div>
+  </div>
+  <div class="action-row">
+    <button class="check-btn" onclick="checkTL()">Check My Rollout</button>
+    <div class="score-badge" id="tl-score" aria-live="polite">Placed: 0 / 8</div>
+    <button class="reset-btn" onclick="resetTL()">Reset</button>
+  </div>
+  <div class="result-box" id="tl-result" role="alert"></div>
+</div>
+
+<div class="tab-panel" id="panel-ts" role="tabpanel" aria-labelledby="tab-ts">
+  <div class="instructions"><strong>Directions:</strong> A new interdisciplinary health promotion team is forming. Select a team behavior on the left, then click the matching development stage (Forming, Storming, Norming, Performing, or Adjourning) on the right.</div>
+  <div class="ts-fb" id="ts-fb" role="alert">Select a behavior to begin.</div>
+  <div class="ts-layout">
+    <div class="ts-col"><h3>Team Behaviors</h3><div id="ts-left"></div></div>
+    <div class="ts-col"><h3>Development Stages</h3><div id="ts-right"></div></div>
+  </div>
+  <div class="score-row">
+    <div class="score-badge" id="ts-score" aria-live="polite">Matched: 0 / 6</div>
+    <button class="reset-btn" onclick="resetTS()">Reset Part 2</button>
+  </div>
+</div>
+
+<script>
+// ROLLOUT TIMELINE
+const tlChips=[
+  {id:'t1',label:'Run the program with 8 volunteer participants at one site to test materials and logistics before full enrollment',zone:'pilot'},
+  {id:'t2',label:'Document bugs found: registration system crashed, session 3 ran 20 minutes over, one handout was confusing',zone:'pilot'},
+  {id:'t3',label:'After fixing pilot issues, open enrollment to 40 participants across two of the six planned sites',zone:'phase'},
+  {id:'t4',label:'Add a third site and expand to 80 participants after smooth operation at the first two sites',zone:'phase'},
+  {id:'t5',label:'Open enrollment to all 200 eligible participants across all six community sites simultaneously',zone:'total'},
+  {id:'t6',label:'Host a program kickoff event at a local health fair to generate community awareness and media coverage',zone:'total'},
+  {id:'t7',label:'Observe every session of the small-group trial to note facilitator challenges and participant reactions',zone:'pilot'},
+  {id:'t8',label:'Deliver all six program modules at all sites with full staff complement as originally designed',zone:'total'},
+];
+let tlPlaced={};let tlDragId=null;
+
+function renderTL(){
+  tlPlaced={};
+  const pool=document.getElementById('tl-pool');pool.innerHTML='';
+  ['pilot','phase','total'].forEach(z=>document.getElementById(`tp-${z}`).innerHTML='');
+  document.getElementById('tl-result').classList.remove('show');
+  tlChips.forEach(c=>{
+    const el=document.createElement('div');el.className='tl-chip';el.id=`tc-${c.id}`;el.textContent=c.label;el.draggable=true;
+    el.addEventListener('dragstart',e=>{tlDragId=c.id;el.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
+    el.addEventListener('dragend',()=>el.classList.remove('dragging'));
+    pool.appendChild(el);
+  });
+  ['pilot','phase','total'].forEach(z=>{
+    const zone=document.getElementById(`ts-${z}`);
+    zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('over');});
+    zone.addEventListener('dragleave',()=>zone.classList.remove('over'));
+    zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('over');dropTL(z);});
+  });
+  updateTLScore();
+}
+
+function dropTL(zone){
+  if(!tlDragId)return;
+  const cid=tlDragId;                          // capture: tlDragId is cleared below
+  if(tlPlaced[cid]) document.querySelector(`#tp-${tlPlaced[cid]} [data-id="${cid}"]`)?.remove();
+  tlPlaced[cid]=zone;
+  const c=tlChips.find(x=>x.id===cid);
+  const pl=document.createElement('div');pl.className='tl-placed';pl.setAttribute('data-id',cid);
+  pl.textContent=c.label;pl.title='Click to return to pool';
+  pl.onclick=()=>{document.querySelector(`#tp-${tlPlaced[cid]} [data-id="${cid}"]`)?.remove();delete tlPlaced[cid];document.getElementById(`tc-${cid}`).style.display='';updateTLScore();document.getElementById('tl-result').classList.remove('show');};
+  document.getElementById(`tp-${zone}`).appendChild(pl);
+  document.getElementById(`tc-${cid}`).style.display='none';
+  tlDragId=null;updateTLScore();
+}
+
+function checkTL(){
+  let correct=0;
+  tlChips.forEach(c=>{
+    const pl=document.querySelector(`[data-id="${c.id}"]`);
+    if(pl){const ok=tlPlaced[c.id]===c.zone;pl.classList.toggle('correct',ok);pl.classList.toggle('wrong',!ok);if(ok)correct++;}
+  });
+  const n=Object.keys(tlPlaced).length;
+  const res=document.getElementById('tl-result');
+  res.textContent=correct===tlChips.length?'All 8 correct! Pilot = small group, finding bugs. Phasing In = controlled expansion, adding sites/participants gradually. Total Implementation = full scale, all sites, all participants, full program.':
+    `${correct} of ${n} correct. Tip: Pilot testing is always small-scale and specifically designed to find problems. Phasing in means deliberately limiting expansion pace. Total implementation is everything at once, at full scale.`;
+  res.className=`result-box show ${correct===tlChips.length?'good':'partial'}`;
+  announce(res.textContent);
+}
+function updateTLScore(){document.getElementById('tl-score').textContent=`Placed: ${Object.keys(tlPlaced).length} / ${tlChips.length}`;}
+function resetTL(){renderTL();announce('Rollout timeline reset.');}
+
+// TEAM STAGES MATCH
+const tsData=[
+  {id:'b1',behavior:'Team members introduce themselves, learn about each other\'s backgrounds, and ask the program director many questions about what the program involves and what their roles will be.',stage:'Forming',feedback:'Forming. The team is orienting to each other and to the task. This stage is characterized by politeness, questions, and uncertainty about roles and expectations.'},
+  {id:'b2',behavior:'Disagreements emerge about how sessions should be facilitated — the nurse wants a clinical structure while the community health workers prefer a peer-led conversational approach. Tensions are high.',stage:'Storming',feedback:'Storming. The team is working through differences about goals, approaches, and responsibilities. This stage is necessary and normal — it is how teams develop a shared understanding of how they will work together.'},
+  {id:'b3',behavior:'After several tense meetings, the team agrees on a hybrid facilitation format that combines both approaches. They divide responsibilities clearly and begin to trust each other\'s judgment.',stage:'Norming',feedback:'Norming. The team has worked through conflicts, established roles, and is developing cohesion. They are settling into how they will operate together before moving into productive action.'},
+  {id:'b4',behavior:'The team is delivering sessions smoothly, solving problems independently without escalating everything to the supervisor, and consistently receiving positive participant feedback.',stage:'Performing',feedback:'Performing. The team is working at full capacity — productive, self-directed, and constructively focused on the program. This is the stage where real impact happens.'},
+  {id:'b5',behavior:'The program achieves its three-year goals. The team holds a final reflection meeting, celebrates their accomplishments, and says goodbye as members move on to new roles.',stage:'Adjourning',feedback:'Adjourning (also called Mourning). The team disbands after achieving its goal. This stage involves acknowledging what was accomplished and transitioning members out of their roles.'},
+  {id:'b6',behavior:'Two months into a new program cycle, the same team reconvenes — but with a new focus on a different health priority. They quickly re-establish their working rhythm without needing to go through early orientation again.',stage:'Reforming',feedback:'Reforming. An existing team reconvenes with a new focus. Because relationships and norms are already established, teams often move through early stages much faster when reforming around a new task.'},
+];
+const tsStages=['Forming','Storming','Norming','Performing','Adjourning','Reforming'];
+let selectedBehavior=null,tsMatchCount=0,tsMatchCorrect=0;
+
+function renderTS(){
+  selectedBehavior=null;tsMatchCount=0;tsMatchCorrect=0;
+  document.getElementById('ts-fb').textContent='Select a behavior to begin.';
+  document.getElementById('ts-fb').className='ts-fb';
+  const leftOrder=[...tsData].sort(()=>Math.random()-.5);
+  const rightOrder=[...tsStages].sort(()=>Math.random()-.5);
+  const left=document.getElementById('ts-left');left.innerHTML='';
+  leftOrder.forEach(d=>{
+    const btn=document.createElement('button');btn.className='ts-card';btn.id=`tsl-${d.id}`;btn.setAttribute('data-id',d.id);
+    btn.textContent=d.behavior;btn.onclick=()=>selectBehavior(d.id);left.appendChild(btn);
+  });
+  const right=document.getElementById('ts-right');right.innerHTML='';
+  rightOrder.forEach(s=>{
+    const btn=document.createElement('button');btn.className='ts-card';btn.id=`tsr-${s}`;btn.setAttribute('data-stage',s);
+    btn.textContent=s;btn.onclick=()=>selectStage(s);right.appendChild(btn);
+  });
+  document.getElementById('ts-score').textContent=`Matched: 0 / ${tsData.length}`;
+}
+
+function selectBehavior(id){
+  if(document.getElementById(`tsl-${id}`).classList.contains('matched'))return;
+  document.querySelectorAll('#ts-left .ts-card').forEach(b=>b.classList.remove('selected'));
+  selectedBehavior=id;document.getElementById(`tsl-${id}`).classList.add('selected');
+  announce('Behavior selected. Now choose the development stage on the right.');
+}
+
+function selectStage(stage){
+  if(!selectedBehavior){announce('Select a behavior first.');return;}
+  const d=tsData.find(x=>x.id===selectedBehavior);
+  const ok=d.stage===stage;
+  tsMatchCount++;if(ok)tsMatchCorrect++;
+  document.getElementById(`tsl-${selectedBehavior}`).classList.remove('selected');
+  document.getElementById(`tsl-${selectedBehavior}`).classList.add('matched',ok?'correct':'wrong');
+  document.getElementById(`tsl-${selectedBehavior}`).disabled=true;
+  const sb=document.getElementById(`tsr-${stage}`);if(sb){sb.classList.add('matched',ok?'correct':'wrong');sb.disabled=true;}
+  if(!ok){const cb=document.getElementById(`tsr-${d.stage}`);if(cb&&!cb.classList.contains('matched')){cb.classList.add('matched','correct');cb.disabled=true;}}
+  const fb=document.getElementById('ts-fb');
+  fb.textContent=ok?`✓ Correct — ${d.stage}! ${d.feedback}`:`✗ Not quite. This behavior matches "${d.stage}". ${d.feedback}`;
+  fb.className=`ts-fb ${ok?'correct':'wrong'}`;
+  announce(fb.textContent);
+  selectedBehavior=null;
+  document.getElementById('ts-score').textContent=`Matched: ${tsMatchCorrect} / ${tsData.length}`;
+}
+function resetTS(){renderTS();announce('Part 2 reset.');}
+
+function switchTab(t){['tl','ts'].forEach(x=>{document.getElementById(`panel-${x}`).classList.toggle('active',x===t);document.getElementById(`tab-${x}`).setAttribute('aria-selected',x===t?'true':'false');});}
+function announce(msg){const el=document.getElementById('live');el.textContent='';setTimeout(()=>{el.textContent=msg;},50);}
+renderTL();renderTS();
+</script>
+</body>
+</html>
