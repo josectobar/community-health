@@ -60,6 +60,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/ch13-ethics/](models/ch13-ethics/): sit on an ethics review panel and flag the ethical concerns in five evaluation proposals.
 - [models/ch13-communicator/](models/ch13-communicator/): tailor the same evaluation findings for funders, staff, community members, and policymakers.
 - [models/ch14-evaluation-sorter/](models/ch14-evaluation-sorter/): sort evaluation activities by timing and purpose into formative or summative.
+- [models/ch15-variable-counter/](models/ch15-variable-counter/): count the variables in each evaluation question to choose univariate, bivariate, or multivariate analysis.
 
 ## Embed snippets
 
@@ -104,6 +105,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Ethical Review Simulation" src="models/ch13-ethics/"></iframe>
 <iframe title="Audience Communicator" src="models/ch13-communicator/"></iframe>
 <iframe title="Formative or Summative?" src="models/ch14-evaluation-sorter/"></iframe>
+<iframe title="Count the Variables" src="models/ch15-variable-counter/"></iframe>
 ```
 
 ## Files
