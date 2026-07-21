@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CH8 Widget 1: Planning Frameworks</title>
+<style>
+:root{color-scheme:light;--teal:#1A6B72;--teal-lt:#D6ECED;--gold:#B07D2A;--gold-lt:#FEF3DC;--purple:#5B3A8E;--purple-lt:#EDE6F7;--red:#9B2335;--red-lt:#FBDDE0;--border:#CCC;--gray:#F4F4F4;--text:#1A1A1A;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;font-size:15px;color:var(--text);background:#fff;padding:20px;max-width:900px;margin:0 auto}
+h1{font-size:1.3rem;color:var(--teal);border-bottom:3px solid var(--teal);padding-bottom:8px;margin-bottom:6px}
+.subtitle{font-size:.88rem;color:#555;margin-bottom:20px}
+.tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.tab-btn{padding:8px 18px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.9rem;font-weight:bold}
+.tab-btn:hover{background:var(--teal-lt)}.tab-btn[aria-selected="true"]{background:var(--teal);color:#fff}
+.tab-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.instructions{background:var(--teal-lt);border-left:4px solid var(--teal);padding:12px 16px;border-radius:4px;margin-bottom:16px;font-size:.9rem}
+.instructions strong{color:var(--teal)}
+.scenario-box{background:var(--gray);border:1px solid var(--border);border-radius:6px;padding:14px;margin-bottom:14px;font-size:.92rem;line-height:1.6}
+.scenario-box strong{color:var(--teal)}
+.chip-pool-label{font-size:.8rem;font-weight:bold;color:#555;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.chip-pool{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;min-height:48px;padding:10px;border:2px dashed var(--border);border-radius:6px;background:#fafafa}
+.chip{padding:7px 13px;border:2px solid var(--border);border-radius:20px;background:#fff;cursor:grab;font-size:.83rem;user-select:none;transition:all .15s;color:var(--text)}
+.chip:hover{border-color:var(--teal);background:var(--teal-lt)}
+.chip.dragging{opacity:.35;cursor:grabbing}
+.lm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+@media(max-width:580px){.lm-grid{grid-template-columns:repeat(2,1fr)}}
+.lm-zone{border:2px dashed var(--border);border-radius:8px;padding:10px;min-height:120px;transition:background .15s}
+.lm-zone.over{background:var(--teal-lt);border-color:var(--teal)}
+.zone-label{font-size:.76rem;font-weight:bold;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;padding:4px 8px;border-radius:4px;color:#fff;display:inline-block}
+.zl-i{background:var(--teal)}.zl-a{background:#2A8A6B}.zl-o{background:var(--purple)}.zl-r{background:var(--gold)}
+.placed{padding:5px 9px;border-radius:12px;font-size:.79rem;margin-bottom:4px;display:inline-block;margin-right:3px;line-height:1.35;cursor:pointer;border:1px solid var(--border);background:#fff}
+.placed:hover{opacity:.7}
+.placed.correct{background:var(--teal-lt);color:var(--teal);border-color:var(--teal)}
+.placed.wrong{background:var(--red-lt);color:var(--red);border-color:var(--red)}
+.action-row{display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.check-btn{padding:9px 20px;background:var(--teal);color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:.9rem;font-weight:bold}
+.check-btn:hover{background:#145a60}.check-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.result-box{margin-top:10px;padding:10px 14px;border-radius:4px;font-size:.88rem;line-height:1.5;display:none}
+.result-box.show{display:block}
+.result-box.good{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+.result-box.partial{background:var(--gold-lt);color:#6B4A00;border-left:4px solid var(--gold)}
+
+/* SEQUENCER */
+.seq-context{background:var(--gray);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:12px;font-size:.92rem;line-height:1.6}
+.seq-pool{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.seq-item{padding:10px 14px;border:2px solid var(--border);border-radius:6px;background:#fff;cursor:grab;font-size:.87rem;line-height:1.45;display:flex;align-items:flex-start;gap:10px;user-select:none;transition:border-color .12s,background .12s}
+.seq-item:hover{border-color:var(--teal);background:var(--teal-lt)}
+.seq-item.dragging{opacity:.35}
+.seq-item.seq-ok{border-color:var(--teal);background:var(--teal-lt)}
+.seq-item.seq-no{border-color:var(--red);background:var(--red-lt)}
+.seq-handle{color:#bbb;font-size:1rem;padding-top:1px;flex-shrink:0}
+.seq-pos{font-weight:bold;color:var(--teal);min-width:22px;flex-shrink:0}
+.seq-fb{padding:10px 14px;border-radius:4px;font-size:.88rem;line-height:1.5;display:none;margin-bottom:10px}
+.seq-fb.show{display:block}
+.seq-fb.all{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+.seq-fb.some{background:var(--gold-lt);color:#6B4A00;border-left:4px solid var(--gold)}
+
+.score-row{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+.score-badge{background:var(--teal);color:#fff;padding:5px 14px;border-radius:20px;font-weight:bold;font-size:.9rem;white-space:nowrap}
+.reset-btn{padding:6px 14px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.88rem;font-weight:bold}
+.reset-btn:hover{background:var(--teal-lt)}.reset-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+<h1>Planning Frameworks: Build and Sequence</h1>
+<p class="subtitle">Sort program components into a logic model, then arrange design thinking stages in the right order.</p>
+<div class="tabs" role="tablist" aria-label="Tabs">
+  <button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-lm" id="tab-lm" onclick="switchTab('lm')">Part 1: Build the Logic Model</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-seq" id="tab-seq" onclick="switchTab('seq')">Part 2: Sequence Design Thinking</button>
+</div>
+<div class="sr-only" aria-live="polite" aria-atomic="true" id="live"></div>
+
+<div class="tab-panel active" id="panel-lm" role="tabpanel" aria-labelledby="tab-lm">
+  <div class="instructions"><strong>Directions:</strong> Read the program description, then drag each component into the correct logic model column — Inputs, Activities, Outputs, or Outcomes. Click a placed chip to return it to the pool. Click Check when done.</div>
+  <div class="scenario-box"><strong>Program:</strong> A county health department receives a $60,000 grant and hires a bilingual community health worker to run a weekly mobile blood pressure screening and education program at three neighborhood barbershops. The CHW conducts screenings, distributes plain-language handouts, and refers high-risk participants to a free clinic. The team tracks the number of screenings completed each week. Within three months, they expect participants to understand their blood pressure numbers; within a year, they expect improved medication adherence among participants with hypertension; and within five years, reduced cardiovascular mortality in the target neighborhood.</div>
+  <div class="chip-pool-label">Components — drag into columns below (click a placed chip to move it back)</div>
+  <div class="chip-pool" id="lm-pool"></div>
+  <div class="lm-grid">
+    <div class="lm-zone" id="zone-i" ondragover="e=>e.preventDefault()" ondrop="drop(event,'i')"><div class="zone-label zl-i">Inputs</div><div id="pi"></div></div>
+    <div class="lm-zone" id="zone-a" ondragover="e=>e.preventDefault()" ondrop="drop(event,'a')"><div class="zone-label zl-a">Activities</div><div id="pa"></div></div>
+    <div class="lm-zone" id="zone-o" ondragover="e=>e.preventDefault()" ondrop="drop(event,'o')"><div class="zone-label zl-o">Outputs</div><div id="po"></div></div>
+    <div class="lm-zone" id="zone-r" ondragover="e=>e.preventDefault()" ondrop="drop(event,'r')"><div class="zone-label zl-r">Outcomes</div><div id="pr"></div></div>
+  </div>
+  <div class="action-row">
+    <button class="check-btn" onclick="checkLM()">Check Logic Model</button>
+    <div class="score-badge" id="lm-score" aria-live="polite">Placed: 0 / 8</div>
+    <button class="reset-btn" onclick="resetLM()">Reset</button>
+  </div>
+  <div class="result-box" id="lm-result" role="alert"></div>
+</div>
+
+<div class="tab-panel" id="panel-seq" role="tabpanel" aria-labelledby="tab-seq">
+  <div class="instructions"><strong>Directions:</strong> A planning team used design thinking to develop a teen mental health program. The five actions below are shuffled. Drag them into the correct order from first (1) to last (5), then click Check.</div>
+  <div class="seq-context">The team wanted to create a low-pressure mental health support option for high school students who avoid counseling because it feels stigmatizing.</div>
+  <div class="action-row" style="margin-bottom:10px">
+    <button class="check-btn" onclick="checkSeq()">Check My Order</button>
+    <button class="reset-btn" onclick="resetSeq()">Reset</button>
+  </div>
+  <div class="seq-fb" id="seq-fb" role="alert"></div>
+  <div class="seq-pool" id="seq-pool"></div>
+</div>
+
+<script>
+// ── LOGIC MODEL ──────────────────────────────────────────────────────────
+const lmChips = [
+  {id:'l1',label:'$60,000 grant funding',zone:'i'},
+  {id:'l2',label:'Bilingual community health worker',zone:'i'},
+  {id:'l3',label:'Weekly barbershop blood pressure screenings',zone:'a'},
+  {id:'l4',label:'Referrals to free clinic for high-risk participants',zone:'a'},
+  {id:'l5',label:'Number of screenings completed per week',zone:'o'},
+  {id:'l6',label:'Plain-language handouts distributed',zone:'o'},
+  {id:'l7',label:'Participants understand their blood pressure numbers (3 months)',zone:'r'},
+  {id:'l8',label:'Reduced cardiovascular mortality in the neighborhood (5 years)',zone:'r'},
+];
+let placed = {}; // chipId -> zone
+let dragChipId = null;
+
+function renderLM() {
+  placed = {};
+  const pool = document.getElementById('lm-pool');
+  pool.innerHTML = '';
+  ['i','a','o','r'].forEach(z => document.getElementById(`p${z}`).innerHTML = '');
+  document.getElementById('lm-result').classList.remove('show');
+  lmChips.forEach(c => pool.appendChild(makeChip(c)));
+  updateLMScore();
+}
+
+function makeChip(c) {
+  const el = document.createElement('div');
+  el.className = 'chip'; el.id = `ch-${c.id}`;
+  el.textContent = c.label; el.draggable = true;
+  el.addEventListener('dragstart', e => { dragChipId = c.id; el.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
+  el.addEventListener('dragend', () => el.classList.remove('dragging'));
+  return el;
+}
+
+['zone-i','zone-a','zone-o','zone-r'].forEach(zId => {
+  const zone = document.getElementById(zId);
+  if(zone) {
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('over'));
+    zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('over'); drop(e, zId.replace('zone-','')); });
+  }
+});
+
+function drop(e, zone) {
+  if(!dragChipId) return;
+  const cid = dragChipId;                     // capture: dragChipId is cleared below
+  if(placed[cid]) document.getElementById(`p${placed[cid]}`)?.querySelector(`[data-id="${cid}"]`)?.remove();
+  placed[cid] = zone;
+  const c = lmChips.find(x=>x.id===cid);
+  const pl = document.createElement('div');
+  pl.className = 'placed'; pl.setAttribute('data-id', cid);
+  pl.textContent = c.label; pl.title = 'Click to return to pool';
+  pl.onclick = () => {
+    document.getElementById(`p${placed[cid]}`)?.querySelector(`[data-id="${cid}"]`)?.remove();
+    delete placed[cid];
+    document.getElementById(`ch-${cid}`).style.display='';
+    updateLMScore();
+    document.getElementById('lm-result').classList.remove('show');
+  };
+  document.getElementById(`p${zone}`).appendChild(pl);
+  document.getElementById(`ch-${cid}`).style.display = 'none';
+  dragChipId = null;
+  updateLMScore();
+}
+
+function checkLM() {
+  let correct = 0;
+  lmChips.forEach(c => {
+    const pl = document.querySelector(`[data-id="${c.id}"]`);
+    if(pl) { const ok = placed[c.id] === c.zone; pl.classList.toggle('correct',ok); pl.classList.toggle('wrong',!ok); if(ok) correct++; }
+  });
+  const n = Object.keys(placed).length;
+  const res = document.getElementById('lm-result');
+  res.textContent = correct === lmChips.length
+    ? 'All 8 correct! You distinguished inputs (resources going in), activities (what the program does), outputs (measurable products of activities), and outcomes (changes that result).'
+    : `${correct} of ${n} placed correctly. Tip: inputs are what you START with (money, staff). Activities are what you DO. Outputs are counts of what was delivered. Outcomes are changes you see in participants or the population.`;
+  res.className = `result-box show ${correct===lmChips.length?'good':'partial'}`;
+  announce(res.textContent);
+}
+
+function updateLMScore() { document.getElementById('lm-score').textContent = `Placed: ${Object.keys(placed).length} / ${lmChips.length}`; }
+function resetLM() { renderLM(); announce('Logic model reset.'); }
+
+// ── SEQUENCER ────────────────────────────────────────────────────────────
+const stages = [
+  {id:'q1', correct:1, text:'Define — The team synthesizes interview findings and agrees: students want peer connection, not therapy, and existing counseling resources feel too clinical and formal.'},
+  {id:'q2', correct:0, text:'Empathize — Team members shadow school counselors, interview 15 students about stress experiences, and attend lunch periods to observe social dynamics firsthand.'},
+  {id:'q3', correct:3, text:'Prototype — The team creates a simple peer circle format: a one-page guide, five conversation starters, and a sign-up sheet — just enough to run and learn from.'},
+  {id:'q4', correct:2, text:'Ideate — The team brainstorms 12 possible program ideas: peer circles, group chats, art rooms, anonymous advice boards, and more — no idea is rejected at this stage.'},
+  {id:'q5', correct:4, text:'Test — The team runs the peer circle with 10 student volunteers for two weeks, gathers weekly feedback, and finds students want less structure and more free conversation time.'},
+];
+
+let seqOrder = [];
+let dragSeqId = null;
+
+function renderSeq() {
+  seqOrder = stages.map(s=>s.id).sort(()=>Math.random()-.5);
+  const pool = document.getElementById('seq-pool');
+  pool.innerHTML = '';
+  document.getElementById('seq-fb').classList.remove('show');
+  seqOrder.forEach(id => pool.appendChild(makeSeqItem(id)));
+  renumberSeq();
+}
+
+function makeSeqItem(id) {
+  const s = stages.find(x=>x.id===id);
+  const el = document.createElement('div');
+  el.className = 'seq-item'; el.id = `sq-${id}`; el.setAttribute('data-id',id);
+  el.draggable = true;
+  el.innerHTML = `<span class="seq-handle" aria-hidden="true">⠿</span><span class="seq-pos"></span><span>${s.text}</span>`;
+  el.addEventListener('dragstart', e => { dragSeqId=id; el.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+  el.addEventListener('dragend', () => el.classList.remove('dragging'));
+  el.addEventListener('dragover', e => {
+    e.preventDefault();
+    const pool = document.getElementById('seq-pool');
+    const after = getAfter(e.clientY);
+    const dragging = document.getElementById(`sq-${dragSeqId}`);
+    if(after) pool.insertBefore(dragging, after); else pool.appendChild(dragging);
+    renumberSeq();
+  });
+  return el;
+}
+
+function getAfter(y) {
+  return [...document.querySelectorAll('.seq-item:not(.dragging)')].reduce((closest,el)=>{
+    const box = el.getBoundingClientRect();
+    const offset = y - box.top - box.height/2;
+    return offset<0 && offset>closest.offset ? {offset,element:el} : closest;
+  },{offset:Number.NEGATIVE_INFINITY}).element;
+}
+
+function renumberSeq() {
+  seqOrder = [...document.querySelectorAll('.seq-item')].map(el=>el.getAttribute('data-id'));
+  document.querySelectorAll('.seq-pos').forEach((el,i) => el.textContent = `${i+1}.`);
+}
+
+function checkSeq() {
+  let correct = 0;
+  seqOrder.forEach((id,i) => {
+    const s = stages.find(x=>x.id===id);
+    const el = document.getElementById(`sq-${id}`);
+    el.classList.remove('seq-ok','seq-no');
+    if(s.correct===i) { el.classList.add('seq-ok'); correct++; } else el.classList.add('seq-no');
+  });
+  const fb = document.getElementById('seq-fb');
+  if(correct===stages.length) {
+    fb.textContent = 'Perfect! The correct order is: Empathize → Define → Ideate → Prototype → Test. Notice how understanding comes before naming the problem, generating options comes before building, and testing feeds back into improving the prototype.';
+    fb.className = 'seq-fb show all';
+  } else {
+    fb.textContent = `${correct} of ${stages.length} in the right position. Remember the flow: Empathize first (understand the community), Define (name the problem clearly), Ideate (generate many options without judging), Prototype (build something simple to learn from), then Test (try it with real people and improve). Try reordering and checking again.`;
+    fb.className = 'seq-fb show some';
+  }
+  announce(fb.textContent);
+}
+function resetSeq() { renderSeq(); announce('Sequencer reset.'); }
+
+function switchTab(t) {
+  ['lm','seq'].forEach(x => {
+    document.getElementById(`panel-${x}`).classList.toggle('active',x===t);
+    document.getElementById(`tab-${x}`).setAttribute('aria-selected',x===t?'true':'false');
+  });
+}
+function announce(msg){const el=document.getElementById('live');el.textContent='';setTimeout(()=>{el.textContent=msg;},50);}
+renderLM(); renderSeq();
+</script>
+</body>
+</html>

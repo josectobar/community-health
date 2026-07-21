@@ -51,6 +51,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/ch10-sustainability/](models/ch10-sustainability/): work through prioritization, evaluation, and sustainability decisions, then classify horizontal versus vertical community resources.
 - [models/ch8-strategies/](models/ch8-strategies/): flip cards to match program actions to the six strategy types, then place interventions on the Health Impact Pyramid.
 - [models/ch8-adopt/](models/ch8-adopt/): work branching decisions about whether to adopt, adapt, or create an intervention, then match failure scenarios to limitation types.
+- [models/ch8-planning/](models/ch8-planning/): sort program components into a logic model, then arrange the five design thinking stages in order.
 
 ## Embed snippets
 
@@ -86,6 +87,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="From Priorities to Sustainability: Decision Scenarios" src="models/ch10-sustainability/"></iframe>
 <iframe title="Strategy Types and the Health Impact Pyramid" src="models/ch8-strategies/"></iframe>
 <iframe title="Adopt, Adapt, or Create - and Diagnosing What Went Wrong" src="models/ch8-adopt/"></iframe>
+<iframe title="Planning Frameworks: Build and Sequence" src="models/ch8-planning/"></iframe>
 ```
 
 ## Files
