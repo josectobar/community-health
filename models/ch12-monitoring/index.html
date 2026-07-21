@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CH12 Widget 5: Monitoring and Recordkeeping</title>
+<style>
+:root{color-scheme:light;--teal:#1A6B72;--teal-lt:#D6ECED;--gold:#B07D2A;--gold-lt:#FEF3DC;--purple:#5B3A8E;--purple-lt:#EDE6F7;--red:#9B2335;--red-lt:#FBDDE0;--border:#CCC;--gray:#F4F4F4;--text:#1A1A1A;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;font-size:15px;color:var(--text);background:#fff;padding:20px;max-width:900px;margin:0 auto}
+h1{font-size:1.3rem;color:var(--teal);border-bottom:3px solid var(--teal);padding-bottom:8px;margin-bottom:6px}
+.subtitle{font-size:.88rem;color:#555;margin-bottom:20px}
+.tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.tab-btn{padding:8px 18px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.9rem;font-weight:bold}
+.tab-btn:hover{background:var(--teal-lt)}.tab-btn[aria-selected="true"]{background:var(--teal);color:#fff}
+.tab-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.instructions{background:var(--teal-lt);border-left:4px solid var(--teal);padding:12px 16px;border-radius:4px;margin-bottom:16px;font-size:.9rem}
+.instructions strong{color:var(--teal)}
+
+/* MONITORING PROBLEM SOLVER — branching */
+.mon-card{border:1px solid var(--border);border-radius:6px;margin-bottom:22px;overflow:hidden}
+.mon-header{background:var(--gray);padding:14px 16px;border-bottom:1px solid var(--border)}
+.mon-num{font-size:.76rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.mon-text{font-size:.93rem;line-height:1.6}
+.mon-step{padding:12px 16px;border-top:1px solid var(--border)}
+.mon-q{font-size:.88rem;font-weight:bold;color:var(--gold);margin-bottom:8px}
+.mon-opts{display:flex;flex-direction:column;gap:7px}
+.mon-opt{padding:9px 14px;border:2px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:.87rem;line-height:1.4;text-align:left;transition:all .15s;color:var(--text)}
+.mon-opt:hover:not([disabled]){border-color:var(--teal);background:var(--teal-lt)}
+.mon-opt:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.mon-opt.selected{border-color:var(--gold);background:var(--gold-lt);font-weight:bold}
+.mon-opt[disabled]{cursor:default}
+.mon-followup{margin-top:10px;padding:10px 14px;border-radius:4px;display:none;font-size:.88rem;line-height:1.5}
+.mon-followup.show{display:block}
+.mon-followup.correct{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+.mon-followup.action{background:var(--purple-lt);color:#2A0F5E;border-left:4px solid var(--purple);margin-top:8px}
+
+/* PRIVACY TRUE/FALSE */
+.tf-card{border:1px solid var(--border);border-radius:6px;margin-bottom:18px;overflow:hidden}
+.tf-header{background:var(--gray);padding:14px 16px;border-bottom:1px solid var(--border)}
+.tf-num{font-size:.76rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.tf-text{font-size:.93rem;line-height:1.6}
+.tf-btns{padding:12px 16px;display:flex;gap:10px}
+.tf-btn{padding:9px 22px;border:2px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:.9rem;font-weight:bold;transition:all .15s;color:var(--text)}
+.tf-btn:hover:not([disabled]){border-color:var(--teal);background:var(--teal-lt)}
+.tf-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.tf-btn.correct{border-color:var(--teal);background:var(--teal-lt);color:var(--teal)}.tf-btn.correct::after{content:" ✓"}
+.tf-btn.wrong{border-color:var(--red);background:var(--red-lt);color:var(--red)}.tf-btn.wrong::after{content:" ✗"}
+.tf-btn[disabled]{cursor:default}
+.tf-fb{margin:0 16px 12px;padding:10px 14px;border-radius:4px;font-size:.87rem;line-height:1.5;display:none}
+.tf-fb.show{display:block}
+.tf-fb.correct{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+.tf-fb.wrong{background:var(--red-lt);color:#6B1020;border-left:4px solid var(--red)}
+
+.score-row{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+.score-badge{background:var(--teal);color:#fff;padding:5px 14px;border-radius:20px;font-weight:bold;font-size:.9rem;white-space:nowrap}
+.reset-btn{padding:6px 14px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.88rem;font-weight:bold}
+.reset-btn:hover{background:var(--teal-lt)}.reset-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+<h1>Monitoring and Recordkeeping: Problem Solving and Privacy Decisions</h1>
+<p class="subtitle">Diagnose monitoring problems and apply what you know about privacy, anonymity, and recordkeeping through true/false reasoning.</p>
+<div class="tabs" role="tablist" aria-label="Tabs">
+  <button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-mon" id="tab-mon" onclick="switchTab('mon')">Part 1: Monitoring Problem Solver</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-priv" id="tab-priv" onclick="switchTab('priv')">Part 2: True or False?</button>
+</div>
+<div class="sr-only" aria-live="polite" aria-atomic="true" id="live"></div>
+
+<div class="tab-panel active" id="panel-mon" role="tabpanel" aria-labelledby="tab-mon">
+  <div class="instructions"><strong>Directions:</strong> Each scenario describes something a program manager notices. Work through the questions to diagnose the monitoring category and recommend what should happen next.</div>
+  <div id="mon-container"></div>
+  <div class="score-row">
+    <div class="score-badge" id="mon-score" aria-live="polite">Completed: 0 / 4</div>
+    <button class="reset-btn" onclick="resetMon()">Reset Part 1</button>
+  </div>
+</div>
+
+<div class="tab-panel" id="panel-priv" role="tabpanel" aria-labelledby="tab-priv">
+  <div class="instructions"><strong>Directions:</strong> Each statement is either True or False. Think carefully — some of these are common misconceptions. Click True or False, then read the explanation.</div>
+  <div id="priv-container"></div>
+  <div class="score-row">
+    <div class="score-badge" id="priv-score" aria-live="polite">Score: 0 / 7</div>
+    <button class="reset-btn" onclick="resetPriv()">Reset Part 2</button>
+  </div>
+</div>
+
+<script>
+const monScenarios=[
+  {
+    num:1,text:"A program manager reviews her records and notices that 75% of participants who enrolled in her cardiovascular health program are women over 65, even though the program was designed to equally serve adults ages 40–75 of all genders.",
+    q1:"What monitoring data revealed this problem?",
+    q1opts:["Attendance data — who showed up to sessions","Registration data — who signed up and their demographic profile","Participation data — how engaged participants are during sessions","Expenditure data — how the budget is being used"],
+    q1correct:1,
+    q1feedback:"Registration data. The problem is in who enrolled, not who showed up or how they behaved in sessions. Registration monitoring tracks whether enrollment reflects the intended priority population.",
+    action:"The manager should review how and where the program was promoted. If outreach was concentrated in settings frequented mainly by older women (e.g., one specific senior center), diversifying recruitment channels could reach the full intended population.",
+    wrongMsg:"Think about what the manager was looking at — enrollment records and who signed up. That is registration, not attendance or participation."
+  },
+  {
+    num:2,text:"A six-session nutrition workshop has strong enrollment (52 registered), but by session 4 only 19 people are showing up. The program had budgeted for 45 consistent participants per session.",
+    q1:"The gap between enrollment and consistent presence is a problem with:",
+    q1opts:["Registration — who enrolled","Attendance — who is actually coming","Participation quality — how engaged people are","Program deviation — the program changed"],
+    q1correct:1,
+    q1feedback:"Attendance. Registering and showing up are different behaviors. Strong enrollment doesn't guarantee consistent attendance — and this gap is exactly what attendance monitoring is designed to catch.",
+    action:"The manager should reach out to participants who have stopped coming to understand why. Common causes include scheduling conflicts, competing demands, or the program not meeting their needs. Early insight allows mid-course adjustments before more participants drop off.",
+    wrongMsg:"People signed up — the problem is they're not coming consistently. Tracking who actually shows up to sessions versus who enrolled is attendance monitoring."
+  },
+  {
+    num:3,text:"Halfway through the program year, the financial coordinator notices the program has spent 78% of its annual supply budget with five months of programming still remaining.",
+    q1:"Which monitoring category captures this issue?",
+    q1opts:["Participant progress — are participants improving?","Program deviations — did something change?","Expenditures and income — is spending on track?","Implementation of activities — are activities happening?"],
+    q1correct:2,
+    q1feedback:"Expenditures and income. Monitoring the rate of spending against the budget and timeline is the financial monitoring function. Catching a budget overrun mid-year allows the team to make adjustments before running out of funds.",
+    action:"The manager should review what drove the higher-than-expected supply costs, adjust purchasing plans for the remaining months, and potentially reallocate from another budget line if available. Finding this in month 7 is far better than discovering it in month 11.",
+    wrongMsg:"This is about money — specifically, spending is outpacing the budget. Tracking how funds are being spent relative to the available budget and timeline is expenditure/income monitoring."
+  },
+  {
+    num:4,text:"A site supervisor visits three sessions of a diabetes prevention program and observes that facilitators are consistently skipping the 10-minute individual goal-setting activity at the end of each session, even though it is a required component in the program manual.",
+    q1:"What is being violated and what monitoring category catches this?",
+    q1opts:["Participation — participants aren't engaging","Attendance — people aren't showing up","Implementation of activities — required program components aren't being delivered as designed","Registration — enrollment is off"],
+    q1correct:2,
+    q1feedback:"Implementation of activities. A required program component is not being delivered as designed — this is a fidelity problem. If it continues, it creates a Type III error: the program isn't failing because the design is bad, but because it's not being implemented correctly.",
+    action:"The manager should discuss the issue with facilitators to understand why the component is being skipped (time pressure? unclear instructions?). Solutions might include adjusting session timing, simplifying the goal-setting activity, or providing additional facilitator training.",
+    wrongMsg:"This isn't about who's present or how engaged they are — it's about whether the program is being delivered as designed. Tracking whether all planned activities happen with fidelity is implementation monitoring."
+  },
+];
+
+let monState=monScenarios.map(()=>({q1done:false,complete:false}));
+
+function renderMon(){
+  monState=monScenarios.map(()=>({q1done:false,complete:false}));
+  const c=document.getElementById('mon-container');c.innerHTML='';
+  monScenarios.forEach((s,i)=>{
+    const div=document.createElement('div');div.className='mon-card';
+    div.innerHTML=`<div class="mon-header"><div class="mon-num">Scenario ${s.num} of ${monScenarios.length}</div><div class="mon-text">${s.text}</div></div>
+      <div class="mon-step">
+        <div class="mon-q">${s.q1}</div>
+        <fieldset style="border:none;padding:0;margin:0"><legend class="sr-only">Answer for scenario ${i+1}</legend>
+          <div class="mon-opts">${s.q1opts.map((o,j)=>`<button class="mon-opt" id="mo-${i}-${j}" onclick="answerMon(${i},${j})">${o}</button>`).join('')}
+          </div></fieldset>
+        <div class="mon-followup" id="mfb-${i}" role="alert"></div>
+        <div class="mon-followup action" id="mact-${i}" style="display:none"></div>
+      </div>`;
+    c.appendChild(div);
+  });
+  document.getElementById('mon-score').textContent=`Completed: 0 / ${monScenarios.length}`;
+}
+
+function answerMon(i,choice){
+  if(monState[i].q1done)return;monState[i].q1done=true;monState[i].complete=true;
+  const s=monScenarios[i];
+  const ok=choice===s.q1correct;
+  s.q1opts.forEach((_,j)=>{const b=document.getElementById(`mo-${i}-${j}`);b.disabled=true;if(j===choice)b.classList.add('selected');});
+  const fb=document.getElementById(`mfb-${i}`);
+  fb.textContent=ok?`✓ Correct. ${s.q1feedback}`:`✗ Not quite. ${s.wrongMsg} ${s.q1feedback}`;
+  fb.className=`mon-followup show ${ok?'correct':'action'}`;
+  const act=document.getElementById(`mact-${i}`);
+  act.textContent=`💡 What to do next: ${s.action}`;act.style.display='block';
+  announce(`Scenario ${i+1}: ${ok?'Correct':'Incorrect'}. ${s.q1feedback}`);
+  document.getElementById('mon-score').textContent=`Completed: ${monState.filter(s=>s.complete).length} / ${monScenarios.length}`;
+}
+function resetMon(){renderMon();announce('Part 1 reset.');}
+
+// TRUE/FALSE
+const tfData=[
+  {text:"A program that collects participant names linked to their health screening results can honestly tell participants their data is 'completely anonymous.'",correct:false,feedback:"False. If the program links names to health data, the data is confidential — not anonymous. Anonymous means no connection between person and data was ever created. Calling confidential data 'anonymous' is a misrepresentation that violates participants' right to accurate information about their privacy."},
+  {text:"Signing a consent form guarantees that a program is legally protected from all liability related to participant harm.",correct:false,feedback:"False. A signed consent form documents that a conversation about participation occurred — it does not provide blanket legal protection. If the consent process was inadequate (e.g., form in wrong language, participant didn't understand), or if the program was negligent, the form provides no protection."},
+  {text:"A program's procedural manual serves primarily to help facilitators remember what to say — not to protect program integrity.",correct:false,feedback:"False. A procedural manual serves multiple critical purposes: standardizing delivery so all facilitators implement the program the same way, preventing Type III errors (wrong implementation), enabling replication in new settings, and documenting program parameters for funders and partners."},
+  {text:"Under HIPAA, a community health program that collects participant health data must have systems in place to protect that information from unauthorized access.",correct:true,feedback:"True. HIPAA's Privacy Rule establishes federal standards for protecting individually identifiable health information. Programs collecting participant health data must store it securely, restrict access to authorized personnel, and follow defined privacy practices."},
+  {text:"If a participant drops an unsigned survey into an anonymous collection box, that data is confidential.",correct:false,feedback:"False — it is anonymous, not confidential. Anonymous means no link between the individual and their data was ever created. Unsigned surveys dropped into a box with no way to trace responses back to individuals are anonymous. Confidential means the link exists but is protected."},
+  {text:"A participant manual is mainly useful during program sessions and has little value after the program ends.",correct:false,feedback:"False. Participant manuals that are used actively during sessions and become familiar tools tend to be referenced by participants after the program ends — extending the program's health impact beyond the formal session period. This is one of the documented benefits of a well-designed participant manual."},
+  {text:"Program monitoring and program evaluation serve the same purpose.",correct:false,feedback:"False. Monitoring tracks whether the program is being delivered as planned — checking implementation in real time during the program. Evaluation assesses whether the program produced its intended outcomes. Monitoring enables mid-course corrections; evaluation assesses final impact. Both are necessary and complementary."},
+];
+let tfAnswered=new Array(tfData.length).fill(false),tfCorrect=new Array(tfData.length).fill(false);
+
+function renderPriv(){
+  tfAnswered.fill(false);tfCorrect.fill(false);
+  const c=document.getElementById('priv-container');c.innerHTML='';
+  tfData.forEach((item,i)=>{
+    const div=document.createElement('div');div.className='tf-card';
+    div.innerHTML=`<div class="tf-header"><div class="tf-num">Statement ${i+1} of ${tfData.length}</div><div class="tf-text">${item.text}</div></div>
+      <div class="tf-btns"><button class="tf-btn" id="tft-${i}" onclick="answerTF(${i},true)">True</button><button class="tf-btn" id="tff-${i}" onclick="answerTF(${i},false)">False</button></div>
+      <div class="tf-fb" id="tffb-${i}" role="alert"></div>`;
+    c.appendChild(div);
+  });
+  document.getElementById('priv-score').textContent=`Score: 0 / ${tfData.length}`;
+}
+
+function answerTF(i,answer){
+  if(tfAnswered[i])return;tfAnswered[i]=true;
+  const ok=answer===tfData[i].correct;tfCorrect[i]=ok;
+  const trueBtn=document.getElementById(`tft-${i}`);const falseBtn=document.getElementById(`tff-${i}`);
+  trueBtn.disabled=true;falseBtn.disabled=true;
+  if(answer){trueBtn.classList.add(ok?'correct':'wrong');if(!ok)falseBtn.classList.add('correct');}
+  else{falseBtn.classList.add(ok?'correct':'wrong');if(!ok)trueBtn.classList.add('correct');}
+  const fb=document.getElementById(`tffb-${i}`);
+  fb.textContent=tfData[i].feedback;fb.className=`tf-fb show ${ok?'correct':'wrong'}`;
+  announce(`Statement ${i+1}: ${ok?'Correct':'Incorrect'}. ${tfData[i].feedback}`);
+  document.getElementById('priv-score').textContent=`Score: ${tfCorrect.filter(Boolean).length} / ${tfData.length}`;
+}
+function resetPriv(){renderPriv();announce('Part 2 reset.');}
+
+function switchTab(t){['mon','priv'].forEach(x=>{document.getElementById(`panel-${x}`).classList.toggle('active',x===t);document.getElementById(`tab-${x}`).setAttribute('aria-selected',x===t?'true':'false');});}
+function announce(msg){const el=document.getElementById('live');el.textContent='';setTimeout(()=>{el.textContent=msg;},50);}
+renderMon();renderPriv();
+</script>
+</body>
+</html>
