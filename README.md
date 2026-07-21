@@ -42,6 +42,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/ch4-six-steps/](models/ch4-six-steps/): explore each step of the needs assessment process, then sort real actions into the right step.
 - [models/ch5-measurement/](models/ch5-measurement/): classify health variables as nominal, ordinal, interval, or ratio, then apply the levels to real measurement decisions.
 - [models/ch5-reliability-validity/](models/ch5-reliability-validity/): diagnose which type of reliability or validity failed in real measurement scenarios, then match each type to its definition.
+- [models/ch5-sampling/](models/ch5-sampling/): choose the best sampling method for a research goal, then identify methods from real-world descriptions.
 
 ## Embed snippets
 
@@ -68,6 +69,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="The Six Steps of a Community Health Needs Assessment" src="models/ch4-six-steps/"></iframe>
 <iframe title="Levels of Measurement: Applied Practice" src="models/ch5-measurement/"></iframe>
 <iframe title="Reliability and Validity: Diagnosing Data Quality" src="models/ch5-reliability-validity/"></iframe>
+<iframe title="Sampling Methods: Selection Strategy Practice" src="models/ch5-sampling/"></iframe>
 ```
 
 ## Files

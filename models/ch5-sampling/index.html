@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sampling Methods</title>
+<style>
+  :root{
+    color-scheme: light;
+    --teal:#1A6B72;--teal-lt:#D6ECED;--gold:#B07D2A;--gold-lt:#FEF3DC;
+    --purple:#5B3A8E;--purple-lt:#EDE6F7;--red:#9B2335;--red-lt:#FBDDE0;
+    --border:#CCCCCC;--gray:#F4F4F4;--text:#1A1A1A;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,sans-serif;font-size:15px;color:var(--text);background:#fff;padding:20px;max-width:860px;margin:0 auto}
+  h1{font-size:1.3rem;color:var(--teal);border-bottom:3px solid var(--teal);padding-bottom:8px;margin-bottom:6px}
+  .subtitle{font-size:.88rem;color:#555;margin-bottom:20px}
+
+  .tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+  .tab-btn{padding:8px 18px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.9rem;font-weight:bold}
+  .tab-btn:hover{background:var(--teal-lt)}
+  .tab-btn[aria-selected="true"]{background:var(--teal);color:#fff}
+  .tab-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .tab-panel{display:none}.tab-panel.active{display:block}
+
+  .instructions{background:var(--teal-lt);border-left:4px solid var(--teal);padding:12px 16px;border-radius:4px;margin-bottom:20px;font-size:.9rem}
+  .instructions strong{color:var(--teal)}
+
+  /* SCENARIO CARDS (both parts) */
+  .s-card{border:1px solid var(--border);border-radius:6px;margin-bottom:22px;overflow:hidden}
+  .s-header{background:var(--gray);padding:14px 16px;border-bottom:1px solid var(--border)}
+  .s-num{font-size:.78rem;font-weight:bold;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+  .s-text{font-size:.95rem;line-height:1.6}
+  .s-goal{padding:10px 16px;font-size:.88rem;color:var(--gold);font-weight:bold;background:var(--gold-lt);border-bottom:1px solid var(--border)}
+  .s-choices{padding:14px 16px;display:flex;gap:8px;flex-wrap:wrap}
+  .s-btn{
+    padding:8px 13px;border:2px solid var(--border);border-radius:4px;
+    background:#fff;cursor:pointer;font-size:.84rem;transition:all .15s;color:var(--text);
+  }
+  .s-btn:hover:not([disabled]){border-color:var(--teal);background:var(--teal-lt)}
+  .s-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .s-btn.correct{border-color:var(--teal);background:var(--teal-lt);color:var(--teal);font-weight:bold}
+  .s-btn.correct::after{content:" ✓"}
+  .s-btn.wrong{border-color:var(--red);background:var(--red-lt);color:var(--red)}
+  .s-btn.wrong::after{content:" ✗"}
+  .s-btn[disabled]{cursor:default}
+  .s-feedback{margin:0 16px 14px;padding:10px 14px;border-radius:4px;font-size:.88rem;line-height:1.5;display:none}
+  .s-feedback.show{display:block}
+  .s-feedback.correct{background:var(--teal-lt);color:#0F4A4F;border-left:4px solid var(--teal)}
+  .s-feedback.wrong{background:var(--red-lt);color:#6B1020;border-left:4px solid var(--red)}
+
+  /* Category badge */
+  .cat-badge{display:inline-block;font-size:.75rem;padding:2px 8px;border-radius:10px;margin-bottom:8px}
+  .cat-prob{background:var(--teal);color:#fff}
+  .cat-nonprob{background:var(--purple);color:#fff}
+
+  .score-row{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+  .score-badge{background:var(--teal);color:#fff;padding:5px 14px;border-radius:20px;font-weight:bold;font-size:.9rem;white-space:nowrap}
+  .reset-btn{padding:6px 14px;border:2px solid var(--teal);background:#fff;color:var(--teal);border-radius:4px;cursor:pointer;font-size:.88rem;font-weight:bold}
+  .reset-btn:hover{background:var(--teal-lt)}
+  .reset-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+
+<h1>Sampling Methods: Selection Strategy Practice</h1>
+<p class="subtitle">Choose the best sampling method for a given research goal, then identify methods from real-world descriptions.</p>
+
+<div class="tabs" role="tablist" aria-label="Activity tabs">
+  <button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-match" id="tab-match" onclick="switchTab('match')">Part 1: Method Matcher</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-spot" id="tab-spot" onclick="switchTab('spot')">Part 2: Spot the Method</button>
+</div>
+<div class="sr-only" aria-live="polite" aria-atomic="true" id="live"></div>
+
+<!-- PART 1: METHOD MATCHER -->
+<div class="tab-panel active" id="panel-match" role="tabpanel" aria-labelledby="tab-match">
+  <div class="instructions">
+    <strong>Directions:</strong> Read each research goal and select the sampling method that best fits the situation. Consider the purpose, population, resources, and need for generalizability.
+  </div>
+  <div id="match-container"></div>
+  <div class="score-row">
+    <div class="score-badge" id="match-score" aria-live="polite">Score: 0 / 6</div>
+    <button class="reset-btn" onclick="resetMatch()">Reset Part 1</button>
+  </div>
+</div>
+
+<!-- PART 2: SPOT THE METHOD -->
+<div class="tab-panel" id="panel-spot" role="tabpanel" aria-labelledby="tab-spot">
+  <div class="instructions">
+    <strong>Directions:</strong> Each card describes exactly how a researcher drew a sample. Identify which sampling method was used based on the process described.
+  </div>
+  <div id="spot-container"></div>
+  <div class="score-row">
+    <div class="score-badge" id="spot-score" aria-live="polite">Score: 0 / 8</div>
+    <button class="reset-btn" onclick="resetSpot()">Reset Part 2</button>
+  </div>
+</div>
+
+<script>
+const matchData = [
+  {
+    scenario:"A state health department wants to estimate the prevalence of uninsured adults across all 15 counties in the state. They need results they can generalize to the whole state population, and they have access to a complete list of all adults registered with any health system in the state.",
+    goal:"Which sampling method best supports this goal?",
+    options:["Simple random sampling","Convenience sampling","Snowball sampling","Quota sampling"],
+    correct:0,
+    feedback:"Simple random sampling is the best fit here. The team has a complete sampling frame (the full list) and needs results generalizable to the state population. Every person on the list has an equal, random chance of selection — exactly what simple random sampling provides.",
+    wrongFeedback:"The team has a complete list of the population and needs generalizable results. When you have a full sampling frame and want population-level estimates without systematic bias, simple random sampling is the foundational choice."
+  },
+  {
+    scenario:"A researcher is studying the health experiences of transgender adults experiencing homelessness — a population with no official registry or list. She begins with two individuals referred by a community health center and asks each one to refer others they know who might be willing to participate.",
+    goal:"Which sampling method is being used?",
+    options:["Cluster sampling","Systematic sampling","Snowball sampling","Homogeneous sampling"],
+    correct:2,
+    feedback:"Snowball sampling. The key features are: (1) no sampling frame exists for this hidden population, (2) the sample grows through participant referrals. Snowball sampling is specifically designed for hard-to-reach or stigmatized populations where conventional sampling is impossible.",
+    wrongFeedback:"Think about what makes this population hard to reach: no list exists, and trust-based networks are the only path in. Starting with a few participants and using their referrals to grow the sample is the defining feature of snowball sampling."
+  },
+  {
+    scenario:"A program evaluation team needs to compare health outcomes across four insurance groups (Medicaid, Medicare, private, uninsured) and wants at least 80 participants in each group for statistical comparison — regardless of how common each group is in the population.",
+    goal:"Which sampling method achieves this goal?",
+    options:["Proportional stratified sampling","Non-proportional stratified sampling","Cluster sampling","Convenience sampling"],
+    correct:1,
+    feedback:"Non-proportional stratified sampling. The team divides the population into strata (insurance groups) and draws an equal number from each — not a number proportional to each group's size. This guarantees adequate representation for comparison even for smaller subgroups like the uninsured.",
+    wrongFeedback:"The team needs a set number (80) from each insurance group regardless of how large or small that group is in the real population. Proportional sampling would give too few participants from rare groups. Ensuring equal numbers across strata regardless of population proportions is non-proportional stratified sampling."
+  },
+  {
+    scenario:"A public health researcher wants to survey farmworkers about heat illness prevention. Farmworkers work on different ranches across a county, and getting a list of all individual workers is impossible. However, the researcher has a list of all 60 ranches in the county and can survey all workers at selected ranches.",
+    goal:"Which sampling design fits this situation?",
+    options:["Simple random sampling","Systematic sampling","Cluster sampling","Maximum variation sampling"],
+    correct:2,
+    feedback:"Cluster sampling. The ranches are natural clusters — the researcher randomly selects ranches, then surveys workers within them. This is ideal when a population is organized into groups, no individual sampling frame exists, and geographic efficiency matters.",
+    wrongFeedback:"The key is that the researcher can list groups (ranches) but not individuals. Randomly selecting groups and then surveying people within them is the defining logic of cluster sampling."
+  },
+  {
+    scenario:"A community needs assessment team wants to understand barriers to physical activity from the perspective of women ages 55–70 with mobility limitations — specifically focusing on the depth of this group's shared experience rather than generalizing across diverse populations.",
+    goal:"Which non-probability method fits best?",
+    options:["Convenience sampling","Quota sampling","Homogeneous sampling","Maximum variation sampling"],
+    correct:2,
+    feedback:"Homogeneous sampling. The team intentionally selects participants who share specific defining characteristics — same age range, gender, and health condition — to explore their common experience in depth. This is the hallmark of homogeneous sampling in qualitative work.",
+    wrongFeedback:"The goal is depth within a specific, similar group — not breadth across diverse perspectives. Selecting participants based on shared characteristics to understand a shared experience is homogeneous sampling."
+  },
+  {
+    scenario:"A qualitative needs assessment team wants to understand the full range of experiences with food access in a large urban county. They intentionally recruit participants from low, middle, and high income levels; from different racial and ethnic groups; from rural and urban ZIP codes; and from households with and without cars.",
+    goal:"Which sampling approach best describes this design?",
+    options:["Convenience sampling","Quota sampling","Systematic sampling","Maximum variation sampling"],
+    correct:3,
+    feedback:"Maximum variation sampling. The team deliberately seeks the widest possible diversity of experiences and perspectives, not statistical representativeness. If the same themes emerge across maximally varied participants, those themes likely reflect something fundamental about the community's experience.",
+    wrongFeedback:"The team is intentionally building diversity into the sample across multiple dimensions — not to be statistically representative, but to capture the full range of lived experiences. Purposefully maximizing diversity of perspective is maximum variation (maximum diversity) sampling."
+  },
+];
+
+const spotData = [
+  {
+    scenario:"A researcher obtains a complete list of 2,400 patients from a community health center. She assigns each patient a number and uses a random number generator to select 240 patients with no pattern or sequence — each patient selected independently.",
+    catClass:"cat-prob", catLabel:"Probability",
+    options:["Simple random sampling","Systematic sampling","Cluster sampling","Stratified sampling"],
+    correct:0,
+    feedback:"Simple random sampling. Every individual was numbered, and random selection gave each one an equal, independent probability of being chosen. No pattern, no sequence, no grouping — just random selection from a complete list.",
+    wrongFeedback:"The key details: a complete numbered list, and random selection with no fixed interval or pattern. Each person had an equal, independent chance of selection from the full list — that is simple random sampling."
+  },
+  {
+    scenario:"A hospital quality team needs to review 100 charts from a file of 500 ordered by admission date. They randomly select a starting point (chart 3) and then pull every 5th chart after that: charts 3, 8, 13, 18, and so on.",
+    catClass:"cat-prob", catLabel:"Probability",
+    options:["Simple random sampling","Systematic sampling","Proportional stratified sampling","Cluster sampling"],
+    correct:1,
+    feedback:"Systematic sampling. A random starting point was selected, then every kth element was chosen from a sequenced list. The sampling interval (every 5th) was determined by dividing population size (500) by desired sample size (100).",
+    wrongFeedback:"Notice the fixed interval — every 5th record after a random start. That regular interval from a sequenced list is the defining feature of systematic sampling."
+  },
+  {
+    scenario:"A statewide survey draws participants so that each county contributes a share of the sample equal to its share of the state's total population. A county with 10% of the state's residents provides 10% of the sample.",
+    catClass:"cat-prob", catLabel:"Probability",
+    options:["Non-proportional stratified sampling","Proportional stratified sampling","Cluster sampling","Simple random sampling"],
+    correct:1,
+    feedback:"Proportional stratified sampling. The population is divided into strata (counties), and the number drawn from each stratum reflects that stratum's proportion in the overall population. This produces a sample that mirrors the population's composition.",
+    wrongFeedback:"The sample from each stratum (county) matches the county's share of the total population — so larger counties contribute more participants. Sampling from strata in proportion to their population size is proportional stratified sampling."
+  },
+  {
+    scenario:"A researcher studying school nutrition programs cannot get a list of every student in the district. She randomly selects 15 schools from the district's list of 90 schools, then surveys every student in those selected schools.",
+    catClass:"cat-prob", catLabel:"Probability",
+    options:["Systematic sampling","Simple random sampling","Cluster sampling","Non-proportional stratified sampling"],
+    correct:2,
+    feedback:"Cluster sampling. The unit of selection is the school (cluster), not the individual student. Schools were randomly selected, then all members within selected schools were included. Students at non-selected schools had zero chance of inclusion — the defining trade-off of cluster sampling.",
+    wrongFeedback:"The researcher selected groups (schools), not individuals — because no individual list existed. Selecting naturally occurring groups and then surveying people within them is cluster sampling."
+  },
+  {
+    scenario:"A health educator surveys 50 adults who happen to be attending a diabetes education fair at the community center on a Tuesday afternoon. Participants were whoever was there and willing.",
+    catClass:"cat-nonprob", catLabel:"Non-Probability",
+    options:["Snowball sampling","Convenience sampling","Quota sampling","Homogeneous sampling"],
+    correct:1,
+    feedback:"Convenience sampling. Participants were selected based entirely on their availability — whoever happened to be present and willing. This is the most commonly used and most easily recognized non-probability method.",
+    wrongFeedback:"There was no referral chain, no deliberate diversity strategy, and no predetermined quotas. People were selected simply because they were present and available. That accessibility-based selection is convenience sampling."
+  },
+  {
+    scenario:"A study on lived experiences with alcohol treatment starts with one person who successfully completed a residential program. That person refers the researcher to two friends who also completed treatment. Each of those friends refers two more, and the sample grows to 25 through successive referrals.",
+    catClass:"cat-nonprob", catLabel:"Non-Probability",
+    options:["Convenience sampling","Maximum variation sampling","Snowball sampling","Quota sampling"],
+    correct:2,
+    feedback:"Snowball sampling. The sample grew through a referral chain — each participant referred others from their personal network. This method is specifically designed for populations that are hard to reach through conventional means and where trust-based access is essential.",
+    wrongFeedback:"The sample didn't start with a list or a random draw — it grew through social connections, each person referring the next. That referral-chain growth is the defining feature of snowball sampling."
+  },
+  {
+    scenario:"A program evaluation team needs exactly 40 participants from each of three age groups (18–30, 31–50, 51+). Interviewers recruit at community locations until each age group's quota of 40 is filled — selecting whoever agrees to participate.",
+    catClass:"cat-nonprob", catLabel:"Non-Probability",
+    options:["Non-proportional stratified sampling","Proportional stratified sampling","Quota sampling","Systematic sampling"],
+    correct:2,
+    feedback:"Quota sampling. The team defined subgroup quotas (40 per age group) and filled them non-randomly — recruiting whoever was available until each quota was met. This resembles stratified sampling in structure but lacks the random selection within each group that makes stratified sampling a probability method.",
+    wrongFeedback:"The structure (defined subgroups, fixed numbers per group) looks like stratified sampling — but the critical difference is that participants within each group were selected by convenience, not randomly. Non-random selection within predefined quotas is quota sampling.",
+  },
+  {
+    scenario:"A qualitative researcher studying barriers to prenatal care intentionally recruits: two recent immigrants with limited English, two long-term residents, two participants from a rural ZIP code, two from an urban ZIP code, two with Medicaid, and two who are uninsured — deliberately maximizing diversity across multiple dimensions.",
+    catClass:"cat-nonprob", catLabel:"Non-Probability",
+    options:["Homogeneous sampling","Maximum variation sampling","Quota sampling","Convenience sampling"],
+    correct:1,
+    feedback:"Maximum variation sampling. The researcher deliberately selected participants to represent the widest possible range of backgrounds and circumstances. The goal is not statistical representativeness but ensuring that the full spectrum of relevant lived experiences is captured in the qualitative data.",
+    wrongFeedback:"The researcher is intentionally building in as much diversity as possible across multiple characteristics. This deliberate diversity-maximizing strategy — not for representativeness but for range of experience — is maximum variation sampling."
+  },
+];
+
+// STATE
+let matchAnswered = new Array(matchData.length).fill(false);
+let matchCorrect  = new Array(matchData.length).fill(false);
+let spotAnswered  = new Array(spotData.length).fill(false);
+let spotCorrect   = new Array(spotData.length).fill(false);
+
+function renderCards(data, container, prefix, answered, correct, answerFn) {
+  const c = document.getElementById(container);
+  c.innerHTML = '';
+  data.forEach((item,i) => {
+    const div = document.createElement('div');
+    div.className = 's-card';
+    div.innerHTML = `
+      <div class="s-header">
+        <div class="s-num">Scenario ${i+1} of ${data.length}</div>
+        ${item.catClass ? `<span class="cat-badge ${item.catClass}">${item.catLabel}</span>` : ''}
+        <div class="s-text">${item.scenario}</div>
+      </div>
+      ${item.goal ? `<div class="s-goal">${item.goal}</div>` : ''}
+      <fieldset style="border:none;padding:0;margin:0">
+        <legend class="sr-only">Answer for scenario ${i+1}</legend>
+        <div class="s-choices">
+          ${item.options.map((o,j)=>`<button class="s-btn" id="${prefix}-${i}-${j}" onclick="${answerFn}(${i},${j})">${o}</button>`).join('')}
+        </div>
+      </fieldset>
+      <div class="s-feedback" id="${prefix}fb-${i}" role="alert"></div>
+    `;
+    c.appendChild(div);
+  });
+}
+
+function answer(q, choice, data, answered, correct, prefix, scoreId) {
+  if (answered[q]) return;
+  answered[q] = true;
+  const ok = choice === data[q].correct;
+  correct[q] = ok;
+  data[q].options.forEach((_,j) => {
+    const btn = document.getElementById(`${prefix}-${q}-${j}`);
+    btn.disabled = true;
+    if (j === choice) btn.classList.add(ok ? 'correct' : 'wrong');
+    if (!ok && j === data[q].correct) btn.classList.add('correct');
+  });
+  const fb = document.getElementById(`${prefix}fb-${q}`);
+  fb.textContent = ok ? data[q].feedback : data[q].wrongFeedback;
+  fb.className = `s-feedback show ${ok ? 'correct' : 'wrong'}`;
+  announce(`Scenario ${q+1}: ${ok ? 'Correct' : 'Incorrect'}. ${ok ? data[q].feedback : data[q].wrongFeedback}`);
+  document.getElementById(scoreId).textContent = `Score: ${correct.filter(Boolean).length} / ${data.length}`;
+}
+
+function answerMatch(q,c){ answer(q,c,matchData,matchAnswered,matchCorrect,'m','match-score'); }
+function answerSpot(q,c){ answer(q,c,spotData,spotAnswered,spotCorrect,'sp','spot-score'); }
+
+function resetMatch() {
+  matchAnswered = new Array(matchData.length).fill(false);
+  matchCorrect  = new Array(matchData.length).fill(false);
+  renderCards(matchData,'match-container','m',matchAnswered,matchCorrect,'answerMatch');
+  document.getElementById('match-score').textContent = `Score: 0 / ${matchData.length}`;
+  announce('Part 1 reset.');
+}
+function resetSpot() {
+  spotAnswered = new Array(spotData.length).fill(false);
+  spotCorrect  = new Array(spotData.length).fill(false);
+  renderCards(spotData,'spot-container','sp',spotAnswered,spotCorrect,'answerSpot');
+  document.getElementById('spot-score').textContent = `Score: 0 / ${spotData.length}`;
+  announce('Part 2 reset.');
+}
+
+function switchTab(tab) {
+  ['match','spot'].forEach(t => {
+    document.getElementById(`panel-${t}`).classList.toggle('active', t === tab);
+    document.getElementById(`tab-${t}`).setAttribute('aria-selected', t === tab ? 'true' : 'false');
+  });
+}
+function announce(msg) {
+  const el = document.getElementById('live'); el.textContent='';
+  setTimeout(()=>{ el.textContent=msg; },50);
+}
+
+// init
+renderCards(matchData,'match-container','m',matchAnswered,matchCorrect,'answerMatch');
+renderCards(spotData,'spot-container','sp',spotAnswered,spotCorrect,'answerSpot');
+</script>
+</body>
+</html>
