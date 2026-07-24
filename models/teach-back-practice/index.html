@@ -3,740 +3,933 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Explaining Hard Choices — Teach-Back Practice</title>
+<title>Explaining Hard Choices — Teach-Back Practice (Offline)</title>
 <style>
   :root{
-    --maroon:#8C1D40; --maroon-dk:#6E1733; --gold:#FFC627; --gold-dk:#E0A800;
-    --ink:#211A1D; --paper:#FBF7F4; --card:#FFFFFF; --line:#E7DAD0;
-    --slate:#5C6670; --sage:#3F7A6E; --sage-lt:#E6F0ED; --rose:#F3E6EC;
-    --ok:#2E7D5B; --warn:#B4431F; --shadow:0 4px 20px rgba(45,20,30,.10);
-    --radius:16px;
+    color-scheme: light;
+    --paper:#FAF6F0;
+    --card:#FFFFFF;
+    --ink:#2B2724;
+    --ink-soft:#6D6259;
+    --line:#E4D9CB;
+    --clay:#B0562F;
+    --clay-soft:#F7E9E0;
+    --sage:#5A7050;
+    --sage-soft:#E9EFE4;
+    --sand:#F3EADD;
+    --gold:#8A6A2F;
+    --serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{-webkit-text-size-adjust:100%}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
   body{
-    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
-    background:
-      radial-gradient(1200px 500px at 85% -10%, rgba(255,198,39,.10), transparent 60%),
-      radial-gradient(900px 500px at -10% 110%, rgba(140,29,64,.08), transparent 55%),
-      var(--paper);
-    color:var(--ink); line-height:1.55; min-height:100vh;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
   }
-  .wrap{max-width:1080px;margin:0 auto;padding:28px 20px 80px}
-  .u-sans{font-family:"Inter","Segoe UI",system-ui,-apple-system,sans-serif}
+  .wrap{max-width:880px;margin:0 auto;padding:22px 20px 48px}
 
-  /* Header */
-  header.top{display:flex;align-items:flex-start;gap:18px;flex-wrap:wrap;margin-bottom:22px}
-  .badge{font-family:"Inter",system-ui,sans-serif;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--maroon);background:var(--rose);padding:6px 12px;border-radius:999px;display:inline-block}
-  h1{font-size:clamp(27px,4.4vw,40px);line-height:1.08;font-weight:700;letter-spacing:-.01em;margin:12px 0 6px}
-  h1 .accent{color:var(--maroon)}
-  .lede{font-size:17px;color:var(--slate);max-width:65ch}
+  /* ---------- header ---------- */
+  .eyebrow{
+    font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--gold);font-weight:700;margin:0 0 6px
+  }
+  h1{
+    font-family:var(--serif);font-weight:400;font-size:31px;line-height:1.18;
+    margin:0 0 8px;letter-spacing:-.01em
+  }
+  h1 em{font-style:italic;color:var(--clay)}
+  .lede{margin:0 0 18px;color:var(--ink-soft);max-width:62ch}
 
-  /* Stepper */
-  .stepper{display:flex;gap:8px;margin:22px 0 26px;flex-wrap:wrap}
-  .stepper .st{font-family:"Inter",system-ui,sans-serif;font-size:12.5px;font-weight:600;color:var(--slate);
-    background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:7px 14px;display:flex;align-items:center;gap:8px}
-  .stepper .st .n{width:20px;height:20px;border-radius:50%;background:var(--line);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:800}
-  .stepper .st.active{color:var(--maroon);border-color:var(--maroon);background:#fff}
-  .stepper .st.active .n{background:var(--maroon)}
-  .stepper .st.done{color:var(--sage);border-color:var(--sage)}
-  .stepper .st.done .n{background:var(--sage)}
+  /* ---------- step rail ---------- */
+  .rail{display:flex;gap:6px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:24px;flex-wrap:wrap}
+  .rail-item{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 6px;border-radius:20px;font-size:13px;color:var(--ink-soft)}
+  .rail-item .num{
+    width:21px;height:21px;border-radius:50%;background:var(--sand);color:var(--ink-soft);
+    display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;flex:none
+  }
+  .rail-item.done .num{background:var(--sage);color:#fff}
+  .rail-item.active{background:var(--clay-soft);color:var(--clay);font-weight:600}
+  .rail-item.active .num{background:var(--clay);color:#fff}
 
-  section.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px;margin-bottom:22px}
-  section.panel.hidden{display:none}
-  h2{font-size:24px;font-weight:700;letter-spacing:-.01em;margin-bottom:6px}
-  h2 .step-label{font-family:"Inter",system-ui,sans-serif;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-dk);display:block;margin-bottom:4px}
-  .sub{color:var(--slate);margin-bottom:20px;max-width:68ch}
+  /* ---------- panels ---------- */
+  .panel{display:none;animation:fade .28s ease}
+  .panel.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion: reduce){.panel{animation:none}}
 
-  /* Learn cards */
-  .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
-  @media(max-width:680px){.cards{grid-template-columns:1fr}}
-  .lc{border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;background:linear-gradient(180deg,#fff, #fdfaf8);position:relative}
-  .lc .tag{font-family:"Inter",system-ui,sans-serif;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--maroon);display:flex;align-items:center;gap:8px;margin-bottom:8px}
-  .lc .tag .dot{width:22px;height:22px;border-radius:7px;background:var(--rose);display:grid;place-items:center;color:var(--maroon);font-size:13px}
-  .lc h3{font-size:18px;margin-bottom:6px;font-weight:700}
-  .lc p{font-size:14.5px;color:#4a4147}
-  .lc .fact{font-family:"Inter",system-ui,sans-serif;font-size:12.5px;color:var(--sage);background:var(--sage-lt);border-radius:8px;padding:6px 10px;margin-top:10px;display:inline-block}
+  .step-tag{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);font-weight:700;margin-bottom:4px}
+  h2{font-family:var(--serif);font-weight:400;font-size:24px;margin:0 0 8px}
+  .sub{color:var(--ink-soft);margin:0 0 20px;max-width:64ch}
 
-  .btn{font-family:"Inter",system-ui,sans-serif;font-weight:700;font-size:15px;border:none;border-radius:11px;padding:13px 22px;cursor:pointer;transition:transform .06s ease,box-shadow .2s,background .2s;display:inline-flex;align-items:center;gap:10px}
-  .btn:active{transform:translateY(1px)}
-  .btn-primary{background:var(--maroon);color:#fff;box-shadow:0 3px 0 var(--maroon-dk)}
-  .btn-primary:hover{background:#7a1837}
-  .btn-primary:disabled{background:#d8c7cd;box-shadow:0 3px 0 #c9b3bb;cursor:not-allowed;color:#fff}
-  .btn-ghost{background:#fff;color:var(--maroon);border:1.5px solid var(--maroon)}
-  .btn-ghost:hover{background:var(--rose)}
-  .btn-gold{background:var(--gold);color:var(--maroon-dk);box-shadow:0 3px 0 var(--gold-dk)}
-  .btn-gold:hover{background:#ffcf47}
-  .row-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:22px}
+  /* ---------- learn cards ---------- */
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:640px){.cards{grid-template-columns:1fr}}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 17px;
+    border-left:4px solid var(--clay)
+  }
+  .card .kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--clay);font-weight:700;margin-bottom:6px}
+  .card h3{font-family:var(--serif);font-weight:400;font-size:19px;margin:0 0 8px}
+  .card p{margin:0 0 12px;font-size:14.5px;color:#443E38}
+  .card .tagline{font-size:12px;color:var(--ink-soft);border-top:1px dashed var(--line);padding-top:8px;font-style:italic}
 
-  /* Readiness quiz */
-  .q{border:1px solid var(--line);border-radius:13px;padding:18px;margin-bottom:14px;background:#fff}
-  .q .qtext{font-weight:700;font-size:16.5px;margin-bottom:12px;display:flex;gap:10px}
-  .q .qtext .qi{font-family:"Inter",sans-serif;font-size:12px;font-weight:800;color:#fff;background:var(--maroon);min-width:24px;height:24px;border-radius:6px;display:grid;place-items:center;margin-top:2px}
-  .opt{font-family:"Inter",system-ui,sans-serif;display:block;width:100%;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:12px 14px;margin-bottom:9px;font-size:14.5px;cursor:pointer;transition:.15s;color:var(--ink)}
-  .opt:hover{border-color:var(--maroon);background:#fffdfd}
-  .opt.correct{border-color:var(--ok);background:#eef7f1;color:#1c5c3f;font-weight:600}
-  .opt.wrong{border-color:var(--warn);background:#fbeee8;color:#8a3517}
-  .opt.locked{pointer-events:none;opacity:.85}
-  .fb{font-family:"Inter",sans-serif;font-size:13.5px;margin-top:8px;padding:10px 12px;border-radius:9px;display:none}
-  .fb.show{display:block}
-  .fb.ok{background:#eef7f1;color:#1c5c3f}
-  .fb.no{background:#fbeee8;color:#8a3517}
-  .quizbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:6px}
-  .progress-pill{font-family:"Inter",sans-serif;font-size:13px;font-weight:700;color:var(--slate)}
+  /* ---------- buttons ---------- */
+  .btn{
+    font-family:var(--sans);font-size:15px;font-weight:600;
+    background:var(--clay);color:#fff;border:none;border-radius:7px;
+    padding:11px 20px;cursor:pointer;line-height:1.3
+  }
+  .btn:hover{background:#9A4A28}
+  .btn:disabled{background:#D8CCC0;color:#8A8078;cursor:not-allowed}
+  .btn.ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--line)}
+  .btn.ghost:hover{background:var(--sand);color:var(--ink)}
+  .btn.sage{background:var(--sage)}
+  .btn.sage:hover{background:#4C5F44}
+  .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:22px}
+  :focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 
-  /* Conversation */
-  .conv-grid{display:grid;grid-template-columns:1fr 320px;gap:20px}
-  @media(max-width:860px){.conv-grid{grid-template-columns:1fr}}
-  .patient-card{display:flex;gap:14px;align-items:center;background:linear-gradient(120deg,var(--maroon),var(--maroon-dk));color:#fff;border-radius:14px;padding:16px 18px;margin-bottom:16px}
-  .patient-card .av{width:54px;height:54px;border-radius:50%;background:var(--gold);color:var(--maroon-dk);display:grid;place-items:center;font-weight:800;font-size:22px;font-family:"Inter",sans-serif;flex-shrink:0}
-  .patient-card .pn{font-weight:700;font-size:18px}
-  .patient-card .pd{font-family:"Inter",sans-serif;font-size:13px;color:#f2d9e2}
-  .chat{border:1px solid var(--line);border-radius:14px;background:#fdfbfa;height:420px;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:14px}
-  .msg{display:flex;gap:10px;max-width:88%}
-  .msg .who{font-family:"Inter",sans-serif;width:34px;height:34px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;font-weight:800;font-size:13px}
-  .msg .bub{border-radius:13px;padding:11px 14px;font-size:15px}
-  .msg.patient .who{background:var(--maroon);color:#fff}
-  .msg.patient .bub{background:#fff;border:1px solid var(--line);border-top-left-radius:4px}
-  .msg.me{align-self:flex-end;flex-direction:row-reverse}
-  .msg.me .who{background:var(--sage);color:#fff}
-  .msg.me .bub{background:var(--sage-lt);border:1px solid #cfe4dd;border-top-right-radius:4px;color:#20463d}
-  .msg.sys .bub{background:#fff7e0;border:1px dashed var(--gold-dk);font-family:"Inter",sans-serif;font-size:13.5px;color:#7a5b00;width:100%}
-  .msg.sys{max-width:100%}
-  .typing .bub{color:var(--slate);font-style:italic}
-  .composer{display:flex;gap:10px;margin-top:14px}
-  .composer textarea{flex:1;font-family:"Inter",system-ui,sans-serif;font-size:15px;border:1.5px solid var(--line);border-radius:11px;padding:12px 14px;resize:none;min-height:52px;max-height:130px;line-height:1.4}
-  .composer textarea:focus{outline:none;border-color:var(--maroon);box-shadow:0 0 0 3px rgba(140,29,64,.12)}
+  /* ---------- quiz ---------- */
+  .q{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 17px;margin-bottom:13px}
+  .q.correct{border-color:var(--sage);background:var(--sage-soft)}
+  .q .qtext{font-weight:600;margin-bottom:11px;font-size:15.5px}
+  .q .qtext .qn{color:var(--gold);font-family:var(--serif);margin-right:7px}
+  .opt{
+    display:block;width:100%;text-align:left;background:var(--paper);border:1px solid var(--line);
+    border-radius:7px;padding:9px 12px;margin-bottom:7px;font-size:14.5px;cursor:pointer;
+    font-family:var(--sans);color:var(--ink);line-height:1.4
+  }
+  .opt:hover{border-color:var(--clay);background:#fff}
+  .opt.picked-right{background:#fff;border-color:var(--sage);border-left:4px solid var(--sage);font-weight:600}
+  .opt.picked-wrong{background:#fff;border-color:var(--clay);border-left:4px solid var(--clay);opacity:.75}
+  .opt:disabled{cursor:default}
+  .why{font-size:13.5px;padding:9px 12px;border-radius:6px;margin:2px 0 8px}
+  .why.right{background:var(--sage-soft);color:#3D4F35;border-left:3px solid var(--sage)}
+  .why.wrong{background:var(--clay-soft);color:#7C3C1E;border-left:3px solid var(--clay)}
+  .tally{font-size:13.5px;color:var(--ink-soft);font-weight:600}
 
-  /* Checklist */
-  .side h4{font-family:"Inter",sans-serif;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:6px}
-  .side .hint{font-family:"Inter",sans-serif;font-size:12.5px;color:var(--slate);margin-bottom:14px}
-  .goal{display:flex;gap:11px;align-items:flex-start;padding:11px 12px;border:1px solid var(--line);border-radius:11px;margin-bottom:9px;background:#fff;transition:.3s}
-  .goal .box{width:22px;height:22px;border-radius:6px;border:2px solid var(--line);flex-shrink:0;display:grid;place-items:center;color:#fff;font-size:13px;transition:.3s;margin-top:1px}
-  .goal .gt{font-family:"Inter",sans-serif;font-size:13.5px;font-weight:600;color:var(--ink)}
-  .goal .gd{font-family:"Inter",sans-serif;font-size:12px;color:var(--slate)}
-  .goal.met{background:#f1f9f5;border-color:var(--ok)}
-  .goal.met .box{background:var(--ok);border-color:var(--ok)}
-  .goal.met .gt{color:#1c5c3f}
-  .goal.just-met{animation:pop .45s ease}
-  @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.04)}100%{transform:scale(1)}}
-  .goalcount{font-family:"Inter",sans-serif;font-size:13px;font-weight:700;color:var(--maroon);margin-top:4px;text-align:center}
+  /* ---------- conversation ---------- */
+  .conv{display:grid;grid-template-columns:1fr 232px;gap:18px;align-items:start}
+  @media (max-width:720px){.conv{grid-template-columns:1fr}}
+  .patient{
+    background:var(--sand);border:1px solid var(--line);border-radius:10px;
+    padding:13px 15px;margin-bottom:14px;display:flex;gap:13px;align-items:center
+  }
+  .avatar{
+    width:42px;height:42px;border-radius:50%;background:var(--clay);color:#fff;flex:none;
+    display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:16px
+  }
+  .patient .pname{font-weight:700;font-size:15px}
+  .patient .pmeta{font-size:12.5px;color:var(--ink-soft);line-height:1.4}
+  .transcript{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;padding:15px;
+    max-height:330px;overflow-y:auto
+  }
+  .turn{margin-bottom:14px}
+  .who{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);font-weight:700;margin-bottom:4px}
+  .bubble{border-radius:9px;padding:10px 13px;font-size:14.5px;line-height:1.5}
+  .bubble.daniel{background:var(--sand);border-bottom-left-radius:2px}
+  .bubble.you{background:#fff;border:1px solid var(--line);border-bottom-right-radius:2px}
+  .turn.you{margin-left:36px}
+  .note{
+    margin-top:7px;font-size:13px;padding:8px 11px;border-radius:6px;line-height:1.45
+  }
+  .note.strong{background:var(--sage-soft);border-left:3px solid var(--sage);color:#3D4F35}
+  .note.weak{background:var(--clay-soft);border-left:3px solid var(--clay);color:#7C3C1E}
+  .note b{font-weight:700}
+  .choices{margin-top:14px}
+  .choices .prompt{font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);font-weight:700;margin-bottom:8px}
+  .choice{
+    display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);
+    border-left:4px solid var(--line);border-radius:8px;padding:11px 14px;margin-bottom:8px;
+    font-size:14.5px;font-family:var(--sans);color:var(--ink);cursor:pointer;line-height:1.45
+  }
+  .choice:hover{border-left-color:var(--clay);background:#fff}
+  .goals{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 15px;position:sticky;top:10px}
+  .goals h4{font-family:var(--serif);font-weight:400;font-size:16px;margin:0 0 4px}
+  .goals .hint{font-size:12.5px;color:var(--ink-soft);margin:0 0 12px;line-height:1.4}
+  .goal{display:flex;gap:9px;align-items:flex-start;font-size:13.5px;margin-bottom:10px;color:var(--ink-soft)}
+  .goal .box{
+    width:17px;height:17px;border:1.5px solid var(--line);border-radius:4px;flex:none;margin-top:2px;
+    display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;background:#fff
+  }
+  .goal.met{color:var(--ink);font-weight:600}
+  .goal.met .box{background:var(--sage);border-color:var(--sage)}
+  .count{font-size:12.5px;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:9px;margin-top:2px}
 
-  /* Feedback */
-  .score-hero{display:flex;align-items:center;gap:22px;flex-wrap:wrap;border:1px solid var(--line);border-radius:14px;padding:22px;background:linear-gradient(180deg,#fff,#fdf7f9);margin-bottom:20px}
-  .ring{--p:0;width:110px;height:110px;border-radius:50%;flex-shrink:0;
-    background:conic-gradient(var(--maroon) calc(var(--p)*1%), #eadfe4 0);display:grid;place-items:center}
-  .ring .inner{width:84px;height:84px;border-radius:50%;background:#fff;display:grid;place-items:center;text-align:center;font-family:"Inter",sans-serif}
-  .ring .inner b{font-size:26px;color:var(--maroon);display:block;line-height:1}
-  .ring .inner span{font-size:11px;color:var(--slate)}
-  .fb-goal{border:1px solid var(--line);border-radius:12px;padding:15px 16px;margin-bottom:12px}
-  .fb-goal .h{display:flex;align-items:center;gap:10px;font-family:"Inter",sans-serif;font-weight:700;font-size:15px;margin-bottom:5px}
-  .fb-goal .pill{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:999px}
-  .fb-goal.met .pill{background:#e6f4ec;color:var(--ok)}
-  .fb-goal.miss .pill{background:#fbeee8;color:var(--warn)}
-  .fb-goal p{font-family:"Inter",sans-serif;font-size:13.5px;color:#4a4147}
+  /* ---------- write step ---------- */
+  .writebox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:17px}
+  textarea{
+    width:100%;min-height:90px;border:1px solid var(--line);border-radius:7px;padding:11px 12px;
+    font-family:var(--sans);font-size:15px;line-height:1.5;color:var(--ink);background:var(--paper);resize:vertical
+  }
+  textarea:focus{background:#fff;border-color:var(--clay)}
+  .selfcheck{margin:14px 0 0}
+  .selfcheck label{display:flex;gap:9px;align-items:flex-start;font-size:14px;margin-bottom:9px;cursor:pointer}
+  .selfcheck input{margin-top:3px;flex:none;width:16px;height:16px;accent-color:var(--sage)}
+  .compare{background:var(--sand);border-radius:8px;padding:13px 15px;margin-top:14px;font-size:14px}
+  .compare .ex{margin-bottom:10px}
+  .compare .ex:last-child{margin-bottom:0}
+  .compare .lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-bottom:3px}
+  .compare .lbl.no{color:var(--clay)}
+  .compare .lbl.yes{color:var(--sage)}
+  .compare q{font-style:italic}
 
-  .callout{font-family:"Inter",sans-serif;font-size:13.5px;background:var(--sage-lt);border:1px solid #cfe4dd;border-radius:11px;padding:13px 15px;color:#20463d;margin-top:6px}
-  .err{font-family:"Inter",sans-serif;font-size:13.5px;background:#fbeee8;border:1px solid #e6b9a6;color:#8a3517;border-radius:11px;padding:13px 15px;margin-top:12px;display:none}
-  .err.show{display:block}
-  .api-note{font-family:"Inter",sans-serif;font-size:12px;color:var(--slate);margin-top:10px}
-  footer.note{text-align:center;font-family:"Inter",sans-serif;font-size:12.5px;color:var(--slate);margin-top:10px}
-  .kbd{font-family:"Inter",sans-serif;font-size:11px;background:#efe6ea;border-radius:5px;padding:1px 6px;color:var(--maroon)}
-  @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+  /* ---------- feedback ---------- */
+  .score{display:flex;gap:14px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:16px}
+  .score .big{font-family:var(--serif);font-size:38px;line-height:1;color:var(--clay)}
+  .score .lbl{font-size:13px;color:var(--ink-soft)}
+  .fb{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:14px}
+  .fb h4{font-family:var(--serif);font-weight:400;font-size:18px;margin:0 0 10px}
+  .fbline{display:flex;gap:10px;font-size:14.5px;margin-bottom:9px;align-items:flex-start}
+  .fbline .mark{font-weight:700;flex:none;width:16px}
+  .fbline.yes .mark{color:var(--sage)}
+  .fbline.no .mark{color:var(--clay)}
+  .replay{border-top:1px solid var(--line);padding-top:11px;margin-top:6px}
+  .replay .item{font-size:13.5px;margin-bottom:11px;color:#443E38}
+  .replay .item .said{color:var(--ink-soft);font-style:italic}
+  .footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-soft)}
+  .hidden{display:none}
+  .copied{font-size:13px;color:var(--sage);font-weight:600}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header class="top">
-    <div>
-      <span class="badge">HCR 220 · Health Communication</span>
-      <h1>Explaining Hard Choices: <span class="accent">a teach-back practice</span></h1>
-      <p class="lede">Learn the topic, then practice explaining it to a real, reacting patient. This is a space to practice how clearly and compassionately you <em>communicate</em> — not a test of medical knowledge.</p>
-    </div>
-  </header>
 
-  <div class="stepper" id="stepper">
-    <div class="st active" data-s="1"><span class="n">1</span> Learn it</div>
-    <div class="st" data-s="2"><span class="n">2</span> Readiness check</div>
-    <div class="st" data-s="3"><span class="n">3</span> Talk with Daniel</div>
-    <div class="st" data-s="4"><span class="n">4</span> Feedback</div>
-  </div>
+  <p class="eyebrow">HCR 220 · Health Communication</p>
+  <h1>Explaining Hard Choices: a <em>teach-back</em> practice</h1>
+  <p class="lede">Learn the topic, then practice explaining it to a patient who reacts to what you say. This is a space to practice how clearly and compassionately you <em>communicate</em> — not a test of medical knowledge.</p>
 
-  <!-- STEP 1: LEARN -->
-  <section class="panel" id="panel1">
-    <h2><span class="step-label">Step 1 of 4</span>Learn it first</h2>
+  <nav class="rail" aria-label="Progress">
+    <div class="rail-item active" id="rail1"><span class="num">1</span> Learn it</div>
+    <div class="rail-item" id="rail2"><span class="num">2</span> Readiness check</div>
+    <div class="rail-item" id="rail3"><span class="num">3</span> Talk with Daniel</div>
+    <div class="rail-item" id="rail4"><span class="num">4</span> Feedback</div>
+  </nav>
+
+  <!-- ============ STEP 1 ============ -->
+  <section class="panel on" id="panel1" aria-labelledby="h1s">
+    <p class="step-tag">Step 1 of 4</p>
+    <h2 id="h1s">Learn it first</h2>
     <p class="sub">Four quick cards. This is everything you need to hold your own in the conversation — read them, then prove you've got the basics.</p>
     <div class="cards">
-      <div class="lc">
-        <div class="tag"><span class="dot">◇</span> The problem</div>
+      <div class="card">
+        <div class="kicker">◇ The problem</div>
         <h3>The kidney waitlist</h3>
-        <p>More than 90,000 people in the U.S. are waiting for a kidney transplant. Many wait years on dialysis — a demanding treatment that filters the blood several times a week. Demand far outstrips the supply of human donor kidneys.</p>
-        <span class="fact">90,000+ waiting · years-long waits</span>
+        <p>More than 90,000 people in the U.S. are waiting for a kidney transplant, and fewer than 30,000 get one in a year. Many wait years on dialysis — a demanding treatment that filters the blood several times a week.</p>
+        <div class="tagline">90,000+ waiting · years-long waits</div>
       </div>
-      <div class="lc">
-        <div class="tag"><span class="dot">◇</span> The idea</div>
+      <div class="card">
+        <div class="kicker">◇ The idea</div>
         <h3>What "xenotransplantation" means</h3>
-        <p>It's transplanting an organ from another species into a human. Here, that's a kidney from a pig that has been genetically modified — its genes edited — to lower the chance the human body rejects it.</p>
-        <span class="fact">Cross-species · gene-edited pig organ</span>
+        <p>It's transplanting an organ from another species into a human. Here, that's a kidney from a pig whose genes have been edited to lower the chance the human body rejects it.</p>
+        <div class="tagline">Cross-species · gene-edited pig organ</div>
       </div>
-      <div class="lc">
-        <div class="tag"><span class="dot">◇</span> The status</div>
+      <div class="card">
+        <div class="kicker">◇ The status</div>
         <h3>Where it stands today</h3>
-        <p>It is still <strong>experimental</strong>. The first FDA-authorized human clinical trials began in 2025. A few patients have received pig kidneys under special access — some worked for weeks to a couple of months. It is <em>not</em> a proven, everyday option you can schedule. There are also real risks: the body can still reject the organ, and there's concern about diseases passing from animal to human across species.</p>
-        <span class="fact">Experimental · rejection &amp; cross-species risk</span>
+        <p>It is still <b>experimental</b>. The first FDA-authorized clinical trials began in 2025 with a very small number of patients. It is <i>not</i> a proven, everyday option you can schedule. Real risks remain: the body can still reject the organ, and there is concern about disease passing from animal to human.</p>
+        <div class="tagline">Experimental · rejection &amp; cross-species risk</div>
       </div>
-      <div class="lc">
-        <div class="tag"><span class="dot">◇</span> Your job</div>
+      <div class="card">
+        <div class="kicker">◇ Your job</div>
         <h3>Why this is a communication challenge</h3>
-        <p>Your task is to listen to the patient, answer their questions in plain language, and check that they understand. You don't need to be a medical expert — you help the patient feel part of the decision and make their own informed choice.</p>
-        <span class="fact">Listen · plain language · informed consent</span>
+        <p>Your task is to listen, answer in plain language, and check that the patient understands. You don't need to be a medical expert. You help the patient feel part of the decision and make their own informed choice.</p>
+        <div class="tagline">Listen · plain language · informed consent</div>
       </div>
     </div>
-    <div class="row-actions">
-      <button class="btn btn-primary" onclick="goStep(2)">I've read these — continue <span aria-hidden="true">→</span></button>
+    <div class="actions">
+      <button class="btn" onclick="goStep(2)">I've read these — continue →</button>
     </div>
   </section>
 
-  <!-- STEP 2: READINESS -->
-  <section class="panel hidden" id="panel2">
-    <h2><span class="step-label">Step 2 of 4</span>Readiness check</h2>
-    <p class="sub">Answer all four correctly to unlock the room. Get one wrong and you'll see why — then try again. Want different questions? Use <em>New question set</em>.</p>
-    <div id="quizBox"></div>
-    <div class="quizbar">
-      <button class="btn btn-primary" id="enterBtn" disabled onclick="goStep(3)">Enter the room <span aria-hidden="true">→</span></button>
-      <button class="btn btn-ghost" onclick="newQuestionSet()">↻ New question set</button>
-      <span class="progress-pill" id="quizProgress">0 of 4 correct</span>
+  <!-- ============ STEP 2 ============ -->
+  <section class="panel" id="panel2" aria-labelledby="h2s">
+    <p class="step-tag">Step 2 of 4</p>
+    <h2 id="h2s">Readiness check</h2>
+    <p class="sub">Answer all four correctly to unlock the room. Pick a wrong one and you'll see why — then try again. Want different questions? Use <i>New question set</i>.</p>
+    <div id="quizHolder"></div>
+    <div class="actions">
+      <button class="btn" id="unlockBtn" disabled onclick="goStep(3)">Enter the room →</button>
+      <button class="btn ghost" onclick="buildQuiz()">↻ New question set</button>
+      <span class="tally" id="tally">0 of 4 correct</span>
     </div>
   </section>
 
-  <!-- STEP 3: CONVERSATION -->
-  <section class="panel hidden" id="panel3">
-    <h2><span class="step-label">Step 3 of 4</span>Talk with Daniel</h2>
-    <p class="sub">Daniel wants to understand the pig-kidney option he heard about. Listen, explain it in plain language, check that he understands, and help him feel part of his own decision. The checklist on the right fills in as you go.</p>
-    <div class="conv-grid">
+  <!-- ============ STEP 3 ============ -->
+  <section class="panel" id="panel3" aria-labelledby="h3s">
+    <p class="step-tag">Step 3 of 4</p>
+    <h2 id="h3s">Talk with Daniel</h2>
+    <p class="sub">Daniel wants to understand the pig-kidney option he heard about. At each point, choose what you would actually say. He reacts to your choice — and so does the checklist.</p>
+
+    <div class="patient">
+      <div class="avatar" aria-hidden="true">DV</div>
       <div>
-        <div class="patient-card">
-          <div class="av">DV</div>
-          <div>
-            <div class="pn">Daniel Vega, 61</div>
-            <div class="pd">2 years on dialysis · curious about the "pig kidney" he heard about · calm and easy to talk with</div>
-          </div>
-        </div>
-        <div class="chat" id="chat" aria-live="polite"></div>
-        <div class="composer">
-          <textarea id="input" placeholder="Type what you'd say to Daniel…  (Enter to send, Shift+Enter for a new line)" rows="2"></textarea>
-          <button class="btn btn-primary" id="sendBtn" onclick="sendTurn()">Send</button>
-        </div>
-        <div class="err" id="convErr"></div>
-        <div class="row-actions">
-          <button class="btn btn-gold" id="finishBtn" disabled onclick="finishConversation()">Finish &amp; see feedback</button>
-          <button class="btn btn-ghost" onclick="restartConversation()">↻ Start over</button>
-        </div>
-        <p class="api-note" id="apiNote"></p>
+        <div class="pname">Daniel Vega, 61</div>
+        <div class="pmeta">2 years on dialysis · Tuesdays, Thursdays, Saturdays · brought in an article his cousin sent him</div>
       </div>
-      <aside class="side">
+    </div>
+
+    <div class="conv">
+      <div>
+        <div class="transcript" id="transcript" aria-live="polite" aria-atomic="false"></div>
+        <div class="choices" id="choices"></div>
+      </div>
+      <aside class="goals" aria-label="Your goals">
         <h4>Your goals</h4>
-        <p class="hint">These check off automatically as Daniel experiences each one. Reach all four to finish.</p>
-        <div id="goals"></div>
-        <div class="goalcount" id="goalCount">0 of 4 reached</div>
+        <p class="hint">These check off only when Daniel actually experiences them.</p>
+        <div class="goal" id="g-plain"><span class="box" aria-hidden="true">✓</span><span>Use plain language</span></div>
+        <div class="goal" id="g-check"><span class="box" aria-hidden="true">✓</span><span>Check understanding</span></div>
+        <div class="goal" id="g-ask"><span class="box" aria-hidden="true">✓</span><span>Invite questions</span></div>
+        <div class="goal" id="g-support"><span class="box" aria-hidden="true">✓</span><span>Support his choice</span></div>
+        <div class="count" id="goalCount" role="status" aria-live="polite">0 of 4 reached</div>
       </aside>
     </div>
-  </section>
 
-  <!-- STEP 4: FEEDBACK -->
-  <section class="panel hidden" id="panel4">
-    <h2><span class="step-label">Step 4 of 4</span>Your feedback</h2>
-    <p class="sub">Scored on the AHRQ teach-back approach — clear communication, honesty, and shared decision-making. This is about how you <em>talked with</em> Daniel, not medical detail.</p>
-    <div class="score-hero">
-      <div class="ring" id="ring"><div class="inner"><b id="scoreNum">0/4</b><span>goals met</span></div></div>
-      <div style="flex:1;min-width:220px">
-        <div style="font-family:Inter,sans-serif;font-weight:700;font-size:18px;margin-bottom:4px" id="scoreHeadline">—</div>
-        <div style="font-family:Inter,sans-serif;font-size:14px;color:var(--slate)" id="scoreSummary">—</div>
+    <!-- write-your-own, appears after the conversation -->
+    <div id="writeStep" class="hidden" style="margin-top:22px">
+      <h2 style="font-size:20px">One more thing — say it in your own words</h2>
+      <p class="sub">Asking someone to teach it back is the hardest sentence in the whole conversation. Write the exact words you would use with Daniel. There is no grading here.</p>
+      <div class="writebox">
+        <label for="myline" style="font-weight:600;font-size:14.5px;display:block;margin-bottom:8px">Your teach-back ask</label>
+        <textarea id="myline" placeholder="Type what you would say out loud…"></textarea>
+        <div class="selfcheck">
+          <label><input type="checkbox" class="sc"> I made it about <b>my</b> explanation, not his memory</label>
+          <label><input type="checkbox" class="sc"> I asked him to use <b>his own words</b></label>
+          <label><input type="checkbox" class="sc"> I avoided "Do you understand?" and "Any questions?"</label>
+          <label><input type="checkbox" class="sc"> No jargon — a neighbor could follow it</label>
+        </div>
+        <button class="btn ghost" id="compareBtn" onclick="showCompare()">Compare with two examples</button>
+        <div class="compare hidden" id="compareBox">
+          <div class="ex">
+            <div class="lbl no">Falls flat</div>
+            <q>Does that all make sense? Any questions?</q> — he will say yes and no, in that order, and you learn nothing.
+          </div>
+          <div class="ex">
+            <div class="lbl yes">Lands</div>
+            <q>I want to make sure I explained this well — that's on me, not you. If your daughter called tonight and asked what we talked about, what would you tell her?</q>
+          </div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="toFeedback" onclick="finish()">See my feedback →</button>
       </div>
     </div>
-    <div id="fbGoals"></div>
-    <div class="callout" id="fbClose"></div>
-    <div class="row-actions">
-      <button class="btn btn-primary" onclick="fullReset()">↻ Practice again</button>
+
+    <div class="actions" id="restart3">
+      <button class="btn ghost" onclick="resetConversation()">↻ Start over</button>
     </div>
   </section>
 
-  <footer class="note">Practice tool for communication skills · patient is simulated · not medical advice</footer>
+  <!-- ============ STEP 4 ============ -->
+  <section class="panel" id="panel4" aria-labelledby="h4s">
+    <p class="step-tag">Step 4 of 4</p>
+    <h2 id="h4s">Your feedback</h2>
+    <p class="sub">Based on the AHRQ teach-back approach — plain language, honesty, checking for understanding, and shared decision-making. This is about <i>how you talked with</i> Daniel, not medical detail.</p>
+    <div id="fbHolder"></div>
+    <div class="actions">
+      <button class="btn ghost" onclick="copySummary()">Copy my summary</button>
+      <button class="btn ghost" onclick="window.print()">Print / save as PDF</button>
+      <button class="btn" onclick="restartAll()">↻ Practice again</button>
+      <span class="copied hidden" id="copiedMsg">Copied — paste it into your submission.</span>
+    </div>
+  </section>
+
+  <p class="footer">Practice tool for communication skills · Daniel is simulated · not medical advice · works without an internet connection</p>
 </div>
 
 <script>
 /* ============================================================
-   MODEL / API
+   STATE
    ============================================================ */
-const MODEL = "claude-sonnet-4-6";
-async function callClaude(messages, system, maxTokens=1000){
-  const res = await fetch("https://api.anthropic.com/v1/messages",{
-    method:"POST", headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({ model:MODEL, max_tokens:maxTokens, system, messages })
-  });
-  if(!res.ok){ throw new Error("API "+res.status); }
-  const data = await res.json();
-  return (data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n").trim();
-}
+var state = {
+  step: 1,
+  quiz: [],
+  beat: 0,
+  log: [],
+  goals: { plain:false, check:false, ask:false, support:false },
+  written: "",
+  selfcheck: 0
+};
+
+var GOAL_LABEL = {
+  plain: "Use plain language",
+  check: "Check understanding",
+  ask: "Invite questions",
+  support: "Support his choice"
+};
 
 /* ============================================================
-   STEP 1 → 2 navigation
+   QUIZ BANK — grouped by learn card, one question drawn per card
    ============================================================ */
-function goStep(n){
-  for(let i=1;i<=4;i++){ document.getElementById("panel"+i).classList.toggle("hidden", i!==n); }
-  document.querySelectorAll("#stepper .st").forEach(el=>{
-    const s=+el.dataset.s;
-    el.classList.toggle("active", s===n);
-    el.classList.toggle("done", s<n);
-  });
-  window.scrollTo({top:0,behavior:"smooth"});
-  if(n===3 && !convStarted){ startConversation(); }
-}
-
-/* ============================================================
-   READINESS CHECK — 3 rotating sets, feedback, gated unlock
-   "Daniel/Mr. Vega" never named in these questions.
-   ============================================================ */
-const QUESTION_SETS = [
-  [
-    { q:"What does “xenotransplantation” mean?",
-      opts:[
-        "Moving an organ from one human to another",
-        "Transplanting an organ from another species into a human",
-        "A machine that filters the blood like a kidney",
-        "Growing a kidney in a laboratory dish"],
-      correct:1,
-      fb:["That's a standard human-to-human transplant. Xeno- means across species.",
-          "Right — an organ from another species (here, a gene-edited pig) placed into a human.",
-          "That describes dialysis, not xenotransplantation.",
-          "That's lab-grown tissue, a different area of research."] },
-    { q:"Why are the donor pigs genetically modified?",
-      opts:[
-        "To make the organ larger than a human kidney",
-        "To lower the chance the human body rejects the organ",
-        "To make the surgery faster",
-        "So the organ never needs any medication"],
-      correct:1,
-      fb:["Size isn't the goal; pig kidneys are already similar in size.",
-          "Correct — the gene edits reduce rejection risk (and inactivate some pig viruses).",
-          "The edits are biological, not about surgical speed.",
-          "Anti-rejection care is still expected afterward."] },
-    { q:"Which statement about the current status is accurate?",
-      opts:[
-        "It's a routine option you can schedule at most hospitals",
-        "It's still experimental, with the first human trials beginning in 2025",
-        "It has been the standard treatment for decades",
-        "It has been proven to last 30 years in most patients"],
-      correct:1,
-      fb:["It isn't routine or widely schedulable yet.",
-          "Right — it's early and experimental; first FDA-authorized trials began in 2025.",
-          "It's very new, not decades-old.",
-          "A ~30-year lifespan is a hope, not a proven result."] },
-    { q:"In this conversation, your main job is to…",
-      opts:[
-        "Convince the patient to choose the pig kidney",
-        "Explain clearly and honestly, and help the patient decide",
-        "Quiz the patient on kidney biology",
-        "Avoid the topic because it's upsetting"],
-      correct:1,
-      fb:["Your role isn't to push one choice — it's to inform and support.",
-          "Exactly — clear, honest explanation plus shared decision-making.",
-          "You're checking your own clarity, not testing them.",
-          "Avoiding it leaves the patient more confused and alone."] }
+var BANK = [
+  [ /* card 1 — the waitlist */
+    { q:"About how many people in the U.S. are waiting for a kidney transplant?",
+      a:[ {t:"More than 90,000", ok:true,  why:"Right — and fewer than 30,000 get one in a typical year."},
+          {t:"About 900",       ok:false, why:"Far too low. The waitlist is in the tens of thousands."},
+          {t:"About 9,000",     ok:false, why:"Not quite — it is more than ten times that."},
+          {t:"About 9 million", ok:false, why:"Too high. That is closer to the number living with kidney disease overall."} ] },
+    { q:"While they wait for a kidney, most people are treated with —",
+      a:[ {t:"dialysis, several times a week", ok:true,  why:"Yes. It keeps people alive, but it is demanding and time-consuming."},
+          {t:"a temporary pig kidney",         ok:false, why:"No — pig kidneys are experimental and have gone to only a handful of patients."},
+          {t:"surgery to repair the kidney",   ok:false, why:"No. Once kidneys fail, they are not repaired surgically."},
+          {t:"nothing, they simply wait",      ok:false, why:"No. Without treatment, kidney failure is fatal within weeks."} ] }
   ],
-  [
-    { q:"A patient on dialysis is waiting for a kidney. Why might a pig-kidney option feel appealing to them?",
-      opts:[
-        "It removes any need for future medication",
-        "It could offer a path that doesn't depend on the long human waitlist",
-        "It's cheaper and available at every clinic",
-        "It's guaranteed to last longer than a human kidney"],
-      correct:1,
-      fb:["Medication is still expected afterward.",
-          "Right — the appeal is a possible route around a years-long waitlist.",
-          "It's neither widely available nor established as cheaper.",
-          "Longevity is hoped-for, not guaranteed."] },
-    { q:"What is the most honest way to describe how well pig kidneys have worked so far?",
-      opts:[
-        "They have all failed immediately",
-        "A few have functioned for weeks to a couple of months in early cases",
-        "They reliably last many years",
-        "There is no data at all"],
-      correct:1,
-      fb:["Not immediate failure in every case — some did function.",
-          "Correct — early recipients saw function for weeks to ~2 months; results are limited and uncertain.",
-          "That overstates what's been shown so far.",
-          "There is early data — limited, but real."] },
-    { q:"“Teach-back” means…",
-      opts:[
-        "Asking the patient to repeat the information in their own words to confirm understanding",
-        "Teaching the patient every medical term you know",
-        "Giving the patient a pamphlet to read later",
-        "Asking “Does that make sense?” and moving on"],
-      correct:0,
-      fb:["Exactly — teach-back checks understanding by having them restate it.",
-          "More jargon isn't the goal; clarity is.",
-          "A pamphlet doesn't confirm they understood.",
-          "“Does that make sense?” rarely reveals real gaps — teach-back does."] },
-    { q:"Being honest about uncertainty while keeping hope means…",
-      opts:[
-        "Promising the pig kidney will work to keep spirits up",
-        "Sharing the real unknowns while still acknowledging the patient's hope",
-        "Listing only the risks so they don't get excited",
-        "Refusing to give any opinion at all"],
-      correct:1,
-      fb:["Overpromising is misleading, even if well-meant.",
-          "Right — honesty and compassion together: real unknowns, real hope.",
-          "Only-risks crushes hope and isn't balanced either.",
-          "Patients still need clear, supportive guidance."] }
+  [ /* card 2 — the idea */
+    { q:"\"Xenotransplantation\" means —",
+      a:[ {t:"moving an organ from one species into another", ok:true,  why:"Correct. Here: a pig kidney into a person."},
+          {t:"a kidney from a living human donor",            ok:false, why:"That is a living-donor transplant, not a cross-species one."},
+          {t:"a machine that filters the blood",              ok:false, why:"That is dialysis."},
+          {t:"a medicine that prevents rejection",            ok:false, why:"Those are immunosuppressants, a different thing."} ] },
+    { q:"Why are the donor pigs gene-edited?",
+      a:[ {t:"To lower the chance the human body rejects the organ", ok:true,  why:"Yes — the edits remove signals that would trigger a fast attack by the immune system."},
+          {t:"To make the organ larger",                             ok:false, why:"No — pig kidneys are already close to human size."},
+          {t:"To help the pig live longer",                          ok:false, why:"No. The edits are aimed at human compatibility."},
+          {t:"So the patient needs no medicines afterward",           ok:false, why:"No. Recipients still need anti-rejection medicine."} ] }
   ],
-  [
-    { q:"Dialysis is best described to a patient as…",
-      opts:[
-        "A one-time surgery that cures kidney failure",
-        "A treatment that filters the blood, often several times a week",
-        "A type of transplant",
-        "A medication taken once a day"],
-      correct:1,
-      fb:["It's ongoing, not a one-time cure.",
-          "Correct — it's a demanding, repeated blood-filtering treatment.",
-          "It's not a transplant; it replaces some kidney function temporarily.",
-          "It's a procedure, not a pill."] },
-    { q:"Which is an example of plain language instead of jargon?",
-      opts:[
-        "“We'll assess your immunologic compatibility and HLA sensitization.”",
-        "“We'll run tests to see how well your body would accept the new kidney.”",
-        "“You have ESRD requiring RRT.”",
-        "“Your creatinine and GFR indicate stage 5.”"],
-      correct:1,
-      fb:["That's dense clinical jargon for most patients.",
-          "Right — same meaning, everyday words.",
-          "Abbreviations like ESRD/RRT lose most patients.",
-          "Lab terms without translation aren't plain language."] },
-    { q:"A patient says: “So I can just get the pig kidney next month, right?” The best response is to…",
-      opts:[
-        "Say “yes” so they stay hopeful",
-        "Gently correct the misunderstanding and re-explain that it's still experimental",
-        "Tell them they weren't listening",
-        "Change the subject"],
-      correct:1,
-      fb:["Agreeing would reinforce a false belief.",
-          "Exactly — kindly re-explain; this is teach-back catching a gap.",
-          "Blame shuts the conversation down.",
-          "Avoiding it leaves the misunderstanding in place."] },
-    { q:"Shared decision-making means…",
-      opts:[
-        "The provider makes the choice and informs the patient",
-        "The patient and provider weigh options together based on what matters to the patient",
-        "The patient decides with no input from the provider",
-        "The family decides on the patient's behalf"],
-      correct:1,
-      fb:["That's the old “orders” model, not shared decision-making.",
-          "Right — it's a partnership guided by the patient's values.",
-          "Patients need the provider's guidance too — it's shared.",
-          "The patient's own voice is central here."] }
+  [ /* card 3 — the status */
+    { q:"Which statement is accurate today?",
+      a:[ {t:"It is experimental and being tested in small trials",  ok:true,  why:"Yes. The first FDA-authorized trials began in 2025."},
+          {t:"It is a standard option most hospitals offer",          ok:false, why:"No — it is not routine care anywhere."},
+          {t:"It has been banned in the United States",               ok:false, why:"No. Trials are authorized and underway."},
+          {t:"It is a proven cure for kidney failure",                ok:false, why:"No. Long-term results are still unknown."} ] },
+    { q:"Two real risks a patient should hear about are —",
+      a:[ {t:"rejection of the organ, and disease passing between species", ok:true,  why:"Correct. Those are the two that patients are actually monitored for."},
+          {t:"cost and parking",                                             ok:false, why:"Real hassles, but not the medical risks in question."},
+          {t:"pain and scarring, and nothing else",                          ok:false, why:"Those come with any surgery. The specific risks here go further."},
+          {t:"none — the gene edits make it fully safe",                      ok:false, why:"No. Gene edits lower risk; they do not remove it."} ] },
+    { q:"A patient asks, \"Can I sign up for one next week?\" The honest answer is —",
+      a:[ {t:"Not like a routine surgery — it is a research study with very few patients", ok:true,  why:"Yes. Honest and still hopeful."},
+          {t:"Yes, your doctor can schedule it",                                            ok:false, why:"That is not true, and it sets up a painful correction later."},
+          {t:"No, and there is nothing for you to look into",                               ok:false, why:"Too closed. Trials exist, and he can ask about them."},
+          {t:"Probably — most people qualify",                                              ok:false, why:"No. Trial criteria are narrow and the numbers are tiny."} ] }
+  ],
+  [ /* card 4 — your job */
+    { q:"In this conversation, your main job is —",
+      a:[ {t:"to help him understand and decide for himself",   ok:true,  why:"Yes. Understanding first, decision his."},
+          {t:"to convince him to try it",                        ok:false, why:"That is persuasion, not informed consent."},
+          {t:"to give him your medical opinion",                 ok:false, why:"Not your role here, and not what he needs."},
+          {t:"to test how much he remembers",                    ok:false, why:"Teach-back checks your explanation, not his memory."} ] },
+    { q:"\"Organizational health literacy\" means the responsibility to be understood belongs to —",
+      a:[ {t:"the provider and the health system",  ok:true,  why:"Exactly. The burden shifts off the patient."},
+          {t:"the patient",                          ok:false, why:"That is the older view this idea replaced."},
+          {t:"the patient's family",                 ok:false, why:"Family can help, but the duty is not theirs."},
+          {t:"the insurance company",                ok:false, why:"Not the idea behind the term."} ] },
+    { q:"Daniel says, \"I don't really get what a gene edit is.\" Your best next move is to —",
+      a:[ {t:"say it a different way, with an everyday comparison", ok:true,  why:"Yes. Rephrase, don't repeat."},
+          {t:"repeat the same sentence more slowly",                ok:false, why:"Volume and pace do not fix vocabulary."},
+          {t:"tell him it is too technical to explain",             ok:false, why:"That shuts him out of his own decision."},
+          {t:"hand him a pamphlet and move on",                     ok:false, why:"A pamphlet is not a check for understanding."} ] }
   ]
 ];
-let currentSet=0, quizState=[];
-function renderQuiz(){
-  const set=QUESTION_SETS[currentSet];
-  quizState=set.map(()=>({answered:false,correct:false}));
-  const box=document.getElementById("quizBox"); box.innerHTML="";
-  set.forEach((item,qi)=>{
-    const q=document.createElement("div"); q.className="q";
-    q.innerHTML=`<div class="qtext"><span class="qi">${qi+1}</span><span>${item.q}</span></div>`;
-    item.opts.forEach((opt,oi)=>{
-      const b=document.createElement("button");
-      b.className="opt"; b.textContent=opt;
-      b.onclick=()=>answer(qi,oi,b);
-      q.appendChild(b);
-    });
-    const fb=document.createElement("div"); fb.className="fb"; fb.id=`fb-${qi}`;
-    q.appendChild(fb);
-    box.appendChild(q);
-  });
-  updateQuizProgress();
-}
-function answer(qi,oi,btn){
-  const item=QUESTION_SETS[currentSet][qi];
-  const st=quizState[qi];
-  const parent=btn.parentElement;
-  const fb=document.getElementById(`fb-${qi}`);
-  const correct = oi===item.correct;
-  if(st.correct) return;
-  parent.querySelectorAll(".opt").forEach(o=>o.classList.remove("wrong"));
-  if(correct){
-    btn.classList.add("correct");
-    parent.querySelectorAll(".opt").forEach(o=>o.classList.add("locked"));
-    fb.className="fb ok show"; fb.textContent="✓ "+item.fb[oi];
-    st.correct=true; st.answered=true;
-  }else{
-    btn.classList.add("wrong");
-    fb.className="fb no show"; fb.textContent="✗ "+item.fb[oi]+"  Try again.";
-    st.answered=true;
+
+/* ============================================================
+   CONVERSATION SCRIPT
+   ============================================================ */
+var BEATS = [
+  {
+    daniel: "My cousin sent me an article about a guy who got a kidney from a pig. Is that… is that a real thing they could do for me?",
+    options: [
+      { text:"Yes — it's called xenotransplantation. It uses a genetically modified porcine graft with multiple edits to reduce hyperacute rejection.",
+        tone:"weak", goals:[],
+        reply:"…Okay. I caught \"pig.\" The rest of that went right over my head.",
+        note:"Every word was accurate, and he still left with nothing. Jargon is the most common way a correct answer fails." },
+      { text:"It's real. Doctors have put kidneys from pigs into a small number of people. The pigs are raised so the body is less likely to fight the new kidney.",
+        tone:"strong", goals:["plain"],
+        reply:"Huh. Okay. That I follow. Nobody's said it that plainly to me before.",
+        note:"Short words, short sentences, one idea at a time. He can repeat this to his wife tonight." },
+      { text:"That's a great question for your nephrologist — I don't want to give you wrong information.",
+        tone:"weak", goals:[],
+        reply:"…Oh. Sure. I'll wait, I guess.",
+        note:"Knowing your limits is good practice. But you do have this information, and handing him off ended the conversation before it started." }
+    ]
+  },
+  {
+    daniel: "So could I sign up for one? Get off this machine?",
+    options: [
+      { text:"It's very promising. I think we'll see it become routine before long.",
+        tone:"weak", goals:[],
+        reply:"Really? That's the best news I've had in two years.",
+        note:"You just raised his hopes past what the evidence supports. Optimism you can't back up costs trust later." },
+      { text:"Not yet — not the way you'd schedule a surgery. It's still being tested. The first approved studies started in 2025, with a very small number of patients.",
+        tone:"strong", goals:["plain"],
+        reply:"Being tested. So I'd be one of the experiments.",
+        note:"Honest and specific, without shutting the door. Notice he restated it — that is a free window into what he heard." },
+      { text:"It's experimental, so realistically this isn't an option for you.",
+        tone:"weak", goals:[],
+        reply:"Right. Figures.",
+        note:"True, but delivered as a door closing. He stopped asking, which is the outcome you least want." }
+    ]
+  },
+  {
+    daniel: "So what could go wrong? Give it to me straight.",
+    options: [
+      { text:"They wouldn't do it if it weren't safe. Try not to worry about that part.",
+        tone:"weak", goals:[],
+        reply:"Okay… sure.",
+        note:"Reassurance that skips the question reads as \"don't ask me that.\" He asked directly; he can handle the answer." },
+      { text:"Two big ones. His body — sorry, your body — could still reject it. And there's concern about germs passing from animal to person, so patients get watched closely for a long time.",
+        tone:"strong", goals:["plain"],
+        reply:"Watched how long? …Actually, you know what, that makes sense. I've been watched closely for two years already.",
+        note:"You named the hard part in everyday words and did not dress it up. That is what earns the right to be believed later." },
+      { text:"Risks include hyperacute and chronic rejection, porcine endogenous retrovirus transmission, lifelong immunosuppression, and unknown graft longevity.",
+        tone:"weak", goals:[],
+        reply:"That's a lot of words. Is that a yes or a no on \"dangerous\"?",
+        note:"Completeness is not clarity. He needed two risks he could hold onto, not four he couldn't." }
+    ]
+  },
+  {
+    daniel: "Alright. I think I've got it.",
+    options: [
+      { text:"Great. Do you understand everything?",
+        tone:"weak", goals:[],
+        reply:"Yeah. Yeah, I think so.",
+        carry:"Actually — one thing. Once I get the cure, how fast do I get off dialysis?",
+        note:"Almost nobody answers that question with \"no.\" You learned nothing, and he may have learned nothing either." },
+      { text:"Let me quiz you — can you tell me what a gene edit does?",
+        tone:"weak", goals:[],
+        reply:"I… I don't know. Sorry. I've never been good at this stuff.",
+        carry:"What I'm hoping is, it's a cure. Gets me off the machine for good. That's the idea, isn't it?",
+        note:"He apologized. That is the tell that a check for understanding turned into a test — and the shame makes him less likely to speak up next time." },
+      { text:"I want to make sure I explained it well — this is on me, not you. If your wife asked tonight what we talked about, how would you put it?",
+        tone:"strong", goals:["check"],
+        reply:"I'd tell her… they can put a pig's kidney in a person now, they fix the pig's genes first so my body won't fight it, and it's a cure that gets me off dialysis for good. Right?",
+        carry:"Right?",
+        note:"That is teach-back done properly — you took the blame for any confusion and asked for his words. And look what it caught." }
+    ]
+  },
+  {
+    danielFromCarry: true,
+    options: [
+      { text:"Like I said, it's still experimental.",
+        tone:"weak", goals:[],
+        reply:"Okay. You did say that.",
+        note:"Repeating the same sentence rarely fixes a misunderstanding. If it didn't land the first time, the words are the problem." },
+      { text:"No, that's not right — I said it's not a cure.",
+        tone:"weak", goals:[],
+        reply:"Sorry. I thought I was following.",
+        note:"He was following — you caught the one piece that slipped. Leading with \"no\" made him feel slow instead of heard." },
+      { text:"You've got most of it, and that's the part that matters. One piece I want to fix, and that's on me: it isn't a cure. It's a study, and nobody knows yet how long these kidneys last.",
+        tone:"strong", goals:["plain"],
+        reply:"Ah. That's different. Okay — a study. Not a cure. I can hold onto that.",
+        note:"Affirm, own the gap, correct in plain words. He kept his footing and the record got straight." }
+    ]
+  },
+  {
+    daniel: "…",
+    danielNote: "Daniel goes quiet and looks at the article in his lap.",
+    options: [
+      { text:"Any questions?",
+        tone:"weak", goals:[],
+        reply:"Nope. I'm good.",
+        carry:"Well. I've got some thinking to do either way.",
+        note:"A yes-or-no question invites a no. Whatever he was about to ask, he just swallowed it." },
+      { text:"Here's my number if anything comes up later.",
+        tone:"weak", goals:[],
+        reply:"Thanks. Appreciate it.",
+        carry:"I've got some thinking to do, I guess.",
+        note:"Kind, and it moves the question to a phone call he probably won't make. The moment to ask was here." },
+      { text:"What questions do you have for me? Even the ones that feel small — those are usually the good ones.",
+        tone:"strong", goals:["ask"],
+        reply:"Well… my wife's going to ask if this is against our faith. Some folks at our church might have something to say about a pig. Is that a stupid thing to bring up?",
+        carry:"Is that a stupid thing to bring up?",
+        note:"An open question, with permission attached. He had a real concern the whole time — and it was never the medical part." }
+    ]
+  },
+  {
+    danielFromCarry: true,
+    optionsIf: function(){
+      if (state.goals.ask){
+        return [
+          { text:"If I were you I'd go for it. Dialysis is no way to live.",
+            tone:"weak", goals:[],
+            reply:"You think so? …I don't know. Maybe.",
+            note:"He asked about his faith and got your opinion about his life. Well-meant advice can quietly take the decision away from him." },
+          { text:"Medically, that shouldn't be a factor.",
+            tone:"weak", goals:[],
+            reply:"Right. Never mind.",
+            note:"You answered a medical question he didn't ask. \"Never mind\" is the sound of a patient deciding not to raise the next thing either." },
+          { text:"Not stupid at all — that's the right question, and your pastor is the right person to ask it with. This is your call, and there's no clock on it.",
+            tone:"strong", goals:["support"],
+            reply:"Thank you. Nobody's said it's my call before. That helps more than you know.",
+            note:"You treated his values as part of the medical picture and handed the decision back to him. That is what informed consent feels like from the patient's chair." }
+        ];
+      }
+      return [
+        { text:"Honestly? I'd go for it. Dialysis is no way to live.",
+          tone:"weak", goals:[],
+          reply:"You think so? …Okay. Maybe.",
+          note:"Well-meant advice can quietly take the decision away from a man who is already losing control of his week." },
+        { text:"Take the packet home and let the team know soon — these study slots don't stay open.",
+          tone:"weak", goals:[],
+          reply:"Soon. Okay.",
+          note:"Urgency you invented pushes him toward a decision he does not understand yet. That is pressure, not consent." },
+        { text:"Whatever you decide is your call, and there's no clock on it. Bring your wife next time and we'll go through the whole thing again.",
+          tone:"strong", goals:["support"],
+          reply:"That'd help. I'd like her to hear it from you. …There was something I meant to ask, but it can wait.",
+          note:"You handed the decision back and left the door open. He still walked out with an unasked question — that is what a closed check-in costs." }
+      ];
+    }
   }
-  updateQuizProgress();
+];
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+function goStep(n){
+  state.step = n;
+  for (var i=1;i<=4;i++){
+    var p = document.getElementById("panel"+i);
+    var r = document.getElementById("rail"+i);
+    if (i===n){ p.classList.add("on"); r.classList.add("active"); }
+    else { p.classList.remove("on"); r.classList.remove("active"); }
+    if (i < n) r.classList.add("done"); else r.classList.remove("done");
+  }
+  window.scrollTo(0,0);
+  try { window.parent.postMessage({type:"tb-step", step:n}, "*"); } catch(e){}
 }
-function updateQuizProgress(){
-  const n=quizState.filter(s=>s.correct).length;
-  document.getElementById("quizProgress").textContent=`${n} of 4 correct`;
-  document.getElementById("enterBtn").disabled = n<4;
-}
-function newQuestionSet(){
-  currentSet=(currentSet+1)%QUESTION_SETS.length;
-  renderQuiz();
-  document.getElementById("panel2").scrollIntoView({behavior:"smooth"});
+
+function shuffle(arr){
+  var a = arr.slice();
+  for (var i=a.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t = a[i]; a[i]=a[j]; a[j]=t;
+  }
+  return a;
 }
 
 /* ============================================================
-   CONVERSATION — live Claude patient + goal detection
+   STEP 2 — QUIZ
    ============================================================ */
-const GOALS=[
-  {id:"plain",  t:"Plain language",       d:"Explains without jargon (or fixes it when Daniel looks lost)"},
-  {id:"teach",  t:"Checks understanding", d:"Asks Daniel to say it back in his own words"},
-  {id:"invite", t:"Invites questions",    d:"Makes space for Daniel to ask"},
-  {id:"share",  t:"Supports their choice",  d:"Helps Daniel feel included and make his own informed decision"}
-];
-let convStarted=false, convHistory=[], goalsMet={}, apiOK=true;
+function buildQuiz(){
+  state.quiz = BANK.map(function(group){
+    var q = group[Math.floor(Math.random()*group.length)];
+    return { q:q.q, a:shuffle(q.a), solved:false };
+  });
+  renderQuiz();
+}
+
+function renderQuiz(){
+  var holder = document.getElementById("quizHolder");
+  holder.innerHTML = "";
+  state.quiz.forEach(function(item, qi){
+    var box = document.createElement("div");
+    box.className = "q" + (item.solved ? " correct" : "");
+    var h = document.createElement("div");
+    h.className = "qtext";
+    h.innerHTML = '<span class="qn">' + (qi+1) + '.</span>' + item.q;
+    box.appendChild(h);
+    item.a.forEach(function(opt, oi){
+      var b = document.createElement("button");
+      b.className = "opt";
+      b.type = "button";
+      b.textContent = opt.t;
+      b.id = "q"+qi+"o"+oi;
+      b.onclick = function(){ answerQuiz(qi, oi); };
+      if (item.solved) b.disabled = true;
+      box.appendChild(b);
+      var w = document.createElement("div");
+      w.className = "why hidden";
+      w.id = "why"+qi+"o"+oi;
+      w.textContent = opt.why;
+      box.appendChild(w);
+    });
+    holder.appendChild(box);
+  });
+  updateTally();
+}
+
+function answerQuiz(qi, oi){
+  var item = state.quiz[qi];
+  if (item.solved) return;
+  var opt = item.a[oi];
+  var btn = document.getElementById("q"+qi+"o"+oi);
+  var why = document.getElementById("why"+qi+"o"+oi);
+  why.classList.remove("hidden");
+  if (opt.ok){
+    item.solved = true;
+    btn.className = "opt picked-right";
+    why.className = "why right";
+    for (var k=0;k<item.a.length;k++){
+      document.getElementById("q"+qi+"o"+k).disabled = true;
+    }
+    document.getElementById("q"+qi+"o"+oi).parentNode.classList.add("correct");
+  } else {
+    btn.className = "opt picked-wrong";
+    btn.disabled = true;
+    why.className = "why wrong";
+  }
+  updateTally();
+}
+
+function updateTally(){
+  var n = state.quiz.filter(function(i){ return i.solved; }).length;
+  document.getElementById("tally").textContent = n + " of 4 correct";
+  document.getElementById("unlockBtn").disabled = (n < 4);
+}
+
+/* ============================================================
+   STEP 3 — CONVERSATION
+   ============================================================ */
+function resetConversation(){
+  state.beat = 0;
+  state.log = [];
+  state.carry = "";
+  state.goals = { plain:false, check:false, ask:false, support:false };
+  state.written = "";
+  document.getElementById("transcript").innerHTML = "";
+  document.getElementById("writeStep").classList.add("hidden");
+  document.getElementById("restart3").classList.remove("hidden");
+  document.getElementById("myline").value = "";
+  document.getElementById("compareBox").classList.add("hidden");
+  document.getElementById("compareBtn").classList.remove("hidden");
+  var boxes = document.querySelectorAll(".sc");
+  for (var i=0;i<boxes.length;i++) boxes[i].checked = false;
+  renderGoals();
+  renderBeat();
+}
+
+function addTurn(who, text, cls){
+  var t = document.getElementById("transcript");
+  var d = document.createElement("div");
+  d.className = "turn " + (who === "you" ? "you" : "");
+  d.innerHTML = '<div class="who">' + (who === "you" ? "You" : "Daniel") + '</div>' +
+                '<div class="bubble ' + (who === "you" ? "you" : "daniel") + '">' + escapeHTML(text) + '</div>';
+  t.appendChild(d);
+  t.scrollTop = t.scrollHeight;
+  return d;
+}
+
+function escapeHTML(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function renderBeat(){
+  var choicesEl = document.getElementById("choices");
+  choicesEl.innerHTML = "";
+  if (state.beat >= BEATS.length){ openWriteStep(); return; }
+
+  var beat = BEATS[state.beat];
+  if (beat.danielFromCarry){
+    if (state.carry) addTurn("daniel", state.carry);
+  } else if (beat.daniel === "…"){
+    var t = document.getElementById("transcript");
+    var d = document.createElement("div");
+    d.className = "turn";
+    d.innerHTML = '<div class="who">Daniel</div><div class="bubble daniel"><i>' + escapeHTML(beat.danielNote || "Daniel is quiet.") + '</i></div>';
+    t.appendChild(d);
+    t.scrollTop = t.scrollHeight;
+  } else if (beat.daniel){
+    addTurn("daniel", beat.daniel);
+  }
+
+  var p = document.createElement("div");
+  p.className = "prompt";
+  p.textContent = "What do you say?";
+  choicesEl.appendChild(p);
+
+  var order = shuffle(beat.optionsIf ? beat.optionsIf() : beat.options);
+  order.forEach(function(opt){
+    var b = document.createElement("button");
+    b.className = "choice";
+    b.type = "button";
+    b.textContent = "\u201C" + opt.text + "\u201D";
+    b.onclick = function(){ chooseOption(opt); };
+    choicesEl.appendChild(b);
+  });
+}
+
+function chooseOption(opt){
+  document.getElementById("choices").innerHTML = "";
+  addTurn("you", opt.text);
+  var danielTurn = addTurn("daniel", opt.reply);
+  var note = document.createElement("div");
+  note.className = "note " + (opt.tone === "strong" ? "strong" : "weak");
+  note.innerHTML = "<b>" + (opt.tone === "strong" ? "What that did: " : "What that cost: ") + "</b>" + escapeHTML(opt.note);
+  danielTurn.appendChild(note);
+  document.getElementById("transcript").scrollTop = document.getElementById("transcript").scrollHeight;
+
+  state.carry = opt.carry || "";
+  state.log.push({ beat: state.beat, said: opt.text, tone: opt.tone, note: opt.note, goals: opt.goals });
+  opt.goals.forEach(function(g){ state.goals[g] = true; });
+  renderGoals();
+
+  state.beat++;
+  var cont = document.createElement("button");
+  cont.className = "btn";
+  cont.type = "button";
+  cont.textContent = (state.beat >= BEATS.length) ? "Wrap up the visit →" : "Continue →";
+  cont.onclick = function(){ renderBeat(); };
+  document.getElementById("choices").appendChild(cont);
+  cont.focus();
+}
 
 function renderGoals(){
-  const g=document.getElementById("goals"); g.innerHTML="";
-  GOALS.forEach(goal=>{
-    const met=!!goalsMet[goal.id];
-    const el=document.createElement("div");
-    el.className="goal"+(met?" met":""); el.id="goal-"+goal.id;
-    el.innerHTML=`<div class="box">${met?"✓":""}</div><div><div class="gt">${goal.t}</div><div class="gd">${goal.d}</div></div>`;
-    g.appendChild(el);
+  var n = 0;
+  ["plain","check","ask","support"].forEach(function(g){
+    var el = document.getElementById("g-"+g);
+    if (state.goals[g]){ el.classList.add("met"); el.setAttribute("aria-label", GOAL_LABEL[g] + " — reached"); n++; }
+    else { el.classList.remove("met"); el.setAttribute("aria-label", GOAL_LABEL[g] + " — not yet reached"); }
   });
-  const n=Object.values(goalsMet).filter(Boolean).length;
-  document.getElementById("goalCount").textContent=`${n} of 4 reached`;
-  document.getElementById("finishBtn").disabled = n<4;
+  document.getElementById("goalCount").textContent = n + " of 4 reached";
 }
-function markGoals(newly){
-  let changed=false;
-  newly.forEach(id=>{ if(GOALS.some(g=>g.id===id) && !goalsMet[id]){ goalsMet[id]=true; changed=true; }});
-  renderGoals();
-  if(changed){
-    newly.forEach(id=>{
-      const el=document.getElementById("goal-"+id);
-      if(el){ el.classList.add("just-met"); setTimeout(()=>el.classList.remove("just-met"),450); }
-    });
+
+function openWriteStep(){
+  document.getElementById("choices").innerHTML = "";
+  document.getElementById("writeStep").classList.remove("hidden");
+  document.getElementById("restart3").classList.add("hidden");
+  var ws = document.getElementById("writeStep");
+  if (ws.scrollIntoView) { try { ws.scrollIntoView({ behavior:"smooth", block:"start" }); } catch(e){ ws.scrollIntoView(); } }
+}
+
+function showCompare(){
+  var txt = document.getElementById("myline").value.trim();
+  if (txt.length < 10){
+    alert("Write your own version first — even a rough one. Comparing before you commit is how you end up copying.");
+    document.getElementById("myline").focus();
+    return;
   }
-}
-
-const PATIENT_SYSTEM = `You are Daniel Vega, 61, a calm and friendly patient with kidney failure who has been on dialysis for two years. You are talking with a first-year health-professions student who is practicing clear communication. You recently heard the words "pig kidney" (xenotransplant) and you simply want to understand what it actually means. You are NOT in crisis, NOT hopeless, and NOT desperate. You are relaxed, cooperative, and easy to talk to.
-
-STAY IN CHARACTER as Daniel. Never break character, never coach the student, never mention teach-back or goals. Keep the conversation SHORT, SIMPLE, and EASY so it can finish in just a few exchanges.
-
-Your role is to help the student succeed at four things: (1) explaining in plain language, (2) checking your understanding, (3) inviting your questions, and (4) helping you feel part of the decision. So:
-- Be warm and receptive. When the student explains something clearly, show that it's clicking: "Oh, okay — that makes sense."
-- If the student uses a big or confusing word, gently and briefly say you're not sure what it means, then accept their simpler explanation happily.
-- When the student asks you to say something back in your own words, DO IT — briefly and mostly correct — so they can confirm you understood. For example: "So it's a kidney from a specially-raised pig, and it's still being tested."
-- When the student invites your questions, ask this ONE simple question, in your own words: whether there are any issues or consequences you should be aware of with this procedure. For example: "Is there anything I should be aware of — any issues or consequences with this procedure?" Do NOT ask any clinical or technical questions (nothing about surgery details, recovery, medications, how long it lasts, cost, biology, or numbers). Do NOT ask what you should choose or what your options are. This consequences question is the ONLY question you ask.
-- IMPORTANT: never ask the student anything clinical or technical, and never ask them to make decisions for you. You are only trying to UNDERSTAND the procedure in simple terms.
-- Never sound scared, hopeless, or desperate. Stay upbeat and grateful.
-- As soon as the student has explained clearly, checked your understanding, invited your questions, and made you feel included in your own choice, wrap up warmly: express that you understand the process much better now, and that you've decided ON YOUR OWN to wait until this procedure is more fully studied and proven successful before considering it. Thank them for helping you understand.
-
-Keep every reply short and human — 1 to 3 sentences. Speak only as Daniel, in first person. Do not use markdown.`;
-
-function goalDetectorSystem(){
-  return `You evaluate a student's MOST RECENT message to a simulated patient (Daniel) in a health-communication role-play. Decide which of these four communication goals the student's latest message clearly demonstrates. Be reasonably generous but require real evidence in THIS message.
-
-GOALS:
-- plain: explains something in plain, everyday language OR notices confusion and rephrases without jargon.
-- teach: asks Daniel to restate/say back in his OWN words what he understood (true teach-back), not just "does that make sense?".
-- invite: explicitly invites Daniel to ask questions or raise concerns.
-- share: helps Daniel feel included in his own decision and supports his right to make an informed choice (e.g., affirms it's his decision, reassures him he can take his time, respects his conclusion) — NOT asking him to pick between medical options.
-
-Respond with ONLY a JSON object, no prose, of the form:
-{"met":["plain","teach"]}
-Include only goals clearly evidenced in the latest student message. If none, use {"met":[]}.
-`;
-}
-
-async function startConversation(){
-  convStarted=true;
-  goalsMet={}; convHistory=[]; renderGoals();
-  const chat=document.getElementById("chat"); chat.innerHTML="";
-  addSys("Daniel has just sat down. He's relaxed and curious, and wants to understand what a 'pig kidney' means. He starts the conversation.");
-  await patientTurn(true);
-}
-
-function addMsg(role,text){
-  const chat=document.getElementById("chat");
-  const m=document.createElement("div");
-  m.className="msg "+(role==="patient"?"patient":role==="me"?"me":"sys");
-  if(role==="sys"){ m.innerHTML=`<div class="bub">${text}</div>`; }
-  else{
-    const who=role==="patient"?"DV":"You";
-    m.innerHTML=`<div class="who">${who}</div><div class="bub"></div>`;
-    m.querySelector(".bub").textContent=text;
-  }
-  chat.appendChild(m); chat.scrollTop=chat.scrollHeight;
-  return m;
-}
-function addSys(t){ return addMsg("sys",t); }
-function showTyping(){
-  const chat=document.getElementById("chat");
-  const m=document.createElement("div"); m.className="msg patient typing"; m.id="typing";
-  m.innerHTML=`<div class="who">DV</div><div class="bub">Daniel is thinking…</div>`;
-  chat.appendChild(m); chat.scrollTop=chat.scrollHeight;
-}
-function hideTyping(){ const t=document.getElementById("typing"); if(t) t.remove(); }
-
-async function patientTurn(isOpening){
-  showTyping();
-  try{
-    const msgs = convHistory.slice();
-    if(isOpening){
-      msgs.push({role:"user",content:"[The student has entered the room. Greet them warmly and calmly, and say you've heard the words 'pig kidney' and would like to understand what it actually means. Keep it short, friendly, and relaxed — you are curious, not worried.]"});
-    }
-    const reply = await callClaude(msgs, PATIENT_SYSTEM, 400);
-    hideTyping();
-    const clean = reply || "…I'm sorry, could you say that again?";
-    addMsg("patient",clean);
-    convHistory.push({role:"assistant",content:clean});
-    setApiNote(true);
-  }catch(e){
-    hideTyping();
-    apiOK=false; setApiNote(false);
-    showConvErr("The patient isn't responding right now (the connection to the AI failed). You can keep typing to practice, but Daniel's live replies and automatic goal-tracking need the connection. Try again in a moment or use “Start over.”");
-  }
-}
-
-async function sendTurn(){
-  const input=document.getElementById("input");
-  const text=input.value.trim();
-  if(!text) return;
-  hideConvErr();
-  input.value="";
-  addMsg("me",text);
-  convHistory.push({role:"user",content:text});
-  detectGoals(text);
-  document.getElementById("sendBtn").disabled=true;
-  await patientTurn(false);
-  document.getElementById("sendBtn").disabled=false;
-  input.focus();
-}
-
-async function detectGoals(latest){
-  if(!apiOK) return;
-  try{
-    const ctx = convHistory.slice(-6).map(m=>(m.role==="user"?"STUDENT: ":"DANIEL: ")+m.content).join("\n");
-    const prompt = `Conversation so far:\n${ctx}\n\nThe latest STUDENT message to evaluate is:\n"${latest}"\n\nReturn the JSON now.`;
-    const out = await callClaude([{role:"user",content:prompt}], goalDetectorSystem(), 200);
-    const m = out.match(/\{[\s\S]*\}/);
-    if(m){
-      const parsed = JSON.parse(m[0]);
-      if(Array.isArray(parsed.met)) markGoals(parsed.met);
-    }
-  }catch(e){ }
-}
-
-function restartConversation(){
-  convStarted=false;
-  document.getElementById("input").value="";
-  hideConvErr();
-  startConversation();
+  document.getElementById("compareBox").classList.remove("hidden");
+  document.getElementById("compareBtn").classList.add("hidden");
 }
 
 /* ============================================================
-   FEEDBACK
+   STEP 4 — FEEDBACK
    ============================================================ */
-async function finishConversation(){
+function finish(){
+  var txt = document.getElementById("myline").value.trim();
+  if (txt.length < 10){
+    alert("Add your teach-back ask before you finish — this is the one line you'll use most often on the job.");
+    document.getElementById("myline").focus();
+    return;
+  }
+  state.written = txt;
+  var boxes = document.querySelectorAll(".sc");
+  var c = 0;
+  for (var i=0;i<boxes.length;i++){ if (boxes[i].checked) c++; }
+  state.selfcheck = c;
+  renderFeedback();
   goStep(4);
-  const n=Object.values(goalsMet).filter(Boolean).length;
-  const ring=document.getElementById("ring");
-  ring.style.setProperty("--p", Math.round(n/4*100));
-  document.getElementById("scoreNum").textContent=n+"/4";
+}
 
-  const headline = n===4 ? "Excellent — you connected on every goal."
-                 : n>=2 ? "Strong work — a few areas to sharpen."
-                 : "Good start — let's build on this.";
-  document.getElementById("scoreHeadline").textContent=headline;
-  document.getElementById("scoreSummary").textContent =
-    "You're judged on communication — clarity, honesty, and partnership — not on medical detail.";
+function renderFeedback(){
+  var met = ["plain","check","ask","support"].filter(function(g){ return state.goals[g]; });
+  var strongCount = state.log.filter(function(l){ return l.tone === "strong"; }).length;
 
-  const fbBox=document.getElementById("fbGoals"); fbBox.innerHTML="";
-  let perGoal=null;
-  if(apiOK){
-    try{ perGoal = await getModelFeedback(); }catch(e){ perGoal=null; }
-  }
-  GOALS.forEach(goal=>{
-    const met=!!goalsMet[goal.id];
-    const div=document.createElement("div");
-    div.className="fb-goal "+(met?"met":"miss");
-    let line = perGoal && perGoal[goal.id] ? perGoal[goal.id]
-             : (met ? defaultMetLine(goal.id) : defaultMissLine(goal.id));
-    div.innerHTML=`<div class="h"><span class="pill">${met?"Reached":"Missed"}</span> ${goal.t}</div><p>${line}</p>`;
-    fbBox.appendChild(div);
+  var headline;
+  if (met.length === 4) headline = "Daniel left this visit understanding his options and knowing the decision was his. That is the whole job.";
+  else if (met.length >= 2) headline = "Daniel got real value from this conversation, and there were openings you let pass. Both are worth looking at.";
+  else headline = "Daniel was polite the whole time — patients usually are. Read the notes below for what he did not get, then run it again.";
+
+  var html = "";
+  html += '<div class="score"><div class="big">' + met.length + '/4</div>' +
+          '<div><div style="font-weight:600">goals reached</div>' +
+          '<div class="lbl">' + strongCount + ' of ' + state.log.length + ' choices moved the conversation forward</div></div></div>';
+
+  html += '<div class="fb"><h4>Where you landed</h4><p style="margin:0 0 14px;font-size:14.5px">' + headline + '</p>';
+  ["plain","check","ask","support"].forEach(function(g){
+    var yes = state.goals[g];
+    html += '<div class="fbline ' + (yes ? "yes" : "no") + '"><span class="mark">' + (yes ? "✓" : "○") + '</span><span><b>' +
+            GOAL_LABEL[g] + '</b> — ' + goalComment(g, yes) + '</span></div>';
   });
+  html += '</div>';
 
-  document.getElementById("fbClose").textContent = n===4
-    ? "Daniel left understanding his options and feeling like a partner in the choice — that's exactly what this skill is for. Being understood was your job, and you did it."
-    : "Every goal you reach is a patient who leaves clearer and more in control. Run it again and see if you can connect on the ones you missed.";
-}
+  html += '<div class="fb"><h4>Turn by turn</h4><div class="replay">';
+  state.log.forEach(function(l, i){
+    html += '<div class="item"><b>' + (i+1) + '.</b> <span class="said">"' + escapeHTML(shorten(l.said)) + '"</span><br>' +
+            (l.tone === "strong" ? "✓ " : "○ ") + escapeHTML(l.note) + '</div>';
+  });
+  html += '</div></div>';
 
-async function getModelFeedback(){
-  const transcript = convHistory.map(m=>(m.role==="user"?"STUDENT: ":"DANIEL: ")+m.content).join("\n");
-  const metList = Object.keys(goalsMet).filter(k=>goalsMet[k]);
-  const sys = `You are a warm, specific communication coach for first-year health students. Given a role-play transcript, write ONE short sentence of feedback (max 24 words) for EACH of four goals, referencing what the student actually did. Encouraging for reached goals; concrete and kind for missed ones. Return ONLY JSON:\n{"plain":"...","teach":"...","invite":"...","share":"..."}`;
-  const usr = `Transcript:\n${transcript}\n\nGoals reached: ${metList.join(", ")||"none"}.\nWrite the four feedback sentences now as JSON.`;
-  const out = await callClaude([{role:"user",content:usr}], sys, 500);
-  const m=out.match(/\{[\s\S]*\}/);
-  return m?JSON.parse(m[0]):null;
-}
-function defaultMetLine(id){
-  return {
-    plain:"You kept your language plain and human — Daniel could follow you.",
-    teach:"You asked Daniel to say it back, which is the heart of teach-back.",
-    invite:"You made room for his questions, so he knew he was allowed to ask.",
-    share:"You helped Daniel feel included and supported his right to make his own informed choice."
-  }[id];
-}
-function defaultMissLine(id){
-  return {
-    plain:"Watch for jargon — when Daniel looks lost, restate it in everyday words.",
-    teach:"Next time, ask Daniel to explain it back in his own words to confirm he understood.",
-    invite:"Invite his questions out loud — “What questions do you have for me?”",
-    share:"Reassure Daniel it's his decision and he can take his time — that's informed consent."
-  }[id];
+  html += '<div class="fb"><h4>Your teach-back ask</h4>' +
+          '<p style="font-size:15px;font-style:italic;background:var(--sand);padding:11px 13px;border-radius:7px;margin:0 0 11px">"' + escapeHTML(state.written) + '"</p>' +
+          '<p style="font-size:14px;margin:0">You checked ' + state.selfcheck + ' of 4 boxes on your own review. ' +
+          (state.selfcheck === 4
+            ? "Say it out loud once before your next clinical — the words come easier the second time."
+            : "The boxes you left blank are the ones to rewrite. Try the line again with those in mind.") +
+          '</p></div>';
+
+  document.getElementById("fbHolder").innerHTML = html;
+  document.getElementById("copiedMsg").classList.add("hidden");
 }
 
-/* ============================================================
-   API status + errors
-   ============================================================ */
-function setApiNote(ok){
-  const el=document.getElementById("apiNote");
-  el.textContent = ok ? "● Live patient connected" : "● Live patient offline — check connection";
-  el.style.color = ok ? "var(--sage)" : "var(--warn)";
+function shorten(s){
+  return s.length > 92 ? s.slice(0,92) + "…" : s;
 }
-function showConvErr(t){ const e=document.getElementById("convErr"); e.textContent=t; e.classList.add("show"); }
-function hideConvErr(){ document.getElementById("convErr").classList.remove("show"); }
 
-/* ============================================================
-   RESET
-   ============================================================ */
-function fullReset(){
-  goalsMet={}; convHistory=[]; convStarted=false;
-  currentSet=0; renderQuiz();
-  document.getElementById("input").value="";
+function goalComment(g, yes){
+  var c = {
+    plain: {
+      y: "you traded the technical word for the everyday one, and he repeated your explanation back without stumbling.",
+      n: "the language stayed above him. Accurate is not the same as understood — watch for the moment he stops asking follow-ups."
+    },
+    check: {
+      y: "you asked him to say it back in his own words, and it surfaced a misunderstanding that \"Do you understand?\" never would have.",
+      n: "you never found out what he actually took away. He agreed with you, which is not the same thing."
+    },
+    ask: {
+      y: "your open question gave him room, and what came out was the concern he had been carrying the whole visit.",
+      n: "he had a question about his faith that he never got to ask. Closed questions and phone numbers both send it home unspoken."
+    },
+    support: {
+      y: "you named the decision as his and gave him time. That is informed consent in practice, not on paper.",
+      n: "the decision drifted toward you. Even kind steering takes a choice away from a patient who is already losing control of his week."
+    }
+  };
+  return yes ? c[g].y : c[g].n;
+}
+
+function copySummary(){
+  var met = ["plain","check","ask","support"].filter(function(g){ return state.goals[g]; });
+  var lines = [];
+  lines.push("TEACH-BACK PRACTICE — SUMMARY");
+  lines.push("Patient: Daniel Vega, 61 · topic: pig kidney (xenotransplantation)");
+  lines.push("Goals reached: " + met.length + " of 4");
+  ["plain","check","ask","support"].forEach(function(g){
+    lines.push("  [" + (state.goals[g] ? "x" : " ") + "] " + GOAL_LABEL[g]);
+  });
+  lines.push("");
+  lines.push("MY CHOICES");
+  state.log.forEach(function(l, i){
+    lines.push((i+1) + ". \"" + l.said + "\"");
+    lines.push("   " + (l.tone === "strong" ? "[effective] " : "[missed] ") + l.note);
+  });
+  lines.push("");
+  lines.push("MY TEACH-BACK ASK");
+  lines.push("\"" + state.written + "\"");
+  lines.push("Self-check boxes met: " + state.selfcheck + " of 4");
+  var text = lines.join("\n");
+
+  var ta = document.createElement("textarea");
+  ta.value = text;
+  ta.setAttribute("readonly","");
+  ta.style.position = "absolute";
+  ta.style.left = "-9999px";
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand("copy"); } catch(e){}
+  document.body.removeChild(ta);
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).catch(function(){});
+  }
+  document.getElementById("copiedMsg").classList.remove("hidden");
+}
+
+function restartAll(){
+  resetConversation();
+  buildQuiz();
   goStep(1);
 }
 
 /* ============================================================
-   INPUT wiring
+   INIT
    ============================================================ */
-document.getElementById("input").addEventListener("keydown",e=>{
-  if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); sendTurn(); }
-});
-document.getElementById("input").addEventListener("input",function(){
-  this.style.height="auto"; this.style.height=Math.min(this.scrollHeight,130)+"px";
-});
-
-/* init */
-renderQuiz();
-renderGoals();
+buildQuiz();
+resetConversation();
 </script>
 </body>
 </html>
