@@ -132,10 +132,23 @@
   }
 
   .summary{background:var(--paper);border:1px solid var(--line);
-    border-radius:8px;padding:15px 17px;margin:14px 0;font-size:.93rem;}
+    border-radius:8px;padding:15px 17px;margin:10px 0 0;font-size:.93rem;}
   .summary .qa{margin:0 0 11px;}
   .summary .qa:last-child{margin-bottom:0;}
   .summary .qa span{display:block;color:var(--ink-soft);font-size:.83rem;}
+
+  .subcard{
+    border:1px solid var(--line);border-radius:9px;
+    padding:15px 17px;margin-bottom:16px;
+  }
+  .subcard.mine{border-color:var(--clay);}
+  .subowner{
+    margin:0;font-weight:700;font-size:1.02rem;
+  }
+  .subowner .rd{
+    display:block;font-weight:400;font-size:.84rem;color:var(--ink-soft);
+    text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;
+  }
 
   .toast{color:var(--sage);font-weight:600;font-size:.9rem;}
   .err{color:var(--clay);font-weight:600;font-size:.9rem;margin-top:10px;}
@@ -248,17 +261,12 @@
 <!-- ============ 5. ROUND DONE ============ -->
 <section class="step" id="s-done" hidden aria-labelledby="h-done">
   <p class="eyebrow" id="done-eyebrow">Round 1 complete</p>
-  <h2 id="h-done">Copy this into Canvas</h2>
-  <p class="muted">This is your submission for the round you just played the patient.</p>
+  <h2 id="h-done">Copy your own responses</h2>
+  <p class="muted" id="done-note"></p>
 
-  <div class="summary" id="summary-view"></div>
+  <div id="sub-list"></div>
 
-  <div class="actions">
-    <button id="btn-copy">Copy my responses</button>
-    <span class="toast" id="copy-toast" hidden>Copied.</span>
-  </div>
-
-  <p id="next-note" style="margin-top:20px;"></p>
+  <p id="next-note" style="margin-top:4px;"></p>
   <div class="actions">
     <button id="btn-next-round">Swap roles &mdash; start round 2</button>
     <button class="ghost" id="btn-restart" hidden>Start over</button>
@@ -376,7 +384,7 @@
 
   var $ = function(id){ return document.getElementById(id); };
   var STEPS = ["s-review","s-pick","s-case","s-check","s-done"];
-  var state = { round:1, used:[], current:null, name:"", last:null };
+  var state = { round:1, used:[], current:null, name:"", answers:[] };
 
   function show(id){
     STEPS.forEach(function(s){ $(s).hidden = (s !== id); });
@@ -437,7 +445,16 @@
       if(!taken){
         b.addEventListener("click", function(){
           var nm = $("pt-name").value.trim();
-          if(!nm){ $("pick-err").hidden = false; $("pt-name").focus(); return; }
+          if(!nm){
+            $("pick-err").textContent = "Type the patient\u2019s name first.";
+            $("pick-err").hidden = false; $("pt-name").focus(); return;
+          }
+          if(state.round === 2 && state.answers.length &&
+             nm.toLowerCase() === state.answers[0].name.toLowerCase()){
+            $("pick-err").textContent = state.answers[0].name +
+              " was the patient in round 1. The other partner is the patient now.";
+            $("pick-err").hidden = false; $("pt-name").focus(); return;
+          }
           state.name = nm;
           openCase(c);
         });
@@ -479,68 +496,109 @@
       $("check-err").hidden = false;
       return;
     }
-    state.last = {
+    state.answers.push({
       round: state.round,
       name: state.name,
       title: state.current.title,
       swap: swap,
       help: help
-    };
+    });
     state.used.push(state.current.id);
     buildDone();
   }
 
-  function summaryText(){
-    var a = state.last;
+  function summaryText(a){
     return [
-      "Teach It to a Classmate \u2014 round " + a.round,
-      "Patient: " + a.name,
+      "Teach It to a Classmate",
+      "Submitted by: " + a.name + " (patient in round " + a.round + ")",
       "Case: " + a.title,
       "",
-      "Word put into plain language: " + a.swap,
+      "Word my provider put into plain language: " + a.swap,
       "",
       "Did they help me understand without talking down to me: " + a.help
     ].join("\n");
   }
 
+  function makeCopyButton(a, toast){
+    var b = document.createElement("button");
+    b.type = "button";
+    b.textContent = "Copy " + a.name + "\u2019s submission";
+    b.addEventListener("click", function(){ copyText(summaryText(a), toast); });
+    return b;
+  }
+
   function buildDone(){
-    var a = state.last;
-    $("done-eyebrow").textContent = "Round " + a.round + " complete";
-    var v = $("summary-view");
-    v.innerHTML = "";
-    [["Patient", a.name],
-     ["Case", a.title],
-     ["Word put into plain language", a.swap],
-     ["Did they help me understand without talking down to me", a.help]
-    ].forEach(function(pair){
-      var pEl = document.createElement("p");
-      pEl.className = "qa";
-      var s = document.createElement("span");
-      s.textContent = pair[0];
-      pEl.appendChild(s);
-      pEl.appendChild(document.createTextNode(pair[1]));
-      v.appendChild(pEl);
+    var latest = state.answers[state.answers.length - 1];
+    var finished = (state.answers.length === 2);
+
+    $("done-eyebrow").textContent = "Round " + latest.round + " complete";
+    $("done-note").textContent = finished
+      ? "Two submissions, one for each of you. Copy only the one with your own name on it and paste it into Canvas. Do it one at a time so you do not overwrite each other."
+      : "This one belongs to " + latest.name + ". You can copy and paste it into Canvas now, or come back for it at the end.";
+
+    var host = $("sub-list");
+    host.innerHTML = "";
+
+    state.answers.forEach(function(a){
+      var card = document.createElement("div");
+      card.className = "subcard" + (a === latest && !finished ? " mine" : "");
+
+      var owner = document.createElement("p");
+      owner.className = "subowner";
+      var rd = document.createElement("span");
+      rd.className = "rd";
+      rd.textContent = "Round " + a.round + " \u00b7 patient";
+      owner.appendChild(rd);
+      owner.appendChild(document.createTextNode(a.name));
+      card.appendChild(owner);
+
+      var box = document.createElement("div");
+      box.className = "summary";
+      [["Case", a.title],
+       ["Word my provider put into plain language", a.swap],
+       ["Did they help me understand without talking down to me", a.help]
+      ].forEach(function(pair){
+        var pEl = document.createElement("p");
+        pEl.className = "qa";
+        var s = document.createElement("span");
+        s.textContent = pair[0];
+        pEl.appendChild(s);
+        pEl.appendChild(document.createTextNode(pair[1]));
+        box.appendChild(pEl);
+      });
+      card.appendChild(box);
+
+      var acts = document.createElement("div");
+      acts.className = "actions";
+      var toast = document.createElement("span");
+      toast.className = "toast";
+      toast.hidden = true;
+      toast.textContent = "Copied. Paste it into Canvas now.";
+      acts.appendChild(makeCopyButton(a, toast));
+      acts.appendChild(toast);
+      card.appendChild(acts);
+
+      host.appendChild(card);
     });
 
-    $("copy-toast").hidden = true;
-
-    if(state.round === 1){
+    if(finished){
+      $("next-note").textContent = "That is the whole activity. Make sure you have each pasted your own responses into Canvas before you close this page. Nothing is saved.";
+      $("btn-next-round").hidden = true;
+      $("btn-restart").hidden = false;
+    } else {
       $("next-note").textContent = "Now swap. Whoever was the provider becomes the patient, picks a different case, and answers these same two questions.";
       $("btn-next-round").hidden = false;
       $("btn-restart").hidden = true;
-    } else {
-      $("next-note").textContent = "That is the whole activity. Make sure you have each copied your own responses into Canvas before you close this page.";
-      $("btn-next-round").hidden = true;
-      $("btn-restart").hidden = false;
     }
     show("s-done");
   }
 
-  function copySummary(){
-    var text = summaryText();
+  function copyText(text, toast){
     var done = function(){
-      $("copy-toast").hidden = false;
-      setTimeout(function(){ $("copy-toast").hidden = true; }, 2600);
+      var all = document.querySelectorAll("#sub-list .toast");
+      Array.prototype.forEach.call(all, function(t){ t.hidden = true; });
+      toast.hidden = false;
+      setTimeout(function(){ toast.hidden = true; }, 3200);
     };
     if(navigator.clipboard && navigator.clipboard.writeText){
       navigator.clipboard.writeText(text).then(done, function(){ fallback(text, done); });
@@ -562,19 +620,18 @@
   }
 
   $("btn-begin").addEventListener("click", function(){
-    state.round = 1; state.used = []; state.last = null;
+    state.round = 1; state.used = []; state.answers = [];
     buildPicker();
   });
   $("btn-back-review").addEventListener("click", function(){ show("s-review"); });
   $("btn-reveal").addEventListener("click", openCheck);
   $("btn-submit").addEventListener("click", submitRound);
-  $("btn-copy").addEventListener("click", copySummary);
   $("btn-next-round").addEventListener("click", function(){
     state.round = 2;
     buildPicker();
   });
   $("btn-restart").addEventListener("click", function(){
-    state = { round:1, used:[], current:null, name:"", last:null };
+    state = { round:1, used:[], current:null, name:"", answers:[] };
     show("s-review");
   });
 
