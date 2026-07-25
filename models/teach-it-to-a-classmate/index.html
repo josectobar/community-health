@@ -45,12 +45,10 @@
   p{margin:0 0 12px;}
   .muted{color:var(--ink-soft);font-size:.92rem;}
 
-  /* ---- review cards ---- */
   .topic{
     border:1px solid var(--line);border-radius:9px;
     padding:15px 17px;margin-bottom:14px;background:var(--paper);
   }
-  .topic:last-of-type{margin-bottom:4px;}
   .topic h3{margin:0 0 8px;font-size:1.04rem;}
   .topic ul{margin:0 0 10px;padding-left:19px;}
   .topic li{margin-bottom:6px;font-size:.94rem;}
@@ -60,7 +58,15 @@
   }
   .keyline strong{color:var(--sage);}
 
-  /* ---- pick ---- */
+  .nextup{
+    border:1px solid var(--clay);border-radius:9px;
+    padding:15px 17px;margin-top:20px;background:var(--clay-soft);
+  }
+  .nextup h3{margin:0 0 8px;font-size:1rem;color:var(--clay);}
+  .nextup ol{margin:0;padding-left:19px;}
+  .nextup li{margin-bottom:6px;font-size:.94rem;}
+  .nextup li:last-child{margin-bottom:0;}
+
   .cases{display:grid;gap:12px;margin-top:14px;}
   .case-pick{
     text-align:left;width:100%;
@@ -68,13 +74,10 @@
     padding:14px 17px;font-weight:400;border-radius:9px;font-family:inherit;
     font-size:1rem;cursor:pointer;
   }
-  .case-pick:hover:not(:disabled){border-color:var(--clay);background:var(--clay-soft);}
+  .case-pick:hover{border-color:var(--clay);background:var(--clay-soft);}
   .case-pick .ct{display:block;font-weight:700;margin-bottom:2px;}
   .case-pick .cq{display:block;font-size:.87rem;color:var(--ink-soft);}
-  .case-pick:disabled{opacity:.5;cursor:not-allowed;}
-  .case-pick:disabled .cq{font-style:italic;}
 
-  /* ---- spoken line ---- */
   .spoken{
     background:var(--clay-soft);border-left:4px solid var(--clay);
     border-radius:0 8px 8px 0;padding:16px 18px;margin:14px 0 16px;
@@ -100,20 +103,17 @@
   .facts li{margin-bottom:7px;font-size:.93rem;}
   .facts li:last-child{margin-bottom:0;}
 
-  /* ---- forms ---- */
   .field{margin-bottom:16px;}
   .field label{display:block;font-weight:600;font-size:.95rem;margin-bottom:2px;}
   .field .hint{color:var(--ink-soft);font-size:.86rem;margin:0 0 5px;}
-  input[type=text],textarea{
+  textarea{
     width:100%;padding:9px 11px;
     border:1px solid var(--line);border-radius:7px;
     background:#fff;color:var(--ink);
     font-family:inherit;font-size:.95rem;line-height:1.5;
+    resize:vertical;min-height:64px;
   }
-  textarea{resize:vertical;min-height:64px;}
-  input:focus,textarea:focus,button:focus-visible{
-    outline:2px solid var(--clay);outline-offset:2px;
-  }
+  textarea:focus,button:focus-visible{outline:2px solid var(--clay);outline-offset:2px;}
 
   button{
     font-family:inherit;font-size:.96rem;font-weight:600;
@@ -125,30 +125,18 @@
   button.ghost:hover{background:var(--clay-soft);}
   .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center;}
 
-  .turnbar{
-    display:inline-block;background:var(--sage);color:#fff;
-    font-size:.77rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
-    padding:4px 12px;border-radius:20px;margin-bottom:12px;
-  }
-
   .summary{background:var(--paper);border:1px solid var(--line);
-    border-radius:8px;padding:15px 17px;margin:10px 0 0;font-size:.93rem;}
+    border-radius:8px;padding:15px 17px;margin:14px 0;font-size:.93rem;}
   .summary .qa{margin:0 0 11px;}
   .summary .qa:last-child{margin-bottom:0;}
   .summary .qa span{display:block;color:var(--ink-soft);font-size:.83rem;}
 
-  .subcard{
+  .swapbox{
     border:1px solid var(--line);border-radius:9px;
-    padding:15px 17px;margin-bottom:16px;
+    padding:15px 17px;margin-top:22px;background:var(--paper);
   }
-  .subcard.mine{border-color:var(--clay);}
-  .subowner{
-    margin:0;font-weight:700;font-size:1.02rem;
-  }
-  .subowner .rd{
-    display:block;font-weight:400;font-size:.84rem;color:var(--ink-soft);
-    text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;
-  }
+  .swapbox h3{margin:0 0 8px;font-size:1rem;}
+  .swapbox p:last-child{margin-bottom:0;}
 
   .toast{color:var(--sage);font-weight:600;font-size:.9rem;}
   .err{color:var(--clay);font-weight:600;font-size:.9rem;margin-top:10px;}
@@ -170,35 +158,40 @@
 
 <header class="top">
   <h1>Teach It to a Classmate</h1>
-  <p class="sub">Peer teach-back practice &middot; two rounds &middot; one screen per pair</p>
+  <p class="sub">Peer teach-back practice &middot; use your own device &middot; you will be the patient</p>
 </header>
 
 <!-- ============ 1. REVIEW ============ -->
 <section class="step" id="s-review" aria-labelledby="h-review">
   <p class="eyebrow">Step 1 of 3</p>
   <h2 id="h-review">Refresh the four topics</h2>
-  <p>Read through these together before you start. In a minute, one of you will have to explain one of them out loud, from memory, with the screen turned away.</p>
+  <p>Read these with your partner. In a minute, one of you will have to explain one of
+     them out loud, from memory, with no screen in front of you.</p>
   <div id="topic-list"></div>
+
+  <div class="nextup">
+    <h3>What happens when you press start</h3>
+    <ol>
+      <li>You are the <strong>patient</strong>. You pick a case and read it out loud to your partner.</li>
+      <li>Your partner is the <strong>provider</strong>. They explain it to you with their screen closed.</li>
+      <li>You say it back in your own words, then you both open the check together.</li>
+      <li>You answer two short questions and paste them into Canvas. That is your submission.</li>
+      <li>Then you swap, and your partner runs this on <strong>their own</strong> device.</li>
+    </ol>
+  </div>
+
   <div class="actions">
-    <button id="btn-begin">I&rsquo;ve read these &mdash; start round 1</button>
+    <button id="btn-begin">Start &mdash; I&rsquo;m the patient</button>
   </div>
 </section>
 
 <!-- ============ 2. PICK ============ -->
 <section class="step" id="s-pick" hidden aria-labelledby="h-pick">
-  <span class="turnbar" id="pick-turn">Round 1</span>
-  <h2 id="h-pick">Who is the patient this round?</h2>
-  <p class="muted">The patient holds the screen. The provider does not look at it from here on.</p>
-
-  <div class="field" style="margin-top:14px;">
-    <label for="pt-name">Patient&rsquo;s name</label>
-    <input type="text" id="pt-name" autocomplete="off" placeholder="Type your name">
-  </div>
-
-  <h2 style="font-size:1.05rem;margin-top:18px;">Pick a case to bring in</h2>
+  <p class="eyebrow">Step 2 of 3</p>
+  <h2 id="h-pick">Pick a case to bring in</h2>
+  <p class="muted">Pick something your partner has not already explained today.
+     Once you choose, ask them to close their screen.</p>
   <div class="cases" id="case-list"></div>
-  <p class="err" id="pick-err" hidden>Type the patient&rsquo;s name first.</p>
-
   <div class="actions">
     <button class="ghost" id="btn-back-review">Back to the four topics</button>
   </div>
@@ -206,21 +199,21 @@
 
 <!-- ============ 3. CASE ============ -->
 <section class="step" id="s-case" hidden aria-labelledby="h-case">
-  <span class="turnbar" id="case-turn">Round 1</span>
+  <p class="eyebrow">Step 3 of 3</p>
   <h2 id="h-case">Case title</h2>
 
   <div class="spoken">
-    <span class="lbl">Patient &mdash; say this out loud, in your own way</span>
+    <span class="lbl">Say this out loud, in your own way</span>
     <span id="case-line"></span>
   </div>
 
   <div class="goals">
-    <p>Provider &mdash; your patient is listening for these</p>
+    <p>While they answer, listen for these</p>
     <ul>
-      <li>Plain language. If you use a technical term, define it in the same breath.</li>
-      <li>Check understanding. Ask them to say it back before you move on.</li>
-      <li>Invite questions. Ask what questions they have, not whether they have any.</li>
-      <li>Support their choice. Give them what they need to decide.</li>
+      <li>Plain language. If they use a technical term, do they define it in the same breath?</li>
+      <li>Checking understanding. Do they ask you to say it back?</li>
+      <li>Inviting questions. Do they ask what questions you have, not whether you have any?</li>
+      <li>Supporting your choice. Do they give you what you need to decide?</li>
     </ul>
   </div>
 
@@ -231,9 +224,8 @@
 
 <!-- ============ 4. CHECK + RESPOND ============ -->
 <section class="step" id="s-check" hidden aria-labelledby="h-check">
-  <span class="turnbar" id="check-turn">Round 1</span>
   <h2 id="h-check">What a full answer covers</h2>
-  <p class="muted">Read this together. Nobody is graded on getting every point.</p>
+  <p class="muted">Read this with your partner. Nobody is graded on getting every point.</p>
 
   <div class="facts" aria-live="polite">
     <p class="fh" id="facts-title"></p>
@@ -253,23 +245,34 @@
   </div>
 
   <div class="actions">
-    <button id="btn-submit">Submit my responses</button>
+    <button id="btn-submit">Done &mdash; show my responses</button>
   </div>
-  <p class="err" id="check-err" hidden>Answer both questions before you submit.</p>
+  <p class="err" id="check-err" hidden>Answer both questions first.</p>
 </section>
 
-<!-- ============ 5. ROUND DONE ============ -->
+<!-- ============ 5. DONE ============ -->
 <section class="step" id="s-done" hidden aria-labelledby="h-done">
-  <p class="eyebrow" id="done-eyebrow">Round 1 complete</p>
-  <h2 id="h-done">Copy your own responses</h2>
-  <p class="muted" id="done-note"></p>
+  <p class="eyebrow">Your turn is finished</p>
+  <h2 id="h-done">Paste this into Canvas</h2>
+  <p class="muted">This is your own submission, on your own device. Copy it and paste it
+     into the assignment box now.</p>
 
-  <div id="sub-list"></div>
+  <div class="summary" id="summary-view"></div>
 
-  <p id="next-note" style="margin-top:4px;"></p>
   <div class="actions">
-    <button id="btn-next-round">Swap roles &mdash; start round 2</button>
-    <button class="ghost" id="btn-restart" hidden>Start over</button>
+    <button id="btn-copy">Copy my responses</button>
+    <span class="toast" id="copy-toast" hidden>Copied. Paste it into Canvas now.</span>
+  </div>
+
+  <div class="swapbox">
+    <h3>Now swap</h3>
+    <p>Close this screen. Your partner opens this same page on <strong>their own</strong>
+       device, picks a different case, and you become the provider.</p>
+    <p class="muted">Copy your responses before you close the page. Nothing is saved here.</p>
+  </div>
+
+  <div class="actions">
+    <button class="ghost" id="btn-restart">Start over</button>
   </div>
 </section>
 
@@ -328,7 +331,6 @@
 
   var CASES = [
     {
-      id:1,
       title:"Inpatient or outpatient?",
       teaser:"A cousin in the hospital, and a surgery center that looks cheaper.",
       line:"\u201cMy cousin got taken to the hospital last night and they told us he\u2019s being admitted as an inpatient. I keep hearing inpatient and outpatient and I honestly don\u2019t know the difference. And my friend told me that if I ever need surgery I should go to one of those outpatient surgery centers because it\u2019s cheaper. My doctor thinks I might need my appendix out. So what\u2019s the difference between the two, and for something like an appendix, where should I be going?\u201d",
@@ -341,7 +343,6 @@
       ]
     },
     {
-      id:2,
       title:"Medicare or Medicaid?",
       teaser:"Turning 67, using a wheelchair, paying out of pocket for help at home.",
       line:"\u201cI\u2019m 67 and I\u2019ve used a wheelchair for a long time. I just got a letter about Medicare in the mail. Then somebody at the clinic said something about Medicaid, and I always thought those were two names for the same thing. Here\u2019s my real problem \u2014 I pay out of pocket for someone to help me at home three mornings a week and it\u2019s eating me alive. What\u2019s the difference between them, and which one would actually help me?\u201d",
@@ -355,7 +356,6 @@
       ]
     },
     {
-      id:3,
       title:"What is overmedicalization?",
       teaser:"Four specialists, nine medications, and three normal tests.",
       line:"\u201cI\u2019ve had diabetes and high blood pressure for twelve years now. I see four different specialists, I take nine pills a day, and last month I had three tests that all came back normal. I\u2019m exhausted from the driving and the appointments. I saw this word online, overmedicalization, and it stuck with me. What does that word even mean, and does it apply to someone like me?\u201d",
@@ -368,7 +368,6 @@
       ]
     },
     {
-      id:4,
       title:"MD, DO, or nurse practitioner?",
       teaser:"A new diabetes diagnosis, and a request for \u201ca real doctor.\u201d",
       line:"\u201cI just found out I have type 2 diabetes. The clinic offered me an appointment with a nurse practitioner and I asked for a real doctor instead. Then the scheduler said there\u2019s also a DO available, and I\u2019ve never even heard of that one. What I actually want is somebody who\u2019s going to help me manage this for years, not just hand me a prescription and send me out the door. What\u2019s the difference between all of them, and who should I be seeing?\u201d",
@@ -384,7 +383,8 @@
 
   var $ = function(id){ return document.getElementById(id); };
   var STEPS = ["s-review","s-pick","s-case","s-check","s-done"];
-  var state = { round:1, used:[], current:null, name:"", answers:[] };
+  var current = null;
+  var answer = null;
 
   function show(id){
     STEPS.forEach(function(s){ $(s).hidden = (s !== id); });
@@ -420,65 +420,36 @@
     });
   }
 
-  function turnLabel(){
-    return "Round " + state.round + " \u00b7 " + state.name + " is the patient";
-  }
-
   function buildPicker(){
-    $("pick-turn").textContent = "Round " + state.round;
-    $("pt-name").value = "";
-    $("pick-err").hidden = true;
     var list = $("case-list");
     list.innerHTML = "";
     CASES.forEach(function(c){
-      var taken = state.used.indexOf(c.id) !== -1;
       var b = document.createElement("button");
       b.className = "case-pick";
       b.type = "button";
-      b.disabled = taken;
       var t1 = document.createElement("span");
       t1.className = "ct"; t1.textContent = c.title;
       var t2 = document.createElement("span");
-      t2.className = "cq";
-      t2.textContent = taken ? "Already used in round 1" : c.teaser;
+      t2.className = "cq"; t2.textContent = c.teaser;
       b.appendChild(t1); b.appendChild(t2);
-      if(!taken){
-        b.addEventListener("click", function(){
-          var nm = $("pt-name").value.trim();
-          if(!nm){
-            $("pick-err").textContent = "Type the patient\u2019s name first.";
-            $("pick-err").hidden = false; $("pt-name").focus(); return;
-          }
-          if(state.round === 2 && state.answers.length &&
-             nm.toLowerCase() === state.answers[0].name.toLowerCase()){
-            $("pick-err").textContent = state.answers[0].name +
-              " was the patient in round 1. The other partner is the patient now.";
-            $("pick-err").hidden = false; $("pt-name").focus(); return;
-          }
-          state.name = nm;
-          openCase(c);
-        });
-      }
+      b.addEventListener("click", function(){ openCase(c); });
       list.appendChild(b);
     });
     show("s-pick");
   }
 
   function openCase(c){
-    state.current = c;
-    $("case-turn").textContent = turnLabel();
+    current = c;
     $("h-case").textContent = c.title;
     $("case-line").textContent = c.line;
     show("s-case");
   }
 
   function openCheck(){
-    var c = state.current;
-    $("check-turn").textContent = turnLabel();
-    $("facts-title").textContent = c.title;
+    $("facts-title").textContent = current.title;
     var ul = $("facts-list");
     ul.innerHTML = "";
-    c.facts.forEach(function(f){
+    current.facts.forEach(function(f){
       var li = document.createElement("li");
       li.textContent = f;
       ul.appendChild(li);
@@ -492,113 +463,46 @@
   function submitRound(){
     var swap = $("r-swap").value.trim();
     var help = $("r-help").value.trim();
-    if(!swap || !help){
-      $("check-err").hidden = false;
-      return;
-    }
-    state.answers.push({
-      round: state.round,
-      name: state.name,
-      title: state.current.title,
-      swap: swap,
-      help: help
-    });
-    state.used.push(state.current.id);
+    if(!swap || !help){ $("check-err").hidden = false; return; }
+    answer = { title: current.title, swap: swap, help: help };
     buildDone();
   }
 
-  function summaryText(a){
+  function summaryText(){
     return [
-      "Teach It to a Classmate",
-      "Submitted by: " + a.name + " (patient in round " + a.round + ")",
-      "Case: " + a.title,
+      "Teach It to a Classmate \u2014 my turn as the patient",
+      "Case I brought in: " + answer.title,
       "",
-      "Word my provider put into plain language: " + a.swap,
+      "Word my provider put into plain language: " + answer.swap,
       "",
-      "Did they help me understand without talking down to me: " + a.help
+      "Did they help me understand without talking down to me: " + answer.help
     ].join("\n");
   }
 
-  function makeCopyButton(a, toast){
-    var b = document.createElement("button");
-    b.type = "button";
-    b.textContent = "Copy " + a.name + "\u2019s submission";
-    b.addEventListener("click", function(){ copyText(summaryText(a), toast); });
-    return b;
-  }
-
   function buildDone(){
-    var latest = state.answers[state.answers.length - 1];
-    var finished = (state.answers.length === 2);
-
-    $("done-eyebrow").textContent = "Round " + latest.round + " complete";
-    $("done-note").textContent = finished
-      ? "Two submissions, one for each of you. Copy only the one with your own name on it and paste it into Canvas. Do it one at a time so you do not overwrite each other."
-      : "This one belongs to " + latest.name + ". You can copy and paste it into Canvas now, or come back for it at the end.";
-
-    var host = $("sub-list");
-    host.innerHTML = "";
-
-    state.answers.forEach(function(a){
-      var card = document.createElement("div");
-      card.className = "subcard" + (a === latest && !finished ? " mine" : "");
-
-      var owner = document.createElement("p");
-      owner.className = "subowner";
-      var rd = document.createElement("span");
-      rd.className = "rd";
-      rd.textContent = "Round " + a.round + " \u00b7 patient";
-      owner.appendChild(rd);
-      owner.appendChild(document.createTextNode(a.name));
-      card.appendChild(owner);
-
-      var box = document.createElement("div");
-      box.className = "summary";
-      [["Case", a.title],
-       ["Word my provider put into plain language", a.swap],
-       ["Did they help me understand without talking down to me", a.help]
-      ].forEach(function(pair){
-        var pEl = document.createElement("p");
-        pEl.className = "qa";
-        var s = document.createElement("span");
-        s.textContent = pair[0];
-        pEl.appendChild(s);
-        pEl.appendChild(document.createTextNode(pair[1]));
-        box.appendChild(pEl);
-      });
-      card.appendChild(box);
-
-      var acts = document.createElement("div");
-      acts.className = "actions";
-      var toast = document.createElement("span");
-      toast.className = "toast";
-      toast.hidden = true;
-      toast.textContent = "Copied. Paste it into Canvas now.";
-      acts.appendChild(makeCopyButton(a, toast));
-      acts.appendChild(toast);
-      card.appendChild(acts);
-
-      host.appendChild(card);
+    var v = $("summary-view");
+    v.innerHTML = "";
+    [["Case I brought in", answer.title],
+     ["Word my provider put into plain language", answer.swap],
+     ["Did they help me understand without talking down to me", answer.help]
+    ].forEach(function(pair){
+      var pEl = document.createElement("p");
+      pEl.className = "qa";
+      var s = document.createElement("span");
+      s.textContent = pair[0];
+      pEl.appendChild(s);
+      pEl.appendChild(document.createTextNode(pair[1]));
+      v.appendChild(pEl);
     });
-
-    if(finished){
-      $("next-note").textContent = "That is the whole activity. Make sure you have each pasted your own responses into Canvas before you close this page. Nothing is saved.";
-      $("btn-next-round").hidden = true;
-      $("btn-restart").hidden = false;
-    } else {
-      $("next-note").textContent = "Now swap. Whoever was the provider becomes the patient, picks a different case, and answers these same two questions.";
-      $("btn-next-round").hidden = false;
-      $("btn-restart").hidden = true;
-    }
+    $("copy-toast").hidden = true;
     show("s-done");
   }
 
-  function copyText(text, toast){
+  function copySummary(){
+    var text = summaryText();
     var done = function(){
-      var all = document.querySelectorAll("#sub-list .toast");
-      Array.prototype.forEach.call(all, function(t){ t.hidden = true; });
-      toast.hidden = false;
-      setTimeout(function(){ toast.hidden = true; }, 3200);
+      $("copy-toast").hidden = false;
+      setTimeout(function(){ $("copy-toast").hidden = true; }, 3200);
     };
     if(navigator.clipboard && navigator.clipboard.writeText){
       navigator.clipboard.writeText(text).then(done, function(){ fallback(text, done); });
@@ -619,19 +523,13 @@
     document.body.removeChild(ta);
   }
 
-  $("btn-begin").addEventListener("click", function(){
-    state.round = 1; state.used = []; state.answers = [];
-    buildPicker();
-  });
+  $("btn-begin").addEventListener("click", buildPicker);
   $("btn-back-review").addEventListener("click", function(){ show("s-review"); });
   $("btn-reveal").addEventListener("click", openCheck);
   $("btn-submit").addEventListener("click", submitRound);
-  $("btn-next-round").addEventListener("click", function(){
-    state.round = 2;
-    buildPicker();
-  });
+  $("btn-copy").addEventListener("click", copySummary);
   $("btn-restart").addEventListener("click", function(){
-    state = { round:1, used:[], current:null, name:"", answers:[] };
+    current = null; answer = null;
     show("s-review");
   });
 
