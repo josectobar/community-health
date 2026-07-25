@@ -194,7 +194,6 @@
   .replay .item .said{color:var(--ink-soft);font-style:italic}
   .footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-soft)}
   .hidden{display:none}
-  .copied{font-size:13px;color:var(--sage);font-weight:600}
 </style>
 </head>
 <body>
@@ -332,10 +331,7 @@
     <p class="sub">Based on the AHRQ teach-back approach — plain language, honesty, checking for understanding, and shared decision-making. This is about <i>how you talked with</i> Daniel, not medical detail.</p>
     <div id="fbHolder"></div>
     <div class="actions">
-      <button class="btn ghost" onclick="copySummary()">Copy my summary</button>
-      <button class="btn ghost" onclick="window.print()">Print / save as PDF</button>
       <button class="btn" onclick="restartAll()">↻ Practice again</button>
-      <span class="copied hidden" id="copiedMsg">Copied — paste it into your submission.</span>
     </div>
   </section>
 
@@ -854,7 +850,6 @@ function renderFeedback(){
           '</p></div>';
 
   document.getElementById("fbHolder").innerHTML = html;
-  document.getElementById("copiedMsg").classList.add("hidden");
 }
 
 function shorten(s){
@@ -881,42 +876,6 @@ function goalComment(g, yes){
     }
   };
   return yes ? c[g].y : c[g].n;
-}
-
-function copySummary(){
-  var met = ["plain","check","ask","support"].filter(function(g){ return state.goals[g]; });
-  var lines = [];
-  lines.push("TEACH-BACK PRACTICE — SUMMARY");
-  lines.push("Patient: Daniel Vega, 61 · topic: pig kidney (xenotransplantation)");
-  lines.push("Goals reached: " + met.length + " of 4");
-  ["plain","check","ask","support"].forEach(function(g){
-    lines.push("  [" + (state.goals[g] ? "x" : " ") + "] " + GOAL_LABEL[g]);
-  });
-  lines.push("");
-  lines.push("MY CHOICES");
-  state.log.forEach(function(l, i){
-    lines.push((i+1) + ". \"" + l.said + "\"");
-    lines.push("   " + (l.tone === "strong" ? "[effective] " : "[missed] ") + l.note);
-  });
-  lines.push("");
-  lines.push("MY TEACH-BACK ASK");
-  lines.push("\"" + state.written + "\"");
-  lines.push("Self-check boxes met: " + state.selfcheck + " of 4");
-  var text = lines.join("\n");
-
-  var ta = document.createElement("textarea");
-  ta.value = text;
-  ta.setAttribute("readonly","");
-  ta.style.position = "absolute";
-  ta.style.left = "-9999px";
-  document.body.appendChild(ta);
-  ta.select();
-  try { document.execCommand("copy"); } catch(e){}
-  document.body.removeChild(ta);
-  if (navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).catch(function(){});
-  }
-  document.getElementById("copiedMsg").classList.remove("hidden");
 }
 
 function restartAll(){
