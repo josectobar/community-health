@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sort the Organizations | HCR 231 Chapter 2</title>
+<style>
+  :root{
+    color-scheme: light;
+    --sand:#F6F1E7; --paper:#FFFDF8; --ink:#2E2A25; --muted:#6B6157;
+    --line:#DED3C2; --gov:#1F5F5B; --quasi:#B0721C; --ngo:#657A3B;
+    --ok:#3F6B3A; --no:#A63D2F; --focus:#1F5F5B;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:20px 16px 40px;
+    background:var(--sand); color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:16px; line-height:1.5;
+  }
+  .wrap{max-width:900px;margin:0 auto}
+  .eyebrow{
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--muted);font-weight:700;margin:0 0 6px;
+  }
+  h1{font-size:26px;line-height:1.2;margin:0 0 8px;font-weight:800}
+  .lede{margin:0 0 18px;color:var(--muted);max-width:62ch}
+  .bar{
+    display:flex;flex-wrap:wrap;gap:12px;align-items:center;
+    background:var(--paper);border:1px solid var(--line);border-radius:10px;
+    padding:10px 14px;margin-bottom:18px;
+  }
+  .bar p{margin:0;font-size:15px}
+  .count{font-weight:800}
+  button{
+    font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);
+    background:var(--paper);color:var(--ink);padding:8px 14px;
+  }
+  button:hover{border-color:var(--muted)}
+  button:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .btn-reset{margin-left:auto}
+
+  .stage{display:grid;grid-template-columns:1fr;gap:18px}
+  @media(min-width:760px){.stage{grid-template-columns:300px 1fr}}
+
+  .deck{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px}
+  .deck h2,.bins h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  .card{
+    display:block;width:100%;text-align:left;margin-bottom:8px;
+    padding:10px 12px;line-height:1.35;border:1px solid var(--line);
+    background:var(--sand);border-radius:8px;
+  }
+  .card[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 4px 0 0 var(--ink);background:#fff}
+  .card .sub{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+  .empty{color:var(--muted);font-size:14px;margin:6px 0 0}
+
+  .bins{display:grid;gap:12px}
+  .bin{
+    background:var(--paper);border:1px solid var(--line);border-left:6px solid var(--c);
+    border-radius:10px;padding:12px 14px;width:100%;text-align:left;
+  }
+  .bin:disabled{opacity:.55;cursor:default}
+  .bin h3{margin:0;font-size:16px;color:var(--c)}
+  .bin .hint{margin:2px 0 0;font-size:13px;color:var(--muted)}
+  .placed{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+  .placed li{
+    font-size:13px;background:var(--sand);border:1px solid var(--line);
+    border-radius:20px;padding:3px 10px;
+  }
+  .placed li.wrong{border-color:var(--no);color:var(--no);text-decoration:line-through}
+
+  .feedback{
+    min-height:52px;margin-top:16px;padding:12px 14px;border-radius:10px;
+    border:1px solid var(--line);background:var(--paper);font-size:15px;
+  }
+  .feedback.ok{border-color:var(--ok);background:#F2F7F0}
+  .feedback.no{border-color:var(--no);background:#FBF1EF}
+  .feedback strong{display:block;margin-bottom:2px}
+
+  .done{
+    margin-top:18px;padding:16px;border:1px solid var(--line);
+    border-left:6px solid var(--gov);border-radius:10px;background:var(--paper);
+  }
+  .done h2{margin:0 0 6px;font-size:19px}
+  .done p{margin:0 0 10px}
+  .done ul{margin:0 0 4px;padding-left:20px}
+  .done li{margin-bottom:4px}
+  .hidden{display:none}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  @media (prefers-reduced-motion:no-preference){
+    .card,.bin{transition:border-color .15s ease, background .15s ease}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">HCR 231 &middot; Chapter 2 &middot; Practice Activity</p>
+  <h1>Sort the Organizations</h1>
+  <p class="lede">Every organization in this chapter falls into one of three groups, and the group is decided by where the money comes from and who the organization answers to. Pick a card, then choose where it belongs.</p>
+
+  <div class="bar">
+    <p>Placed: <span class="count" id="progress">0 of 16</span></p>
+    <p>Correct on first try: <span class="count" id="score">0</span></p>
+    <button type="button" class="btn-reset" id="reset">Start over</button>
+  </div>
+
+  <div class="stage">
+    <section class="deck" aria-labelledby="deck-h">
+      <h2 id="deck-h">Round <span id="roundNum">1</span> &mdash; <span id="roundName">Three classifications</span></h2>
+      <div id="cards"></div>
+      <p class="empty hidden" id="deckEmpty">All cards placed.</p>
+    </section>
+
+    <section class="bins" aria-labelledby="bins-h">
+      <h2 id="bins-h" class="sr">Categories</h2>
+      <div id="bins"></div>
+    </section>
+  </div>
+
+  <div class="feedback" id="feedback" role="status" aria-live="polite">
+    Select a card to begin.
+  </div>
+
+  <div class="done hidden" id="done"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var ROUNDS = [
+    {
+      name: "Three classifications",
+      prompt: "Select a card to begin.",
+      bins: [
+        {id:"gov", label:"Governmental", hint:"Tax funded, run by government officials, holds authority over a geographic area", color:"var(--gov)"},
+        {id:"quasi", label:"Quasi-Governmental", hint:"Given official duties by government, but operates independently and raises its own money", color:"var(--quasi)"},
+        {id:"ngo", label:"Nongovernmental", hint:"Funded by donations, dues, or an endowment; formed to meet a need government was not meeting", color:"var(--ngo)"}
+      ],
+      cards: [
+        {t:"World Health Organization", s:"194 member states, Geneva", a:"gov", why:"Funded by its member nations and governed by the World Health Assembly. It is government, just at the international level."},
+        {t:"U.S. Department of Health and Human Services", s:"13 operating agencies", a:"gov", why:"The federal health department. Its Secretary is appointed by the president and sits on the cabinet."},
+        {t:"Arizona Department of Health Services", s:"Licensing, inspections, vital records", a:"gov", why:"A state agency funded by state tax dollars, with a director appointed by the governor."},
+        {t:"Maricopa County Department of Public Health", s:"One of about 2,500 nationwide", a:"gov", why:"Local government. Funded by county tax revenue plus state and federal grants."},
+        {t:"American Red Cross", s:"Disaster relief and blood services", a:"quasi", why:"Carries official duties assigned by the federal government, including liaison to the armed forces, but runs on donations and takes no government direction."},
+        {t:"National Science Foundation", s:"Funds scientific research", a:"quasi", why:"Textbook example of quasi-governmental: some official responsibility, but it operates outside normal government supervision."},
+        {t:"National Academy of Sciences", s:"Advises the nation on science", a:"quasi", why:"Chartered to advise the federal government, yet it is not a government agency and is not run by government officials."},
+        {t:"American Cancer Society", s:"Screening education, research funding", a:"ngo", why:"A voluntary health agency. Citizens created it because a health need was going unmet, and it lives on donations."},
+        {t:"American Public Health Association", s:"Members hold credentials in the field", a:"ngo", why:"A professional health organization funded by membership dues. Its mission is upholding standards of practice."},
+        {t:"Robert Wood Johnson Foundation", s:"Grants from a private endowment", a:"ngo", why:"A philanthropic foundation. The endowment is private, so no government reviews its grant decisions."},
+        {t:"Lions Club", s:"Vision screenings, community service", a:"ngo", why:"A service organization. Health is not its primary mission, but its health contributions are real."},
+        {t:"A company's worksite wellness program", s:"Fitness, screenings, safety training", a:"ngo", why:"Corporate involvement. The company funds it to lower healthcare costs and absenteeism among its own employees."}
+      ]
+    },
+    {
+      name: "Four levels of government",
+      prompt: "Now place each government agency at its level.",
+      bins: [
+        {id:"intl", label:"International", hint:"Works across nations", color:"var(--gov)"},
+        {id:"natl", label:"National", hint:"Serves one country", color:"var(--gov)"},
+        {id:"state", label:"State", hint:"Serves one state", color:"var(--gov)"},
+        {id:"local", label:"Local", hint:"Serves a city or county", color:"var(--gov)"}
+      ],
+      cards: [
+        {t:"World Health Organization", s:"", a:"intl", why:"The largest international governmental health organization, headquartered in Geneva with six regional offices."},
+        {t:"U.S. Department of Health and Human Services", s:"", a:"natl", why:"The primary national health agency of the United States."},
+        {t:"Arizona Department of Health Services", s:"", a:"state", why:"State health departments set health regulations and serve as the link between federal and local agencies."},
+        {t:"Maricopa County Department of Public Health", s:"", a:"local", why:"Local health departments carry out state-mandated services such as inspections, disease reporting, and vital statistics."}
+      ]
+    }
+  ];
+
+  var round = 0, selected = null, placedCount = 0, firstTryScore = 0, totalCards = 0;
+  var attempted = {};
+
+  var elCards = document.getElementById("cards");
+  var elBins = document.getElementById("bins");
+  var elFeedback = document.getElementById("feedback");
+  var elProgress = document.getElementById("progress");
+  var elScore = document.getElementById("score");
+  var elDone = document.getElementById("done");
+  var elDeckEmpty = document.getElementById("deckEmpty");
+  var elRoundNum = document.getElementById("roundNum");
+  var elRoundName = document.getElementById("roundName");
+
+  ROUNDS.forEach(function(r){ totalCards += r.cards.length; });
+
+  function shuffle(a){
+    var arr = a.slice();
+    for(var i=arr.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var t = arr[i]; arr[i]=arr[j]; arr[j]=t;
+    }
+    return arr;
+  }
+
+  function setFeedback(msg, state){
+    elFeedback.className = "feedback" + (state ? " " + state : "");
+    elFeedback.innerHTML = msg;
+  }
+
+  function renderRound(){
+    var r = ROUNDS[round];
+    selected = null;
+    elRoundNum.textContent = String(round + 1);
+    elRoundName.textContent = r.name;
+    elDeckEmpty.classList.add("hidden");
+
+    elCards.innerHTML = "";
+    shuffle(r.cards).forEach(function(card){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "card";
+      b.setAttribute("aria-pressed","false");
+      b.dataset.answer = card.a;
+      b.dataset.why = card.why;
+      b.dataset.title = card.t;
+      b.innerHTML = "<span>" + card.t + "</span>" + (card.s ? '<span class="sub">' + card.s + "</span>" : "");
+      b.addEventListener("click", function(){ selectCard(b); });
+      elCards.appendChild(b);
+    });
+
+    elBins.innerHTML = "";
+    r.bins.forEach(function(bin){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "bin";
+      b.style.setProperty("--c", bin.color);
+      b.dataset.bin = bin.id;
+      b.innerHTML = "<h3>" + bin.label + "</h3><p class='hint'>" + bin.hint + "</p><ul class='placed'></ul>";
+      b.addEventListener("click", function(){ placeCard(bin); });
+      elBins.appendChild(b);
+    });
+
+    setFeedback(r.prompt);
+  }
+
+  function selectCard(btn){
+    Array.prototype.forEach.call(elCards.querySelectorAll(".card"), function(c){
+      c.setAttribute("aria-pressed", c === btn ? "true" : "false");
+    });
+    selected = btn;
+    setFeedback("<strong>" + btn.dataset.title + "</strong>Now choose the category it belongs to.");
+  }
+
+  function placeCard(bin){
+    if(!selected){
+      setFeedback("Select a card first, then choose a category.");
+      return;
+    }
+    var card = selected;
+    var key = round + "|" + card.dataset.title;
+    var correct = card.dataset.answer === bin.id;
+
+    if(!correct){
+      if(!attempted[key]) attempted[key] = true;
+      setFeedback("<strong>Not quite &mdash; " + card.dataset.title + " is not " + bin.label.toLowerCase() + ".</strong>" +
+                  "Ask yourself two questions: where does its money come from, and who can tell it what to do? Try another category.");
+      return;
+    }
+
+    if(!attempted[key]) firstTryScore++;
+    placedCount++;
+
+    var li = document.createElement("li");
+    li.textContent = card.dataset.title;
+    elBins.querySelector('[data-bin="' + bin.id + '"] .placed').appendChild(li);
+
+    card.remove();
+    selected = null;
+
+    setFeedback("<strong>Correct &mdash; " + card.dataset.title + " is " + bin.label.toLowerCase() + ".</strong>" + card.dataset.why, "ok");
+    elProgress.textContent = placedCount + " of " + totalCards;
+    elScore.textContent = String(firstTryScore);
+
+    if(!elCards.querySelector(".card")) endRound();
+  }
+
+  function endRound(){
+    elDeckEmpty.classList.remove("hidden");
+    if(round < ROUNDS.length - 1){
+      round++;
+      window.setTimeout(renderRound, 900);
+    } else {
+      finish();
+    }
+  }
+
+  function finish(){
+    elDone.classList.remove("hidden");
+    elDone.innerHTML =
+      "<h2>Both rounds complete &mdash; " + firstTryScore + " of " + totalCards + " correct on the first try</h2>" +
+      "<p>Notice what actually decided each answer. It was never the size of the organization or how famous it is. It was these three things:</p>" +
+      "<ul>" +
+        "<li><strong>Funding source.</strong> Tax dollars point to government. Donations, dues, and endowments point to nongovernmental.</li>" +
+        "<li><strong>Who gives the orders.</strong> A government official, or no one outside the organization.</li>" +
+        "<li><strong>Where the authority stops.</strong> A geographic boundary for government agencies; no legal boundary at all for the others.</li>" +
+      "</ul>" +
+      "<p>The Red Cross is the hard case precisely because it splits the difference, which is what quasi-governmental means.</p>";
+    elDone.setAttribute("tabindex","-1");
+    elDone.focus();
+  }
+
+  document.getElementById("reset").addEventListener("click", function(){
+    round = 0; selected = null; placedCount = 0; firstTryScore = 0; attempted = {};
+    elProgress.textContent = "0 of " + totalCards;
+    elScore.textContent = "0";
+    elDone.classList.add("hidden");
+    elDone.innerHTML = "";
+    renderRound();
+  });
+
+  elProgress.textContent = "0 of " + totalCards;
+  renderRound();
+})();
+</script>
+</body>
+</html>
