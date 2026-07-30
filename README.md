@@ -66,6 +66,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/hcr231-ch2-sort-organizations/](models/hcr231-ch2-sort-organizations/): hCR 231 Chapter 2 — sorting health organizations by classification and level of government.
 - [models/hcr231-ch2-culture-matrix/](models/hcr231-ch2-culture-matrix/): hCR 231 Chapter 2 — comparing five health organizations by funding, authority, and signature activity.
 - [models/hcr231-ch4-prevention-timeline/](models/hcr231-ch4-prevention-timeline/): hCR 231 Chapter 4 — placing interventions across the four levels of prevention.
+- [models/hcr231-ch4-break-the-chain/](models/hcr231-ch4-break-the-chain/): hCR 231 Chapter 4 — matching control measures to the six links in the chain of infection.
 
 ## Embed snippets
 
@@ -116,6 +117,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Sort the Organizations" src="models/hcr231-ch2-sort-organizations/"></iframe>
 <iframe title="Build the Comparison Matrix" src="models/hcr231-ch2-culture-matrix/"></iframe>
 <iframe title="When Does Prevention Happen?" src="models/hcr231-ch4-prevention-timeline/"></iframe>
+<iframe title="Break the Chain" src="models/hcr231-ch4-break-the-chain/"></iframe>
 ```
 
 ## Files

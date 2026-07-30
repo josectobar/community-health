@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Break the Chain | HCR 231 Chapter 4</title>
+<style>
+  :root{
+    color-scheme: light;
+    --sand:#F6F1E7; --paper:#FFFDF8; --ink:#2E2A25; --muted:#6B6157; --line:#DED3C2;
+    --chain:#8A7B66; --broken:#3F6B3A; --no:#A63D2F; --accent:#1F5F5B;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;padding:20px 16px 40px;background:var(--sand);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:16px;line-height:1.5;
+  }
+  .wrap{max-width:960px;margin:0 auto}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0 0 6px}
+  h1{font-size:26px;line-height:1.2;margin:0 0 8px;font-weight:800}
+  .lede{margin:0 0 18px;color:var(--muted);max-width:66ch}
+
+  .bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;background:var(--paper);
+       border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:18px}
+  .bar p{margin:0;font-size:15px}
+  .count{font-weight:800}
+  button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);
+         background:var(--paper);color:var(--ink);padding:8px 14px}
+  button:hover{border-color:var(--muted)}
+  button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+  .btn-reset{margin-left:auto}
+
+  .scenario{background:var(--paper);border:1px solid var(--line);border-left:6px solid var(--accent);
+            border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:15px}
+  .scenario p{margin:0}
+
+  .chainwrap{margin-bottom:18px}
+  .chainwrap h2,.deck h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  .chain{display:grid;gap:8px;grid-template-columns:1fr}
+  @media(min-width:700px){.chain{grid-template-columns:repeat(3,1fr)}}
+  @media(min-width:1000px){.chain{grid-template-columns:repeat(6,1fr)}}
+
+  .link{
+    position:relative;text-align:left;width:100%;padding:12px 12px 10px;
+    border:2px solid var(--chain);border-radius:10px;background:var(--paper);
+  }
+  .link .step{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;display:block;margin-bottom:3px}
+  .link h3{margin:0 0 3px;font-size:15px}
+  .link .this{margin:0;font-size:13px;color:var(--muted)}
+  .link .measures{list-style:none;margin:8px 0 0;padding:0}
+  .link .measures li{font-size:12px;color:var(--broken);margin-top:3px;padding-left:14px;position:relative}
+  .link .measures li::before{content:"\2713";position:absolute;left:0;font-weight:800}
+  .link.broken{border-style:dashed;border-color:var(--broken);background:#F2F7F0}
+  .link.broken h3{color:var(--broken)}
+  .link.broken .step::after{content:" \00B7 broken";color:var(--broken)}
+
+  .deck{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px}
+  .cards{display:flex;flex-wrap:wrap;gap:8px}
+  .card{flex:1 1 280px;text-align:left;padding:10px 12px;line-height:1.35;
+        border:1px solid var(--line);background:var(--sand);border-radius:8px}
+  .card[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 4px 0 0 var(--ink);background:#fff}
+  .empty{color:var(--muted);font-size:14px;margin:0}
+
+  .feedback{min-height:52px;margin-top:16px;padding:12px 14px;border-radius:10px;
+            border:1px solid var(--line);background:var(--paper);font-size:15px}
+  .feedback.ok{border-color:var(--broken);background:#F2F7F0}
+  .feedback.no{border-color:var(--no);background:#FBF1EF}
+  .feedback strong{display:block;margin-bottom:2px}
+
+  .done{margin-top:18px;padding:16px 18px;border:1px solid var(--line);
+        border-left:6px solid var(--broken);border-radius:10px;background:var(--paper)}
+  .done h2{margin:0 0 8px;font-size:20px}
+  .done p{margin:0 0 10px}
+  .done ul{margin:0;padding-left:20px}
+  .done li{margin-bottom:6px}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">HCR 231 &middot; Chapter 4 &middot; Practice Activity</p>
+  <h1>Break the Chain</h1>
+  <p class="lede">An infection needs all six links to connect. Remove any one of them and transmission stops, which is why public health rarely attacks a disease head-on &mdash; it looks for the weakest link. Match each measure to the link it breaks.</p>
+
+  <div class="scenario">
+    <p><strong>Measles at Maplewood Elementary.</strong> A student with active measles attended school for several days while infectious, coughing and sneezing in the classroom. The virus traveled in respiratory droplets that stayed suspended in the air for up to two hours. Unvaccinated classmates inhaled those droplets through the nose and mouth, and three developed measles within 10 to 12 days.</p>
+  </div>
+
+  <div class="bar">
+    <p>Links broken: <span class="count" id="progress">0 of 6</span></p>
+    <p>Correct on first try: <span class="count" id="score">0</span></p>
+    <button type="button" class="btn-reset" id="reset">Start over</button>
+  </div>
+
+  <section class="chainwrap" aria-labelledby="chain-h">
+    <h2 id="chain-h">The chain in this outbreak</h2>
+    <div class="chain" id="chain"></div>
+  </section>
+
+  <section class="deck" aria-labelledby="deck-h">
+    <h2 id="deck-h">Measures</h2>
+    <div class="cards" id="cards"></div>
+    <p class="empty hidden" id="deckEmpty">All measures assigned.</p>
+  </section>
+
+  <div class="feedback" id="feedback" role="status" aria-live="polite">Select a measure to begin.</div>
+  <div class="done hidden" id="done"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var LINKS = [
+    {id:"pathogen", step:"Link 1", name:"Pathogen", this:"Measles virus (Morbillivirus)"},
+    {id:"reservoir", step:"Link 2", name:"Reservoir", this:"The infected student, attending school while contagious"},
+    {id:"exit", step:"Link 3", name:"Portal of exit", this:"The respiratory tract, during coughing and sneezing"},
+    {id:"transmission", step:"Link 4", name:"Mode of transmission", this:"Airborne droplets suspended for up to two hours"},
+    {id:"entry", step:"Link 5", name:"Portal of entry", this:"The nose and mouth of nearby classmates"},
+    {id:"host", step:"Link 6", name:"Susceptible host", this:"Classmates without both doses of MMR"}
+  ];
+
+  var MEASURES = [
+    {t:"Disinfect shared classroom surfaces and equipment", a:"pathogen", why:"Attacking the organism itself, before it ever reaches a person, breaks the chain at the pathogen."},
+    {t:"Keep the infected student home until they are no longer contagious", a:"reservoir", why:"The reservoir is where the pathogen lives and multiplies. Removing that person from the school removes the source."},
+    {t:"Teach students to cover coughs and sneezes with a tissue", a:"exit", why:"The virus leaves through the respiratory tract. Containing coughs blocks its way out."},
+    {t:"Have the infectious student wear a mask before leaving the building", a:"exit", why:"A mask on the infectious person catches droplets at the moment of exit, which is why this breaks the same link as covering coughs."},
+    {t:"Upgrade classroom ventilation and add HEPA air filtration", a:"transmission", why:"Airborne droplets are the vehicle. Clearing and filtering the air removes the route between people."},
+    {t:"Move class outdoors and increase the space between desks", a:"transmission", why:"Distance and open air disrupt the airborne route the droplets depend on."},
+    {t:"Hand hygiene, so students do not carry the virus to their own nose and mouth", a:"entry", why:"The portal of entry is the point where the pathogen gets in. Clean hands close that door."},
+    {t:"Hold an MMR vaccination clinic for students who are not fully vaccinated", a:"host", why:"Vaccination removes susceptibility. Even if every other link holds, an immune host ends the chain."}
+  ];
+
+  var selected=null, firstTry=0, assigned=0, attempted={};
+  var broken={};
+
+  var elChain=document.getElementById("chain"),
+      elCards=document.getElementById("cards"),
+      elFb=document.getElementById("feedback"),
+      elProg=document.getElementById("progress"),
+      elScore=document.getElementById("score"),
+      elDone=document.getElementById("done"),
+      elEmpty=document.getElementById("deckEmpty");
+
+  function shuffle(a){var r=a.slice();for(var i=r.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=r[i];r[i]=r[j];r[j]=t;}return r;}
+  function fb(html,state){ elFb.className="feedback"+(state?" "+state:""); elFb.innerHTML=html; }
+
+  function build(){
+    selected=null; firstTry=0; assigned=0; attempted={}; broken={};
+    elProg.textContent="0 of "+LINKS.length; elScore.textContent="0";
+    elDone.classList.add("hidden"); elDone.innerHTML="";
+    elEmpty.classList.add("hidden");
+
+    elChain.innerHTML="";
+    LINKS.forEach(function(l){
+      var b=document.createElement("button");
+      b.type="button"; b.className="link"; b.dataset.link=l.id;
+      b.innerHTML="<span class='step'>"+l.step+"</span><h3>"+l.name+"</h3>"+
+                  "<p class='this'>"+l.this+"</p><ul class='measures'></ul>";
+      b.addEventListener("click",function(){ assign(l,b); });
+      elChain.appendChild(b);
+    });
+
+    elCards.innerHTML="";
+    shuffle(MEASURES).forEach(function(m){
+      var b=document.createElement("button");
+      b.type="button"; b.className="card"; b.setAttribute("aria-pressed","false");
+      b.dataset.a=m.a; b.dataset.why=m.why; b.dataset.t=m.t;
+      b.textContent=m.t;
+      b.addEventListener("click",function(){ select(b); });
+      elCards.appendChild(b);
+    });
+
+    fb("Select a measure to begin.");
+  }
+
+  function select(btn){
+    Array.prototype.forEach.call(elCards.querySelectorAll(".card"),function(c){
+      c.setAttribute("aria-pressed", c===btn?"true":"false");
+    });
+    selected=btn;
+    fb("<strong>"+btn.dataset.t+"</strong>Which link does this measure break?");
+  }
+
+  function assign(link,linkEl){
+    if(!selected){ fb("Select a measure first, then choose the link it breaks."); return; }
+    var card=selected, key=card.dataset.t;
+
+    if(card.dataset.a!==link.id){
+      attempted[key]=true;
+      fb("<strong>That is not the link this measure breaks.</strong>Ask where in the sequence this measure acts: on the organism, on the person carrying it, on the way out, on the route through the air, on the way in, or on the person receiving it.","no");
+      return;
+    }
+
+    if(!attempted[key]) firstTry++;
+    assigned++;
+
+    var li=document.createElement("li"); li.textContent=card.dataset.t;
+    linkEl.querySelector(".measures").appendChild(li);
+
+    if(!broken[link.id]){
+      broken[link.id]=true;
+      linkEl.classList.add("broken");
+      elProg.textContent=Object.keys(broken).length+" of "+LINKS.length;
+    }
+
+    card.remove(); selected=null;
+    elScore.textContent=String(firstTry);
+    fb("<strong>"+link.name+" broken.</strong>"+card.dataset.why,"ok");
+
+    if(assigned===MEASURES.length) finish();
+  }
+
+  function finish(){
+    elEmpty.classList.remove("hidden");
+    elDone.classList.remove("hidden");
+    elDone.innerHTML=
+      "<h2>All six links broken &mdash; "+firstTry+" of "+MEASURES.length+" matched on the first try</h2>"+
+      "<p>Two things are worth carrying into the quiz.</p>"+
+      "<ul>"+
+        "<li><strong>One break is enough.</strong> You do not have to defeat the pathogen to stop an outbreak. Interrupting any single link ends transmission, which is why a vaccination clinic and better ventilation can both work on the same outbreak.</li>"+
+        "<li><strong>Exit and entry are different links.</strong> Masking the person who is sick blocks the portal of exit. Hand hygiene and vaccination protect the person who is well, at entry and at host. Mixing these two up is the most common error on this material.</li>"+
+      "</ul>"+
+      "<p>Notice that two links here had more than one measure. In practice most links can be attacked several ways, and public health picks whichever one is fastest, cheapest, or most acceptable to the community.</p>";
+    elDone.setAttribute("tabindex","-1");
+    elDone.focus();
+  }
+
+  document.getElementById("reset").addEventListener("click",build);
+  build();
+})();
+</script>
+</body>
+</html>
