@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>When Does Prevention Happen? | HCR 231 Chapter 4</title>
+<style>
+  :root{
+    color-scheme: light;
+    --sand:#F6F1E7; --paper:#FFFDF8; --ink:#2E2A25; --muted:#6B6157; --line:#DED3C2;
+    --p1:#1F5F5B; --p2:#B0721C; --p3:#657A3B; --p4:#7B4B54;
+    --ok:#3F6B3A; --no:#A63D2F;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;padding:20px 16px 40px;background:var(--sand);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:16px;line-height:1.5;
+  }
+  .wrap{max-width:960px;margin:0 auto}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0 0 6px}
+  h1{font-size:26px;line-height:1.2;margin:0 0 8px;font-weight:800}
+  .lede{margin:0 0 18px;color:var(--muted);max-width:66ch}
+
+  .bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;background:var(--paper);
+       border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:18px}
+  .bar p{margin:0;font-size:15px}
+  .count{font-weight:800}
+  button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);
+         background:var(--paper);color:var(--ink);padding:8px 14px}
+  button:hover{border-color:var(--muted)}
+  button:focus-visible{outline:3px solid var(--p1);outline-offset:2px}
+  .btn-reset{margin-left:auto}
+
+  .deck{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:18px}
+  .deck h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  .cards{display:flex;flex-wrap:wrap;gap:8px}
+  .card{
+    flex:1 1 260px;text-align:left;padding:10px 12px;line-height:1.35;
+    border:1px solid var(--line);background:var(--sand);border-radius:8px;
+  }
+  .card[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 4px 0 0 var(--ink);background:#fff}
+  .empty{color:var(--muted);font-size:14px;margin:0}
+
+  .axis{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+        font-weight:700;display:flex;justify-content:space-between;margin:0 2px 6px}
+  .track{display:grid;gap:10px;grid-template-columns:1fr}
+  @media(min-width:800px){.track{grid-template-columns:repeat(3,1fr)}}
+  .stage{
+    background:var(--paper);border:1px solid var(--line);border-top:6px solid var(--c);
+    border-radius:10px;padding:12px 14px;text-align:left;width:100%;
+  }
+  .stage h3{margin:0 0 2px;font-size:15px;color:var(--c)}
+  .stage .num{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;display:block;margin-bottom:4px}
+  .stage .hint{margin:0;font-size:13px;color:var(--muted)}
+  .stage .level{display:none;margin:8px 0 0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--c)}
+  .stage.revealed .level{display:block}
+  .dropped{list-style:none;margin:9px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+  .dropped li{font-size:13px;background:var(--sand);border:1px solid var(--line);border-radius:20px;padding:3px 10px}
+
+  .aside{
+    margin-top:12px;background:var(--paper);border:1px solid var(--line);
+    border-top:6px solid var(--p4);border-radius:10px;padding:12px 14px;text-align:left;width:100%;
+  }
+  .aside h3{margin:0 0 2px;font-size:15px;color:var(--p4)}
+  .aside .num{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;display:block;margin-bottom:4px}
+  .aside .hint{margin:0;font-size:13px;color:var(--muted)}
+  .aside .level{display:none;margin:8px 0 0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--p4)}
+  .aside.revealed .level{display:block}
+
+  .feedback{min-height:52px;margin-top:16px;padding:12px 14px;border-radius:10px;
+            border:1px solid var(--line);background:var(--paper);font-size:15px}
+  .feedback.ok{border-color:var(--ok);background:#F2F7F0}
+  .feedback.no{border-color:var(--no);background:#FBF1EF}
+  .feedback strong{display:block;margin-bottom:2px}
+
+  .done{margin-top:18px;padding:16px 18px;border:1px solid var(--line);
+        border-left:6px solid var(--p1);border-radius:10px;background:var(--paper)}
+  .done h2{margin:0 0 8px;font-size:20px}
+  .done p{margin:0 0 10px}
+  .done ul{margin:0;padding-left:20px}
+  .done li{margin-bottom:6px}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">HCR 231 &middot; Chapter 4 &middot; Practice Activity</p>
+  <h1>When Does Prevention Happen?</h1>
+  <p class="lede">The four levels of prevention are not four kinds of activity. They are four moments. What separates them is where the person stands in relation to the disease at the moment you intervene. Place each intervention at the moment it happens.</p>
+
+  <div class="bar">
+    <p>Placed: <span class="count" id="progress">0 of 12</span></p>
+    <p>Correct on first try: <span class="count" id="score">0</span></p>
+    <button type="button" class="btn-reset" id="reset">Start over</button>
+  </div>
+
+  <section class="deck" aria-labelledby="deck-h">
+    <h2 id="deck-h">Interventions</h2>
+    <div class="cards" id="cards"></div>
+    <p class="empty hidden" id="deckEmpty">All interventions placed.</p>
+  </section>
+
+  <p class="axis"><span>Healthy</span><span>Disease progresses &rarr;</span><span>Living with disease</span></p>
+  <div class="track" id="track"></div>
+  <div id="asideSlot"></div>
+
+  <div class="feedback" id="feedback" role="status" aria-live="polite">Select an intervention to begin.</div>
+  <div class="done hidden" id="done"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var STAGES = [
+    {id:"s1", num:"Moment 1", label:"Before disease begins", hint:"The person is healthy and the disease is not present. The goal is to keep it that way.", level:"Primary prevention", color:"var(--p1)"},
+    {id:"s2", num:"Moment 2", label:"Disease has begun, no symptoms yet", hint:"Something is already there but the person feels fine. The goal is to find it early.", level:"Secondary prevention", color:"var(--p2)"},
+    {id:"s3", num:"Moment 3", label:"Disease is established and being managed", hint:"The diagnosis exists. The goal is to limit complications and protect quality of life.", level:"Tertiary prevention", color:"var(--p3)"}
+  ];
+  var ASIDE = {id:"s4", num:"Runs alongside all three", label:"The care itself is the risk", hint:"The threat is not the disease. It is unnecessary or excessive medical intervention. The goal is to protect the patient from overtreatment.", level:"Quaternary prevention", color:"var(--p4)"};
+
+  var CARDS = [
+    {t:"An on-site MMR vaccination clinic for students who are not fully vaccinated", a:"s1", why:"Nobody here is infected. Vaccination raises immunity before exposure, which is the definition of primary prevention."},
+    {t:"Improving ventilation and airflow in a shelter's sleeping areas", a:"s1", why:"This changes the environment before anyone is exposed, so it is primary prevention."},
+    {t:"Teaching a community how tuberculosis spreads, before anyone is exposed", a:"s1", why:"Education aimed at people who are still healthy is primary prevention."},
+    {t:"Offering TB testing to every shelter resident, including those without symptoms", a:"s2", why:"Testing people who feel fine is designed to catch infection that is already present but silent. That is secondary prevention."},
+    {t:"A mammogram for a woman with no symptoms and no lump", a:"s2", why:"Screening an asymptomatic person is the clearest example of secondary prevention: find it before it announces itself."},
+    {t:"Blood pressure checks at a community health fair", a:"s2", why:"Most people with high blood pressure feel nothing. Screening finds the disease in its silent stage."},
+    {t:"Antiretroviral therapy that keeps a patient's viral load undetectable", a:"s3", why:"The diagnosis already exists. Ongoing treatment limits progression and complications, which is tertiary prevention."},
+    {t:"Cardiac rehabilitation after a heart attack", a:"s3", why:"Rehabilitation restores function and prevents a second event after disease has occurred. Tertiary prevention."},
+    {t:"A support group for people living with HIV", a:"s3", why:"Quality of life and long-term management for people who already have the condition is tertiary prevention."},
+    {t:"Deciding against an MRI after asking whether the result would change the treatment plan", a:"s4", why:"The patient is being protected from a test that carries cost and risk with no expected benefit. That is quaternary prevention."},
+    {t:"Discussing the realistic burdens of chemotherapy with a terminally ill patient", a:"s4", why:"Honest discussion that lets a patient decline burdensome treatment protects them from the care system itself."},
+    {t:"Starting a conversation about safely stopping a medication that is no longer indicated", a:"s4", why:"Deprescribing removes an intervention that is no longer helping. Quaternary prevention."}
+  ];
+
+  var selected=null, placed=0, firstTry=0, attempted={};
+  var elCards=document.getElementById("cards"),
+      elTrack=document.getElementById("track"),
+      elAside=document.getElementById("asideSlot"),
+      elFb=document.getElementById("feedback"),
+      elProg=document.getElementById("progress"),
+      elScore=document.getElementById("score"),
+      elDone=document.getElementById("done"),
+      elEmpty=document.getElementById("deckEmpty");
+
+  function shuffle(a){var r=a.slice();for(var i=r.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=r[i];r[i]=r[j];r[j]=t;}return r;}
+
+  function fb(html,state){ elFb.className="feedback"+(state?" "+state:""); elFb.innerHTML=html; }
+
+  function build(){
+    selected=null; placed=0; firstTry=0; attempted={};
+    elProg.textContent="0 of "+CARDS.length; elScore.textContent="0";
+    elDone.classList.add("hidden"); elDone.innerHTML="";
+    elEmpty.classList.add("hidden");
+
+    elCards.innerHTML="";
+    shuffle(CARDS).forEach(function(c){
+      var b=document.createElement("button");
+      b.type="button"; b.className="card"; b.setAttribute("aria-pressed","false");
+      b.dataset.a=c.a; b.dataset.why=c.why; b.dataset.t=c.t;
+      b.textContent=c.t;
+      b.addEventListener("click",function(){ select(b); });
+      elCards.appendChild(b);
+    });
+
+    elTrack.innerHTML="";
+    STAGES.forEach(function(s){ elTrack.appendChild(makeZone(s,"stage")); });
+    elAside.innerHTML="";
+    elAside.appendChild(makeZone(ASIDE,"aside"));
+
+    fb("Select an intervention to begin.");
+  }
+
+  function makeZone(s,cls){
+    var b=document.createElement("button");
+    b.type="button"; b.className=cls; b.dataset.zone=s.id;
+    b.style.setProperty("--c",s.color);
+    b.innerHTML="<span class='num'>"+s.num+"</span><h3>"+s.label+"</h3><p class='hint'>"+s.hint+"</p>"+
+                "<p class='level'>"+s.level+"</p><ul class='dropped'></ul>";
+    b.addEventListener("click",function(){ place(s,b); });
+    return b;
+  }
+
+  function select(btn){
+    Array.prototype.forEach.call(elCards.querySelectorAll(".card"),function(c){
+      c.setAttribute("aria-pressed", c===btn?"true":"false");
+    });
+    selected=btn;
+    fb("<strong>"+btn.dataset.t+"</strong>Where in the course of disease does this happen?");
+  }
+
+  function place(stage,zoneEl){
+    if(!selected){ fb("Select an intervention first, then choose a moment."); return; }
+    var card=selected, key=card.dataset.t;
+
+    if(card.dataset.a!==stage.id){
+      attempted[key]=true;
+      fb("<strong>Not this moment.</strong>Ask one question: at the instant this happens, does the person have the disease, and do they know it? Try again.","no");
+      return;
+    }
+
+    if(!attempted[key]) firstTry++;
+    placed++;
+
+    var li=document.createElement("li"); li.textContent=card.dataset.t;
+    zoneEl.querySelector(".dropped").appendChild(li);
+    zoneEl.classList.add("revealed");
+
+    card.remove(); selected=null;
+    fb("<strong>Correct &mdash; "+stage.level+".</strong>"+card.dataset.why,"ok");
+    elProg.textContent=placed+" of "+CARDS.length;
+    elScore.textContent=String(firstTry);
+
+    if(placed===CARDS.length) finish();
+  }
+
+  function finish(){
+    elEmpty.classList.remove("hidden");
+    elDone.classList.remove("hidden");
+    elDone.innerHTML=
+      "<h2>All 12 placed &mdash; "+firstTry+" of "+CARDS.length+" on the first try</h2>"+
+      "<p>Look at what actually decided each answer. It was never the activity itself. A conversation, a test, a medication &mdash; any of those can belong to a different level depending on when it happens.</p>"+
+      "<ul>"+
+        "<li><strong>Primary:</strong> no disease yet. Keep it from starting.</li>"+
+        "<li><strong>Secondary:</strong> disease has started but is silent. Find it before symptoms do.</li>"+
+        "<li><strong>Tertiary:</strong> disease is established. Limit damage and protect quality of life.</li>"+
+        "<li><strong>Quaternary:</strong> sits outside the timeline entirely. The risk being prevented is the medical care itself.</li>"+
+      "</ul>"+
+      "<p>One caution for the quiz: quaternary prevention is not the same as unnecessary care. Quaternary prevention is the decision that <em>stops</em> unnecessary care. Ordering the needless scan is the harm; questioning whether the scan is needed is the prevention.</p>";
+    elDone.setAttribute("tabindex","-1");
+    elDone.focus();
+  }
+
+  document.getElementById("reset").addEventListener("click",build);
+  build();
+})();
+</script>
+</body>
+</html>
