@@ -64,6 +64,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/ch15-manage-analyze-report/](models/ch15-manage-analyze-report/): place each post-data-collection task into the manage, analyze, or report step of evaluation.
 - [models/teach-it-to-a-classmate/](models/teach-it-to-a-classmate/): peer teach-back practice on health system topics, two rounds per pair.
 - [models/hcr231-ch2-sort-organizations/](models/hcr231-ch2-sort-organizations/): hCR 231 Chapter 2 — sorting health organizations by classification and level of government.
+- [models/hcr231-ch2-culture-matrix/](models/hcr231-ch2-culture-matrix/): hCR 231 Chapter 2 — comparing five health organizations by funding, authority, and signature activity.
 
 ## Embed snippets
 
@@ -112,6 +113,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Manage, Analyze, or Report?" src="models/ch15-manage-analyze-report/"></iframe>
 <iframe title="Teach It to a Classmate" src="models/teach-it-to-a-classmate/"></iframe>
 <iframe title="Sort the Organizations" src="models/hcr231-ch2-sort-organizations/"></iframe>
+<iframe title="Build the Comparison Matrix" src="models/hcr231-ch2-culture-matrix/"></iframe>
 ```
 
 ## Files

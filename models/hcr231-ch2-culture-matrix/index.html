@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build the Comparison Matrix | HCR 231 Chapter 2</title>
+<style>
+  :root{
+    color-scheme: light;
+    --sand:#F6F1E7; --paper:#FFFDF8; --ink:#2E2A25; --muted:#6B6157;
+    --line:#DED3C2; --gov:#1F5F5B; --quasi:#B0721C; --ngo:#657A3B;
+    --ok:#3F6B3A; --no:#A63D2F;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;padding:20px 16px 40px;background:var(--sand);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:16px;line-height:1.5;
+  }
+  .wrap{max-width:900px;margin:0 auto}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0 0 6px}
+  h1{font-size:26px;line-height:1.2;margin:0 0 8px;font-weight:800}
+  .lede{margin:0 0 18px;color:var(--muted);max-width:64ch}
+
+  .bar{
+    display:flex;flex-wrap:wrap;gap:12px;align-items:center;background:var(--paper);
+    border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:18px;
+  }
+  .bar p{margin:0;font-size:15px}
+  .count{font-weight:800}
+  button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);padding:8px 14px}
+  button:hover{border-color:var(--muted)}
+  button:focus-visible,select:focus-visible{outline:3px solid var(--gov);outline-offset:2px}
+  .btn-reset{margin-left:auto}
+
+  .org{
+    background:var(--paper);border:1px solid var(--line);border-left:6px solid var(--c);
+    border-radius:10px;padding:14px 16px;margin-bottom:14px;
+  }
+  .org header{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;margin-bottom:4px}
+  .org h2{margin:0;font-size:18px}
+  .chip{
+    font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+    color:var(--c);border:1px solid var(--c);border-radius:20px;padding:2px 9px;
+  }
+  .org .snapshot{margin:0 0 12px;font-size:15px;color:var(--muted)}
+
+  .fields{display:grid;gap:12px}
+  @media(min-width:720px){.fields{grid-template-columns:repeat(3,1fr)}}
+  .field label{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:4px}
+  select{
+    font:inherit;width:100%;padding:8px 10px;border-radius:8px;
+    border:1px solid var(--line);background:#fff;color:var(--ink);
+  }
+  select.right{border-color:var(--ok);background:#F2F7F0}
+  select.wrong{border-color:var(--no);background:#FBF1EF}
+  .note{margin:6px 0 0;font-size:14px;min-height:1px}
+  .note.right{color:var(--ok)}
+  .note.wrong{color:var(--no)}
+
+  .summary{
+    margin-top:22px;padding:16px 18px;background:var(--paper);
+    border:1px solid var(--line);border-left:6px solid var(--gov);border-radius:10px;
+  }
+  .summary h2{margin:0 0 8px;font-size:20px}
+  .summary p{margin:0 0 12px}
+  table{border-collapse:collapse;width:100%;font-size:14px;margin-bottom:14px}
+  caption{text-align:left;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;padding-bottom:6px}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+  th{background:var(--sand);font-weight:700}
+  tbody th{font-weight:700;width:22%}
+  .takeaway{margin:0;padding-left:20px}
+  .takeaway li{margin-bottom:6px}
+  .hidden{display:none}
+  .scroll{overflow-x:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">HCR 231 &middot; Chapter 2 &middot; Practice Activity</p>
+  <h1>Build the Comparison Matrix</h1>
+  <p class="lede">Five organizations, all working on public health, all built differently. Fill in each row and watch a pattern appear: money decides authority, and authority decides what the organization is actually able to do.</p>
+
+  <div class="bar">
+    <p>Rows completed: <span class="count" id="progress">0 of 5</span></p>
+    <button type="button" class="btn-reset" id="reset">Start over</button>
+  </div>
+
+  <div id="orgs"></div>
+
+  <div class="summary hidden" id="summary" tabindex="-1"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var FUNDING = [
+    "Federal tax dollars",
+    "State tax dollars",
+    "County tax revenue plus state and federal grants",
+    "Private donations and blood drives",
+    "Private donations and fundraising events",
+    "Income from a private endowment"
+  ];
+  var AUTHORITY = [
+    "Federal law, under a cabinet secretary",
+    "State law, under a governor's appointee",
+    "County government, limited to county lines",
+    "Official duties granted by federal charter, otherwise independent",
+    "No legal authority at all; it can only persuade",
+    "No legal authority; it decides on its own who receives its money"
+  ];
+  var ACTIVITY = [
+    "Nationwide disease surveillance and advisories",
+    "Inspection, licensing, and enforcement",
+    "Disaster sheltering and emergency relief",
+    "Community education and free screening events",
+    "Making grants to researchers and organizations"
+  ];
+
+  var ORGS = [
+    {
+      name:"Centers for Disease Control and Prevention",
+      cls:"Governmental &mdash; national", color:"var(--gov)",
+      snapshot:"An operating agency inside the Department of Health and Human Services. Tracks outbreaks across all 50 states and issues national advisories.",
+      funding:"Federal tax dollars",
+      authority:"Federal law, under a cabinet secretary",
+      activity:"Nationwide disease surveillance and advisories",
+      why:"Congress appropriates its budget, the HHS Secretary sits above it, and its reach is the whole country rather than any one state."
+    },
+    {
+      name:"Arizona Department of Health Services",
+      cls:"Governmental &mdash; state", color:"var(--gov)",
+      snapshot:"Licenses hospitals, keeps vital records, and inspects restaurants. Can order a business to correct violations or close.",
+      funding:"State tax dollars",
+      authority:"State law, under a governor's appointee",
+      activity:"Inspection, licensing, and enforcement",
+      why:"Only a government agency can compel anyone to do anything, and a state agency's power comes from state law. This is also the link that passes federal money and guidance down to counties."
+    },
+    {
+      name:"American Red Cross",
+      cls:"Quasi-governmental", color:"var(--quasi)",
+      snapshot:"Arrives within hours of a disaster to run shelters. Also serves as the official liaison between service members and their families.",
+      funding:"Private donations and blood drives",
+      authority:"Official duties granted by federal charter, otherwise independent",
+      activity:"Disaster sheltering and emergency relief",
+      why:"This split is exactly what quasi-governmental means: the federal government assigned it real duties, but no official directs its daily work and no tax dollars fund it."
+    },
+    {
+      name:"American Cancer Society",
+      cls:"Nongovernmental &mdash; voluntary", color:"var(--ngo)",
+      snapshot:"Started by citizens who saw a health need going unaddressed. Runs free screening events and trains volunteers.",
+      funding:"Private donations and fundraising events",
+      authority:"No legal authority at all; it can only persuade",
+      activity:"Community education and free screening events",
+      why:"A voluntary health agency cannot require anyone to get screened. Everything it accomplishes depends on convincing people, which is why education and outreach are its core work."
+    },
+    {
+      name:"Robert Wood Johnson Foundation",
+      cls:"Nongovernmental &mdash; philanthropic", color:"var(--ngo)",
+      snapshot:"Reviews applications and awards multimillion-dollar grants for research and community health programs.",
+      funding:"Income from a private endowment",
+      authority:"No legal authority; it decides on its own who receives its money",
+      activity:"Making grants to researchers and organizations",
+      why:"A foundation's power is the checkbook, not the law. Because the endowment is private, no voter and no agency reviews which health issues it chooses to fund."
+    }
+  ];
+
+  var COLS = [
+    {key:"funding", label:"Funding source", options:FUNDING},
+    {key:"authority", label:"Source of authority", options:AUTHORITY},
+    {key:"activity", label:"Signature activity", options:ACTIVITY}
+  ];
+
+  var elOrgs = document.getElementById("orgs");
+  var elProgress = document.getElementById("progress");
+  var elSummary = document.getElementById("summary");
+
+  function build(){
+    elOrgs.innerHTML = "";
+    elSummary.classList.add("hidden");
+    elSummary.innerHTML = "";
+    elProgress.textContent = "0 of " + ORGS.length;
+
+    ORGS.forEach(function(org, i){
+      var sec = document.createElement("section");
+      sec.className = "org";
+      sec.style.setProperty("--c", org.color);
+      sec.dataset.index = String(i);
+
+      var head = '<header><h2>' + org.name + '</h2><span class="chip">' + org.cls + '</span></header>' +
+                 '<p class="snapshot">' + org.snapshot + '</p><div class="fields"></div>';
+      sec.innerHTML = head;
+      var fields = sec.querySelector(".fields");
+
+      COLS.forEach(function(col){
+        var id = "f" + i + "-" + col.key;
+        var wrap = document.createElement("div");
+        wrap.className = "field";
+        var opts = '<option value="">Choose…</option>';
+        col.options.forEach(function(o){ opts += '<option value="' + o + '">' + o + "</option>"; });
+        wrap.innerHTML = '<label for="' + id + '">' + col.label + "</label>" +
+                         '<select id="' + id + '" data-col="' + col.key + '">' + opts + "</select>" +
+                         '<p class="note" role="status" aria-live="polite"></p>';
+        fields.appendChild(wrap);
+
+        var sel = wrap.querySelector("select");
+        sel.addEventListener("change", function(){ check(sel, org, col, sec); });
+      });
+
+      elOrgs.appendChild(sec);
+    });
+  }
+
+  function check(sel, org, col, sec){
+    var note = sel.parentNode.querySelector(".note");
+    sel.classList.remove("right","wrong");
+    note.classList.remove("right","wrong");
+
+    if(!sel.value){ note.textContent = ""; updateProgress(); return; }
+
+    if(sel.value === org[col.key]){
+      sel.classList.add("right");
+      note.classList.add("right");
+      note.textContent = "Correct.";
+    } else {
+      sel.classList.add("wrong");
+      note.classList.add("wrong");
+      note.textContent = "Not this one. Reread the snapshot above and try again.";
+    }
+    checkRow(org, sec);
+    updateProgress();
+  }
+
+  function checkRow(org, sec){
+    var sels = sec.querySelectorAll("select");
+    var complete = true;
+    Array.prototype.forEach.call(sels, function(s){
+      var col = s.dataset.col;
+      if(s.value !== org[col]) complete = false;
+    });
+    var existing = sec.querySelector(".rowdone");
+    if(complete && !existing){
+      sec.dataset.done = "1";
+      var p = document.createElement("p");
+      p.className = "note right rowdone";
+      p.style.marginTop = "10px";
+      p.innerHTML = "<strong>Row complete.</strong> " + org.why;
+      sec.appendChild(p);
+    } else if(!complete && existing){
+      delete sec.dataset.done;
+      existing.remove();
+    }
+  }
+
+  function updateProgress(){
+    var done = elOrgs.querySelectorAll('.org[data-done="1"]').length;
+    elProgress.textContent = done + " of " + ORGS.length;
+    if(done === ORGS.length) showSummary();
+  }
+
+  function showSummary(){
+    if(!elSummary.classList.contains("hidden")) return;
+
+    var rows = "";
+    ORGS.forEach(function(o){
+      rows += "<tr><th scope='row'>" + o.name + "</th><td>" + o.funding + "</td><td>" + o.authority + "</td><td>" + o.activity + "</td></tr>";
+    });
+
+    elSummary.innerHTML =
+      "<h2>The matrix is complete. Now read it sideways.</h2>" +
+      "<div class='scroll'><table><caption>Five organizations, three columns</caption>" +
+      "<thead><tr><th scope='col'>Organization</th><th scope='col'>Funding</th><th scope='col'>Authority</th><th scope='col'>Signature activity</th></tr></thead>" +
+      "<tbody>" + rows + "</tbody></table></div>" +
+      "<p>Every row follows the same chain. Where the money comes from sets what kind of authority the organization can hold, and that authority sets what it is able to do about a health problem.</p>" +
+      "<ul class='takeaway'>" +
+        "<li><strong>Tax dollars buy authority.</strong> Only the two government agencies can require anything of anyone, and only within their own borders.</li>" +
+        "<li><strong>Donations buy speed and freedom.</strong> The Red Cross does not wait for an appropriation, and the ACS does not need permission to start a program. Neither can compel anyone.</li>" +
+        "<li><strong>An endowment buys agenda-setting.</strong> The foundation cannot enforce or deliver care, but it decides which questions get studied at all.</li>" +
+        "<li><strong>No single row is sufficient.</strong> The gaps in one organization's reach are what the others were built to fill, which is the reason the system looks so crowded.</li>" +
+      "</ul>";
+    elSummary.classList.remove("hidden");
+    elSummary.focus();
+  }
+
+  document.getElementById("reset").addEventListener("click", build);
+  build();
+})();
+</script>
+</body>
+</html>
