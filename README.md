@@ -73,6 +73,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/hcr231-ch7-mic-timeline/](models/hcr231-ch7-mic-timeline/): sequence the maternal, infant, and child health window, then place risk factors and reasoning checks within it.
 - [models/hcr231-ch7-barriers-bridges-health-literacy/](models/hcr231-ch7-barriers-bridges-health-literacy/): sort obstacles into barriers and bridges, then appraise how much health literacy a document demands.
 - [models/hcr231-ch7-program-finder/](models/hcr231-ch7-program-finder/): match federal maternal and child health programs to who they serve, then self-check a written case response.
+- [models/hcr231-ch10-sdoh-explorer/](models/hcr231-ch10-sdoh-explorer/): explore the five social determinants of health categories and write your own examples of each.
 
 ## Embed snippets
 
@@ -130,6 +131,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="The MIC Timeline" src="models/hcr231-ch7-mic-timeline/"></iframe>
 <iframe title="Barriers, Bridges and Health Literacy" src="models/hcr231-ch7-barriers-bridges-health-literacy/"></iframe>
 <iframe title="Program Finder and Response Builder" src="models/hcr231-ch7-program-finder/"></iframe>
+<iframe title="SDoH Explorer" src="models/hcr231-ch10-sdoh-explorer/"></iframe>
 ```
 
 ## Files

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SDoH Explorer | HCR 231 Chapter 10</title>
+<style>
+  :root{
+    color-scheme: light;
+    --parchment:#FBF7F1; --surface:#FFFFFF; --ink:#2C2823; --clay:#8A4033;
+    --sage:#5C6B4C; --ochre:#A87526; --muted:#6B6157; --rule:#E3D9C9;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:24px 16px 56px;background:var(--parchment);color:var(--ink);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:880px;margin:0 auto}
+  header{border-bottom:3px solid var(--clay);padding-bottom:14px;margin-bottom:22px}
+  .eyebrow{font:600 12px/1 inherit;letter-spacing:.14em;text-transform:uppercase;color:var(--ochre);margin:0 0 8px}
+  h1{font-family:Georgia,"Times New Roman",serif;font-size:29px;line-height:1.2;margin:0 0 8px;font-weight:600}
+  .lede{margin:0;color:var(--muted);max-width:62ch}
+  h2{font-family:Georgia,serif;font-size:20px;margin:32px 0 10px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin:16px 0 0}
+  .cat{background:var(--surface);border:1px solid var(--rule);border-left:5px solid var(--sage);
+    border-radius:6px;padding:13px 14px;text-align:left;cursor:pointer;font:inherit;color:inherit;
+    transition:border-color .15s,box-shadow .15s}
+  .cat:hover{border-left-color:var(--clay);box-shadow:0 2px 8px rgba(44,40,35,.09)}
+  .cat[aria-pressed="true"]{border-left-color:var(--clay);background:#FDF6EE;box-shadow:0 2px 8px rgba(44,40,35,.1)}
+  .cat:focus-visible{outline:3px solid var(--ochre);outline-offset:2px}
+  .cat b{display:block;font-family:Georgia,serif;font-size:16px;margin-bottom:3px}
+  .cat span{font-size:13.5px;color:var(--muted)}
+  .panel{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:20px 22px;margin-top:18px}
+  .panel h3{font-family:Georgia,serif;font-size:19px;margin:0 0 6px;color:var(--clay)}
+  .panel .def{margin:0 0 14px;color:var(--muted)}
+  .ask{margin:0;padding-left:20px}
+  .ask li{margin-bottom:6px}
+  label{display:block;font-weight:600;font-size:14px;margin:18px 0 6px}
+  textarea{width:100%;min-height:96px;padding:11px 12px;border:1px solid var(--rule);border-radius:5px;
+    background:var(--parchment);font:inherit;font-size:15px;color:var(--ink);resize:vertical}
+  textarea:focus{outline:3px solid var(--ochre);outline-offset:1px;background:#fff}
+  .hint{font-size:13.5px;color:var(--muted);margin:6px 0 0}
+  .empty{color:var(--muted);font-style:italic;margin:0}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px;padding-top:18px;border-top:1px solid var(--rule)}
+  button.act{background:var(--clay);color:#fff;border:0;border-radius:5px;padding:10px 18px;font:600 15px inherit;cursor:pointer}
+  button.act.ghost{background:transparent;color:var(--clay);border:1.5px solid var(--clay)}
+  button.act:focus-visible{outline:3px solid var(--ochre);outline-offset:2px}
+  .note{background:#F5F1E4;border-left:4px solid var(--ochre);padding:12px 16px;border-radius:0 5px 5px 0;margin-top:26px;font-size:14.5px}
+  .count{font-size:13px;color:var(--muted);margin-top:20px}
+  @media print{
+    body{background:#fff;padding:0}
+    .bar,.cards,.hint{display:none}
+    .panel{border:1px solid #999;page-break-inside:avoid}
+    textarea{border:1px solid #999;background:#fff}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <p class="eyebrow">HCR 231 &middot; Chapter 10 &middot; Practice Activity 1 of 3</p>
+  <h1>SDoH Explorer</h1>
+  <p class="lede">Five categories, five sets of questions. Pick a category, read what it covers, then write your own examples. Nothing here is graded &mdash; this is practice for the Chapter 10 assignment.</p>
+</header>
+
+<h2>Choose a category</h2>
+<div class="cards" id="cards" role="group" aria-label="Social determinants of health categories"></div>
+
+<div class="panel" id="panel" aria-live="polite">
+  <p class="empty" id="emptyMsg">Select a category above to begin.</p>
+  <div id="detail" hidden>
+    <h3 id="dTitle"></h3>
+    <p class="def" id="dDef"></p>
+    <p style="font-weight:600;margin:0 0 6px;font-size:14px">Questions a community health worker would ask:</p>
+    <ul class="ask" id="dAsk"></ul>
+    <label for="ex">Write TWO examples of this category from your own community, your family, or a place you have lived.</label>
+    <textarea id="ex" placeholder="1.&#10;2."></textarea>
+    <label for="bar">Now pick ONE of your examples. How could it become a barrier to someone getting the health care they need?</label>
+    <textarea id="bar" placeholder="Because..."></textarea>
+    <p class="hint">Your writing stays on this page only. Copy anything you want to keep before you close the activity.</p>
+  </div>
+</div>
+
+<p class="count" id="progress">Categories opened: 0 of 5</p>
+
+<div class="note"><strong>Watch for overlap.</strong> Real situations rarely sit in one category. A parent who misses work to take a child to a clinic across town is touching Economic Stability, Healthcare Access, and Neighborhood at once. On the assignment you will be asked to explain your reasoning, so being able to say <em>why</em> you placed something matters more than placing it perfectly.</div>
+
+<div class="bar">
+  <button class="act" type="button" onclick="window.print()">Print or save my notes</button>
+  <button class="act ghost" type="button" id="clearBtn">Clear this category</button>
+</div>
+</div>
+
+<script>
+var DATA = [
+ {k:"econ", n:"Economic Stability", t:"Money coming in, and what it has to cover",
+  d:"Income, steady employment, poverty, benefits, debt, and whether a household can afford food, rent, utilities, and medicine at the same time.",
+  a:["Is the work steady, seasonal, or unpredictable?","Does the job offer health insurance or paid sick leave?","What has to go unpaid when an unexpected bill arrives?","Is the household enrolled in the benefits it qualifies for?"]},
+ {k:"educ", n:"Education Access & Quality", t:"School, reading, and what gets in the way",
+  d:"School attendance and graduation, reading and language skills, early childhood programs, and anything that pulls a student out of the classroom.",
+  a:["What keeps this student from attending regularly?","Is anyone in the household carrying adult responsibilities during school hours?","At what reading level can the adults in this home read health information?","Does the school know what is happening at home?"]},
+ {k:"care", n:"Healthcare Access & Quality", t:"Getting to care, and understanding it",
+  d:"Insurance coverage, having a regular provider, transportation to appointments, cost of prescriptions, and being able to understand instructions once you get them.",
+  a:["Is the household insured, and does anyone know what it covers?","How far is the nearest clinic and pharmacy, and how do they get there?","Was care explained in a language and at a level the person understood?","Did anyone check whether the person actually understood?"]},
+ {k:"neigh", n:"Neighborhood & Built Environment", t:"The physical place people live in",
+  d:"Housing quality and repairs, safety, air and water quality, transit, sidewalks, parks, and distance to a grocery store or pharmacy.",
+  a:["What condition is the housing in, and who is responsible for repairs?","Is it safe to walk or for children to play outside?","What transportation exists, and is it reliable?","Where is the nearest place to buy fresh food?"]},
+ {k:"soc", n:"Social & Community Context", t:"People, belonging, and being treated fairly",
+  d:"Family and friends, community connection, faith communities, discrimination, isolation, and whether a person feels safe and included.",
+  a:["Who does this person turn to when something goes wrong?","What groups or organizations are they already part of?","Have they been treated badly by an institution before?","Is anyone in the household isolated or withdrawing?"]}
+];
+
+var opened = {}, current = null;
+var cards = document.getElementById('cards');
+
+DATA.forEach(function(c){
+  var b = document.createElement('button');
+  b.type = 'button'; b.className = 'cat'; b.setAttribute('aria-pressed','false');
+  b.dataset.k = c.k;
+  b.innerHTML = '<b></b><span></span>';
+  b.querySelector('b').textContent = c.n;
+  b.querySelector('span').textContent = c.t;
+  b.addEventListener('click', function(){ select(c.k); });
+  cards.appendChild(b);
+});
+
+function select(k){
+  var c = DATA.filter(function(x){return x.k===k;})[0];
+  current = k; opened[k] = true;
+  Array.prototype.forEach.call(cards.children, function(b){
+    b.setAttribute('aria-pressed', b.dataset.k===k ? 'true':'false');
+  });
+  document.getElementById('emptyMsg').hidden = true;
+  document.getElementById('detail').hidden = false;
+  document.getElementById('dTitle').textContent = c.n;
+  document.getElementById('dDef').textContent = c.d;
+  var ul = document.getElementById('dAsk'); ul.innerHTML = '';
+  c.a.forEach(function(q){ var li=document.createElement('li'); li.textContent=q; ul.appendChild(li); });
+  document.getElementById('ex').value = store[k] ? store[k].ex : '';
+  document.getElementById('bar').value = store[k] ? store[k].bar : '';
+  document.getElementById('progress').textContent =
+    'Categories opened: ' + Object.keys(opened).length + ' of 5';
+}
+
+var store = {};
+function save(){
+  if(!current) return;
+  store[current] = {ex:document.getElementById('ex').value, bar:document.getElementById('bar').value};
+}
+document.getElementById('ex').addEventListener('input', save);
+document.getElementById('bar').addEventListener('input', save);
+document.getElementById('clearBtn').addEventListener('click', function(){
+  if(!current) return;
+  document.getElementById('ex').value=''; document.getElementById('bar').value=''; save();
+  document.getElementById('ex').focus();
+});
+</script>
+</body>
+</html>
