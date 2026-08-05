@@ -258,7 +258,7 @@ document.getElementById('check').onclick=function(){
   if(misses) html+='<li class="miss">'+misses+' criterion(s) still unflagged. Reread Excerpt 1 one line at a time and ask each checklist question in turn.</li>';
   if(hits===5&&falses===0) html+='<li>All five, cleanly. Excerpt 1 fails every criterion — which is why a single long clinical sentence can be technically accurate and still unusable. Now compare: which criteria does Excerpt 2 pass, and how do you know?</li>';
   else html+='<li>Work criterion by criterion rather than reacting to the excerpt as a whole. That is also how you earn points on the written item.</li>';
-  fb.innerHTML=html+'</ul>'; fb.className='fb show ok';
+  fb.innerHTML=html+'</ul>'; fb.className='fb show '+(hits===5&&falses===0?'ok':'no');
 };
 document.getElementById('clear').onclick=function(){
   boxes.forEach(function(b){b.checked=false;});
