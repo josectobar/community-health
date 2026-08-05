@@ -71,6 +71,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/hcr231-ch5-plain-language-clinic/](models/hcr231-ch5-plain-language-clinic/): flag what fails the reader in a health notice, then rewrite it in three plain sentences.
 - [models/hcr231-ch5-team-and-objective/](models/hcr231-ch5-team-and-objective/): match public health roles to coalition jobs, then assemble and classify a SMART objective.
 - [models/hcr231-ch7-mic-timeline/](models/hcr231-ch7-mic-timeline/): sequence the maternal, infant, and child health window, then place risk factors and reasoning checks within it.
+- [models/hcr231-ch7-barriers-bridges-sorter/](models/hcr231-ch7-barriers-bridges-sorter/): sort scenarios into communication barriers, access barriers, and communication bridges.
 
 ## Embed snippets
 
@@ -126,6 +127,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="The Plain Language Clinic" src="models/hcr231-ch5-plain-language-clinic/"></iframe>
 <iframe title="Build the Team, Write the Objective" src="models/hcr231-ch5-team-and-objective/"></iframe>
 <iframe title="The MIC Timeline" src="models/hcr231-ch7-mic-timeline/"></iframe>
+<iframe title="Barriers and Bridges Sorter" src="models/hcr231-ch7-barriers-bridges-sorter/"></iframe>
 ```
 
 ## Files
