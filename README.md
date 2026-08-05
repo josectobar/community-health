@@ -68,6 +68,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/hcr231-ch4-prevention-timeline/](models/hcr231-ch4-prevention-timeline/): hCR 231 Chapter 4 — placing interventions across the four levels of prevention.
 - [models/hcr231-ch4-break-the-chain/](models/hcr231-ch4-break-the-chain/): hCR 231 Chapter 4 — matching control measures to the six links in the chain of infection.
 - [models/hcr231-ch5-barriers-and-bridges/](models/hcr231-ch5-barriers-and-bridges/): sorting communication barriers and bridges in a rural community case.
+- [models/hcr231-ch5-plain-language-clinic/](models/hcr231-ch5-plain-language-clinic/): flag what fails the reader in a health notice, then rewrite it in three plain sentences.
 
 ## Embed snippets
 
@@ -120,6 +121,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="When Does Prevention Happen?" src="models/hcr231-ch4-prevention-timeline/"></iframe>
 <iframe title="Break the Chain" src="models/hcr231-ch4-break-the-chain/"></iframe>
 <iframe title="Barriers and Bridges in Copper Ridge" src="models/hcr231-ch5-barriers-and-bridges/"></iframe>
+<iframe title="The Plain Language Clinic" src="models/hcr231-ch5-plain-language-clinic/"></iframe>
 ```
 
 ## Files

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Practice 2: The Plain Language Clinic</title>
+<style>
+  :root{
+    color-scheme: light;
+    --sand:#F5EFE3; --card:#FFFFFF; --line:#E0D3BC; --ink:#2C2722; --muted:#6B6055;
+    --mesquite:#6B4A2F; --creosote:#5F7355; --ocotillo:#A63D28; --sun:#C08A2E;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:24px 16px 56px;background:var(--sand);color:var(--ink);
+       font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:860px;margin:0 auto}
+  h1{font:600 30px/1.25 Georgia,"Times New Roman",serif;color:var(--mesquite);margin:0 0 6px}
+  .eyebrow{font:600 12px/1 -apple-system,system-ui,sans-serif;letter-spacing:.14em;
+           text-transform:uppercase;color:var(--sun);margin:0 0 14px}
+  .lede{color:var(--muted);margin:0 0 22px;max-width:62ch}
+  h2.section{font:600 20px/1.3 Georgia,serif;color:var(--mesquite);margin:34px 0 4px}
+  .step{font:600 12px/1 sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--sun);margin:0 0 2px}
+  .hint{color:var(--muted);font-size:14px;margin:0 0 16px;max-width:64ch}
+  .flyer{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:22px 24px;
+         font:17px/1.85 Georgia,serif}
+  .flyer h3{font:600 18px Georgia,serif;margin:0 0 12px;color:var(--mesquite)}
+  .flag{border:0;background:#F1E7D4;border-bottom:2px dotted var(--muted);padding:1px 3px;
+        border-radius:3px;cursor:pointer;font:inherit;color:inherit}
+  .flag[aria-pressed="true"]{background:#F3D9A8;border-bottom:2px solid var(--sun)}
+  .flag:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+  .flag.correct{background:#DFE8D8;border-bottom:2px solid var(--creosote)}
+  .flag.missed{background:#F7EAE6;border-bottom:2px solid var(--ocotillo)}
+  .flag.over{background:#EDE8E0;border-bottom:2px solid var(--muted)}
+  .key{margin:16px 0 0;padding:0;list-style:none}
+  .key li{padding:9px 12px;border-radius:4px;margin:0 0 7px;font-size:14.5px;border-left:3px solid var(--line);background:var(--card)}
+  .key li.ok{border-left-color:var(--creosote);background:#EDF1E9}
+  .key li.no{border-left-color:var(--ocotillo);background:#F7EAE6}
+  .key li.fine{border-left-color:var(--muted);background:#F2EDE4}
+  .key b{display:block;font-size:13px;letter-spacing:.02em;color:var(--mesquite);margin:0 0 2px}
+  .grid{display:grid;gap:14px}
+  .field{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px 16px}
+  .field label{display:block;font:600 15px Georgia,serif;color:var(--mesquite);margin:0 0 2px}
+  .field .ask{font-size:13.5px;color:var(--muted);margin:0 0 8px}
+  textarea{width:100%;min-height:62px;font:16px/1.55 inherit;padding:9px 10px;
+           border:1.5px solid var(--line);border-radius:4px;background:#FDFBF7;color:var(--ink);resize:vertical}
+  textarea:focus-visible{outline:3px solid var(--sun);outline-offset:1px;border-color:var(--mesquite)}
+  .meter{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:16px 18px;margin:14px 0 0}
+  .meter h3{font:600 16px Georgia,serif;margin:0 0 10px;color:var(--mesquite)}
+  .checks{list-style:none;margin:0;padding:0}
+  .checks li{font-size:14.5px;padding:5px 0 5px 26px;position:relative}
+  .checks li::before{position:absolute;left:0;top:5px;font-weight:700}
+  .checks li.pass::before{content:"\2713";color:var(--creosote)}
+  .checks li.fail::before{content:"\2022";color:var(--ocotillo)}
+  .checks li.idle::before{content:"\25CB";color:var(--line)}
+  .bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:20px 0 0}
+  button{font:600 15px/1 inherit;padding:12px 22px;border-radius:4px;border:1.5px solid var(--mesquite);
+         background:var(--mesquite);color:#fff;cursor:pointer}
+  button.ghost{background:transparent;color:var(--mesquite)}
+  button:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+  .score{font:600 16px Georgia,serif;color:var(--mesquite)}
+  .model{display:none;margin:14px 0 0;padding:16px 18px;background:#EFE6D4;border:1px solid var(--line);
+         border-left:4px solid var(--creosote);border-radius:4px}
+  .model.show{display:block}
+  .model h3{font:600 16px Georgia,serif;margin:0 0 8px;color:var(--mesquite)}
+  .model p{margin:0 0 8px;font:17px/1.7 Georgia,serif}
+  .model .note{font:14px/1.6 sans-serif;color:var(--muted);margin:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Chapter 5 &middot; Practice 2 of 3</p>
+  <h1>The plain language clinic</h1>
+  <p class="lede">Appraising a material is not about knowing big words. It is about telling when a material fails the person holding it &mdash; and then fixing it. Practice on a notice written for Copper Ridge, a former mining town of 3,800 in Gila County where a third of residents are over 65 and the nearest specialist is 40 miles away.</p>
+
+  <p class="step">Step 1</p>
+  <h2 class="section">Find what fails the reader</h2>
+  <p class="hint">This notice was mailed to Copper Ridge households. Click any phrase you think would make it hard for a packing shed worker to use. Not every underlined phrase is a problem &mdash; some are exactly what the reader needs. Choose carefully, then check.</p>
+
+  <div class="flyer">
+    <h3>Notice: Low Blood Sugar</h3>
+    <p>Patients receiving <button class="flag" data-i="0" aria-pressed="false">glucose-lowering pharmacotherapy</button> may experience <button class="flag" data-i="1" aria-pressed="false">hypoglycemic episodes</button>. <button class="flag" data-i="2" aria-pressed="false">Symptomatology should be monitored continuously.</button> Individuals experiencing <button class="flag" data-i="3" aria-pressed="false">neuroglycopenic manifestations</button> should <button class="flag" data-i="4" aria-pressed="false">ingest rapid-acting carbohydrate</button> and <button class="flag" data-i="5" aria-pressed="false">consult their endocrinologist</button> regarding regimen adjustment. Education sessions are held at <button class="flag" data-i="6" aria-pressed="false">the Copper Ridge Senior Center</button> <button class="flag" data-i="7" aria-pressed="false">on the second Tuesday of each month at 10:00 a.m.</button></p>
+  </div>
+
+  <div class="bar">
+    <button id="check1">Check my flags</button>
+    <button id="reset1" class="ghost">Clear</button>
+    <span class="score" id="score1" role="status" aria-live="polite"></span>
+  </div>
+  <ul class="key" id="key1"></ul>
+
+  <p class="step" style="margin-top:36px">Step 2</p>
+  <h2 class="section">Rewrite it in three sentences</h2>
+  <p class="hint">This is the shape the quiz asks for. Answer three questions for the reader, one sentence each. Use words you would say out loud to a family member who has no health training.</p>
+
+  <div class="grid">
+    <div class="field">
+      <label for="s1">Sentence 1</label>
+      <p class="ask">What is the danger?</p>
+      <textarea id="s1" placeholder="Write one short sentence."></textarea>
+    </div>
+    <div class="field">
+      <label for="s2">Sentence 2</label>
+      <p class="ask">What should I do? Include a number or a time if you can.</p>
+      <textarea id="s2" placeholder="Write one short sentence."></textarea>
+    </div>
+    <div class="field">
+      <label for="s3">Sentence 3</label>
+      <p class="ask">When should I get help?</p>
+      <textarea id="s3" placeholder="Write one short sentence."></textarea>
+    </div>
+  </div>
+
+  <div class="meter">
+    <h3>Plain language check</h3>
+    <ul class="checks" id="checks">
+      <li class="idle" id="c1">All three sentences are written</li>
+      <li class="idle" id="c2">Sentences stay under about 15 words</li>
+      <li class="idle" id="c3">No leftover technical words</li>
+      <li class="idle" id="c4">Sentence 2 tells the reader a specific amount or time</li>
+      <li class="idle" id="c5">Sentence 3 names something the reader could notice in their own body</li>
+    </ul>
+  </div>
+
+  <div class="bar">
+    <button id="check2">Check my writing</button>
+    <button id="showmodel" class="ghost">Compare with a sample</button>
+  </div>
+
+  <div class="model" id="model">
+    <h3>One way to write it</h3>
+    <p>Diabetes medicine can make your blood sugar drop too low. If you feel shaky, sweaty, or confused, eat or drink something sugary right away &mdash; half a cup of juice or a few glucose tablets. If you do not feel better in 15 minutes, or you cannot swallow or think clearly, call 911.</p>
+    <p class="note">Notice what changed. The reader is spoken to directly. The symptom words are things a person can feel. &ldquo;Rapid-acting carbohydrate&rdquo; became two examples you could find in a kitchen. And the specialist referral was cut entirely, because it was not usable here, replaced by a next step that is. Your version does not need to match this one. It needs to pass the same five checks.</p>
+  </div>
+</div>
+
+<script>
+var PHRASES = [
+ {ok:false, label:"glucose-lowering pharmacotherapy",
+  note:"Nobody calls their medicine this. \u201cYour diabetes medicine\u201d says the same thing, and the reader can tell whether it applies to them."},
+ {ok:false, label:"hypoglycemic episodes",
+  note:"The reader has to already know the word to know whether this notice is about them. \u201cLow blood sugar\u201d costs nothing and excludes no one."},
+ {ok:false, label:"Symptomatology should be monitored continuously.",
+  note:"Passive voice with no subject. It never says who should watch, and it names no symptom at all."},
+ {ok:false, label:"neuroglycopenic manifestations",
+  note:"This is the most important idea in the notice and the least readable. The reader needs actual signs, not a category name."},
+ {ok:false, label:"ingest rapid-acting carbohydrate",
+  note:"An instruction with no example. Half a cup of juice is an action; \u201crapid-acting carbohydrate\u201d is a puzzle."},
+ {ok:false, label:"consult their endocrinologist",
+  note:"There is no endocrinologist within 40 miles of Copper Ridge. Correct advice this reader cannot follow is still a dead end."},
+ {ok:true,  label:"the Copper Ridge Senior Center",
+  note:"Keep this. A named local place the reader already knows how to reach is one of the strongest things a notice can offer."},
+ {ok:true,  label:"on the second Tuesday of each month at 10:00 a.m.",
+  note:"Keep this. Specific, repeating timing is what lets a reader act. Do not cut the useful parts when you simplify."}
+];
+
+var flags = Array.prototype.slice.call(document.querySelectorAll('.flag'));
+flags.forEach(function(b){
+  b.addEventListener('click', function(){
+    b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+  });
+});
+
+document.getElementById('check1').addEventListener('click', function(){
+  var key = document.getElementById('key1'); key.innerHTML = '';
+  var found = 0, over = 0, problems = 0;
+  PHRASES.forEach(function(p, i){
+    if(!p.ok) problems++;
+    var b = flags[i], on = b.getAttribute('aria-pressed') === 'true';
+    b.className = 'flag';
+    var li = document.createElement('li'), head;
+    if(!p.ok && on){ b.classList.add('correct'); found++; head = 'You caught it'; li.className = 'key ok'; li.classList.add('ok'); }
+    else if(!p.ok && !on){ b.classList.add('missed'); head = 'You missed this one'; li.classList.add('no'); }
+    else if(p.ok && on){ b.classList.add('over'); over++; head = 'This one is fine as written'; li.classList.add('fine'); }
+    else { head = 'Correctly left alone'; li.classList.add('fine'); }
+    li.innerHTML = '<b>' + head + ' \u2014 \u201c' + p.label + '\u201d</b>' + p.note;
+    key.appendChild(li);
+  });
+  var msg = found + ' of ' + problems + ' problems found';
+  if(over) msg += ', ' + over + ' good phrase' + (over>1?'s':'') + ' flagged by mistake';
+  document.getElementById('score1').textContent = msg;
+});
+
+document.getElementById('reset1').addEventListener('click', function(){
+  flags.forEach(function(b){ b.setAttribute('aria-pressed','false'); b.className='flag'; });
+  document.getElementById('key1').innerHTML = '';
+  document.getElementById('score1').textContent = '';
+});
+
+var JARGON = ['pharmacotherap','hypoglycem','neuroglycopen','symptomatolog','endocrinolog','carbohydrate',
+              'monitored continuously','regimen','manifestation','glycem','individuals','adequate','ingest','utiliz'];
+var BODY = ['shaky','shaking','sweat','dizzy','dizziness','confus','weak','hungry','blurry','faint',
+            'pass out','heart racing','tired','headache','swallow','think clearly','trembl'];
+
+function setCheck(id, pass, touched){
+  var el = document.getElementById(id);
+  el.className = touched ? (pass ? 'pass' : 'fail') : 'idle';
+}
+
+document.getElementById('check2').addEventListener('click', function(){
+  var a = document.getElementById('s1').value.trim(),
+      b = document.getElementById('s2').value.trim(),
+      c = document.getElementById('s3').value.trim();
+  var all = [a,b,c], joined = all.join(' ').toLowerCase();
+  var written = a && b && c;
+  setCheck('c1', !!written, true);
+
+  var longest = 0;
+  all.forEach(function(t){
+    t.split(/[.!?]+/).forEach(function(s){
+      var n = s.trim().split(/\s+/).filter(Boolean).length;
+      if(n > longest) longest = n;
+    });
+  });
+  setCheck('c2', longest > 0 && longest <= 15, true);
+  document.getElementById('c2').textContent = 'Sentences stay under about 15 words' +
+    (longest ? ' \u2014 your longest is ' + longest : '');
+
+  var hit = JARGON.filter(function(w){ return joined.indexOf(w) > -1; });
+  setCheck('c3', hit.length === 0, true);
+  document.getElementById('c3').textContent = hit.length
+    ? 'Technical words still in your text: ' + hit.join(', ')
+    : 'No leftover technical words';
+
+  setCheck('c4', /\d/.test(b) || /(every|each|hour|minute|daily|morning|noon)/i.test(b), true);
+  setCheck('c5', BODY.some(function(w){ return c.toLowerCase().indexOf(w) > -1; }), true);
+});
+
+document.getElementById('showmodel').addEventListener('click', function(){
+  document.getElementById('model').classList.add('show');
+});
+</script>
+</body>
+</html>
