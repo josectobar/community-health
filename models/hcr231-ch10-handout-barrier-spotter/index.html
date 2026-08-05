@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Handout Barrier Spotter | HCR 231 Chapter 10</title>
+<style>
+  :root{
+    color-scheme: light;
+    --parchment:#FBF7F1; --surface:#FFFFFF; --ink:#2C2823; --clay:#8A4033;
+    --sage:#5C6B4C; --ochre:#A87526; --muted:#6B6157; --rule:#E3D9C9;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:24px 16px 56px;background:var(--parchment);color:var(--ink);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:900px;margin:0 auto}
+  header{border-bottom:3px solid var(--clay);padding-bottom:14px;margin-bottom:22px}
+  .eyebrow{font:600 12px/1 inherit;letter-spacing:.14em;text-transform:uppercase;color:var(--ochre);margin:0 0 8px}
+  h1{font-family:Georgia,"Times New Roman",serif;font-size:29px;line-height:1.2;margin:0 0 8px;font-weight:600}
+  .lede{margin:0;color:var(--muted);max-width:64ch}
+  h2{font-family:Georgia,serif;font-size:20px;margin:30px 0 10px}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+  @media (max-width:760px){.cols{grid-template-columns:1fr}}
+  .doc{background:#fff;border:1px solid #CFC6B6;border-radius:3px;padding:22px 24px;
+    box-shadow:0 2px 10px rgba(44,40,35,.08);font-family:Georgia,serif;font-size:13.5px;line-height:1.5}
+  .doc h4{font-size:15px;margin:0 0 4px;text-align:center}
+  .doc .sub{text-align:center;font-size:11px;color:#666;margin:0 0 14px;letter-spacing:.05em}
+  .doc p{margin:0 0 9px}
+  .doc ul{margin:0 0 9px;padding-left:18px}
+  .doc li{margin-bottom:4px}
+  .stamp{font-size:10.5px;color:#777;border-top:1px solid #ddd;padding-top:8px;margin-top:12px}
+  fieldset{border:1px solid var(--rule);border-radius:6px;background:var(--surface);padding:16px 18px;margin:0}
+  legend{font-family:Georgia,serif;font-size:17px;padding:0 8px;color:var(--clay)}
+  .opt{display:flex;gap:10px;align-items:flex-start;padding:8px 8px;border-radius:5px;cursor:pointer}
+  .opt:hover{background:#FDF6EE}
+  .opt input{margin-top:5px;width:17px;height:17px;accent-color:var(--clay);flex:0 0 auto}
+  .opt input:focus-visible{outline:3px solid var(--ochre);outline-offset:2px}
+  .opt .txt{font-size:14.5px}
+  .opt .txt em{display:block;color:var(--muted);font-size:13px;font-style:normal;margin-top:2px}
+  label.q{display:block;font-weight:600;font-size:14px;margin:20px 0 6px}
+  textarea{width:100%;min-height:88px;padding:11px 12px;border:1px solid var(--rule);border-radius:5px;
+    background:var(--parchment);font:inherit;font-size:15px;color:var(--ink);resize:vertical}
+  textarea:focus{outline:3px solid var(--ochre);outline-offset:1px;background:#fff}
+  .tally{margin:14px 0 0;font-size:13.5px;color:var(--muted)}
+  .note{background:#F5F1E4;border-left:4px solid var(--ochre);padding:12px 16px;border-radius:0 5px 5px 0;margin-top:26px;font-size:14.5px}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px;padding-top:18px;border-top:1px solid var(--rule)}
+  button.act{background:var(--clay);color:#fff;border:0;border-radius:5px;padding:10px 18px;font:600 15px inherit;cursor:pointer}
+  button.act.ghost{background:transparent;color:var(--clay);border:1.5px solid var(--clay)}
+  button.act:focus-visible{outline:3px solid var(--ochre);outline-offset:2px}
+  @media print{
+    body{background:#fff;padding:0}
+    .bar{display:none}
+    .cols{grid-template-columns:1fr 1fr}
+    textarea{border:1px solid #999;background:#fff}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <p class="eyebrow">HCR 231 &middot; Chapter 10 &middot; Practice Activity 2 of 3</p>
+  <h1>Handout Barrier Spotter</h1>
+  <p class="lede">Below is a discharge handout of the kind hospitals hand to families every day. Read it the way a parent would read it at 11 p.m. in a waiting room. Then work through the checklist and write your strategies.</p>
+</header>
+
+<div class="cols">
+  <div>
+    <h2 style="margin-top:0">The handout</h2>
+    <div class="doc">
+      <h4>Managing Pediatric Asthma at Home</h4>
+      <p class="sub">PATIENT DISCHARGE INSTRUCTIONS &mdash; PEDS/RESP</p>
+      <p>Following an acute exacerbation, adherence to the prescribed pharmacologic regimen is essential to mitigate the risk of subsequent hospitalization and to optimize long-term pulmonary function.</p>
+      <p>Administer the maintenance corticosteroid via MDI with spacer BID. The rescue bronchodilator may be administered PRN, not to exceed the frequency indicated on the pharmacy label. Monitor for tachypnea, accessory muscle utilization, and desaturation; if SpO<sub>2</sub> falls below the threshold established by the pulmonology service, seek immediate evaluation.</p>
+      <ul>
+        <li>Avoid known environmental triggers and allergens.</li>
+        <li>Maintain adequate ambient humidity and ventilation.</li>
+        <li>Ensure prophylactic immunizations remain current.</li>
+        <li>Adhere to the scheduled follow-up appointment.</li>
+      </ul>
+      <p>Refer to the attached spirometry results and asthma action plan for individualized parameters. Contact the pulmonology service with questions regarding the therapeutic regimen.</p>
+      <p class="stamp">Rev. 04/2024 &middot; Page 1 of 2 &middot; Reading level: Grade 12.4 &middot; Available in English</p>
+    </div>
+  </div>
+
+  <div>
+    <h2 style="margin-top:0">What did you notice?</h2>
+    <fieldset>
+      <legend>Check every barrier you can find</legend>
+      <div id="opts"></div>
+      <p class="tally" id="tally">0 selected</p>
+    </fieldset>
+
+    <label class="q" for="s1">Choose ONE barrier you checked. Describe a concrete strategy a community health worker could use to address it. Say what the CHW would actually do or say.</label>
+    <textarea id="s1" placeholder="Barrier:&#10;Strategy:"></textarea>
+
+    <label class="q" for="s2">Now choose a DIFFERENT barrier and do the same.</label>
+    <textarea id="s2" placeholder="Barrier:&#10;Strategy:"></textarea>
+
+    <label class="q" for="s3">Imagine this handout is translated into Spanish and nothing else changes. Which barriers you checked would still be there?</label>
+    <textarea id="s3" placeholder="Still there, because..."></textarea>
+  </div>
+</div>
+
+<div class="note"><strong>A strategy is something a person does.</strong> "Improve communication" is a goal, not a strategy. "Ask Elena to explain the inhaler steps back to me in her own words before I leave" is a strategy &mdash; you can picture it happening. Aim for that level of detail on the assignment.</div>
+
+<div class="bar">
+  <button class="act" type="button" onclick="window.print()">Print or save my work</button>
+  <button class="act ghost" type="button" id="reset">Start over</button>
+</div>
+</div>
+
+<script>
+var OPTS = [
+ ["Reading level far above the average adult","Written near a 12th-grade level."],
+ ["Medical abbreviations with no explanation","MDI, BID, PRN, SpO2."],
+ ["Clinical vocabulary in place of plain words","Exacerbation, pharmacologic regimen, tachypnea."],
+ ["No pictures, diagrams, or demonstration","All dense text."],
+ ["Available in only one language",""],
+ ["Refers to documents the family may not have","Attached spirometry results, asthma action plan."],
+ ["Instructions that are vague about what to actually do","\u201cAvoid known triggers.\u201d Which ones? How?"],
+ ["Numbers and thresholds the family cannot know","\u201cBelow the threshold established by the service.\u201d"],
+ ["No phone number or name a parent could actually call",""],
+ ["No check that the family understood any of it",""],
+ ["Assumes the family has a spacer and knows how to use it",""],
+ ["Says nothing about what to do if they cannot afford the medicine",""]
+];
+
+var box = document.getElementById('opts');
+OPTS.forEach(function(o,i){
+  var id = 'o'+i;
+  var lab = document.createElement('label');
+  lab.className = 'opt'; lab.setAttribute('for', id);
+  lab.innerHTML = '<input type="checkbox" id="'+id+'"><span class="txt"></span>';
+  var t = lab.querySelector('.txt');
+  t.appendChild(document.createTextNode(o[0]));
+  if(o[1]){ var em = document.createElement('em'); em.textContent = o[1]; t.appendChild(em); }
+  box.appendChild(lab);
+});
+
+function tally(){
+  var n = box.querySelectorAll('input:checked').length;
+  document.getElementById('tally').textContent = n + (n===1 ? ' selected' : ' selected');
+}
+box.addEventListener('change', tally);
+
+document.getElementById('reset').addEventListener('click', function(){
+  box.querySelectorAll('input').forEach(function(c){ c.checked = false; });
+  ['s1','s2','s3'].forEach(function(id){ document.getElementById(id).value=''; });
+  tally();
+  box.querySelector('input').focus();
+});
+</script>
+</body>
+</html>
