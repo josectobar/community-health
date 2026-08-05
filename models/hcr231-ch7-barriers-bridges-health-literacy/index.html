@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Barriers, Bridges &amp; Health Literacy — HCR 231 Chapter 7</title>
+<style>
+  :root{
+    color-scheme: light;
+    --oat:#F6F1E7; --card:#FFFDF8; --ink:#2E2A24; --muted:#6B6154;
+    --olive:#4A5D3A; --sage:#8FA07E; --ochre:#B67A22; --brick:#9C4527; --line:#DDD2BE;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--oat);color:var(--ink);
+       font:16px/1.55 "Segoe UI",-apple-system,Roboto,Helvetica,Arial,sans-serif;padding:24px 16px 56px}
+  .wrap{max-width:920px;margin:0 auto}
+  header{border-bottom:3px double var(--line);padding-bottom:16px;margin-bottom:20px}
+  .eyebrow{font:600 12px/1 "Segoe UI",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--brick)}
+  h1{font:700 30px/1.15 Georgia,"Times New Roman",serif;margin:10px 0 6px}
+  .sub{color:var(--muted);margin:0;max-width:64ch}
+  .tabs{display:flex;gap:6px;border-bottom:2px solid var(--line);margin-bottom:20px;flex-wrap:wrap}
+  .tabs button{font:600 15px/1 "Segoe UI",sans-serif;padding:12px 18px;border:none;background:none;
+       color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
+  .tabs button[aria-selected=true]{color:var(--brick);border-bottom-color:var(--brick)}
+  .tabs button:focus-visible{outline:3px solid var(--ochre);outline-offset:-3px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin-bottom:18px}
+  h2{font:700 19px/1.2 Georgia,serif;margin:0 0 8px}
+  .lede{font-size:15px;color:var(--muted);margin:0 0 14px}
+  .defs{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));margin:0;padding:0;list-style:none}
+  .defs li{border-left:4px solid var(--sage);padding:8px 12px;background:#FAF6EC;border-radius:0 6px 6px 0;font-size:14.5px}
+  .defs b{display:block;color:var(--olive)}
+  .card{border:1px solid var(--line);border-left:5px solid var(--ochre);border-radius:8px;
+        padding:14px 16px;margin-bottom:14px;background:#FAF6EC}
+  .card p.scen{margin:0 0 12px;font-size:15.5px}
+  .card p.scen b{color:var(--brick)}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  button.opt{font:inherit;font-size:14px;padding:8px 14px;border-radius:20px;cursor:pointer;
+        border:1.5px solid var(--sage);background:#fff;color:var(--olive)}
+  button.opt:hover:not(:disabled){background:#EEF2E7}
+  button.opt:focus-visible{outline:3px solid var(--ochre);outline-offset:2px}
+  button.opt.right{background:var(--olive);border-color:var(--olive);color:#fff}
+  button.opt.wrong{background:#F6E6E0;border-color:var(--brick);color:var(--brick);text-decoration:line-through}
+  button.opt:disabled{cursor:default;opacity:.85}
+  .fb{margin:12px 0 0;padding:11px 14px;border-radius:6px;font-size:14.5px;display:none}
+  .fb.show{display:block}
+  .fb.ok{background:#EDF3E6;border-left:4px solid var(--olive)}
+  .fb.no{background:#FBEDE7;border-left:4px solid var(--brick)}
+  .fb ul{margin:8px 0 0;padding-left:20px}
+  .fb li{margin-bottom:6px}
+  .fb .miss{color:var(--brick)}
+  .meter{font-size:14.5px;padding:11px 14px;border-radius:6px;background:#EEF2E7;border-left:4px solid var(--sage)}
+  .excerpt{background:#FAF6EC;border:1px dashed var(--line);border-radius:8px;padding:14px 16px;margin:0 0 16px;
+           font:15.5px/1.65 Georgia,serif}
+  .tag{display:inline-block;font:600 11px/1 "Segoe UI",sans-serif;letter-spacing:.1em;text-transform:uppercase;
+       color:#fff;background:var(--ochre);padding:5px 9px;border-radius:4px;margin-bottom:9px}
+  ol.crit{margin:0;padding-left:22px;font-size:15px}
+  ol.crit li{margin-bottom:5px}
+  ol.crit b{color:var(--olive)}
+  fieldset{border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin:0}
+  legend{font-weight:600;padding:0 8px;color:var(--olive);font-size:15px}
+  label.chk{display:flex;gap:9px;align-items:flex-start;padding:7px 6px;border-radius:5px;cursor:pointer;font-size:15px}
+  label.chk:hover{background:#F1F5EB}
+  input[type=checkbox]{margin-top:4px;width:17px;height:17px;accent-color:var(--olive);flex:0 0 auto}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .go{font:inherit;padding:9px 18px;border-radius:6px;border:1.5px solid var(--olive);background:var(--olive);color:#fff;cursor:pointer}
+  .ghost{font:inherit;padding:9px 18px;border-radius:6px;border:1.5px solid var(--brick);background:#fff;color:var(--brick);cursor:pointer}
+  .go:focus-visible,.ghost:focus-visible{outline:3px solid var(--ochre);outline-offset:2px}
+  textarea{width:100%;min-height:110px;font:inherit;font-size:15px;padding:11px;border:1px solid var(--line);
+           border-radius:6px;background:#fff;resize:vertical}
+  textarea:focus-visible{outline:3px solid var(--ochre);outline-offset:1px}
+  .count{font-size:13px;color:var(--muted);margin-top:6px}
+  [hidden]{display:none!important}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">HCR 231 · Chapter 7 · Practice Widget for Page 2</div>
+  <h1>Barriers, Bridges &amp; Health Literacy</h1>
+  <p class="sub">Two skills, two tabs. Sort obstacles into the right family, then appraise a document for how much
+  health literacy it demands. Every scenario and excerpt here is different from the ones you will be assessed on.</p>
+</header>
+
+<div class="tabs" role="tablist" aria-label="Practice sections">
+  <button role="tab" id="t1" aria-controls="p1" aria-selected="true">1 · Barriers &amp; bridges</button>
+  <button role="tab" id="t2" aria-controls="p2" aria-selected="false">2 · Health literacy</button>
+</div>
+
+<div role="tabpanel" id="p1" aria-labelledby="t1" tabindex="0">
+  <section class="panel">
+    <h2>The three categories</h2>
+    <ul class="defs">
+      <li><b>Communication barrier</b>Blocks a patient from understanding or acting on health information &mdash;
+      language, jargon, low health literacy, mistrust.</li>
+      <li><b>Access / structural barrier</b>Blocks care itself &mdash; cost, transportation, distance, policy,
+      fear tied to immigration status.</li>
+      <li><b>Communication bridge</b>A strategy or resource that closes the gap &mdash; plain language, visuals,
+      interpreters, community health workers, peer educators, mobile clinics, culturally competent care.</li>
+    </ul>
+  </section>
+  <section class="panel" aria-label="Sorting practice">
+    <h2>Sort each situation</h2>
+    <p class="lede">Run the diagnostic from Page 2 before you click: if a perfect interpreter walked in right now,
+    would the problem go away?</p>
+    <div id="deck"></div>
+    <div class="meter" id="score" role="status" aria-live="polite">Sorted 0 of 8</div>
+    <div class="row"><button class="ghost" id="reset" type="button">Start over</button></div>
+  </section>
+</div>
+
+<div role="tabpanel" id="p2" aria-labelledby="t2" tabindex="0" hidden>
+  <section class="panel">
+    <h2>The five-criterion checklist</h2>
+    <ol class="crit">
+      <li><b>Plain language vs. medical jargon</b> — clinical words a patient wouldn't use at home?</li>
+      <li><b>Sentence length</b> — short and direct, or long with stacked clauses?</li>
+      <li><b>Reading level required</b> — elementary, middle school, or college?</li>
+      <li><b>Clear action step</b> — does the reader know exactly what to do next?</li>
+      <li><b>Design / visual support</b> — headings, bullets, images, white space, a phone number?</li>
+    </ol>
+  </section>
+
+  <section class="panel">
+    <h2>Read both, then diagnose</h2>
+    <div class="excerpt">
+      <span class="tag">Excerpt 1 — State health department notice</span>
+      <p style="margin:0">Pursuant to state statute, all neonates shall undergo metabolic and hemoglobinopathy
+      screening prior to discharge, with specimen collection occurring no earlier than 24 hours postpartum;
+      abnormal results necessitate confirmatory diagnostic evaluation, and the responsible clinician will initiate
+      parental notification through the reporting protocol established by the department.</p>
+    </div>
+    <div class="excerpt">
+      <span class="tag">Excerpt 2 — Hospital handout for parents</span>
+      <p style="margin:0"><strong>Your baby's first blood test</strong><br>
+      Before you go home, a nurse will prick your baby's heel and take a few drops of blood. This checks for rare
+      health problems that are easier to treat when they are found early. Most babies' results are normal. If
+      anything looks off, we will call you within two weeks and set up another test. <strong>Questions? Call the
+      nursery at 555-0148.</strong></p>
+    </div>
+    <fieldset>
+      <legend>Which criteria does Excerpt 1 fail? Check all that apply.</legend>
+      <label class="chk"><input type="checkbox" data-k="1"> Plain language — it relies on medical jargon</label>
+      <label class="chk"><input type="checkbox" data-k="1"> Sentence length — it is one long sentence with stacked clauses</label>
+      <label class="chk"><input type="checkbox" data-k="1"> Reading level — it demands a college-level reader</label>
+      <label class="chk"><input type="checkbox" data-k="1"> Action step — the reader is never told what to do</label>
+      <label class="chk"><input type="checkbox" data-k="1"> Design support — no headings, bullets, or contact information</label>
+      <label class="chk"><input type="checkbox" data-k="0"> It gives the wrong medical information</label>
+      <label class="chk"><input type="checkbox" data-k="0"> It is too short to be useful</label>
+      <div class="row">
+        <button type="button" class="go" id="check">Check my diagnosis</button>
+        <button type="button" class="ghost" id="clear">Clear</button>
+      </div>
+      <div class="fb" id="fb" role="status" aria-live="polite"></div>
+    </fieldset>
+  </section>
+
+  <section class="panel">
+    <h2>Now write it the way you'll be graded</h2>
+    <p class="lede">A full-credit justification does three things in order: <strong>name the criterion &rarr; quote
+    the evidence &rarr; say what it costs the reader.</strong> Nothing here is saved or graded — it's a scratch pad.</p>
+    <p style="margin:0 0 8px;font-size:14px;color:var(--muted)"><em>"Excerpt ___ demands more health literacy
+    because of ___ [criterion]. For example, it says '___' [evidence], which means a reader would have to ___
+    before they could ___ [cost to the reader]."</em></p>
+    <label for="draft" style="display:block;font-weight:600;margin-bottom:6px">Your draft justification</label>
+    <textarea id="draft" placeholder="Excerpt 1 demands more health literacy because…"></textarea>
+    <div class="count" id="cnt" role="status" aria-live="polite">0 words · aim for 60–100</div>
+  </section>
+</div>
+</div>
+
+<script>
+/* tabs */
+var tabs=[document.getElementById('t1'),document.getElementById('t2')];
+var pans=[document.getElementById('p1'),document.getElementById('p2')];
+function show(i){
+  tabs.forEach(function(t,k){t.setAttribute('aria-selected',k===i?'true':'false');});
+  pans.forEach(function(p,k){p.hidden=k!==i;});
+}
+tabs.forEach(function(t,i){
+  t.onclick=function(){show(i);};
+  t.onkeydown=function(e){
+    var n=null;
+    if(e.key==='ArrowRight') n=(i+1)%tabs.length;
+    if(e.key==='ArrowLeft') n=(i-1+tabs.length)%tabs.length;
+    if(n!==null){e.preventDefault();show(n);tabs[n].focus();}
+  };
+});
+
+/* sorter */
+var CATS=["Communication barrier","Access / structural barrier","Communication bridge"];
+var ITEMS=[
+ {t:"A clinic mails immunization reminders written at a 12th-grade reading level. Many parents in the neighborhood set them aside without reading them.",a:0,
+  w:"The reminder exists and the shot is free — what fails is that the message can't be understood. That is health literacy, which lives on the communication side."},
+ {t:"A county health department parks a van with a nurse practitioner at a farmworker housing site twice a month.",a:2,
+  w:"This is a mobile clinic. It removes distance and time-off obstacles by bringing care to people, so it belongs with the strategies that help."},
+ {t:"A new mother works an hourly job with no paid sick leave and loses a day's wages every time she takes the baby to a checkup.",a:1,
+  w:"Nothing here is about understanding — she knows the appointment matters. The obstacle is economic and structural."},
+ {t:"A provider tells a patient her infant has 'failure to thrive with suspected postprandial reflux' and the mother nods without asking a question.",a:0,
+  w:"Medical jargon is a classic communication barrier. Nodding is not the same as understanding."},
+ {t:"A hospital trains a group of neighborhood mothers who have used maternal health services to answer questions and share their experience with new families.",a:2,
+  w:"These are peer educators — someone from the same community sharing information. That's a bridge."},
+ {t:"A family avoids applying for benefits because a relative told them enrolling could affect their immigration case.",a:1,
+  w:"Fear about immigration status keeps people away from the door entirely. It is grouped with access and structural barriers."},
+ {t:"A prenatal handout replaces a paragraph of text with a simple picture timeline showing when each visit happens.",a:2,
+  w:"Visual aids reduce how much reading is required to act. That is a bridge."},
+ {t:"A patient does not take her prescribed prenatal vitamin because she believes hospitals push medication on people like her.",a:0,
+  w:"Cultural mistrust of the healthcare system is listed as a communication barrier — the relationship, not the logistics, is the obstacle."}
+];
+var done=0;
+function render(){
+  var d=document.getElementById("deck"); d.innerHTML=""; done=0; update();
+  ITEMS.forEach(function(it,i){
+    var c=document.createElement("section"); c.className="card"; c.setAttribute("aria-labelledby","s"+i);
+    var p=document.createElement("p"); p.className="scen"; p.id="s"+i;
+    var lab=document.createElement("b"); lab.textContent="Scenario "+(i+1)+". ";
+    p.appendChild(lab); p.appendChild(document.createTextNode(it.t)); c.appendChild(p);
+    var g=document.createElement("div"); g.className="opts";
+    g.setAttribute("role","group"); g.setAttribute("aria-label","Choose a category for scenario "+(i+1));
+    var fb=document.createElement("p"); fb.className="fb";
+    CATS.forEach(function(name,k){
+      var b=document.createElement("button");
+      b.type="button"; b.className="opt"; b.textContent=name;
+      b.onclick=function(){
+        var bs=g.querySelectorAll("button"); if(bs[0].disabled) return;
+        for(var j=0;j<bs.length;j++) bs[j].disabled=true;
+        fb.className="fb show "+(k===it.a?"ok":"no");
+        if(k===it.a){ bs[k].classList.add("right"); fb.textContent="Correct — "+it.w; }
+        else{ bs[k].classList.add("wrong"); bs[it.a].classList.add("right");
+              fb.textContent="Not quite. The better fit is \u201C"+CATS[it.a]+".\u201D "+it.w; }
+        done++; update();
+      };
+      g.appendChild(b);
+    });
+    c.appendChild(g); c.appendChild(fb); d.appendChild(c);
+  });
+}
+function update(){
+  document.getElementById("score").textContent="Sorted "+done+" of "+ITEMS.length+
+    (done===ITEMS.length?" — all eight sorted. Try naming the category out loud before you click next time.":"");
+}
+document.getElementById("reset").onclick=render;
+render();
+
+/* health literacy check */
+var boxes=[].slice.call(document.querySelectorAll('input[type=checkbox]'));
+var fb=document.getElementById('fb');
+document.getElementById('check').onclick=function(){
+  var hits=0,misses=0,falses=0;
+  boxes.forEach(function(b){
+    var key=b.getAttribute('data-k')==='1';
+    if(b.checked&&key) hits++;
+    if(!b.checked&&key) misses++;
+    if(b.checked&&!key) falses++;
+  });
+  var html='<strong>You flagged '+hits+' of the 5 real weaknesses.</strong><ul>';
+  if(falses) html+='<li class="miss">'+falses+' of your selections describe something else. Both distractors are about accuracy or length — neither is one of the five criteria. Reread the checklist.</li>';
+  if(misses) html+='<li class="miss">'+misses+' criterion(s) still unflagged. Reread Excerpt 1 one line at a time and ask each checklist question in turn.</li>';
+  if(hits===5&&falses===0) html+='<li>All five, cleanly. Excerpt 1 fails every criterion — which is why a single long clinical sentence can be technically accurate and still unusable. Now compare: which criteria does Excerpt 2 pass, and how do you know?</li>';
+  else html+='<li>Work criterion by criterion rather than reacting to the excerpt as a whole. That is also how you earn points on the written item.</li>';
+  fb.innerHTML=html+'</ul>'; fb.className='fb show ok';
+};
+document.getElementById('clear').onclick=function(){
+  boxes.forEach(function(b){b.checked=false;});
+  fb.className='fb'; fb.innerHTML='';
+};
+var d2=document.getElementById('draft'),c2=document.getElementById('cnt');
+d2.addEventListener('input',function(){
+  var w=d2.value.trim()?d2.value.trim().split(/\s+/).length:0;
+  c2.textContent=w+' word'+(w===1?'':'s')+' · aim for 60–100';
+});
+</script>
+</body>
+</html>
