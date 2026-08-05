@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Practice 3: Build the Team, Write the Objective</title>
+<style>
+  :root{
+    color-scheme: light;
+    --sand:#F5EFE3; --card:#FFFFFF; --line:#E0D3BC; --ink:#2C2722; --muted:#6B6055;
+    --mesquite:#6B4A2F; --creosote:#5F7355; --ocotillo:#A63D28; --sun:#C08A2E;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:24px 16px 56px;background:var(--sand);color:var(--ink);
+       font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:860px;margin:0 auto}
+  h1{font:600 30px/1.25 Georgia,"Times New Roman",serif;color:var(--mesquite);margin:0 0 6px}
+  .eyebrow{font:600 12px/1 sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--sun);margin:0 0 14px}
+  .lede{color:var(--muted);margin:0 0 22px;max-width:62ch}
+  h2.section{font:600 20px/1.3 Georgia,serif;color:var(--mesquite);margin:34px 0 4px}
+  .step{font:600 12px/1 sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--sun);margin:0 0 2px}
+  .hint{color:var(--muted);font-size:14px;margin:0 0 16px;max-width:64ch}
+  .task{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin:0 0 12px}
+  .task p.job{margin:0 0 10px;font-size:16px}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  select{font:15px inherit;padding:9px 10px;border:1.5px solid var(--line);border-radius:4px;
+         background:#FDFBF7;color:var(--ink);min-width:280px}
+  select:focus-visible{outline:3px solid var(--sun);outline-offset:1px;border-color:var(--mesquite)}
+  .fb{margin:11px 0 0;padding:10px 12px;border-radius:4px;font-size:14.5px;display:none}
+  .fb.show{display:block}
+  .fb.ok{background:#EDF1E9;border-left:3px solid var(--creosote);color:#3C4A35}
+  .fb.no{background:#F7EAE6;border-left:3px solid var(--ocotillo);color:#6E2A1B}
+  .fb b{display:block;margin:0 0 2px}
+  .builder{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:18px 20px}
+  .slot{margin:0 0 14px}
+  .slot label{display:block;font:600 13px sans-serif;letter-spacing:.06em;text-transform:uppercase;
+              color:var(--sun);margin:0 0 5px}
+  .slot select{width:100%;min-width:0}
+  .preview{margin:18px 0 0;padding:18px 20px;background:#EFE6D4;border:1px solid var(--line);
+           border-left:4px solid var(--mesquite);border-radius:4px;font:17px/1.7 Georgia,serif;min-height:64px}
+  .preview .blank{color:var(--muted);font-style:italic}
+  .bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:20px 0 0}
+  button{font:600 15px/1 inherit;padding:12px 22px;border-radius:4px;border:1.5px solid var(--mesquite);
+         background:var(--mesquite);color:#fff;cursor:pointer}
+  button.ghost{background:transparent;color:var(--mesquite)}
+  button:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+  .score{font:600 16px Georgia,serif;color:var(--mesquite)}
+  .opt{position:relative;display:inline-block}
+  .opt input{position:absolute;opacity:0;width:0;height:0}
+  .opt span{display:inline-block;border:1.5px solid var(--line);background:#FBF7EF;padding:8px 18px;
+            border-radius:999px;cursor:pointer;font-size:15px;font-weight:600;color:var(--muted)}
+  .opt input:checked + span{border-color:var(--mesquite);background:var(--mesquite);color:#fff}
+  .opt input:focus-visible + span{outline:3px solid var(--sun);outline-offset:2px}
+  .takeaway{margin:34px 0 0;padding:18px;background:var(--card);border:1px solid var(--line);border-radius:6px}
+  .takeaway h2{font:600 17px Georgia,serif;margin:0 0 8px;color:var(--mesquite)}
+  .takeaway ul{margin:0;padding-left:20px}
+  .takeaway li{margin:0 0 6px;font-size:15px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Chapter 5 &middot; Practice 3 of 3</p>
+  <h1>Build the team, write the objective</h1>
+  <p class="lede">Planners do two things constantly: decide who belongs on the team, and state what the program is committing to. Practice both here on Copper Ridge, a former mining town of 3,800 in Gila County where diabetes-related hospitalizations have climbed for three years.</p>
+
+  <p class="step">Step 1</p>
+  <h2 class="section">Who should take this on?</h2>
+  <p class="hint">The Copper Ridge coalition has five jobs to assign and five professionals available. Each professional takes exactly one job. Match them, then check &mdash; the feedback explains what makes each role distinct.</p>
+
+  <div id="tasks"></div>
+
+  <div class="bar">
+    <button id="checkA">Check my assignments</button>
+    <button id="resetA" class="ghost">Start over</button>
+    <span class="score" id="scoreA" role="status" aria-live="polite"></span>
+  </div>
+
+  <p class="step" style="margin-top:38px">Step 2</p>
+  <h2 class="section">Assemble a SMART objective</h2>
+  <p class="hint">Choose one option in each row. Watch the objective build itself underneath, then decide what kind of objective you made. Pay attention to which four pieces are always present &mdash; you will need to supply them yourself when you write one from scratch.</p>
+
+  <div class="builder">
+    <div class="slot">
+      <label for="who">Who</label>
+      <select id="who">
+        <option value="">Choose the population</option>
+        <option value="Copper Ridge residents age 65 and older">Copper Ridge residents age 65 and older</option>
+        <option value="adults screened at the senior center">adults screened at the senior center</option>
+        <option value="residents enrolled in the diabetes prevention program">residents enrolled in the diabetes prevention program</option>
+      </select>
+    </div>
+    <div class="slot">
+      <label for="what">What will change</label>
+      <select id="what">
+        <option value="">Choose the change</option>
+        <option value="will attend all six diabetes prevention sessions" data-type="process">will attend all six diabetes prevention sessions</option>
+        <option value="will be able to name three signs of low blood sugar" data-type="impact">will be able to name three signs of low blood sugar</option>
+        <option value="will report checking their blood sugar at least once a day" data-type="impact">will report checking their blood sugar at least once a day</option>
+        <option value="will have a no-cost glucose meter in their home" data-type="impact">will have a no-cost glucose meter in their home</option>
+        <option value="will show a lower rate of diabetes-related hospitalizations" data-type="outcome">will show a lower rate of diabetes-related hospitalizations</option>
+      </select>
+    </div>
+    <div class="slot">
+      <label for="much">How much</label>
+      <select id="much">
+        <option value="">Choose the amount</option>
+        <option value="At least 60% of">At least 60% of</option>
+        <option value="At least 8 in 10">At least 8 in 10</option>
+        <option value="All">All</option>
+      </select>
+    </div>
+    <div class="slot">
+      <label for="when">By when</label>
+      <select id="when">
+        <option value="">Choose the deadline</option>
+        <option value="by December 31, 2027">by December 31, 2027</option>
+        <option value="by the end of the first program year">by the end of the first program year</option>
+        <option value="within three years of program launch">within three years of program launch</option>
+      </select>
+    </div>
+
+    <div class="preview" id="preview" role="status" aria-live="polite">
+      <span class="blank">Your objective will appear here as you choose.</span>
+    </div>
+
+    <div style="margin:20px 0 0">
+      <p style="font:600 15px Georgia,serif;color:var(--mesquite);margin:0 0 8px" id="classq">What kind of objective did you build?</p>
+      <div class="row" role="radiogroup" aria-labelledby="classq">
+        <label class="opt"><input type="radio" name="kind" value="process"><span>Process</span></label>
+        <label class="opt"><input type="radio" name="kind" value="impact"><span>Impact</span></label>
+        <label class="opt"><input type="radio" name="kind" value="outcome"><span>Outcome</span></label>
+      </div>
+      <p class="fb" id="fbB"></p>
+    </div>
+
+    <div class="bar">
+      <button id="checkB">Check my objective</button>
+      <button id="resetB" class="ghost">Clear</button>
+    </div>
+  </div>
+
+  <div class="takeaway">
+    <h2>What to take away</h2>
+    <ul>
+      <li>A role is defined by what someone is <em>responsible for</em>, not by where they work. Two people can sit in the same clinic and answer for very different things.</li>
+      <li>An objective without a number and a date is a goal wearing an objective's clothes.</li>
+      <li>Process counts what you did. Impact measures what changed in people or their surroundings. Outcome measures health itself, and takes the longest to see.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+var PROS = ["Epidemiologist","Community health worker","Environmental health specialist",
+            "Public health nurse","Medical social worker"];
+
+var TASKS = [
+ {job:"Test well water at homes on the north side for arsenic left behind by the mine tailings, and cite the responsible party if it fails standards.",
+  a:"Environmental health specialist",
+  w:"Inspection and enforcement authority is what sets this role apart. No one else on the team can compel a property owner to act."},
+ {job:"Determine whether diabetes hospitalizations truly rose, and identify which age groups and which months account for the increase.",
+  a:"Epidemiologist",
+  w:"Person, place, and time. This role tells the coalition whether the pattern is real and where to aim before resources are spent."},
+ {job:"Sit at a longtime resident's kitchen table, someone whose family she has known for years, and walk her through the new walking group schedule.",
+  a:"Community health worker",
+  w:"Standing relationships in the community are the expertise here. This work depends on who the person is, so it cannot be handed to whoever is available."},
+ {job:"Run blood glucose screenings at the senior center and arrange clinical follow-up for anyone with a high reading.",
+  a:"Public health nurse",
+  w:"Clinical assessment and referral. The nurse can act on an abnormal finding in a way no one else on this team is licensed to."},
+ {job:"Help a resident who cannot afford insulin apply for a prescription assistance program, and follow up with the agency until it is approved.",
+  a:"Medical social worker",
+  w:"Benefits navigation and advocacy inside systems. The need here is not clinical or educational \u2014 it is access to a resource the person is entitled to."}
+];
+
+var tbox = document.getElementById('tasks');
+TASKS.forEach(function(t, i){
+  var opts = '<option value="">Choose a professional</option>' +
+    PROS.map(function(p){ return '<option value="'+p+'">'+p+'</option>'; }).join('');
+  var d = document.createElement('div');
+  d.className = 'task';
+  d.innerHTML = '<p class="job" id="job'+i+'">' + t.job + '</p>' +
+    '<div class="row"><select id="sel'+i+'" aria-labelledby="job'+i+'">' + opts + '</select></div>' +
+    '<p class="fb" id="tfb'+i+'"></p>';
+  tbox.appendChild(d);
+});
+
+document.getElementById('checkA').addEventListener('click', function(){
+  var right = 0;
+  TASKS.forEach(function(t, i){
+    var v = document.getElementById('sel'+i).value;
+    var fb = document.getElementById('tfb'+i);
+    if(!v){ fb.className='fb show no'; fb.innerHTML='<b>Not assigned yet.</b>Choose a professional, then check again.'; return; }
+    var ok = v === t.a;
+    if(ok) right++;
+    fb.className = 'fb show ' + (ok ? 'ok' : 'no');
+    fb.innerHTML = '<b>' + (ok ? 'Correct \u2014 ' + t.a : 'This one belongs to the ' + t.a.toLowerCase()) + '</b>' + t.w;
+  });
+  document.getElementById('scoreA').textContent = right + ' of 5 correct';
+});
+
+document.getElementById('resetA').addEventListener('click', function(){
+  TASKS.forEach(function(t,i){
+    document.getElementById('sel'+i).value = '';
+    var fb = document.getElementById('tfb'+i); fb.className='fb'; fb.textContent='';
+  });
+  document.getElementById('scoreA').textContent = '';
+});
+
+var who = document.getElementById('who'), what = document.getElementById('what'),
+    much = document.getElementById('much'), when = document.getElementById('when'),
+    prev = document.getElementById('preview');
+
+function render(){
+  if(!who.value && !what.value && !much.value && !when.value){
+    prev.innerHTML = '<span class="blank">Your objective will appear here as you choose.</span>';
+    return;
+  }
+  function part(v, ph){ return v ? v : '<span class="blank">[' + ph + ']</span>'; }
+  var w = when.value ? when.value.charAt(0).toUpperCase() + when.value.slice(1) : '<span class="blank">[by when]</span>';
+  prev.innerHTML = w + ', ' + part(much.value.toLowerCase(), 'how much') + ' ' +
+                   part(who.value, 'who') + ' ' + part(what.value, 'what will change') + '.';
+}
+[who, what, much, when].forEach(function(s){ s.addEventListener('change', render); });
+
+document.getElementById('checkB').addEventListener('click', function(){
+  var fb = document.getElementById('fbB');
+  var missing = [];
+  if(!who.value) missing.push('who');
+  if(!what.value) missing.push('what will change');
+  if(!much.value) missing.push('how much');
+  if(!when.value) missing.push('by when');
+  if(missing.length){
+    fb.className = 'fb show no';
+    fb.innerHTML = '<b>Still missing: ' + missing.join(', ') + '</b>An objective needs all four before it can be measured. This is the most common gap in quiz answers.';
+    return;
+  }
+  var kind = what.options[what.selectedIndex].getAttribute('data-type');
+  var picked = document.querySelector('input[name="kind"]:checked');
+  if(!picked){
+    fb.className = 'fb show no';
+    fb.innerHTML = '<b>Choose process, impact, or outcome.</b>Look at what your objective measures: an activity, a change in people or surroundings, or health status itself.';
+    return;
+  }
+  var why = {
+    process:"It counts an activity the program delivered \u2014 attendance at a session. Nothing has changed in anyone's health or behavior yet.",
+    impact:"It measures a change in awareness, behavior, or the environment. This is the middle layer, and it is where most program objectives live.",
+    outcome:"It measures health status itself \u2014 illness rates. These take the longest to move and usually need years of data."
+  };
+  var ok = picked.value === kind;
+  fb.className = 'fb show ' + (ok ? 'ok' : 'no');
+  fb.innerHTML = '<b>' + (ok ? 'Yes \u2014 this is ' + kind : 'This one is actually ' + kind) + '</b>' + why[kind];
+});
+
+document.getElementById('resetB').addEventListener('click', function(){
+  [who, what, much, when].forEach(function(s){ s.value = ''; });
+  var p = document.querySelector('input[name="kind"]:checked'); if(p) p.checked = false;
+  var fb = document.getElementById('fbB'); fb.className='fb'; fb.textContent='';
+  render();
+});
+</script>
+</body>
+</html>
