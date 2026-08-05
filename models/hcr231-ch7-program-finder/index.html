@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Program Finder &amp; Response Builder — HCR 231 Chapter 7</title>
+<style>
+  :root{
+    color-scheme: light;
+    --oat:#F6F1E7; --card:#FFFDF8; --ink:#2E2A24; --muted:#6B6154;
+    --olive:#4A5D3A; --sage:#8FA07E; --ochre:#B67A22; --brick:#9C4527; --line:#DDD2BE;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--oat);color:var(--ink);
+       font:16px/1.55 "Segoe UI",-apple-system,Roboto,Helvetica,Arial,sans-serif;padding:24px 16px 56px}
+  .wrap{max-width:920px;margin:0 auto}
+  header{border-bottom:3px double var(--line);padding-bottom:16px;margin-bottom:20px}
+  .eyebrow{font:600 12px/1 "Segoe UI",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--brick)}
+  h1{font:700 30px/1.15 Georgia,"Times New Roman",serif;margin:10px 0 6px}
+  .sub{color:var(--muted);margin:0;max-width:64ch}
+  .tabs{display:flex;gap:6px;border-bottom:2px solid var(--line);margin-bottom:20px}
+  .tabs button{font:600 15px/1 "Segoe UI",sans-serif;padding:12px 18px;border:none;background:none;
+       color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
+  .tabs button[aria-selected=true]{color:var(--brick);border-bottom-color:var(--brick)}
+  .tabs button:focus-visible{outline:3px solid var(--ochre);outline-offset:-3px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin-bottom:18px}
+  h2{font:700 19px/1.2 Georgia,serif;margin:0 0 10px}
+  h3{font:700 16px/1.2 "Segoe UI",sans-serif;margin:16px 0 8px;color:var(--olive)}
+  table{width:100%;border-collapse:collapse;font-size:14.5px}
+  caption{text-align:left;font-size:13.5px;color:var(--muted);padding-bottom:8px}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:#EEF2E7;color:var(--olive);font-weight:600}
+  .q{border-left:5px solid var(--ochre);border-radius:8px;background:#FAF6EC;padding:14px 16px;margin-bottom:14px}
+  .q p{margin:0 0 11px;font-size:15.5px}
+  .q p b{color:var(--brick)}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  button.opt{font:inherit;font-size:14px;padding:8px 14px;border-radius:20px;cursor:pointer;
+       border:1.5px solid var(--sage);background:#fff;color:var(--olive)}
+  button.opt:hover:not(:disabled){background:#EEF2E7}
+  button.opt:focus-visible{outline:3px solid var(--ochre);outline-offset:2px}
+  button.opt.right{background:var(--olive);border-color:var(--olive);color:#fff}
+  button.opt.wrong{background:#F6E6E0;border-color:var(--brick);color:var(--brick);text-decoration:line-through}
+  button.opt:disabled{cursor:default;opacity:.85}
+  .fb{margin:11px 0 0;padding:11px 14px;border-radius:6px;font-size:14.5px;display:none}
+  .fb.show{display:block}
+  .fb.ok{background:#EDF3E6;border-left:4px solid var(--olive)}
+  .fb.no{background:#FBEDE7;border-left:4px solid var(--brick)}
+  .steps{counter-reset:s;list-style:none;margin:0;padding:0}
+  .steps li{counter-increment:s;position:relative;padding:12px 0 12px 46px;border-bottom:1px solid var(--line)}
+  .steps li:last-child{border-bottom:none}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:12px;width:30px;height:30px;
+       border-radius:50%;background:var(--olive);color:#fff;display:flex;align-items:center;
+       justify-content:center;font:700 15px "Segoe UI",sans-serif}
+  .steps b{display:block;font-size:15.5px}
+  .steps span{font-size:14.5px;color:var(--muted)}
+  label.chk{display:flex;gap:9px;align-items:flex-start;padding:8px 6px;border-radius:5px;cursor:pointer;font-size:15px}
+  label.chk:hover{background:#F1F5EB}
+  input[type=checkbox]{margin-top:4px;width:17px;height:17px;accent-color:var(--olive);flex:0 0 auto}
+  .meter{margin-top:12px;font-size:14.5px;padding:11px 14px;border-radius:6px;background:#EEF2E7;
+       border-left:4px solid var(--sage)}
+  .note{font-size:13.5px;color:var(--muted);margin-top:18px;border-top:1px solid var(--line);padding-top:12px}
+  [hidden]{display:none!important}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">HCR 231 · Chapter 7 · Practice Widget 3 of 3</div>
+  <h1>Program Finder &amp; Response Builder</h1>
+  <p class="sub">Two tools. The first drills the federal programs until you can tell them apart by who they serve.
+  The second shows you how a written answer earns full credit — using a practice case that is not on the quiz.</p>
+</header>
+
+<div class="tabs" role="tablist" aria-label="Widget sections">
+  <button role="tab" id="t1" aria-controls="p1" aria-selected="true">Program finder</button>
+  <button role="tab" id="t2" aria-controls="p2" aria-selected="false">Response builder</button>
+</div>
+
+<div role="tabpanel" id="p1" aria-labelledby="t1" tabindex="0">
+  <section class="panel">
+    <h2>Who does each program actually serve?</h2>
+    <table>
+      <caption>The distinguishing feature is almost always <em>who is eligible</em>, not what the program provides.</caption>
+      <thead><tr><th style="width:16%">Program</th><th style="width:42%">Serves</th><th>The detail people miss</th></tr></thead>
+      <tbody>
+        <tr><td><strong>WIC</strong></td><td>Pregnant women, new and breastfeeding mothers, infants under 1, children under 5</td><td>Immigration status does not affect eligibility. It provides food and nutrition services — it is not health insurance.</td></tr>
+        <tr><td><strong>Medicaid</strong></td><td>Low-income individuals and families</td><td>It is health insurance. Ten states have not expanded it, which leaves many low-income pregnant women uncovered.</td></tr>
+        <tr><td><strong>CHIP</strong></td><td>Children whose families earn too much for Medicaid but cannot afford private coverage</td><td>It exists to fill the gap <em>above</em> the Medicaid line — that gap is the whole point of the program.</td></tr>
+        <tr><td><strong>Title X</strong></td><td>Low-income people seeking family planning services</td><td>Family planning and reproductive health — contraception, screening. Not food, not insurance.</td></tr>
+        <tr><td><strong>Title V</strong></td><td>Mothers and children broadly, through state block grants</td><td>The only federal legislation dedicated solely to maternal and child health; administered by the Maternal and Child Health Bureau.</td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="panel" aria-label="Program practice questions">
+    <h2>Practice</h2>
+    <div id="deck"></div>
+    <div class="meter" id="score" role="status" aria-live="polite">Answered 0 of 5</div>
+  </section>
+</div>
+
+<div role="tabpanel" id="p2" aria-labelledby="t2" tabindex="0" hidden>
+  <section class="panel">
+    <h2>How a written answer earns full credit</h2>
+    <p style="margin:0 0 4px;font-size:15px">The case questions on this quiz are worth 2 points each, and they are
+    scored on <em>application</em>, not recall. Every one of them follows the same four-move structure:</p>
+    <ol class="steps">
+      <li><b>Name the term exactly as it appears in the Key Terms.</b>
+        <span>"Transportation barrier" earns the point. "She can't really get there" does not.</span></li>
+      <li><b>Label it by type when the question asks you to.</b>
+        <span>If the prompt says one communication barrier and one access barrier, write the labels down. Graders look for them.</span></li>
+      <li><b>Anchor it to a specific detail from the case.</b>
+        <span>Point at the sentence in the scenario that proves it. Generic reasoning that could apply to any patient loses half the point.</span></li>
+      <li><b>Answer every part of the prompt.</b>
+        <span>Several questions ask for three things — a bridge, a cultural value, and something you'd want to learn about the community. Count the asks before you submit.</span></li>
+    </ol>
+  </section>
+
+  <section class="panel">
+    <h2>Try it on a practice case</h2>
+    <p style="margin:0 0 12px;font-size:15px;background:#FAF6EC;border-left:5px solid var(--ochre);
+       border-radius:0 8px 8px 0;padding:13px 15px"><b>Practice case — not on the quiz.</b> Deysi is 19 and four
+    months pregnant. She reads Spanish comfortably but little English. The nearest prenatal clinic is on a bus
+    route, but the route stops running before her shift ends. Her mother has told her that women in their family
+    have always given birth without doctors and that going in only invites problems. Deysi missed her first
+    appointment and has not rescheduled.</p>
+    <h3>Self-check your draft</h3>
+    <p style="margin:0 0 6px;font-size:14.5px;color:var(--muted)">Write an answer on paper first, then check it
+    against these. This tool does not grade content — it checks whether your answer has the right <em>parts</em>.</p>
+    <div id="checks"></div>
+    <div class="meter" id="cscore" role="status" aria-live="polite">0 of 6 checked</div>
+  </section>
+</div>
+
+<p class="note">If you can say your answer out loud in the form <em>"This is a ___, and I know because the case says
+___"</em> — you are writing at the level this quiz rewards.</p>
+</div>
+
+<script>
+/* tabs */
+var tabs=[document.getElementById('t1'),document.getElementById('t2')];
+var pans=[document.getElementById('p1'),document.getElementById('p2')];
+tabs.forEach(function(t,i){
+  t.onclick=function(){ show(i); };
+  t.onkeydown=function(e){
+    if(e.key==='ArrowRight'||e.key==='ArrowLeft'){
+      e.preventDefault(); var n=(i+(e.key==='ArrowRight'?1:1))%2; show(n); tabs[n].focus();
+    }
+  };
+});
+function show(i){
+  tabs.forEach(function(t,k){ t.setAttribute('aria-selected',k===i?'true':'false'); });
+  pans.forEach(function(p,k){ p.hidden=k!==i; });
+}
+
+/* program practice */
+var PROGS=["WIC","Medicaid","CHIP","Title X","Title V"];
+var Q=[
+ {t:"A 22-year-old with no children wants low-cost contraception and a reproductive health screening. She earns too little to afford a private visit.",a:3,
+  w:"Title X funds family planning and reproductive health services for low-income people. No children are involved, so WIC and CHIP don't apply."},
+ {t:"A family of four earns $6,000 more than the Medicaid cutoff. Their two school-age children have been uninsured for a year because private premiums are out of reach.",a:2,
+  w:"CHIP was built precisely for children above the Medicaid line whose families still can't afford private coverage."},
+ {t:"A breastfeeding mother of a 4-month-old needs help affording nutritious food and wants to talk with someone about feeding her baby.",a:0,
+  w:"WIC serves breastfeeding mothers and infants under 1 with food and nutrition services."},
+ {t:"A state health department applies for a federal block grant to fund a statewide home-visiting program for new mothers.",a:4,
+  w:"Title V is the federal legislation dedicated to maternal and child health, administered through state block grants by the Maternal and Child Health Bureau."},
+ {t:"A single father earning below the federal poverty line needs health coverage for himself and his toddler in a state that expanded coverage in 2014.",a:1,
+  w:"Medicaid is health insurance for low-income individuals and families, and it is the single largest source of children's coverage in the U.S."}
+];
+var done=0;
+(function(){
+  var d=document.getElementById('deck');
+  Q.forEach(function(it,i){
+    var s=document.createElement('div'); s.className='q';
+    var p=document.createElement('p');
+    var b=document.createElement('b'); b.textContent='Case '+(i+1)+'. ';
+    p.appendChild(b); p.appendChild(document.createTextNode(it.t)); s.appendChild(p);
+    var g=document.createElement('div'); g.className='opts';
+    g.setAttribute('role','group'); g.setAttribute('aria-label','Choose a program for case '+(i+1));
+    var fb=document.createElement('p'); fb.className='fb';
+    PROGS.forEach(function(name,k){
+      var btn=document.createElement('button');
+      btn.type='button'; btn.className='opt'; btn.textContent=name;
+      btn.onclick=function(){
+        var bs=g.querySelectorAll('button'); if(bs[0].disabled) return;
+        for(var j=0;j<bs.length;j++) bs[j].disabled=true;
+        fb.className='fb show '+(k===it.a?'ok':'no');
+        if(k===it.a){ bs[k].classList.add('right'); fb.textContent='Correct — '+it.w; }
+        else{ bs[k].classList.add('wrong'); bs[it.a].classList.add('right');
+              fb.textContent='Not this one. The fit is '+PROGS[it.a]+'. '+it.w; }
+        done++;
+        document.getElementById('score').textContent='Answered '+done+' of '+Q.length+
+          (done===Q.length?' — before the quiz, try naming each program\u2019s eligible population from memory.':'');
+      };
+      g.appendChild(btn);
+    });
+    s.appendChild(g); s.appendChild(fb); d.appendChild(s);
+  });
+})();
+
+/* self-check */
+var CHECKS=[
+ "I named at least one barrier using the exact wording from the Key Terms.",
+ "I labeled each barrier by type — communication, or access/structural.",
+ "For each barrier, I pointed to a specific line in the case as evidence.",
+ "I chose a bridge that addresses the barrier I actually named, not a different one.",
+ "I named a cultural value from the Key Terms and connected it to Deysi's decision.",
+ "I wrote a question I would want answered about her community — a question, not an assumption."
+];
+(function(){
+  var c=document.getElementById('checks');
+  CHECKS.forEach(function(t,i){
+    var l=document.createElement('label'); l.className='chk';
+    var b=document.createElement('input'); b.type='checkbox';
+    b.onchange=function(){
+      var n=c.querySelectorAll('input:checked').length;
+      document.getElementById('cscore').textContent=n+' of 6 checked'+
+        (n===6?' — that is the shape of a full-credit response.':'');
+    };
+    l.appendChild(b); l.appendChild(document.createTextNode(t)); c.appendChild(l);
+  });
+})();
+</script>
+</body>
+</html>
