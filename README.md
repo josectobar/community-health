@@ -70,6 +70,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/hcr231-ch5-barriers-and-bridges/](models/hcr231-ch5-barriers-and-bridges/): sorting communication barriers and bridges in a rural community case.
 - [models/hcr231-ch5-plain-language-clinic/](models/hcr231-ch5-plain-language-clinic/): flag what fails the reader in a health notice, then rewrite it in three plain sentences.
 - [models/hcr231-ch5-team-and-objective/](models/hcr231-ch5-team-and-objective/): match public health roles to coalition jobs, then assemble and classify a SMART objective.
+- [models/hcr231-ch7-mic-timeline/](models/hcr231-ch7-mic-timeline/): sequence the maternal, infant, and child health window, then place risk factors and reasoning checks within it.
 
 ## Embed snippets
 
@@ -124,6 +125,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Barriers and Bridges in Copper Ridge" src="models/hcr231-ch5-barriers-and-bridges/"></iframe>
 <iframe title="The Plain Language Clinic" src="models/hcr231-ch5-plain-language-clinic/"></iframe>
 <iframe title="Build the Team, Write the Objective" src="models/hcr231-ch5-team-and-objective/"></iframe>
+<iframe title="The MIC Timeline" src="models/hcr231-ch7-mic-timeline/"></iframe>
 ```
 
 ## Files

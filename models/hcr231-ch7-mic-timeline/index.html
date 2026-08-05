@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The MIC Timeline — HCR 231 Chapter 7</title>
+<style>
+  :root{
+    color-scheme: light;
+    --oat:#F6F1E7; --card:#FFFDF8; --ink:#2E2A24; --muted:#6B6154;
+    --olive:#4A5D3A; --sage:#8FA07E; --ochre:#B67A22; --brick:#9C4527; --line:#DDD2BE;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--oat);color:var(--ink);
+       font:16px/1.55 "Segoe UI",-apple-system,Roboto,Helvetica,Arial,sans-serif;padding:24px 16px 56px}
+  .wrap{max-width:920px;margin:0 auto}
+  header{border-bottom:3px double var(--line);padding-bottom:16px;margin-bottom:22px}
+  .eyebrow{font:600 12px/1 "Segoe UI",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--brick)}
+  h1{font:700 30px/1.15 Georgia,"Times New Roman",serif;margin:10px 0 6px}
+  .sub{color:var(--muted);margin:0;max-width:64ch}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin-bottom:20px}
+  h2{font:700 19px/1.2 Georgia,serif;margin:0 0 6px}
+  .lede{font-size:15px;color:var(--muted);margin:0 0 14px}
+  .pool{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:14px}
+  button{font:inherit;cursor:pointer}
+  button:focus-visible{outline:3px solid var(--ochre);outline-offset:2px}
+  .stage{font-size:14.5px;padding:9px 15px;border-radius:22px;border:1.5px solid var(--sage);
+         background:#fff;color:var(--olive)}
+  .stage:hover:not(:disabled){background:#EEF2E7}
+  .stage:disabled{opacity:.35;cursor:default}
+  .track{border:2px dashed var(--line);border-radius:8px;background:#FAF6EC;padding:12px;min-height:74px;
+         display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+  .track:empty::before{content:"Click the stages above in the order they occur across the MIC window.";
+         color:var(--muted);font-size:14px}
+  .slot{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--sage);
+        border-radius:8px;padding:8px 13px;font-size:14.5px}
+  .slot .n{background:var(--olive);color:#fff;width:22px;height:22px;border-radius:50%;
+        display:flex;align-items:center;justify-content:center;font:700 12px "Segoe UI",sans-serif;flex:0 0 auto}
+  .slot.ok{border-color:var(--olive);background:#EDF3E6}
+  .slot.bad{border-color:var(--brick);background:#FBEDE7}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .go{padding:9px 18px;border-radius:6px;border:1.5px solid var(--olive);background:var(--olive);color:#fff}
+  .ghost{padding:9px 18px;border-radius:6px;border:1.5px solid var(--brick);background:#fff;color:var(--brick)}
+  .fb{margin-top:14px;padding:12px 15px;border-radius:6px;font-size:14.5px;display:none}
+  .fb.show{display:block}
+  .fb.ok{background:#EDF3E6;border-left:4px solid var(--olive)}
+  .fb.no{background:#FBEDE7;border-left:4px solid var(--brick)}
+  .q{border-left:5px solid var(--ochre);border-radius:8px;background:#FAF6EC;padding:14px 16px;margin-bottom:14px}
+  .q p{margin:0 0 11px;font-size:15.5px}
+  .q p b{color:var(--brick)}
+  .opts{display:flex;flex-direction:column;gap:7px}
+  .opt{text-align:left;font-size:14.5px;padding:9px 14px;border-radius:7px;border:1.5px solid var(--sage);
+       background:#fff;color:var(--ink)}
+  .opt:hover:not(:disabled){background:#EEF2E7}
+  .opt.right{background:var(--olive);border-color:var(--olive);color:#fff}
+  .opt.wrong{background:#F6E6E0;border-color:var(--brick);color:var(--brick)}
+  .opt:disabled{cursor:default;opacity:.9}
+  .meter{font-size:14.5px;padding:11px 14px;border-radius:6px;background:#EEF2E7;border-left:4px solid var(--sage)}
+  .note{font-size:13.5px;color:var(--muted);margin-top:18px;border-top:1px solid var(--line);padding-top:12px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">HCR 231 · Chapter 7 · Practice Widget for Page 1</div>
+  <h1>The MIC Timeline</h1>
+  <p class="sub">Maternal, infant, and child health covers a wide window, and the chapter divides it into named
+  periods because risks and prevention strategies change as you move across it. Build the timeline, then place
+  the risks where they belong.</p>
+</header>
+
+<section class="panel" aria-labelledby="s1">
+  <h2 id="s1">Part 1 · Put the window in order</h2>
+  <p class="lede">Click the six stages in the order they occur, earliest first.</p>
+  <div class="pool" id="pool" role="group" aria-label="Stages to sequence"></div>
+  <div class="track" id="track" aria-live="polite" aria-label="Your sequence"></div>
+  <div class="row">
+    <button class="go" type="button" id="checkSeq">Check my sequence</button>
+    <button class="ghost" type="button" id="resetSeq">Clear</button>
+  </div>
+  <div class="fb" id="fbSeq" role="status"></div>
+</section>
+
+<section class="panel" aria-labelledby="s2">
+  <h2 id="s2">Part 2 · Where does each factor act?</h2>
+  <p class="lede">Every item below affects MIC outcomes. Identify the period in which it does its work — this is
+  what determines where a prevention program has to intervene.</p>
+  <div id="deck2"></div>
+  <div class="meter" id="score2" role="status" aria-live="polite">Answered 0 of 6</div>
+</section>
+
+<section class="panel" aria-labelledby="s3">
+  <h2 id="s3">Part 3 · Concept checks</h2>
+  <p class="lede">Reasoning, not recall. Each explanation tells you why the other options fail.</p>
+  <div id="deck3"></div>
+  <div class="meter" id="score3" role="status" aria-live="polite">Answered 0 of 5</div>
+</section>
+
+<p class="note">None of these items appear on the in-class activity or the online quiz. What transfers is the habit
+of asking <em>when</em> a factor acts and <em>who</em> can reach it at that moment.</p>
+</div>
+
+<script>
+/* ---------- Part 1: sequence ---------- */
+var STAGES=[
+ {t:"Preconception period",d:"Health of women and men before conception occurs."},
+ {t:"Prenatal period",d:"From conception until the birth process begins."},
+ {t:"Labor and delivery",d:"The birth itself."},
+ {t:"Neonatal period",d:"The earliest segment of the first year of life."},
+ {t:"Postneonatal period",d:"The remainder of the first year."},
+ {t:"Childhood",d:"From the first birthday through adolescence."}
+];
+var shuffled=STAGES.map(function(s,i){return i;});
+for(var i=shuffled.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=shuffled[i];shuffled[i]=shuffled[j];shuffled[j]=t;}
+var picked=[];
+function buildPool(){
+  var p=document.getElementById('pool'); p.innerHTML='';
+  shuffled.forEach(function(idx){
+    var b=document.createElement('button');
+    b.type='button'; b.className='stage'; b.textContent=STAGES[idx].t;
+    b.setAttribute('data-i',idx);
+    b.onclick=function(){ if(b.disabled) return; b.disabled=true; picked.push(idx); drawTrack(); };
+    p.appendChild(b);
+  });
+}
+function drawTrack(){
+  var t=document.getElementById('track'); t.innerHTML='';
+  picked.forEach(function(idx,pos){
+    var s=document.createElement('div'); s.className='slot';
+    var n=document.createElement('span'); n.className='n'; n.textContent=pos+1;
+    s.appendChild(n); s.appendChild(document.createTextNode(STAGES[idx].t));
+    t.appendChild(s);
+  });
+}
+document.getElementById('checkSeq').onclick=function(){
+  var fb=document.getElementById('fbSeq');
+  if(picked.length<6){ fb.className='fb show no'; fb.textContent='Place all six stages before checking.'; return; }
+  var slots=document.querySelectorAll('#track .slot'), wrong=0;
+  picked.forEach(function(idx,pos){
+    if(idx===pos){ slots[pos].classList.add('ok'); } else { slots[pos].classList.add('bad'); wrong++; }
+  });
+  if(!wrong){
+    fb.className='fb show ok';
+    fb.innerHTML='<strong>Correct.</strong> Notice that the window opens <em>before</em> conception. That is the '+
+      'whole argument for preconception care: by the time a pregnancy is confirmed, some of the factors that '+
+      'shape its outcome have already been operating for months. Also notice that the first year of life is '+
+      'split into two named periods — the chapter separates them because deaths in each tend to have different '+
+      'causes, which means different prevention strategies.';
+  } else {
+    fb.className='fb show no';
+    fb.innerHTML='<strong>'+wrong+' stage(s) out of place</strong> (shown in red). Two checkpoints: does your '+
+      'sequence begin before conception, and did you split the first year of life into its two named periods '+
+      'in the right order? Clear and try again.';
+  }
+};
+document.getElementById('resetSeq').onclick=function(){
+  picked=[]; document.getElementById('fbSeq').className='fb';
+  document.querySelectorAll('#pool .stage').forEach(function(b){b.disabled=false;});
+  drawTrack();
+};
+buildPool();
+
+/* ---------- generic MC renderer ---------- */
+function renderDeck(deckId,scoreId,items,labelPrefix){
+  var d=document.getElementById(deckId), done=0;
+  items.forEach(function(it,i){
+    var s=document.createElement('div'); s.className='q';
+    var p=document.createElement('p');
+    var b=document.createElement('b'); b.textContent=labelPrefix+' '+(i+1)+'. ';
+    p.appendChild(b); p.appendChild(document.createTextNode(it.t)); s.appendChild(p);
+    var g=document.createElement('div'); g.className='opts';
+    g.setAttribute('role','group'); g.setAttribute('aria-label',labelPrefix+' '+(i+1));
+    var fb=document.createElement('p'); fb.className='fb';
+    it.o.forEach(function(txt,k){
+      var btn=document.createElement('button');
+      btn.type='button'; btn.className='opt'; btn.textContent=txt;
+      btn.onclick=function(){
+        var bs=g.querySelectorAll('button'); if(bs[0].disabled) return;
+        for(var j=0;j<bs.length;j++) bs[j].disabled=true;
+        fb.className='fb show '+(k===it.a?'ok':'no');
+        if(k===it.a){ bs[k].classList.add('right'); fb.innerHTML='<strong>Correct.</strong> '+it.w; }
+        else{ bs[k].classList.add('wrong'); bs[it.a].classList.add('right');
+              fb.innerHTML='<strong>Not this one.</strong> '+it.w; }
+        done++;
+        document.getElementById(scoreId).textContent='Answered '+done+' of '+items.length+
+          (done===items.length?' — reread the explanations before you move on.':'');
+      };
+      g.appendChild(btn);
+    });
+    s.appendChild(g); s.appendChild(fb); d.appendChild(s);
+  });
+}
+
+/* ---------- Part 2 ---------- */
+renderDeck('deck2','score2',[
+ {t:"A woman's folic acid intake and management of a chronic condition such as diabetes.",
+  o:["Preconception period","Prenatal period","Neonatal period","Childhood"],a:0,
+  w:"These act before conception. Neural tube development and the effects of poorly controlled chronic disease are underway before most women know they are pregnant — which is why preconception care targets men and women who are not yet expecting."},
+ {t:"The number and timing of clinical visits a pregnant woman attends.",
+  o:["Preconception period","Prenatal period","Labor and delivery","Postneonatal period"],a:1,
+  w:"Prenatal care runs from conception to the birth process. The chapter emphasizes that it must be both early and continuous — starting late or stopping partway forfeits much of the benefit."},
+ {t:"Congenital abnormalities present at birth.",
+  o:["Prenatal period","Neonatal period","Postneonatal period","Childhood"],a:1,
+  w:"Congenital abnormalities are a leading cause of death in the earliest segment of the first year. They originate developmentally, but they act on mortality in the neonatal window."},
+ {t:"Safe sleep practices and the risk of sudden infant death syndrome.",
+  o:["Prenatal period","Labor and delivery","Postneonatal period","Childhood"],a:2,
+  w:"SIDS deaths cluster after the neonatal period, in the remainder of the first year. That timing is exactly why safe-sleep education is delivered to families going home rather than in the delivery room alone."},
+ {t:"Whether a child is properly restrained in a motor vehicle.",
+  o:["Neonatal period","Postneonatal period","Childhood","Preconception period"],a:2,
+  w:"Unintentional injury is the leading cause of death among children, and motor vehicle deaths are the most prominent subcategory. Note that this is a behavioral and environmental target — community health has more leverage here than clinical medicine does."},
+ {t:"Whether a family has a consistent, coordinated source of care rather than episodic visits.",
+  o:["Preconception period","Labor and delivery","Neonatal period","Childhood"],a:3,
+  w:"This is the medical home, which the chapter recommends for child health. Its value is continuity — one place that knows the child's history, tracks immunizations, and catches what a series of unconnected visits would miss."}
+],'Factor');
+
+/* ---------- Part 3 ---------- */
+renderDeck('deck3','score3',[
+ {t:"Why does the chapter treat maternal and infant statistics as indicators of a whole community's health, not just of obstetric care?",
+  o:["Because mothers and infants make up most of the population",
+     "Because they are the population most sensitive to gaps in access, nutrition, sanitation, and clinical care, so system strain shows up in their numbers first",
+     "Because their data is the easiest to collect",
+     "Because most community health funding is spent on them"],a:1,
+  w:"The logic is sensitivity, not size. When any part of the system strains — access, sanitation, nutrition, clinical quality — this group registers it before other groups do, which makes their rates an early signal about the whole."},
+ {t:"The chapter links unintended pregnancy to poorer birth outcomes. What is the mechanism it describes?",
+  o:["Unintended pregnancies are more common among older mothers",
+     "Unintended pregnancy directly causes congenital abnormalities",
+     "Unintended pregnancy is associated with delayed prenatal care and health behaviors such as inadequate weight gain and substance use",
+     "Unintended pregnancies are more likely to occur in hospitals without obstetric units"],a:2,
+  w:"Intention changes the timing of care and the behaviors around the pregnancy, and those change outcomes. Naming the mechanism matters — it is what tells you the intervention point is early access to care, not the intention itself."},
+ {t:"A student writes: 'Maternal mortality is the main way we measure how pregnancy affects women.' What is incomplete about this?",
+  o:["Nothing — mortality is the complete measure",
+     "It ignores maternal morbidity, which is far more common and often invisible in headline statistics",
+     "Maternal mortality is not actually measured in the U.S.",
+     "It applies only to first pregnancies"],a:1,
+  w:"Morbidity — illness and lasting complications short of death — affects far more women than mortality does. A community that tracks only deaths will conclude it has a smaller problem than it has."},
+ {t:"The chapter attributes the long-run decline in infant mortality to five factors. Which of these was NOT among them?",
+  o:["Improved sanitation","Economic growth","Mandatory hospital birth laws","Better nutrition"],a:2,
+  w:"The five named are economic growth, improved sanitation, advances in clinical care, improved access to care, and better nutrition. Three of the five happen entirely outside a hospital — that distribution is the point worth carrying forward."},
+ {t:"The Family and Medical Leave Act grants 12 work weeks of unpaid, job-protected leave after a birth. What limitation does the chapter attach to it?",
+  o:["It applies only to mothers, not fathers",
+     "It applies only to businesses above a certain employee threshold",
+     "It expires after the child's first birthday",
+     "It requires a physician's certification of complications"],a:1,
+  w:"The size threshold is the limitation, and it is worth asking who it excludes: workers at small employers, who are also more likely to be low-wage and less likely to have paid leave through any other route. Note also that the leave is unpaid, which limits who can actually use it even when they qualify."}
+],'Question');
+</script>
+</body>
+</html>
