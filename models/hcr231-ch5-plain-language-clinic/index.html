@@ -128,8 +128,8 @@
 
   <div class="model" id="model">
     <h3>One way to write it</h3>
-    <p>Diabetes medicine can make your blood sugar drop too low. If you feel shaky, sweaty, or confused, eat or drink something sugary right away &mdash; half a cup of juice or a few glucose tablets. If you do not feel better in 15 minutes, or you cannot swallow or think clearly, call 911.</p>
-    <p class="note">Notice what changed. The reader is spoken to directly. The symptom words are things a person can feel. &ldquo;Rapid-acting carbohydrate&rdquo; became two examples you could find in a kitchen. And the specialist referral was cut entirely, because it was not usable here, replaced by a next step that is. Your version does not need to match this one. It needs to pass the same five checks.</p>
+    <p>Your diabetes medicine can make your blood sugar drop too low. If you feel shaky or confused, drink half a cup of juice now. Call 911 if you cannot swallow or still feel shaky after 15 minutes.</p>
+    <p class="note">Notice what changed. The reader is spoken to directly. The symptom words are things a person can feel. &ldquo;Rapid-acting carbohydrate&rdquo; became half a cup of juice, something you could find in a kitchen. And the specialist referral was cut entirely, because it was not usable here, replaced by a next step that is. Your version does not need to match this one. It needs to pass the same five checks.</p>
   </div>
 </div>
 
@@ -221,7 +221,9 @@ document.getElementById('check2').addEventListener('click', function(){
     ? 'Technical words still in your text: ' + hit.join(', ')
     : 'No leftover technical words';
 
-  setCheck('c4', /\d/.test(b) || /(every|each|hour|minute|daily|morning|noon)/i.test(b), true);
+  var AMOUNT = /\d|\b(half|quarter|one|two|three|four|five|six|couple|few|cup|cups|glass|glasses|box|tablet|tablets|teaspoon|tablespoon|spoon|piece|slice|serving|sip|bite|handful)\b/i;
+  var TIME = /\b(every|each|hour|hours|minute|minutes|daily|morning|noon|night|right away|now|immediately)\b/i;
+  setCheck('c4', AMOUNT.test(b) || TIME.test(b), true);
   setCheck('c5', BODY.some(function(w){ return c.toLowerCase().indexOf(w) > -1; }), true);
 });
 
