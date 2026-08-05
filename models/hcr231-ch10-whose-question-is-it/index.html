@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Whose Question Is It? | HCR 231 Chapter 10</title>
+<style>
+  :root{
+    color-scheme: light;
+    --parchment:#FBF7F1; --surface:#FFFFFF; --ink:#2C2823; --clay:#8A4033;
+    --sage:#5C6B4C; --ochre:#A87526; --muted:#6B6157; --rule:#E3D9C9;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:24px 16px 56px;background:var(--parchment);color:var(--ink);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:900px;margin:0 auto}
+  header{border-bottom:3px solid var(--clay);padding-bottom:14px;margin-bottom:22px}
+  .eyebrow{font:600 12px/1 inherit;letter-spacing:.14em;text-transform:uppercase;color:var(--ochre);margin:0 0 8px}
+  h1{font-family:Georgia,"Times New Roman",serif;font-size:29px;line-height:1.2;margin:0 0 8px;font-weight:600}
+  .lede{margin:0;color:var(--muted);max-width:64ch}
+  h2{font-family:Georgia,serif;font-size:20px;margin:32px 0 8px}
+  .sect-note{margin:0 0 14px;color:var(--muted);font-size:14.5px;max-width:66ch}
+  .case{background:#F5F1E4;border-left:4px solid var(--sage);padding:14px 18px;border-radius:0 5px 5px 0;font-size:14.5px}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0}
+  .tab{background:var(--surface);border:1px solid var(--rule);border-radius:20px;padding:8px 16px;
+    font:600 14.5px inherit;color:var(--ink);cursor:pointer}
+  .tab[aria-selected="true"]{background:var(--clay);border-color:var(--clay);color:#fff}
+  .tab:focus-visible{outline:3px solid var(--ochre);outline-offset:2px}
+  .pane{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:18px 20px;margin-top:14px}
+  .pane h3{font-family:Georgia,serif;font-size:18px;margin:0 0 4px;color:var(--clay)}
+  .pane .role{margin:0 0 12px;color:var(--muted);font-size:14.5px}
+  .looks{margin:0 0 4px;padding-left:20px;font-size:14.5px}
+  .looks li{margin-bottom:5px}
+  label.q{display:block;font-weight:600;font-size:14px;margin:18px 0 6px}
+  textarea{width:100%;min-height:80px;padding:11px 12px;border:1px solid var(--rule);border-radius:5px;
+    background:var(--parchment);font:inherit;font-size:15px;color:var(--ink);resize:vertical}
+  textarea:focus{outline:3px solid var(--ochre);outline-offset:1px;background:#fff}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:10px;margin-top:14px}
+  .pcard{background:var(--surface);border:1px solid var(--rule);border-top:4px solid var(--ochre);
+    border-radius:6px;padding:14px 15px}
+  .pcard b{font-family:Georgia,serif;font-size:16px;display:block;margin-bottom:3px}
+  .pcard p{margin:0;font-size:14px;color:var(--muted)}
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin-top:12px}
+  .step{background:var(--surface);border:1px solid var(--rule);border-radius:5px;padding:10px 12px;font-size:14px;
+    display:flex;gap:9px;align-items:baseline}
+  .step span{font-family:Georgia,serif;color:var(--ochre);font-weight:700;flex:0 0 auto}
+  .note{background:#F5F1E4;border-left:4px solid var(--ochre);padding:12px 16px;border-radius:0 5px 5px 0;margin-top:26px;font-size:14.5px}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px;padding-top:18px;border-top:1px solid var(--rule)}
+  button.act{background:var(--clay);color:#fff;border:0;border-radius:5px;padding:10px 18px;font:600 15px inherit;cursor:pointer}
+  button.act.ghost{background:transparent;color:var(--clay);border:1.5px solid var(--clay)}
+  button.act:focus-visible{outline:3px solid var(--ochre);outline-offset:2px}
+  @media print{
+    body{background:#fff;padding:0}
+    .bar,.tabs{display:none}
+    .pane{border:1px solid #999;page-break-inside:avoid}
+    textarea{border:1px solid #999;background:#fff}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <p class="eyebrow">HCR 231 &middot; Chapter 10 &middot; Practice Activity 3 of 3</p>
+  <h1>Whose Question Is It?</h1>
+  <p class="lede">Same child, same asthma, four professionals. Each one walks in looking for something different. This activity gives you the lenses; the questions are yours to write.</p>
+</header>
+
+<div class="case"><strong>The case.</strong> Daniel is 16. He was diagnosed with asthma after an emergency room visit last month. A maintenance inhaler was prescribed but never picked up. He lives with his parents and younger siblings in an older apartment where the heat fails in winter. He misses school to watch his siblings. He has been withdrawn lately.</div>
+
+<h2>Part 1 &mdash; Four professional lenses</h2>
+<p class="sect-note">Open each tab, read what that profession tends to focus on, then write the single most important question you think they would ask. There is no answer key here &mdash; different reasonable questions will earn credit as long as they fit the profession.</p>
+
+<div class="tabs" role="tablist" aria-label="Professions" id="tabs"></div>
+<div class="pane" id="pane" role="tabpanel" tabindex="0">
+  <h3 id="pTitle"></h3>
+  <p class="role" id="pRole"></p>
+  <p style="font-weight:600;font-size:14px;margin:0 0 6px">This profession tends to look at:</p>
+  <ul class="looks" id="pLooks"></ul>
+  <label class="q" for="pQ">The main question this profession would ask about Daniel:</label>
+  <textarea id="pQ" placeholder="Write one clear question."></textarea>
+  <label class="q" for="pI">One type of information they would gather to answer it:</label>
+  <textarea id="pI" placeholder="What would they collect, and from where?"></textarea>
+</div>
+
+<h2>Part 2 &mdash; Four ethical principles</h2>
+<p class="sect-note">A community health worker learns that the family has been sharing a neighbor's leftover inhaler, and is asked to keep it private. Use these definitions to decide which principle sits on each side of that decision.</p>
+<div class="grid">
+  <div class="pcard"><b>Autonomy</b><p>Respecting a person's right to make their own decisions about their life and their information.</p></div>
+  <div class="pcard"><b>Beneficence</b><p>Acting to do good and to benefit the person.</p></div>
+  <div class="pcard"><b>Nonmaleficence</b><p>Avoiding harm.</p></div>
+  <div class="pcard"><b>Justice</b><p>Treating people fairly and distributing resources equitably.</p></div>
+</div>
+<label class="q" for="e1">Which principle supports keeping Elena's disclosure private, and what could go wrong if the CHW follows it?</label>
+<textarea id="e1"></textarea>
+<label class="q" for="e2">Which principle supports acting on the information, and what could go wrong if the CHW follows that one instead?</label>
+<textarea id="e2"></textarea>
+
+<h2>Part 3 &mdash; Seven steps for managing implicit bias</h2>
+<p class="sect-note">From Chapter 10. Read all seven, then apply two of them to a professional who wrote that a family "seems disengaged" after one meeting.</p>
+<div class="steps" id="stepBox"></div>
+<label class="q" for="b1">Pick TWO steps. What could the professional have said or done differently if she had used them?</label>
+<textarea id="b1" style="min-height:110px" placeholder="Step:&#10;What she could have done:&#10;&#10;Step:&#10;What she could have done:"></textarea>
+
+<div class="note"><strong>Step 4 catches people off guard.</strong> "See differences" does not mean judge them. It means the opposite of saying you do not notice race or culture &mdash; because pretending differences are not there also erases the conditions that create disparities.</div>
+
+<div class="bar">
+  <button class="act" type="button" onclick="window.print()">Print or save my work</button>
+  <button class="act ghost" type="button" id="reset">Start over</button>
+</div>
+</div>
+
+<script>
+var PROS = [
+ {n:"Nurse", r:"Focuses on the body, the medication, and how the plan of care is actually working at home.",
+  l:["How often symptoms happen and what sets them off","Whether the inhaler is being used, and used correctly","Whether the family has a spacer and knows the technique","Warning signs that mean go back to the emergency room"]},
+ {n:"Social worker", r:"Focuses on the conditions around the patient that make care possible or impossible.",
+  l:["Housing conditions, rent stability, and landlord repairs","Income, benefits the family qualifies for but has not enrolled in","Who is caring for the younger children, and at what cost to Daniel","Family stress, and whether Daniel's withdrawal needs attention"]},
+ {n:"Public health researcher", r:"Focuses on the pattern across a population rather than one household.",
+  l:["How common childhood asthma is in this ZIP code","Which groups have the highest rates and why","What in the environment (housing age, air quality, heat) drives it","Whether the rate is rising, falling, or holding steady"]},
+ {n:"Health educator", r:"Focuses on what people understand and what would close the gap.",
+  l:["What the family believes asthma is and what causes it","What reading level and language their materials need to be in","Whether anyone ever checked for understanding","What teaching method would actually work in this home"]}
+];
+
+var STEPS = ["Acknowledge bias","Challenge current negative biases","Be empathetic","See differences",
+             "Be an ally","Recognize this is stressful and painful","Engage in dialogue"];
+
+var tabs = document.getElementById('tabs'), current = 0, saved = {};
+
+PROS.forEach(function(p,i){
+  var b = document.createElement('button');
+  b.type='button'; b.className='tab'; b.setAttribute('role','tab');
+  b.setAttribute('aria-selected', i===0 ? 'true':'false');
+  b.textContent = p.n;
+  b.addEventListener('click', function(){ show(i); });
+  tabs.appendChild(b);
+});
+
+function stash(){
+  saved[current] = {q:document.getElementById('pQ').value, i:document.getElementById('pI').value};
+}
+function show(i){
+  stash();
+  current = i;
+  var p = PROS[i];
+  Array.prototype.forEach.call(tabs.children, function(b,j){
+    b.setAttribute('aria-selected', j===i ? 'true':'false');
+  });
+  document.getElementById('pTitle').textContent = p.n;
+  document.getElementById('pRole').textContent = p.r;
+  var ul = document.getElementById('pLooks'); ul.innerHTML='';
+  p.l.forEach(function(x){ var li=document.createElement('li'); li.textContent=x; ul.appendChild(li); });
+  document.getElementById('pQ').value = saved[i] ? saved[i].q : '';
+  document.getElementById('pI').value = saved[i] ? saved[i].i : '';
+}
+document.getElementById('pQ').addEventListener('input', stash);
+document.getElementById('pI').addEventListener('input', stash);
+
+var sb = document.getElementById('stepBox');
+STEPS.forEach(function(s,i){
+  var d = document.createElement('div'); d.className='step';
+  var n = document.createElement('span'); n.textContent = (i+1)+'.';
+  d.appendChild(n); d.appendChild(document.createTextNode(s));
+  sb.appendChild(d);
+});
+
+document.getElementById('reset').addEventListener('click', function(){
+  saved = {};
+  ['pQ','pI','e1','e2','b1'].forEach(function(id){ document.getElementById(id).value=''; });
+  show(0);
+});
+
+show(0);
+</script>
+</body>
+</html>
