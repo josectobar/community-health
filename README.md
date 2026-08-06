@@ -78,6 +78,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/hcr231-ch10-whose-question-is-it/](models/hcr231-ch10-whose-question-is-it/): write the question each profession would ask about one case, then work through ethical principles and implicit bias steps.
 - [models/ch12-program-fit-analyzer/](models/ch12-program-fit-analyzer/): matching a scenario to the right prevention or treatment program.
 - [models/ch12-plain-language-checker/](models/ch12-plain-language-checker/): rewriting a health message in plain, respectful language.
+- [models/ch12-millbrook-team-builder/](models/ch12-millbrook-team-builder/): staffing a rural naloxone program across professions.
 
 ## Embed snippets
 
@@ -140,6 +141,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Whose Question Is It" src="models/hcr231-ch10-whose-question-is-it/"></iframe>
 <iframe title="Program Fit Analyzer" src="models/ch12-program-fit-analyzer/"></iframe>
 <iframe title="Plain Language Checker" src="models/ch12-plain-language-checker/"></iframe>
+<iframe title="Millbrook Team Builder" src="models/ch12-millbrook-team-builder/"></iframe>
 ```
 
 ## Files

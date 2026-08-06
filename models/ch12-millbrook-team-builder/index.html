@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Millbrook Team Builder | HCR 231 Chapter 12</title>
+<style>
+:root { color-scheme: light; }
+</style>
+</head>
+<body style="margin:0; padding:18px; font-family: Arial, Helvetica, sans-serif; color:#2b2b2b; background:#ffffff; line-height:1.55;">
+
+<main style="max-width:880px; margin:0 auto;">
+
+  <header style="border-left:6px solid #7D8F6A; background:#F5F8F1; padding:14px 18px; margin-bottom:20px;">
+    <p style="margin:0 0 5px 0; font-size:12px; letter-spacing:1px; text-transform:uppercase; color:#4d6b3f; font-weight:bold;">HCR 231 &middot; Chapter 12 &middot; Practice Widget 3</p>
+    <h1 style="margin:0 0 6px 0; font-size:22px; color:#3d5732;">Millbrook Team Builder</h1>
+    <p style="margin:0; font-size:14px;">Millbrook is starting a naloxone program. Six jobs need doing. Decide who should take each one, then explain what makes that person the right fit. There is no answer key here &mdash; the reasoning is the work.</p>
+  </header>
+
+  <section aria-labelledby="h-case">
+    <h2 id="h-case" style="font-size:17px; color:#3d5732; border-bottom:2px solid #D3DEC8; padding-bottom:5px;">The case</h2>
+    <p style="font-size:15px; background:#F7FAFA; border:1px solid #C9DAD8; padding:14px 16px; margin:10px 0 0 0;">Millbrook is a rural town of 18,000. Opioid overdose deaths rose from 3 to 14 in three years, and 40% of overdose patients in the emergency room have been treated more than once. Unemployment is at 14%. Overdose survivors avoid the clinic because they fear being judged. Three students were found with prescription pills on campus. Families do not know how to help a relative who is using. No naloxone is available to the public.</p>
+  </section>
+
+  <section aria-labelledby="h-assign" style="margin-top:24px;">
+    <h2 id="h-assign" style="font-size:17px; color:#4d6b3f; border-bottom:2px solid #D3DEC8; padding-bottom:5px;">Assign the work</h2>
+    <div id="taskList"></div>
+    <button id="reviewBtn" type="button" style="margin-top:14px; padding:10px 22px; font-size:14px; font-weight:bold; color:#fff; background:#7D8F6A; border:none; cursor:pointer;">Review my team</button>
+    <button id="resetBtn" type="button" style="margin-top:14px; margin-left:8px; padding:10px 22px; font-size:14px; color:#4d6b3f; background:#fff; border:1px solid #8fa07d; cursor:pointer;">Start over</button>
+  </section>
+
+  <section id="review" aria-labelledby="h-review" aria-live="polite" style="margin-top:24px; display:none;">
+    <h2 id="h-review" style="font-size:17px; color:#1f4d4a; border-bottom:2px solid #C9DAD8; padding-bottom:5px;">Review</h2>
+    <div id="reviewBody"></div>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  var people = ["Community health worker (promotora)","Pharmacist","Nurse","Social worker","School counselor","Peer recovery support specialist","Physician","Paramedic","Health educator"];
+  var tasks = [
+    {id:"t1", label:"Reach the overdose survivors who will not come into the clinic."},
+    {id:"t2", label:"Make sure the naloxone doses are stored correctly and have not expired."},
+    {id:"t3", label:"Get prevention information to the students on campus."},
+    {id:"t4", label:"Help an uninsured resident find housing and apply for coverage."},
+    {id:"t5", label:"Write the flyer and check that families can actually read and understand it."},
+    {id:"t6", label:"Train people to give naloxone at the moment an overdose is happening."}
+  ];
+
+  var listEl = document.getElementById('taskList');
+  var html = '';
+  for(var i=0;i<tasks.length;i++){
+    var t = tasks[i];
+    html += '<div style="border:1px solid #DDE5D5; border-left:5px solid #7D8F6A; background:' + (i%2 ? '#F8FAF5' : '#FFFFFF') + '; padding:12px 16px; margin-bottom:10px;">'
+      + '<p style="margin:0 0 8px 0; font-size:15px; font-weight:bold; color:#3d5732;">Job ' + (i+1) + '. ' + t.label + '</p>'
+      + '<label for="' + t.id + '_p" style="display:block; font-size:13px; font-weight:bold; margin-bottom:4px;">Who takes this job?</label>'
+      + '<select id="' + t.id + '_p" style="width:100%; padding:8px; font-size:14px; border:1px solid #8fa07d; background:#fff; margin-bottom:8px;"><option value="">Choose one&hellip;</option>';
+    for(var j=0;j<people.length;j++){ html += '<option>' + people[j] + '</option>'; }
+    html += '</select>'
+      + '<label for="' + t.id + '_r" style="display:block; font-size:13px; font-weight:bold; margin-bottom:4px;">What can this person do here that nobody else on your team can?</label>'
+      + '<input id="' + t.id + '_r" type="text" placeholder="Only this person can&hellip;" style="width:100%; padding:8px; font-size:14px; border:1px solid #8fa07d; box-sizing:border-box;">'
+      + '</div>';
+  }
+  listEl.innerHTML = html;
+
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    for(var i=0;i<tasks.length;i++){
+      document.getElementById(tasks[i].id + '_p').value = '';
+      document.getElementById(tasks[i].id + '_r').value = '';
+    }
+    document.getElementById('review').style.display = 'none';
+  });
+
+  document.getElementById('reviewBtn').addEventListener('click', function(){
+    var picks = [], reasons = [], missing = 0, thin = 0;
+    for(var i=0;i<tasks.length;i++){
+      var p = document.getElementById(tasks[i].id + '_p').value;
+      var r = document.getElementById(tasks[i].id + '_r').value.trim();
+      picks.push(p); reasons.push(r);
+      if(!p) missing++;
+      if(r.split(/\s+/).filter(Boolean).length < 5) thin++;
+    }
+    var body = document.getElementById('reviewBody');
+    document.getElementById('review').style.display = 'block';
+    if(missing > 0){
+      body.innerHTML = '<p role="alert" style="font-size:15px; color:#8c3b3b;">' + missing + ' job(s) still have nobody assigned. Fill in every job, then review.</p>';
+      return;
+    }
+    var distinct = [];
+    for(var k=0;k<picks.length;k++){ if(distinct.indexOf(picks[k])===-1) distinct.push(picks[k]); }
+
+    var dupReasons = 0;
+    for(var a=0;a<reasons.length;a++){
+      for(var b=a+1;b<reasons.length;b++){
+        if(reasons[a] && reasons[a].toLowerCase() === reasons[b].toLowerCase()) dupReasons++;
+      }
+    }
+
+    var out = '<div style="border:1px solid #C9DAD8; background:#F7FAFA; padding:16px 18px;">';
+    out += '<p style="margin:0 0 10px 0; font-size:15px;">Your team uses <strong>' + distinct.length + '</strong> different professional' + (distinct.length===1?'':'s') + ' across six jobs.</p>';
+    out += '<ul style="margin:0 0 14px 0; padding-left:20px; font-size:14px;">';
+    if(distinct.length <= 2){
+      out += '<li style="margin-bottom:7px;">Two or fewer professionals are covering all six jobs. Go back through the list and ask, for each job, whether the person you assigned was actually trained to do it &mdash; or whether you assigned them because they were already on your list.</li>';
+    } else if(distinct.length >= 5){
+      out += '<li style="margin-bottom:7px;">You have spread the work across five or more professionals. A wide team covers more ground, but it also needs coordination. Who on your team keeps everyone talking to each other?</li>';
+    } else {
+      out += '<li style="margin-bottom:7px;">Your team size sits in a workable range. Check whether any one person is carrying jobs that pull them in two very different directions.</li>';
+    }
+    if(thin > 0){
+      out += '<li style="margin-bottom:7px;">' + thin + ' of your reasons are very short. On the quiz, "they are good at it" earns nothing. Name the training, the access, or the relationship that makes this person the only right fit.</li>';
+    } else {
+      out += '<li style="margin-bottom:7px;">You wrote a developed reason for every job. Now test each one: would that same sentence be true of a different professional? If it would, it is not yet a differentiated reason.</li>';
+    }
+    if(dupReasons > 0){
+      out += '<li style="margin-bottom:7px;">Two or more of your reasons are worded the same way. Different professions bring different things &mdash; if the reason is identical, one of the two assignments probably needs rethinking.</li>';
+    }
+    out += '<li style="margin-bottom:7px;">Look at the Millbrook facts again. Which fact in the case does each of your assignments respond to? If a job on your team does not connect to any fact in the case, ask why it is on the list.</li>';
+    out += '<li>Pick any two people on your team. If one of them left town tomorrow, what would Millbrook lose that the other could not replace? That question is the whole point of interprofessional practice.</li>';
+    out += '</ul>';
+    out += '<p style="margin:0; font-size:13px; color:#555; border-top:1px solid #C9DAD8; padding-top:10px;">This tool does not score your team. There is more than one defensible way to staff this program, and your reasoning is what makes an answer strong.</p>';
+    out += '</div>';
+    body.innerHTML = out;
+  });
+})();
+</script>
+</body>
+</html>
