@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plain Language Checker | HCR 231 Chapter 12</title>
+<style>
+:root { color-scheme: light; }
+</style>
+</head>
+<body style="margin:0; padding:18px; font-family: Arial, Helvetica, sans-serif; color:#2b2b2b; background:#ffffff; line-height:1.55;">
+
+<main style="max-width:860px; margin:0 auto;">
+
+  <header style="border-left:6px solid #B07D2B; background:#FBF6EC; padding:14px 18px; margin-bottom:20px;">
+    <p style="margin:0 0 5px 0; font-size:12px; letter-spacing:1px; text-transform:uppercase; color:#8a5f16; font-weight:bold;">HCR 231 &middot; Chapter 12 &middot; Practice Widget 2</p>
+    <h1 style="margin:0 0 6px 0; font-size:22px; color:#7a5413;">Plain Language Checker</h1>
+    <p style="margin:0; font-size:14px;">Practice rewriting a health message so a community member can read it and act on it. This tool checks your writing against the plain-language checklist. It does not write the message for you.</p>
+  </header>
+
+  <section aria-labelledby="h-orig">
+    <h2 id="h-orig" style="font-size:17px; color:#8a5f16; border-bottom:2px solid #EBDCC0; padding-bottom:5px;">The message to rewrite</h2>
+    <label for="samplePick" style="display:block; font-size:14px; font-weight:bold; margin:10px 0 5px 0;">Practice message</label>
+    <select id="samplePick" style="width:100%; padding:9px; font-size:14px; border:1px solid #c4ab7c; background:#fff; margin-bottom:12px;">
+      <option value="0">Message A &mdash; Free hepatitis screening</option>
+      <option value="1">Message B &mdash; Teen substance use screening at the school clinic</option>
+      <option value="2">Message C &mdash; Treatment medication program</option>
+    </select>
+    <blockquote id="sampleText" role="region" aria-live="polite" style="margin:0; background:#F7F4EE; border:1px solid #E0D5BC; padding:14px 16px; font-size:15px; font-style:italic;"></blockquote>
+  </section>
+
+  <section aria-labelledby="h-write" style="margin-top:24px;">
+    <h2 id="h-write" style="font-size:17px; color:#1f4d4a; border-bottom:2px solid #C9DAD8; padding-bottom:5px;">Your rewrite</h2>
+    <p style="font-size:14px;">Write three or four short sentences in everyday words. Make up a realistic address and hours if the original does not give them &mdash; a reader needs to know where to go.</p>
+    <label for="draft" style="position:absolute; left:-9999px;">Your plain language rewrite</label>
+    <textarea id="draft" rows="7" placeholder="Write your version here&hellip;" style="width:100%; padding:11px; font-size:15px; border:1px solid #9db3b1; box-sizing:border-box; font-family:Arial, Helvetica, sans-serif;"></textarea>
+    <button id="runBtn" type="button" style="margin-top:12px; padding:10px 22px; font-size:14px; font-weight:bold; color:#fff; background:#B07D2B; border:none; cursor:pointer;">Check my rewrite</button>
+    <button id="clearBtn" type="button" style="margin-top:12px; margin-left:8px; padding:10px 22px; font-size:14px; color:#7a5413; background:#fff; border:1px solid #c4ab7c; cursor:pointer;">Clear</button>
+  </section>
+
+  <section id="report" aria-labelledby="h-report" aria-live="polite" style="margin-top:24px; display:none;">
+    <h2 id="h-report" style="font-size:17px; color:#4d6b3f; border-bottom:2px solid #D3DEC8; padding-bottom:5px;">Checklist report</h2>
+    <div id="reportBody"></div>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  var samples = [
+    "PUBLIC HEALTH ADVISORY: The county is facilitating a no-cost serologic screening initiative for hepatitis C virus among individuals with a history of parenteral substance administration. Interested parties may present to the mobile unit during operational hours to undergo venipuncture and receive results within a 14-day interval.",
+    "NOTICE TO GUARDIANS: The school-based health center will be implementing universal adolescent substance use screening utilizing a validated brief intervention protocol. Students identified as exhibiting elevated risk indicators will be referred to appropriate community-based treatment resources by clinical staff.",
+    "PROGRAM ANNOUNCEMENT: Medication Assisted Treatment, comprising FDA-approved pharmacotherapy in conjunction with behavioral counseling, is now obtainable for individuals presenting with opioid use disorder. Eligibility determination requires completion of a comprehensive intake evaluation. Uninsured individuals may qualify for financial assistance."
+  ];
+  var jargon = ["serologic","parenteral","venipuncture","interval","facilitating","initiative","implementing","universal","validated","protocol","indicators","comprising","pharmacotherapy","conjunction","behavioral counseling","obtainable","presenting with","eligibility determination","comprehensive","intake evaluation","utilizing","disseminated","administration","antagonist","respiratory depression","intranasal","hydrochloride","mitigation","clinical staff","community-based","adolescent","operational hours","posted business hours","interested parties","individuals exhibiting","elevated risk","referral protocol","assessment"];
+  var judgy = ["abuse","abusing","abuser","addict","addicts","junkie","clean","dirty","before it is too late","before it's too late","failed","non-adherent","noncompliant","refuses","substance abuser"];
+
+  var sp = document.getElementById('samplePick');
+  var stx = document.getElementById('sampleText');
+  function paint(){ stx.textContent = samples[parseInt(sp.value,10)]; }
+  sp.addEventListener('change', function(){ paint(); document.getElementById('report').style.display='none'; });
+  paint();
+
+  document.getElementById('clearBtn').addEventListener('click', function(){
+    document.getElementById('draft').value='';
+    document.getElementById('report').style.display='none';
+  });
+
+  function found(list, low){
+    var hits=[];
+    for(var i=0;i<list.length;i++){
+      if(low.indexOf(list[i]) !== -1) hits.push(list[i]);
+    }
+    return hits;
+  }
+
+  function line(ok, good, bad){
+    var mark = ok ? '&#10003;' : '&#9679;';
+    var col  = ok ? '#4d6b3f' : '#8a5f16';
+    return '<li style="margin-bottom:7px; color:' + col + ';"><strong>' + mark + '</strong> <span style="color:#2b2b2b;">' + (ok ? good : bad) + '</span></li>';
+  }
+
+  document.getElementById('runBtn').addEventListener('click', function(){
+    var raw = document.getElementById('draft').value.trim();
+    var body = document.getElementById('reportBody');
+    document.getElementById('report').style.display='block';
+    if(raw.length < 20){
+      body.innerHTML = '<p role="alert" style="color:#8c3b3b; font-size:15px;">Write your rewrite first, then check it.</p>';
+      return;
+    }
+    var low = ' ' + raw.toLowerCase().replace(/\s+/g,' ') + ' ';
+    var sentences = raw.split(/[.!?]+/).filter(function(s){ return s.trim().length>2; });
+    var words = raw.split(/\s+/).filter(Boolean);
+    var longest = 0;
+    for(var i=0;i<sentences.length;i++){
+      var n = sentences[i].trim().split(/\s+/).length;
+      if(n>longest) longest = n;
+    }
+    var jHits = found(jargon, low);
+    var jHits2 = [];
+    for (var k=0;k<jHits.length;k++){ if(jHits2.indexOf(jHits[k])===-1) jHits2.push(jHits[k]); }
+    var kHits = found(judgy, low);
+
+    var hasCost   = /\bfree\b|no cost|costs? nothing|no charge|\$/.test(low);
+    var hasWhere  = /street|ave|avenue|road\b|rd\b|blvd|suite|room \d|building|clinic at|located at|\d{2,5} [a-z]/.test(low);
+    var hasWhen   = /monday|tuesday|wednesday|thursday|friday|saturday|sunday|a\.m|p\.m|am\b|pm\b|weekday|hours/.test(low);
+    var hasWho    = /anyone|any adult|any resident|you can|everyone|all students|parents can|families can|no insurance needed|you do not need/.test(low);
+    var hasWhat   = /save|saves|reverse|stop an overdose|breathe|breathing|protect|test|screen|check|treat|helps you|helps people/.test(low);
+
+    var html = '<div style="border:1px solid #DDE5D5; background:#F5F8F1; padding:16px 18px;">';
+    html += '<p style="margin:0 0 10px 0; font-size:15px; font-weight:bold; color:#4d6b3f;">Does your version tell the reader&hellip;</p><ul style="margin:0 0 14px 0; padding-left:20px; font-size:14px; list-style:none;">';
+    html += line(hasWhat,  'What it does &mdash; you describe what happens for the person.', 'What it does &mdash; a reader may not know what this actually does for them. Say it in one plain sentence.');
+    html += line(hasWho,   'Who can get it &mdash; you say directly who is included.', 'Who can get it &mdash; nothing tells the reader whether they qualify. Say it outright.');
+    html += line(hasCost,  'What it costs &mdash; the cost is stated.', 'What it costs &mdash; if it is free, the word "free" should appear.');
+    html += line(hasWhere, 'Where to go &mdash; there is a place a reader could actually find.', 'Where to go &mdash; no address or specific place. "The mobile unit" is not a location.');
+    html += line(hasWhen,  'When to go &mdash; days or hours are given.', 'When to go &mdash; no days or hours. "Operational hours" tells a reader nothing.');
+    html += '</ul>';
+
+    html += '<p style="margin:0 0 10px 0; font-size:15px; font-weight:bold; color:#4d6b3f;">And is it free of&hellip;</p><ul style="margin:0 0 14px 0; padding-left:20px; font-size:14px; list-style:none;">';
+    if(jHits2.length === 0){
+      html += line(true, 'Words a reader would have to look up &mdash; none flagged.', '');
+    } else {
+      html += '<li style="margin-bottom:7px; color:#8a5f16;"><strong>&#9679;</strong> <span style="color:#2b2b2b;">These words came through from the original and are likely to stop a reader: <strong>' + jHits2.join(', ') + '</strong>. Say each one a different way.</span></li>';
+    }
+    if(kHits.length === 0){
+      html += line(true, 'Wording that judges the reader &mdash; none flagged.', '');
+    } else {
+      html += '<li style="margin-bottom:7px; color:#8c3b3b;"><strong>&#9679;</strong> <span style="color:#2b2b2b;">These words carry judgment or stigma: <strong>' + kHits.join(', ') + '</strong>. Plain wording still has to be respectful wording.</span></li>';
+    }
+    html += line(longest <= 20, 'Long sentences &mdash; your longest is ' + longest + ' words, which is readable.', 'Long sentences &mdash; your longest runs ' + longest + ' words. Break it into two.');
+    html += '</ul>';
+
+    html += '<p style="margin:0; font-size:13px; color:#555; border-top:1px solid #cdd8c3; padding-top:10px;">Length: ' + words.length + ' words in ' + sentences.length + ' sentences. This tool matches keywords, so it can miss things. A clear check mark is not the same as a strong rewrite &mdash; read your version out loud and ask whether a neighbor could follow it.</p>';
+    html += '</div>';
+    body.innerHTML = html;
+  });
+})();
+</script>
+</body>
+</html>
