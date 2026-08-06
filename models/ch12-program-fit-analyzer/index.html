@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Program Fit Analyzer | HCR 231 Chapter 12</title>
+<style>
+:root { color-scheme: light; }
+</style>
+</head>
+<body style="margin:0; padding:18px; font-family: Arial, Helvetica, sans-serif; color:#2b2b2b; background:#ffffff; line-height:1.55;">
+
+<main style="max-width:860px; margin:0 auto;">
+
+  <header style="border-left:6px solid #2F6F6B; background:#F2F6F5; padding:14px 18px; margin-bottom:20px;">
+    <p style="margin:0 0 5px 0; font-size:12px; letter-spacing:1px; text-transform:uppercase; color:#2F6F6B; font-weight:bold;">HCR 231 &middot; Chapter 12 &middot; Practice Widget 1</p>
+    <h1 style="margin:0 0 6px 0; font-size:22px; color:#1f4d4a;">Program Fit Analyzer</h1>
+    <p style="margin:0; font-size:14px;">Work through a scenario the way you will on the quiz. This tool will not tell you which program is right. It narrows the field and then asks you to defend your choice.</p>
+  </header>
+
+  <section aria-labelledby="h-scenario">
+    <h2 id="h-scenario" style="font-size:17px; color:#1f4d4a; border-bottom:2px solid #C9DAD8; padding-bottom:5px;">Step 1. Choose a practice scenario</h2>
+    <label for="scenarioPick" style="display:block; font-size:14px; font-weight:bold; margin-bottom:5px;">Practice scenario</label>
+    <select id="scenarioPick" style="width:100%; padding:9px; font-size:14px; border:1px solid #9db3b1; background:#fff; margin-bottom:12px;">
+      <option value="0">Scenario A &mdash; Fourth-grade classroom</option>
+      <option value="1">Scenario B &mdash; Emergency room nurse</option>
+      <option value="2">Scenario C &mdash; Rural mother of three</option>
+      <option value="3">Scenario D &mdash; Church volunteer group</option>
+      <option value="4">Scenario E &mdash; County jail release program</option>
+      <option value="5">Scenario F &mdash; Downtown outreach van</option>
+    </select>
+    <div id="scenarioText" role="region" aria-live="polite" style="background:#F7FAFA; border:1px solid #C9DAD8; padding:14px 16px; font-size:15px;"></div>
+  </section>
+
+  <section aria-labelledby="h-analyze" style="margin-top:24px;">
+    <h2 id="h-analyze" style="font-size:17px; color:#8a5f16; border-bottom:2px solid #EBDCC0; padding-bottom:5px;">Step 2. Analyze before you choose</h2>
+
+    <label for="qStage" style="display:block; font-size:14px; font-weight:bold; margin:12px 0 5px 0;">Where is this person on the timeline?</label>
+    <select id="qStage" style="width:100%; padding:9px; font-size:14px; border:1px solid #c4ab7c; background:#fff;">
+      <option value="">Choose one&hellip;</option>
+      <option value="prevention">Has never used substances &mdash; prevention</option>
+      <option value="early">Early or risky use, may not see a problem yet</option>
+      <option value="emergency">An overdose could happen right now &mdash; emergency</option>
+      <option value="active">Using now, not ready or able to stop</option>
+      <option value="treatment">Ready for treatment, or in treatment now</option>
+      <option value="after">Finished treatment, needs support to stay well</option>
+    </select>
+
+    <label for="qWho" style="display:block; font-size:14px; font-weight:bold; margin:12px 0 5px 0;">Who is asking for help?</label>
+    <select id="qWho" style="width:100%; padding:9px; font-size:14px; border:1px solid #c4ab7c; background:#fff;">
+      <option value="">Choose one&hellip;</option>
+      <option>The person who uses substances</option>
+      <option>A family member</option>
+      <option>A health provider</option>
+      <option>A community member or volunteer</option>
+      <option>A school or agency</option>
+    </select>
+
+    <label for="qProblem" style="display:block; font-size:14px; font-weight:bold; margin:12px 0 5px 0;">In your own words, what is the immediate problem stated in the scenario?</label>
+    <input id="qProblem" type="text" placeholder="Example: nowhere safe to sleep" style="width:100%; padding:9px; font-size:14px; border:1px solid #c4ab7c; box-sizing:border-box;">
+
+    <button id="narrowBtn" type="button" style="margin-top:14px; padding:10px 20px; font-size:14px; font-weight:bold; color:#fff; background:#2F6F6B; border:none; cursor:pointer;">Narrow the field</button>
+    <p id="narrowErr" role="alert" style="color:#8c3b3b; font-size:14px; margin:8px 0 0 0;"></p>
+  </section>
+
+  <section id="resultBox" aria-labelledby="h-result" style="margin-top:24px; display:none;">
+    <h2 id="h-result" style="font-size:17px; color:#4d6b3f; border-bottom:2px solid #D3DEC8; padding-bottom:5px;">Step 3. Decide, then defend</h2>
+    <div aria-live="polite">
+      <p style="font-size:14px; margin:12px 0 8px 0;">Based on the stage you selected, these programs are worth considering. More than one is listed on purpose. Check each against the target population and against the problem you wrote down.</p>
+      <div id="candidates"></div>
+      <label for="finalPick" style="display:block; font-size:14px; font-weight:bold; margin:16px 0 5px 0;">My choice, and one reason it fits</label>
+      <textarea id="finalPick" rows="3" placeholder="I would choose ______ because ______" style="width:100%; padding:9px; font-size:14px; border:1px solid #8fa07d; box-sizing:border-box;"></textarea>
+      <button id="checkBtn" type="button" style="margin-top:10px; padding:10px 20px; font-size:14px; font-weight:bold; color:#fff; background:#7D8F6A; border:none; cursor:pointer;">Check my reasoning</button>
+      <div id="selfCheck" role="region" aria-live="polite" style="margin-top:14px;"></div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  var scenarios = [
+    {t:"A fourth-grade teacher wants a program that will run for the next three years and teach her students how to handle stress and turn down a friend who offers them something."},
+    {t:"An emergency room nurse keeps seeing patients who drink far more than they realize. She has about four minutes with each one and wants something she can actually use in that time."},
+    {t:"A mother in a rural county has opioid use disorder. The nearest treatment center is 90 minutes away. She has tried to stop on her own twice and both times the withdrawal sent her back."},
+    {t:"A church group hosts a weekly community dinner in a neighborhood where two people have overdosed in the last month. They want to be ready if it happens during dinner."},
+    {t:"A county jail is releasing a 28-year-old woman next week. She completed a treatment program inside, but the address she gave is her old apartment, where she used to use."},
+    {t:"An outreach van serves people living downtown who inject drugs. Hepatitis C rates in this group have doubled. Many of the people served say they are not ready to stop using."}
+  ];
+  var byStage = {
+    prevention: ["LifeSkills Training","Family therapy"],
+    early: ["SBIRT","LifeSkills Training","Family therapy"],
+    emergency: ["Naloxone (Narcan)","Syringe services program"],
+    active: ["Syringe services program","Naloxone (Narcan)","SBIRT"],
+    treatment: ["Medication Assisted Treatment (MAT)","Family therapy","SBIRT"],
+    after: ["Sober living home","Medication Assisted Treatment (MAT)","Family therapy"]
+  };
+  var pop = {
+    "Naloxone (Narcan)":"Anyone who might witness an overdose, including family, friends, and volunteers. Very little training needed.",
+    "SBIRT":"Adults, teens 12 and up, and pregnant women in any health or community setting. Best for early or risky use.",
+    "Medication Assisted Treatment (MAT)":"Adults with opioid or alcohol use disorder, pregnant women, and justice-involved individuals.",
+    "Syringe services program":"People who inject drugs. No requirement to stop using first.",
+    "LifeSkills Training":"Grades 3 through 10, over three years.",
+    "Sober living home":"Adults who need stable, sober housing after treatment or after incarceration. No clinical services.",
+    "Family therapy":"Teens and adults with substance use disorders, together with their families."
+  };
+  var sc = document.getElementById('scenarioPick');
+  var st = document.getElementById('scenarioText');
+  function paint(){ st.textContent = scenarios[parseInt(sc.value,10)].t; }
+  sc.addEventListener('change', function(){
+    paint();
+    document.getElementById('resultBox').style.display='none';
+    document.getElementById('selfCheck').innerHTML='';
+  });
+  paint();
+
+  document.getElementById('narrowBtn').addEventListener('click', function(){
+    var stage = document.getElementById('qStage').value;
+    var who = document.getElementById('qWho').value;
+    var prob = document.getElementById('qProblem').value.trim();
+    var err = document.getElementById('narrowErr');
+    if(!stage || !who || prob.length < 3){
+      err.textContent = 'Answer all three questions before narrowing the field. The analysis is the point of the exercise.';
+      return;
+    }
+    err.textContent = '';
+    var list = byStage[stage];
+    var html = '';
+    for(var i=0;i<list.length;i++){
+      html += '<div style="border:1px solid #D9E3E2; border-left:5px solid #B07D2B; padding:10px 14px; margin-bottom:8px; background:#FBF6EC;">'
+            + '<p style="margin:0 0 4px 0; font-size:15px; font-weight:bold; color:#8a5f16;">' + list[i] + '</p>'
+            + '<p style="margin:0; font-size:14px;"><strong>Target population:</strong> ' + pop[list[i]] + '</p></div>';
+    }
+    html += '<p style="font-size:14px; background:#FAF3F3; border-left:5px solid #A76A6A; padding:10px 14px; margin:12px 0 0 0;">You wrote that the immediate problem is: <strong>' + prob.replace(/</g,'&lt;') + '</strong>. Which of the programs above actually solves that problem, and not a different one?</p>';
+    document.getElementById('candidates').innerHTML = html;
+    document.getElementById('resultBox').style.display='block';
+  });
+
+  document.getElementById('checkBtn').addEventListener('click', function(){
+    var txt = document.getElementById('finalPick').value.trim();
+    var box = document.getElementById('selfCheck');
+    if(txt.length < 15){
+      box.innerHTML = '<p role="alert" style="color:#8c3b3b; font-size:14px; margin:0;">Write your choice and your reason first.</p>';
+      return;
+    }
+    var hasBecause = /because|since|so that|in order to/i.test(txt);
+    var items = [
+      [hasBecause, 'Your answer gives a reason, not just a program name.', 'Your answer names a program but does not say why. On the quiz, a reason is what earns the point.'],
+      [txt.split(/\s+/).length >= 12, 'Your reason is developed enough to show your thinking.', 'Your reason is very short. Add what specifically about the scenario made you choose it.'],
+      [true, '', '']
+    ];
+    var html = '<div style="border:1px solid #DDE5D5; background:#F5F8F1; padding:14px 16px;">'
+      + '<p style="margin:0 0 8px 0; font-size:15px; font-weight:bold; color:#4d6b3f;">Self-check</p><ul style="margin:0; padding-left:20px; font-size:14px;">';
+    for(var i=0;i<2;i++){
+      html += '<li style="margin-bottom:6px;">' + (items[i][0] ? '&#10003; ' + items[i][1] : '&#9679; ' + items[i][2]) + '</li>';
+    }
+    html += '<li style="margin-bottom:6px;">Read the target population line for the program you chose one more time. Does it include the person in this scenario?</li>'
+          + '<li style="margin-bottom:6px;">Could someone argue for a different program on this list? If yes, what would you say back to them?</li>'
+          + '<li>Would your reason still make sense if you swapped in a different program name? If it would, your reason is too general.</li>'
+          + '</ul></div>';
+    box.innerHTML = html;
+  });
+})();
+</script>
+</body>
+</html>
