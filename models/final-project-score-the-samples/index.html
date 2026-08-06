@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HCR 231 Score the Samples</title>
+<style>
+:root { color-scheme: light; }
+</style>
+</head>
+<body style="margin:0; padding:20px; background:#F7F4EE; font-family:Georgia,'Times New Roman',serif; color:#2B2A28; line-height:1.6;">
+<div style="max-width:880px; margin:0 auto;">
+
+  <div style="border-left:8px solid #2F6B6A; background:#F2F6F5; padding:18px 22px; margin-bottom:20px;">
+    <h1 style="margin:0 0 6px 0; font-family:Arial,Helvetica,sans-serif; font-size:24px; color:#2F6B6A;">Score the Samples</h1>
+    <p style="margin:0; font-size:16px;">Before you write your final project responses, practice reading them the way they will be graded. You will score five sample responses using the same rubric your instructor will use on you.</p>
+  </div>
+
+  <div style="background:#FAF6EC; border-left:6px solid #B5842B; padding:14px 20px; margin-bottom:22px;">
+    <p style="margin:0; font-size:15px;">The cases below are <strong>not</strong> the cases on your final project. They are built to work the same way, so what you learn here transfers without giving you answers to memorize.</p>
+  </div>
+
+  <div id="app"></div>
+
+  <div id="wrapup" style="display:none; background:#F2F6F5; border:1px solid #C4D6D3; padding:18px 22px; margin-top:8px;">
+    <h2 style="margin:0 0 8px 0; font-family:Arial,Helvetica,sans-serif; font-size:19px; color:#2F6B6A;">What to carry into your own writing</h2>
+    <p style="margin:0 0 8px 0; font-size:16px;">Look back at what separated the weak responses from the strong ones. It was almost never effort or sincerity. It was three things:</p>
+    <ul style="margin:0 0 8px 0; font-size:16px; padding-left:22px;">
+      <li style="margin-bottom:5px;">Every lettered part of the prompt was actually answered, not just most of them.</li>
+      <li style="margin-bottom:5px;">The response used details from the specific scenario instead of statements that would fit any workplace or any patient.</li>
+      <li style="margin-bottom:5px;">Course concepts did work in the response rather than appearing as vocabulary.</li>
+    </ul>
+    <p style="margin:0; font-size:16px;">When you finish drafting your final project responses, read your own writing as a grader once. Find each lettered part. If you cannot point to it, it is not there.</p>
+  </div>
+
+  <div id="progress" role="status" aria-live="polite" style="margin-top:18px; padding:14px 18px; background:#FFFFFF; border:1px solid #DDD6C8; font-family:Arial,Helvetica,sans-serif; font-size:16px;">Scored 0 of 5 samples.</div>
+  <button onclick="resetAll()" style="margin-top:12px; font-family:Arial,Helvetica,sans-serif; font-size:15px; padding:10px 18px; border:2px solid #7D8F6B; background:#FFFFFF; color:#5F6E50; cursor:pointer;">Start over</button>
+
+</div>
+
+<script>
+var LEVELS = [
+  {n:"Exemplary", p:5},
+  {n:"Proficient", p:4},
+  {n:"Developing", p:3},
+  {n:"Beginning", p:1},
+  {n:"Not Evidenced", p:0}
+];
+
+var CASES = [
+{
+ id:"work",
+ color:"#5F6E50", bg:"#F5F7F1",
+ label:"Practice case one: workplace health",
+ scenario:"<strong>Saguaro Inn</strong> employs 60 housekeepers. Each is expected to clean 16 rooms per shift. Over the past year the hotel recorded 11 injuries, mostly back and shoulder strains from lifting mattresses and pushing heavy carts, plus several skin and respiratory complaints linked to cleaning chemicals. Most housekeepers speak Spanish as their primary language and are paid hourly. Several told a supervisor privately that they work through pain because reporting an injury has cost coworkers hours in the past.",
+ prompt:"Design an intervention for this workplace. Your response should (a) identify at least two specific contributing factors to the injury pattern, (b) propose one intervention that changes the environment or work process and one intervention that targets worker behavior or education, (c) explain how you would address the underreporting of injuries, and (d) name at least one workplace health resource or standard that would inform your plan.",
+ parts:["(a) Two contributing factors","(b) Both kinds of intervention","(c) Addresses underreporting","(d) Names a resource or standard"],
+ samples:[
+  {
+   name:"Sample A",
+   text:"Housekeeping is physically demanding work and injuries are common in this line of work. The hotel should make safety a priority and train the housekeepers on how to lift correctly and use good body mechanics. Workers also need to be careful when using chemicals and follow the directions on the label. If everyone does their part and management takes safety seriously, the injury numbers will go down. Safety should always come first in any workplace.",
+   present:[false,false,false,false],
+   level:3,
+   why:"This student clearly cares, and that is not the same as answering the question. Part (a) never appears: the response says the work is demanding but names no contributing factor from the scenario, not the 16-room quota, not the carts, not the chemicals. Part (b) offers only behavioral interventions, training and carefulness, with nothing that changes the environment or the work process. Part (c) is absent entirely even though the scenario hands the student a clear reason workers stay silent. Part (d) is absent. Nearly every sentence would fit any workplace in the country, which is the surest sign a response has not engaged the scenario.",
+   fix:"The fastest improvement here is not better writing. It is going back to the prompt, finding the four letters, and making sure each has a home in the response."
+  },
+  {
+   name:"Sample B",
+   text:"Two factors contributing to these injuries are the 16-room quota, which pushes housekeepers to work quickly and skip safer techniques, and repeated lifting of mattresses without any assistive equipment. To change the work process, I would reduce the quota or build recovery time into the shift, and provide lighter carts and mattress-lifting tools so the physical load drops. For education, I would offer training on safe lifting and chemical handling delivered in Spanish rather than English, since most of the staff speak Spanish primarily. OSHA standards on workplace safety would guide the plan.",
+   present:[true,true,false,true],
+   level:1,
+   why:"This is a real response to a real scenario. Part (a) is solid and specific, drawn straight from the case. Part (b) is done well, and the distinction between changing the work process and changing worker behavior is clear rather than blurred. Part (d) names OSHA, though only in passing, without saying what OSHA guidance would actually shape. What holds this back from the top band is part (c): underreporting is never addressed. The scenario states plainly that workers hide injuries because reporting has cost coworkers hours, which means the hotel's count of 11 is a floor rather than a true number. A plan built on undercounted data will target the wrong things.",
+   fix:"One missing lettered part costs a full band even when everything else is strong. Check for the letters before you submit."
+  },
+  {
+   name:"Sample C",
+   text:"Two contributing factors are the 16-room quota, which creates time pressure that pushes workers to lift and twist in unsafe ways, and the absence of assistive equipment for mattress lifting and heavy carts. Ventilation and chemical selection are a third. To change the work process, I would reduce the quota, stagger heavy rooms across the shift, and replace the carts and cleaning products with lower-hazard alternatives, because removing the hazard does not depend on anyone remembering a technique under time pressure. For education, I would run short training in Spanish on chemical handling and safe lifting, delivered by a trainer from the workforce rather than a manager. Underreporting is the harder problem. Workers are not confused about the reporting process; they have watched reporting cost people hours, so silence is a rational response to how the system currently works. I would decouple reporting from scheduling entirely, state that in writing and in Spanish, create a reporting route that does not run through the supervisor who assigns shifts, and track whether reports rise, which would be a sign the system is working rather than a sign injuries increased. OSHA recordkeeping requirements and the general duty clause would inform the plan, and NIOSH ergonomics guidance for hotel housekeeping would shape the equipment and workload changes specifically.",
+   present:[true,true,true,true],
+   level:0,
+   why:"All four parts are present and each is developed rather than named. The strongest move is in part (c): the student recognizes that underreporting is a rational response to consequences rather than a knowledge gap, and designs around the incentive instead of adding another training. The prediction that reports will rise, and that a rise is good news, shows the student understands what the recorded number actually measures. Part (d) distinguishes what OSHA governs from what NIOSH contributes, which is the difference between naming an agency and using one.",
+   fix:"Notice the length is not what makes this strong. Sample B is nearly as long. Depth on each lettered part is what separates them."
+  }
+ ]
+},
+{
+ id:"reflect",
+ color:"#8A5854", bg:"#FAF3F2",
+ label:"Practice case two: reflection on future practice",
+ scenario:"The final project asks you to reflect on how community health concepts will change the way you practice with individual patients. Reflection questions are graded, and they are where strong students most often lose points, because sincerity reads as depth to the writer but not to the reader.",
+ prompt:"Explain how the community health concepts in this course will change the way you practice with individual patients. Address at least three of the following: health literacy and communication, social determinants of health, cultural humility, ethical practice, and the roles and expertise of other health professionals. Use specific examples from course content rather than general statements about caring for people.",
+ parts:["Area 1, with a course example","Area 2, with a course example","Area 3, with a course example","Names something they will do differently"],
+ samples:[
+  {
+   name:"Sample D",
+   text:"This course has really opened my eyes to how much goes into community health. I have learned that health literacy is important and that not everyone understands medical information the same way. I also learned about social determinants of health and how where someone lives affects their health outcomes. Cultural humility is important too because every patient comes from a different background. Going forward I will treat all my patients with respect and remember that they are people, not just diagnoses. I will be culturally sensitive and make sure my patients understand their care. This class has made me a more compassionate future clinician.",
+   present:[false,false,false,false],
+   level:3,
+   why:"Three areas are named, so it can look at first glance like the requirement is met. Read again for examples: there are none. Health literacy is called important, but no course content, case, or assignment appears, and nothing indicates what the student would do about it. The same holds for the other two areas. The closing commitments, respect and cultural sensitivity, describe an attitude rather than a practice, and an attitude cannot be observed or changed. Nothing here could be different next semester if the student had taken a different course.",
+   fix:"The test for a reflection: could a reader tell which course you took from what you wrote? If not, it is too general to score well."
+  },
+  {
+   name:"Sample E",
+   text:"Three areas will change how I practice as a nurse. First, health literacy. Rewriting that asthma handout in the school health activity showed me that I had been writing at my own reading level without noticing. In practice I will write discharge instructions at roughly a sixth-grade level and use teach-back before the patient leaves, because I now know that asking whether someone has questions almost always produces a no. Second, social determinants. In the farmworker clinic case, low attendance at diabetes classes was not disinterest; it was a class scheduled against the agricultural workday. That has changed what I ask. Before I hand someone a follow-up appointment I will ask what their work schedule and transportation look like, since a plan the patient cannot physically reach is not a plan. Third, interprofessional practice. I used to think of a social worker as someone I call when a discharge goes wrong. The interprofessional material reframed that as expertise I do not have, so I will bring social work and pharmacy in early rather than as a rescue.",
+   present:[true,true,true,true],
+   level:0,
+   why:"Each of the three areas is anchored to specific course content, the handout activity, the farmworker clinic case, the interprofessional material, and each is followed by a change in practice that someone could actually observe. Writing at a sixth-grade level and using teach-back is a behavior. Asking about work schedule before scheduling a follow-up is a behavior. Bringing in social work early rather than late is a behavior. The student also names a prior belief that changed, which is what reflection means in an academic sense.",
+   fix:"Note how short each example is. Depth here comes from specificity, not from length."
+  }
+ ]
+}
+];
+
+var scored = {};
+
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function render(){
+  var html = "";
+  CASES.forEach(function(c, ci){
+    html += '<div style="margin-bottom:34px;">';
+    html += '<p style="margin:0 0 6px 0; font-family:Arial,Helvetica,sans-serif; font-size:12px; letter-spacing:0.06em; text-transform:uppercase; color:'+c.color+';">'+esc(c.label)+'</p>';
+    html += '<div style="background:'+c.bg+'; border-left:6px solid '+c.color+'; padding:16px 20px; margin-bottom:14px;">';
+    html += '<p style="margin:0 0 10px 0; font-size:16px;">'+c.scenario+'</p>';
+    html += '<p style="margin:0; font-size:15px; padding-top:10px; border-top:1px solid #DDD6C8;"><strong>The prompt students answered:</strong> '+esc(c.prompt)+'</p>';
+    html += '</div>';
+
+    c.samples.forEach(function(s, si){
+      var key = ci + "_" + si;
+      html += '<div style="background:#FFFFFF; border:1px solid #DDD6C8; padding:18px 22px; margin-bottom:16px;">';
+      html += '<h2 style="margin:0 0 10px 0; font-family:Arial,Helvetica,sans-serif; font-size:18px; color:'+c.color+';">'+esc(s.name)+'</h2>';
+      html += '<div style="background:#FDFCF9; border:1px solid #EDE7DA; padding:14px 18px; font-size:15px; margin-bottom:16px;">'+esc(s.text)+'</div>';
+
+      html += '<fieldset style="border:1px solid #DDD6C8; padding:12px 16px; margin:0 0 14px 0;">';
+      html += '<legend style="font-family:Arial,Helvetica,sans-serif; font-size:14px; padding:0 6px;">Step 1. Which required parts are actually present?</legend>';
+      c.parts.forEach(function(p, pi){
+        html += '<div><label style="display:block; font-size:15px; padding:4px 0; cursor:pointer;"><input type="checkbox" id="cb_'+key+'_'+pi+'" style="margin-right:8px;"> '+esc(p)+'</label></div>';
+      });
+      html += '</fieldset>';
+
+      html += '<fieldset style="border:1px solid #DDD6C8; padding:12px 16px; margin:0 0 12px 0;">';
+      html += '<legend style="font-family:Arial,Helvetica,sans-serif; font-size:14px; padding:0 6px;">Step 2. What rating would you give it?</legend>';
+      LEVELS.forEach(function(L, li){
+        html += '<label style="display:inline-block; font-size:15px; padding:4px 14px 4px 0; cursor:pointer;"><input type="radio" name="lv_'+key+'" value="'+li+'" style="margin-right:6px;"> '+esc(L.n)+' ('+L.p+')</label>';
+      });
+      html += '</fieldset>';
+
+      html += '<button onclick="reveal('+ci+','+si+')" style="font-family:Arial,Helvetica,sans-serif; font-size:15px; padding:9px 18px; border:2px solid '+c.color+'; background:'+c.color+'; color:#FFFFFF; cursor:pointer;">Compare with the instructor score</button>';
+      html += '<div id="rv_'+key+'" role="status" aria-live="polite" style="margin-top:14px;"></div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  });
+  document.getElementById("app").innerHTML = html;
+}
+
+function reveal(ci, si){
+  var c = CASES[ci], s = c.samples[si], key = ci + "_" + si;
+  var chosen = null;
+  var radios = document.getElementsByName("lv_" + key);
+  for (var i = 0; i < radios.length; i++){ if (radios[i].checked) { chosen = parseInt(radios[i].value, 10); } }
+
+  var box = document.getElementById("rv_" + key);
+  if (chosen === null){
+    box.innerHTML = '<div style="background:#FAF6EC; border-left:5px solid #B5842B; padding:10px 14px; font-size:15px;">Choose a rating in Step 2 first. Commit to a judgment before you see the answer, or you will just agree with whatever appears.</div>';
+    return;
+  }
+
+  var out = "";
+
+  var partLines = "";
+  var partsRight = true;
+  c.parts.forEach(function(p, pi){
+    var box2 = document.getElementById("cb_"+key+"_"+pi);
+    var studentSaid = box2.checked;
+    var truth = s.present[pi];
+    if (studentSaid !== truth) { partsRight = false; }
+    var mark = truth ? "Present" : "Missing";
+    var col = truth ? "#2F6B6A" : "#8A5854";
+    var note = (studentSaid === truth) ? "" : (studentSaid ? " &mdash; you marked this present" : " &mdash; you marked this missing");
+    partLines += '<li style="margin-bottom:4px;"><span style="color:'+col+'; font-weight:bold;">'+mark+':</span> '+esc(p)+'<span style="color:#8A5854;">'+note+'</span></li>';
+  });
+
+  out += '<div style="background:#F7F4EE; border:1px solid #DDD6C8; padding:14px 18px;">';
+  out += '<p style="margin:0 0 6px 0; font-family:Arial,Helvetica,sans-serif; font-size:15px; color:#2F6B6A;"><strong>Which parts were there</strong></p>';
+  out += '<ul style="margin:0 0 12px 0; padding-left:20px; font-size:15px;">'+partLines+'</ul>';
+  if (partsRight){
+    out += '<p style="margin:0 0 12px 0; font-size:15px; color:#2F6B6A;">You identified every part correctly. That is the skill that protects your own score.</p>';
+  }
+
+  var truthLevel = s.level;
+  var yourL = LEVELS[chosen], trueL = LEVELS[truthLevel];
+  var agree = (chosen === truthLevel);
+  var gapText;
+  if (agree){ gapText = "Your rating matched."; }
+  else if (chosen < truthLevel){ gapText = "You scored this higher than the rubric does."; }
+  else { gapText = "You scored this lower than the rubric does."; }
+
+  out += '<p style="margin:0 0 6px 0; font-family:Arial,Helvetica,sans-serif; font-size:15px; color:#2F6B6A;"><strong>Rating</strong></p>';
+  out += '<p style="margin:0 0 12px 0; font-size:15px;">You said <strong>'+esc(yourL.n)+' ('+yourL.p+')</strong>. The rubric places this at <strong>'+esc(trueL.n)+' ('+trueL.p+')</strong>. '+esc(gapText)+'</p>';
+
+  out += '<p style="margin:0 0 6px 0; font-family:Arial,Helvetica,sans-serif; font-size:15px; color:#2F6B6A;"><strong>Why</strong></p>';
+  out += '<p style="margin:0 0 12px 0; font-size:15px;">'+esc(s.why)+'</p>';
+
+  out += '<div style="background:'+c.bg+'; border-left:5px solid '+c.color+'; padding:10px 14px; font-size:15px;"><strong>Take this with you:</strong> '+esc(s.fix)+'</div>';
+  out += '</div>';
+
+  box.innerHTML = out;
+  scored[key] = true;
+  updateProgress();
+}
+
+function updateProgress(){
+  var total = 0;
+  CASES.forEach(function(c){ total += c.samples.length; });
+  var n = Object.keys(scored).length;
+  var msg = "Scored " + n + " of " + total + " samples.";
+  document.getElementById("progress").textContent = msg;
+  document.getElementById("wrapup").style.display = (n === total) ? "block" : "none";
+}
+
+function resetAll(){
+  scored = {};
+  render();
+  updateProgress();
+  window.scrollTo(0, 0);
+}
+
+render();
+updateProgress();
+</script>
+</body>
+</html>

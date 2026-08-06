@@ -79,6 +79,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/ch12-program-fit-analyzer/](models/ch12-program-fit-analyzer/): matching a scenario to the right prevention or treatment program.
 - [models/ch12-plain-language-checker/](models/ch12-plain-language-checker/): rewriting a health message in plain, respectful language.
 - [models/ch12-millbrook-team-builder/](models/ch12-millbrook-team-builder/): staffing a rural naloxone program across professions.
+- [models/final-project-score-the-samples/](models/final-project-score-the-samples/): practice grading sample final project responses against the rubric.
 
 ## Embed snippets
 
@@ -142,6 +143,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Program Fit Analyzer" src="models/ch12-program-fit-analyzer/"></iframe>
 <iframe title="Plain Language Checker" src="models/ch12-plain-language-checker/"></iframe>
 <iframe title="Millbrook Team Builder" src="models/ch12-millbrook-team-builder/"></iframe>
+<iframe title="Score the Samples" src="models/final-project-score-the-samples/"></iframe>
 ```
 
 ## Files
