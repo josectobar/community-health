@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Trace the Chain — Funding, Authority, Capability</title>
+<style>
+  :root{
+    color-scheme: light;
+    --teal:#1F5F5B;
+    --teal-dark:#164543;
+    --cream:#F6F1E7;
+    --green:#657A3B;
+    --ink:#22201C;
+    --muted:#5f5b52;
+    --line:#d9d2c4;
+    --good:#2f7d55;
+    --good-bg:#e7f3ec;
+    --bad:#b23b3b;
+    --bad-bg:#f7e8e6;
+    --white:#fffdf8;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);
+    background:var(--white);
+    line-height:1.5;
+    padding:18px 16px 28px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1000px;margin:0 auto;}
+  h1{
+    font-size:1.35rem;
+    margin:0 0 6px;
+    color:var(--teal-dark);
+    letter-spacing:.2px;
+  }
+  .lede{margin:0 0 4px;font-size:1rem;color:var(--ink);}
+  .lede strong{color:var(--teal-dark);}
+  .sub{margin:2px 0 16px;font-size:.9rem;color:var(--muted);}
+  .bar{
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    background:var(--cream);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:10px 14px;
+    margin:0 0 16px;
+  }
+  .progress-track{
+    flex:1 1 200px;height:12px;background:#e7e0d1;border-radius:99px;overflow:hidden;min-width:160px;
+  }
+  .progress-fill{height:100%;width:0%;background:var(--teal);transition:width .35s ease;}
+  .progress-label{font-weight:700;color:var(--teal-dark);font-size:.92rem;white-space:nowrap;}
+  .btn{
+    border:1px solid var(--teal);
+    background:var(--white);
+    color:var(--teal-dark);
+    font-weight:600;
+    padding:7px 14px;
+    border-radius:9px;
+    cursor:pointer;
+    font-size:.88rem;
+  }
+  .btn:hover{background:var(--cream);}
+  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px;border:1px solid var(--line);}
+  table{border-collapse:collapse;width:100%;min-width:720px;background:var(--white);}
+  caption{text-align:left;padding:0 0 8px;font-size:.85rem;color:var(--muted);}
+  thead th{
+    background:var(--teal);color:#fff;text-align:left;font-size:.82rem;font-weight:700;
+    padding:11px 12px;position:sticky;top:0;letter-spacing:.3px;
+  }
+  thead th:first-child{border-top-left-radius:0;}
+  tbody td, tbody th{border-top:1px solid var(--line);padding:10px 12px;vertical-align:top;}
+  tbody th[scope=row]{
+    text-align:left;font-weight:700;color:var(--teal-dark);font-size:.9rem;background:var(--cream);
+    white-space:normal;min-width:150px;
+  }
+  .type-tag{display:block;font-weight:500;color:var(--muted);font-size:.74rem;margin-top:3px;}
+  select{
+    width:100%;min-width:150px;font-size:.82rem;font-family:inherit;color:var(--ink);
+    padding:8px 9px;border:1px solid var(--line);border-radius:8px;background:var(--white);cursor:pointer;
+  }
+  select:focus{outline:2px solid var(--teal);outline-offset:1px;}
+  .cell.correct select{border-color:var(--good);background:var(--good-bg);color:#20402f;font-weight:600;}
+  .cell.wrong select{border-color:var(--bad);background:var(--bad-bg);}
+  .cell .mark{font-size:.78rem;font-weight:700;margin-top:4px;display:none;}
+  .cell.correct .mark{display:block;color:var(--good);}
+  .cell.wrong .mark{display:block;color:var(--bad);}
+  tr.locked th[scope=row]{background:var(--good-bg);}
+  .takeaway{
+    display:none;background:var(--cream);border-left:5px solid var(--green);
+    font-size:.85rem;color:var(--ink);padding:9px 12px;margin-top:8px;border-radius:0 8px 8px 0;
+  }
+  tr.locked .takeaway{display:block;}
+  .takeaway strong{color:var(--green);}
+  .summary{
+    display:none;margin-top:20px;background:var(--teal-dark);color:#fdfbf5;
+    border-radius:14px;padding:18px 20px;font-size:1rem;line-height:1.55;
+  }
+  .summary.show{display:block;animation:rise .4s ease;}
+  .summary h2{margin:0 0 6px;font-size:1.05rem;color:#fff;}
+  .summary .chain{
+    display:inline-block;background:rgba(255,255,255,.14);border-radius:8px;
+    padding:4px 10px;margin:8px 0 0;font-weight:700;letter-spacing:.3px;
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;}
+  .hint{font-size:.8rem;color:var(--muted);margin:14px 2px 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Practice: Trace the Chain</h1>
+  <p class="lede">Fill in each row and a pattern appears: <strong>where the money comes from sets the kind of authority an organization has &mdash; and that authority decides both what it can do and what it can&rsquo;t.</strong></p>
+  <p class="sub">These six organizations are not on your quiz, but each one is the <em>same type</em> as an organization you will see there. Match the funding, authority, and signature activity for each. When a row is right, it locks and reveals the tradeoff hidden inside it.</p>
+
+  <div class="bar">
+    <span class="progress-label" id="progressLabel">Rows completed: 0 of 6</span>
+    <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+    <button class="btn" id="resetBtn" type="button">Start over</button>
+  </div>
+
+  <div class="scroll">
+    <table id="matrix">
+      <caption class="sr-only">Match each organization to its funding source, source of authority, and signature activity.</caption>
+      <thead>
+        <tr>
+          <th scope="col">Organization</th>
+          <th scope="col">Funding source</th>
+          <th scope="col">Source of authority</th>
+          <th scope="col">Signature activity</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"><!-- rows injected --></tbody>
+    </table>
+  </div>
+
+  <div class="summary" id="summary" role="status">
+    <h2>You found the pattern.</h2>
+    <p>Read down the columns. The organizations that run on <strong>tax dollars</strong> are the only ones that can <strong>compel</strong> anyone &mdash; but their reach stops at a border and they answer to elected leadership. The ones that run on <strong>donations or an endowment</strong> move freely and independently, but they can only <strong>persuade or fund</strong>, and their money is never guaranteed.</p>
+    <span class="chain">Funding &rarr; Authority &rarr; What it can (and can&rsquo;t) do</span>
+    <p style="margin:12px 0 0;">That single chain is what separates every organization in this chapter. On the quiz, don&rsquo;t memorize labels &mdash; ask each scenario three questions: <em>Where does the money come from? What authority does that buy? What does that authority let this person do &mdash; and stop them from doing?</em></p>
+  </div>
+
+  <p class="hint">Tip: if a row won&rsquo;t lock, one of its three cells is still mismatched. Change your answers until all three turn green.</p>
+
+  <div class="sr-only" id="live" aria-live="polite"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var ORGS = [
+    {
+      name:"U.S. Food and Drug Administration",
+      type:"National governmental agency",
+      funding:"Federal tax dollars",
+      authority:"Federal law; part of a cabinet department",
+      activity:"Regulates food and drugs nationwide and can order recalls",
+      takeaway:"Its reach is national, but it depends on states and local departments to do much of the on-the-ground work."
+    },
+    {
+      name:"Texas Department of State Health Services",
+      type:"State governmental agency",
+      funding:"State tax dollars",
+      authority:"State law; director appointed by state leadership",
+      activity:"Licenses facilities and enforces health rules within the state",
+      takeaway:"It has real power to license and enforce &mdash; but only inside its own state line."
+    },
+    {
+      name:"Chicago Department of Public Health",
+      type:"Local governmental agency",
+      funding:"City tax revenue plus state and federal grants",
+      authority:"Local authority delegated to it under state law",
+      activity:"Inspections, disease reporting, and vital records within the city",
+      takeaway:"It sits closest to daily life, yet its authority ends at the city line &mdash; disease does not."
+    },
+    {
+      name:"National Academy of Sciences",
+      type:"Quasi-governmental organization",
+      funding:"Private funds and an endowment, not a government budget line",
+      authority:"A federal charter giving it official duties, but it stays independent",
+      activity:"Gives official expert advice to the government when asked",
+      takeaway:"It carries official weight, but it cannot compel &mdash; the government is free to ignore its advice."
+    },
+    {
+      name:"American Heart Association",
+      type:"Voluntary (nongovernmental) health agency",
+      funding:"Private donations and fundraising events",
+      authority:"None &mdash; it can only inform and persuade",
+      activity:"Public education, advocacy, and funding heart research",
+      takeaway:"It is free to act and advocate, but it can&rsquo;t require anything, and its funding is never guaranteed."
+    },
+    {
+      name:"Bill &amp; Melinda Gates Foundation",
+      type:"Philanthropic foundation",
+      funding:"Income from a private endowment",
+      authority:"None &mdash; it decides on its own what to fund",
+      activity:"Large grants that shape which health questions get studied",
+      takeaway:"It can&rsquo;t treat, inspect, or require &mdash; its power is deciding which problems get money and attention."
+    }
+  ];
+
+  var COLS = ["funding","authority","activity"];
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var t=a[i]; a[i]=a[j]; a[j]=t;
+    }
+    return a;
+  }
+
+  // one shared shuffled option order per column
+  var optionOrder = {};
+  COLS.forEach(function(col){
+    optionOrder[col] = shuffle(ORGS.map(function(o){return o[col];}));
+  });
+
+  var tbody = document.getElementById("tbody");
+  var live = document.getElementById("live");
+
+  function makeSelect(rowIdx, col){
+    var sel = document.createElement("select");
+    sel.setAttribute("data-row", rowIdx);
+    sel.setAttribute("data-col", col);
+    sel.setAttribute("aria-label", ORGS[rowIdx].name + " — " + col);
+    var ph = document.createElement("option");
+    ph.value = ""; ph.textContent = "Choose…"; ph.disabled = false; ph.selected = true;
+    sel.appendChild(ph);
+    optionOrder[col].forEach(function(txt){
+      var op = document.createElement("option");
+      // strip HTML entities for the option text safely
+      var tmp = document.createElement("div"); tmp.innerHTML = txt;
+      op.value = tmp.textContent; op.textContent = tmp.textContent;
+      sel.appendChild(op);
+    });
+    sel.addEventListener("change", onChange);
+    return sel;
+  }
+
+  function decode(html){ var d=document.createElement("div"); d.innerHTML=html; return d.textContent; }
+
+  ORGS.forEach(function(org, i){
+    var tr = document.createElement("tr");
+    tr.setAttribute("data-row", i);
+
+    var th = document.createElement("th");
+    th.setAttribute("scope","row");
+    th.innerHTML = org.name + '<span class="type-tag">'+org.type+'</span>';
+    tr.appendChild(th);
+
+    COLS.forEach(function(col){
+      var td = document.createElement("td");
+      td.className = "cell";
+      td.setAttribute("data-row", i);
+      td.setAttribute("data-col", col);
+      td.appendChild(makeSelect(i, col));
+      var mark = document.createElement("span");
+      mark.className = "mark";
+      mark.setAttribute("aria-hidden","true");
+      td.appendChild(mark);
+      tr.appendChild(td);
+    });
+
+    // takeaway spans full row via a following row
+    tbody.appendChild(tr);
+
+    var trT = document.createElement("tr");
+    trT.className = "takeaway-row";
+    var tdT = document.createElement("td");
+    tdT.setAttribute("colspan","4");
+    tdT.style.padding = "0 12px 0";
+    tdT.style.borderTop = "none";
+    var box = document.createElement("div");
+    box.className = "takeaway";
+    box.innerHTML = "<strong>The tradeoff:</strong> " + org.takeaway;
+    tdT.appendChild(box);
+    trT.appendChild(tdT);
+    // move takeaway visibility onto the data row via CSS sibling won't work across rows,
+    // so we toggle a class on this row directly.
+    trT.setAttribute("data-takeaway-for", i);
+    tbody.appendChild(trT);
+  });
+
+  function onChange(e){
+    var sel = e.target;
+    var row = +sel.getAttribute("data-row");
+    var col = sel.getAttribute("data-col");
+    var td = sel.closest("td");
+    var correct = decode(ORGS[row][col]);
+    var picked = sel.value;
+    var mark = td.querySelector(".mark");
+
+    if(picked === ""){ td.classList.remove("correct","wrong"); mark.textContent=""; }
+    else if(picked === correct){
+      td.classList.add("correct"); td.classList.remove("wrong");
+      mark.textContent = "✓ correct";
+    } else {
+      td.classList.add("wrong"); td.classList.remove("correct");
+      mark.textContent = "✗ not this one";
+    }
+    checkRow(row);
+    updateProgress();
+  }
+
+  function checkRow(row){
+    var dataRow = tbody.querySelector('tr[data-row="'+row+'"]');
+    var cells = dataRow.querySelectorAll("td.cell");
+    var allCorrect = true;
+    cells.forEach(function(c){ if(!c.classList.contains("correct")) allCorrect=false; });
+    var takeRow = tbody.querySelector('tr[data-takeaway-for="'+row+'"] .takeaway');
+    if(allCorrect){
+      if(!dataRow.classList.contains("locked")){
+        dataRow.classList.add("locked");
+        if(takeRow) takeRow.style.display = "block";
+        live.textContent = ORGS[row].name + " row complete. " + decode(ORGS[row].takeaway);
+      }
+    } else {
+      dataRow.classList.remove("locked");
+      if(takeRow) takeRow.style.display = "none";
+    }
+  }
+
+  function updateProgress(){
+    var locked = tbody.querySelectorAll("tr.locked").length;
+    document.getElementById("progressLabel").textContent = "Rows completed: " + locked + " of 6";
+    document.getElementById("progressFill").style.width = (locked/6*100) + "%";
+    var summary = document.getElementById("summary");
+    if(locked === 6){ summary.classList.add("show"); }
+    else { summary.classList.remove("show"); }
+  }
+
+  document.getElementById("resetBtn").addEventListener("click", function(){
+    tbody.querySelectorAll("select").forEach(function(s){ s.value=""; });
+    tbody.querySelectorAll("td.cell").forEach(function(c){ c.classList.remove("correct","wrong"); var m=c.querySelector(".mark"); if(m) m.textContent=""; });
+    tbody.querySelectorAll("tr[data-row]").forEach(function(r){ r.classList.remove("locked"); });
+    tbody.querySelectorAll(".takeaway").forEach(function(t){ t.style.display="none"; });
+    updateProgress();
+    live.textContent = "Cleared. Start again.";
+  });
+
+  updateProgress();
+})();
+</script>
+</body>
+</html>
