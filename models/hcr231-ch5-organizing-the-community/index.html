@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 5 Prep — Part 1: Organizing the Community</title>
+<style>
+  :root{
+    color-scheme: light;
+    --navy:#1f3864; --teal:#2a9d8f; --amber:#e0912f; --ink:#1e2733; --muted:#5b6672;
+    --bg:#eef2f7; --card:#ffffff; --line:#dfe6ee; --soft:#eaf3f2;
+    --good:#2e7d5b; --bad:#c0473f; --good-bg:#e7f4ee; --bad-bg:#fbeae8;
+    --shadow:0 2px 10px rgba(31,56,100,.08), 0 1px 2px rgba(31,56,100,.06);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:900px;margin:0 auto;padding:22px 18px 60px;}
+  header.hero{background:linear-gradient(135deg,var(--navy),#2c4f86);color:#fff;border-radius:18px;
+    padding:26px 26px 24px;box-shadow:var(--shadow);}
+  .kicker{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;opacity:.85;font-weight:700;margin:0 0 6px}
+  header.hero h1{margin:0 0 8px;font-size:1.6rem;line-height:1.2}
+  header.hero p{margin:0;opacity:.95;font-size:1rem;max-width:60ch}
+  .note{margin-top:16px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);
+    border-radius:12px;padding:12px 14px;font-size:.92rem}
+  .note b{color:var(--amber);filter:brightness(1.4)}
+  section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:20px;box-shadow:var(--shadow)}
+  .sec-head{display:flex;align-items:center;gap:12px;margin:0 0 4px}
+  .badge{flex:0 0 auto;width:30px;height:30px;border-radius:9px;background:var(--soft);color:var(--teal);
+    display:grid;place-items:center;font-weight:800;font-size:.95rem}
+  h2{font-size:1.22rem;margin:0;color:var(--navy)}
+  .lead{color:var(--muted);margin:.35rem 0 1.1rem;font-size:.96rem}
+  /* flip cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+  .flip{background:none;border:0;padding:0;perspective:1000px;height:150px;cursor:pointer;font-family:inherit;text-align:left}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+  .flip[aria-pressed="true"] .flip-inner{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;padding:16px;display:flex;
+    flex-direction:column;justify-content:center;border:1px solid var(--line)}
+  .front{background:linear-gradient(135deg,#f7fafc,#eef4f3)}
+  .front .term{font-weight:800;color:var(--navy);font-size:1.05rem}
+  .front .hint{margin-top:8px;color:var(--teal);font-size:.78rem;font-weight:700;letter-spacing:.03em}
+  .back{background:var(--navy);color:#fff;transform:rotateY(180deg)}
+  .back .def{font-size:.9rem}
+  .back .lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;opacity:.7;margin-bottom:6px;font-weight:700}
+  /* quiz */
+  .q{border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;background:#fbfcfe}
+  .q .stem{font-weight:600;margin:0 0 12px}
+  .q .stem .n{color:var(--teal);font-weight:800;margin-right:6px}
+  .opts{display:grid;gap:8px}
+  .opt{text-align:left;border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 12px;
+    cursor:pointer;font:inherit;color:var(--ink);transition:.15s;display:flex;gap:10px;align-items:flex-start}
+  .opt:hover{border-color:var(--teal);background:#f4faf9}
+  .opt .mk{flex:0 0 auto;width:20px;height:20px;border-radius:50%;border:2px solid #c4d0dd;margin-top:1px;display:grid;place-items:center;font-size:.8rem;font-weight:800}
+  .opt.correct{border-color:var(--good);background:var(--good-bg)}
+  .opt.correct .mk{border-color:var(--good);background:var(--good);color:#fff}
+  .opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+  .opt.wrong .mk{border-color:var(--bad);background:var(--bad);color:#fff}
+  .opt.lock{cursor:default;opacity:.75}
+  .opt.lock.correct,.opt.lock.wrong{opacity:1}
+  .fb{margin-top:11px;font-size:.9rem;padding:10px 12px;border-radius:10px;display:none}
+  .fb.show{display:block}
+  .fb.ok{background:var(--good-bg);color:#1f5c42;border:1px solid #bfe2d0}
+  .fb.no{background:var(--bad-bg);color:#8f322c;border:1px solid #f0cfcb}
+  .score{font-weight:700;color:var(--navy);margin-top:6px}
+  /* checklist */
+  .check{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+  .check li{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fbfcfe;cursor:pointer}
+  .check li:hover{border-color:var(--teal)}
+  .check input{margin-top:3px;width:18px;height:18px;accent-color:var(--teal);flex:0 0 auto}
+  .check li.done{background:var(--good-bg);border-color:#bfe2d0}
+  .bar{height:12px;border-radius:99px;background:#e3eaf2;overflow:hidden;margin:4px 0 6px}
+  .bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--good));transition:width .35s}
+  .barlbl{font-size:.85rem;color:var(--muted);font-weight:600}
+  .tip{font-size:.86rem;color:var(--muted);margin-top:10px}
+  footer{margin-top:26px;text-align:center;color:var(--muted);font-size:.82rem}
+  @media (max-width:520px){header.hero h1{font-size:1.35rem}.flip{height:165px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <p class="kicker">HCR 231 · Chapter 5 · Pre-Class Warm-Up</p>
+    <h1>Get Ready: Organizing the Community</h1>
+    <p>A short, interactive warm-up for your in-class pair activity on community organizing and program planning. Click, flip, and test yourself — it takes about 10 minutes.</p>
+    <div class="note">📌 <b>Heads up:</b> This primer gives you the <b>tools</b> to answer the activity — it does not answer the questions for you. The practice examples here are different from the ones you'll see in class. Come ready to think!</div>
+  </header>
+
+  <!-- Meet Rio Lindo -->
+  <section>
+    <div class="sec-head"><span class="badge">📍</span><h2>Meet the community: Rio Lindo</h2></div>
+    <p class="lead">Your activity is set in one place. Get familiar with it now so you can jump straight into problem-solving in class.</p>
+    <p style="margin:0">Rio Lindo is a rural community of about <b>4,200 residents</b> in Santa Cruz County. Most residents <b>speak Spanish at home</b>, and many work at the local <b>produce packing sheds</b>. County data show that emergency-room visits for <b>heat illness doubled last summer</b>. Imagine you are a health education specialist newly assigned there — you don't know anyone yet, and you'll work with this community for the next two years.</p>
+  </section>
+
+  <!-- Vocabulary flip cards -->
+  <section>
+    <div class="sec-head"><span class="badge">1</span><h2>Key terms — flip to learn</h2></div>
+    <p class="lead">Tap a card to reveal the meaning. You'll use every one of these ideas in the activity, so make sure you can explain each in your own words.</p>
+    <div class="grid" id="cards"></div>
+    <p class="tip">💡 After flipping through, cover the definitions and try to say each one out loud from the term alone.</p>
+  </section>
+
+  <!-- Spot the principle quiz -->
+  <section>
+    <div class="sec-head"><span class="badge">2</span><h2>Spot the principle</h2></div>
+    <p class="lead">Read each short scenario and choose the best answer. You'll get instant feedback that explains the idea. (These are practice scenarios — not the activity questions.)</p>
+    <div id="quiz"></div>
+    <div class="score" id="score" aria-live="polite"></div>
+  </section>
+
+  <!-- Readiness checklist -->
+  <section>
+    <div class="sec-head"><span class="badge">✓</span><h2>Am I ready?</h2></div>
+    <p class="lead">Check each box you can honestly say "yes" to. If you can't check one yet, revisit the cards above or your Chapter 5 reading.</p>
+    <div class="bar"><i id="fill"></i></div>
+    <div class="barlbl" id="pct">0 of 5 ready</div>
+    <ul class="check" id="list"></ul>
+    <p class="tip">This checklist is just for you — nothing is submitted. Bring your questions to class!</p>
+  </section>
+
+  <footer>You've got this. See you in class 👋</footer>
+</div>
+
+<script>
+/* ---------- Vocabulary ---------- */
+const CARDS = [
+  ["Gaining entry","Building trust and relationships when you first join a community — before launching any program."],
+  ["Start where the people are","Beginning with the needs and priorities the community names, instead of the agenda you arrived with. (Relevance.)"],
+  ["Barrier to participation","Anything about how, when, or where a program is offered that makes it hard to take part — language, distance, timing, cost, childcare."],
+  ["Grassroots organizing","Efforts that begin with community members themselves, rather than an outside agency or authority."],
+  ["Priority population","The specific group a program is designed to serve."],
+  ["Formative evaluation","Testing and improving a program or its materials during development — before the full rollout."],
+  ["Health literacy","How easily people can find, understand, and use health information to make decisions."],
+  ["Selecting a priority issue","Choosing a first project using criteria like importance, feasibility, and the chance of an early, credible win."],
+];
+const cardsEl = document.getElementById('cards');
+CARDS.forEach(([t,d])=>{
+  const b=document.createElement('button');
+  b.className='flip';b.setAttribute('aria-pressed','false');
+  b.innerHTML=`<div class="flip-inner">
+      <div class="face front"><div class="term">${t}</div><div class="hint">▸ tap to flip</div></div>
+      <div class="face back"><div class="lbl">Definition</div><div class="def">${d}</div></div>
+    </div>`;
+  b.addEventListener('click',()=>b.setAttribute('aria-pressed', b.getAttribute('aria-pressed')==='true'?'false':'true'));
+  cardsEl.appendChild(b);
+});
+
+/* ---------- Quiz ---------- */
+const QUIZ = [
+  {q:"A nurse is assigned to a neighborhood she's never worked in. In week one she books a lecture hall and schedules a class using last year's clinic data — without meeting anyone first. Which principle did she skip?",
+   opts:["Gaining entry","Formative evaluation","Health literacy","Selecting a priority issue"],a:0,
+   fb:"Entering a community means building relationships and trust first. Jumping straight to programming skips the step that makes people willing to show up."},
+  {q:"A break-room poster reads: “Utilize sun-protective barrier garments to mitigate integumentary compromise.” Most workers can't tell what it's asking them to do. This is mainly a problem of…",
+   opts:["Grassroots organizing","Health literacy","Priority population","Gaining entry"],a:1,
+   fb:"Health literacy is about whether people can understand and act on information. Plain, everyday language beats technical wording for a general audience."},
+  {q:"A free class is offered only in English, 25 miles from where residents live, at noon on a weekday. Almost no one comes. These three facts are best described as…",
+   opts:["Proof the topic doesn't matter to people","Barriers to participation","A sign the priority issue was wrong","Formative evaluation"],a:1,
+   fb:"Language, distance, and timing are classic barriers — features of how/when/where the program is offered. The fix is to change the program, not blame the community."},
+  {q:"Frustrated by a dangerous intersection, a group of parents starts its own petition and organizes neighbors to speak at a city meeting. No agency told them to. This is an example of…",
+   opts:["Formative evaluation","Priority population","Grassroots organizing","Health literacy"],a:2,
+   fb:"When the effort starts with community members themselves rather than an outside authority, that's grassroots organizing."},
+  {q:"Before printing 3,000 brochures, a team asks a handful of residents to read the draft aloud and then revises the confusing parts. What kind of evaluation is this?",
+   opts:["Formative evaluation","Outcome evaluation","No evaluation — just editing","Priority setting"],a:0,
+   fb:"Testing and improving materials during development — before the big print run — is formative evaluation."},
+];
+let answered=0, correct=0;
+const quizEl=document.getElementById('quiz'), scoreEl=document.getElementById('score');
+QUIZ.forEach((item,i)=>{
+  const wrap=document.createElement('div');wrap.className='q';
+  const opts=item.opts.map((o,j)=>`<button class="opt" data-i="${i}" data-j="${j}"><span class="mk"></span><span>${o}</span></button>`).join('');
+  wrap.innerHTML=`<p class="stem"><span class="n">${i+1}.</span>${item.q}</p><div class="opts">${opts}</div><div class="fb" id="fb${i}"></div>`;
+  quizEl.appendChild(wrap);
+});
+quizEl.addEventListener('click',e=>{
+  const btn=e.target.closest('.opt'); if(!btn) return;
+  const i=+btn.dataset.i, j=+btn.dataset.j;
+  const box=quizEl.querySelectorAll('.q')[i];
+  if(box.dataset.done) return; box.dataset.done='1';
+  const item=QUIZ[i];
+  box.querySelectorAll('.opt').forEach((o,k)=>{o.classList.add('lock');
+    if(k===item.a){o.classList.add('correct');o.querySelector('.mk').textContent='✓';}
+    if(k===j&&j!==item.a){o.classList.add('wrong');o.querySelector('.mk').textContent='✕';}
+  });
+  const fb=document.getElementById('fb'+i);
+  const ok=j===item.a; if(ok)correct++;
+  answered++;
+  fb.className='fb show '+(ok?'ok':'no');
+  fb.innerHTML=(ok?'✅ <b>Nice.</b> ':'↪️ <b>Not quite.</b> ')+item.fb;
+  scoreEl.textContent=`Score: ${correct} / ${answered} answered`;
+});
+
+/* ---------- Checklist ---------- */
+const ITEMS=[
+  "I can explain how to appropriately enter a community I've just been assigned to.",
+  "I can give an example of “starting where the people are” (relevance).",
+  "I can name at least two barriers to participation and a specific fix for each.",
+  "I can define grassroots organizing, priority population, and formative evaluation in my own words.",
+  "I can explain why plain, everyday language matters for health materials."
+];
+const listEl=document.getElementById('list'), fill=document.getElementById('fill'), pct=document.getElementById('pct');
+ITEMS.forEach((t,i)=>{
+  const li=document.createElement('li');
+  li.innerHTML=`<input type="checkbox" id="c${i}"><label for="c${i}" style="cursor:pointer">${t}</label>`;
+  listEl.appendChild(li);
+});
+listEl.addEventListener('change',()=>{
+  const boxes=[...listEl.querySelectorAll('input')];
+  const done=boxes.filter(b=>b.checked).length;
+  boxes.forEach(b=>b.closest('li').classList.toggle('done',b.checked));
+  fill.style.width=(done/boxes.length*100)+'%';
+  pct.textContent=`${done} of ${boxes.length} ready`;
+});
+</script>
+</body>
+</html>
