@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 5 Prep — Part 2: Roles &amp; Planning Tools</title>
+<style>
+  :root{
+    color-scheme: light;
+    --navy:#1f3864; --teal:#2a9d8f; --amber:#e0912f; --ink:#1e2733; --muted:#5b6672;
+    --bg:#eef2f7; --card:#ffffff; --line:#dfe6ee; --soft:#eaf3f2;
+    --good:#2e7d5b; --bad:#c0473f; --good-bg:#e7f4ee; --bad-bg:#fbeae8;
+    --shadow:0 2px 10px rgba(31,56,100,.08), 0 1px 2px rgba(31,56,100,.06);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:900px;margin:0 auto;padding:22px 18px 60px;}
+  header.hero{background:linear-gradient(135deg,#134a54,var(--teal));color:#fff;border-radius:18px;padding:26px 26px 24px;box-shadow:var(--shadow)}
+  .kicker{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;opacity:.9;font-weight:700;margin:0 0 6px}
+  header.hero h1{margin:0 0 8px;font-size:1.6rem;line-height:1.2}
+  header.hero p{margin:0;opacity:.97;font-size:1rem;max-width:62ch}
+  .note{margin-top:16px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:12px;padding:12px 14px;font-size:.92rem}
+  .note b{color:#ffe6bf}
+  section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:20px;box-shadow:var(--shadow)}
+  .sec-head{display:flex;align-items:center;gap:12px;margin:0 0 4px}
+  .badge{flex:0 0 auto;width:30px;height:30px;border-radius:9px;background:var(--soft);color:var(--teal);display:grid;place-items:center;font-weight:800;font-size:.95rem}
+  h2{font-size:1.22rem;margin:0;color:var(--navy)}
+  .lead{color:var(--muted);margin:.35rem 0 1.1rem;font-size:.96rem}
+  /* role flip cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+  .flip{background:none;border:0;padding:0;perspective:1000px;height:160px;cursor:pointer;font-family:inherit;text-align:left}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+  .flip[aria-pressed="true"] .flip-inner{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;padding:16px;display:flex;flex-direction:column;justify-content:center;border:1px solid var(--line)}
+  .front{background:linear-gradient(135deg,#f7fafc,#eef4f3)}
+  .front .term{font-weight:800;color:var(--navy);font-size:1.02rem}
+  .front .emoji{font-size:1.5rem;margin-bottom:6px}
+  .front .hint{margin-top:8px;color:var(--teal);font-size:.78rem;font-weight:700}
+  .back{background:var(--navy);color:#fff;transform:rotateY(180deg)}
+  .back .def{font-size:.88rem}
+  .back .lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;opacity:.7;margin-bottom:6px;font-weight:700}
+  /* matching */
+  .pool{display:flex;flex-wrap:wrap;gap:10px;padding:14px;border:2px dashed #c7d3e0;border-radius:12px;background:#f8fafc;min-height:56px;margin-bottom:14px}
+  .pool.empty::before{content:"All tasks placed — hit Check!";color:var(--muted);font-size:.88rem;font-style:italic}
+  .chip{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 12px;font:inherit;font-size:.9rem;cursor:pointer;text-align:left;box-shadow:0 1px 2px rgba(0,0,0,.05);max-width:100%}
+  .chip:hover{border-color:var(--teal)}
+  .chip.sel{border-color:var(--amber);box-shadow:0 0 0 3px rgba(224,145,47,.25);background:#fff8ee}
+  .chip.ok{border-color:var(--good);background:var(--good-bg)}
+  .chip.no{border-color:var(--bad);background:var(--bad-bg)}
+  .targets{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+  .target{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fbfcfe}
+  .target h3{margin:0 0 4px;font-size:.98rem;color:var(--navy)}
+  .target .em{font-size:1.1rem}
+  .drop{margin-top:8px;min-height:40px;border-radius:9px;border:1px dashed #cdd8e4;padding:6px;display:flex;flex-direction:column;gap:6px;background:#fff}
+  .target.armed{border-color:var(--amber);box-shadow:0 0 0 3px rgba(224,145,47,.15)}
+  .btn{border:0;border-radius:10px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer}
+  .btn.primary{background:var(--teal);color:#fff}
+  .btn.ghost{background:#eef2f7;color:var(--navy)}
+  .btnrow{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;align-items:center}
+  .result{font-weight:700;color:var(--navy)}
+  /* quiz (shared) */
+  .q{border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;background:#fbfcfe}
+  .q .stem{font-weight:600;margin:0 0 12px}
+  .q .stem .n{color:var(--teal);font-weight:800;margin-right:6px}
+  .opts{display:grid;gap:8px}
+  .opt{text-align:left;border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 12px;cursor:pointer;font:inherit;color:var(--ink);transition:.15s;display:flex;gap:10px;align-items:flex-start}
+  .opt:hover{border-color:var(--teal);background:#f4faf9}
+  .opt .mk{flex:0 0 auto;width:20px;height:20px;border-radius:50%;border:2px solid #c4d0dd;margin-top:1px;display:grid;place-items:center;font-size:.8rem;font-weight:800}
+  .opt.correct{border-color:var(--good);background:var(--good-bg)}
+  .opt.correct .mk{border-color:var(--good);background:var(--good);color:#fff}
+  .opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+  .opt.wrong .mk{border-color:var(--bad);background:var(--bad);color:#fff}
+  .opt.lock{cursor:default}
+  .fb{margin-top:11px;font-size:.9rem;padding:10px 12px;border-radius:10px;display:none}
+  .fb.show{display:block}
+  .fb.ok{background:var(--good-bg);color:#1f5c42;border:1px solid #bfe2d0}
+  .fb.no{background:var(--bad-bg);color:#8f322c;border:1px solid #f0cfcb}
+  /* reference tiles */
+  .smart{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:6px 0 4px}
+  .stile{border:1px solid var(--line);border-radius:12px;padding:12px;background:#f8fbfb}
+  .stile .L{width:30px;height:30px;border-radius:8px;background:var(--teal);color:#fff;display:grid;place-items:center;font-weight:800;margin-bottom:8px}
+  .stile b{color:var(--navy)}
+  .stile p{margin:4px 0 0;font-size:.85rem;color:var(--muted)}
+  .types{display:grid;gap:10px;margin-top:6px}
+  .type{border-left:4px solid var(--teal);background:#f6fafb;border-radius:0 10px 10px 0;padding:10px 14px}
+  .type b{color:var(--navy)}
+  .type .ex{font-size:.85rem;color:var(--muted);margin-top:3px}
+  /* tips accordion */
+  details.tip{border:1px solid var(--line);border-radius:12px;padding:0;margin-bottom:10px;background:#fbfcfe;overflow:hidden}
+  details.tip summary{cursor:pointer;padding:13px 16px;font-weight:700;color:var(--navy);list-style:none;display:flex;justify-content:space-between;align-items:center}
+  details.tip summary::-webkit-details-marker{display:none}
+  details.tip summary::after{content:"+";font-size:1.3rem;color:var(--teal)}
+  details.tip[open] summary::after{content:"–"}
+  details.tip .body{padding:0 16px 14px;font-size:.92rem;color:#37424f}
+  /* checklist */
+  .check{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+  .check li{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fbfcfe}
+  .check input{margin-top:3px;width:18px;height:18px;accent-color:var(--teal);flex:0 0 auto}
+  .check li.done{background:var(--good-bg);border-color:#bfe2d0}
+  .bar{height:12px;border-radius:99px;background:#e3eaf2;overflow:hidden;margin:4px 0 6px}
+  .bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--good));transition:width .35s}
+  .barlbl{font-size:.85rem;color:var(--muted);font-weight:600}
+  .tiptext{font-size:.86rem;color:var(--muted);margin-top:10px}
+  footer{margin-top:26px;text-align:center;color:var(--muted);font-size:.82rem}
+  @media (max-width:520px){header.hero h1{font-size:1.35rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <p class="kicker">HCR 231 · Chapter 5 · Pre-Class Warm-Up</p>
+    <h1>Get Ready: Roles &amp; Planning Tools</h1>
+    <p>Part 2 of your warm-up. Learn who does what on a public-health team, practice matching, and get comfortable with SMART objectives before your in-class activity.</p>
+    <div class="note">📌 <b>Reminder:</b> Everything here uses <b>practice</b> examples, not the activity's questions — so you build the skill and still do your own thinking in class.</div>
+  </header>
+
+  <!-- Roles flip cards -->
+  <section>
+    <div class="sec-head"><span class="badge">1</span><h2>Meet the public-health team</h2></div>
+    <p class="lead">Each of these professionals brings something different. Flip the cards to learn what each one is best at.</p>
+    <div class="grid" id="roles"></div>
+  </section>
+
+  <!-- Matching -->
+  <section>
+    <div class="sec-head"><span class="badge">2</span><h2>Practice: who should take this task?</h2></div>
+    <p class="lead"><b>Tap a task</b> to pick it up, then <b>tap the professional</b> who should handle it. Tap a placed task again to move it. Then hit <b>Check</b>.</p>
+    <div class="pool" id="pool" aria-label="Tasks to place"></div>
+    <div class="targets" id="targets"></div>
+    <div class="btnrow">
+      <button class="btn primary" id="check">Check my matches</button>
+      <button class="btn ghost" id="reset">Reset</button>
+      <span class="result" id="matchResult" aria-live="polite"></span>
+    </div>
+  </section>
+
+  <!-- Communication -->
+  <section>
+    <div class="sec-head"><span class="badge">3</span><h2>Barriers &amp; bridges in communication</h2></div>
+    <p class="lead">A <b>barrier</b> is something that gets in the way of your message being understood or trusted. A <b>bridge</b> is a deliberate strategy to get across that barrier. Try these:</p>
+    <div id="commQuiz"></div>
+  </section>
+
+  <!-- SMART -->
+  <section>
+    <div class="sec-head"><span class="badge">4</span><h2>SMART objectives</h2></div>
+    <p class="lead">A strong objective is Specific, Measurable, Achievable, Relevant, and Time-bound. Skim the reference, then test the difference between objective types.</p>
+    <div class="smart">
+      <div class="stile"><div class="L">S</div><b>Specific</b><p>Exactly who and what.</p></div>
+      <div class="stile"><div class="L">M</div><b>Measurable</b><p>A number you can track.</p></div>
+      <div class="stile"><div class="L">A</div><b>Achievable</b><p>Realistic with your resources.</p></div>
+      <div class="stile"><div class="L">R</div><b>Relevant</b><p>Tied to the real goal.</p></div>
+      <div class="stile"><div class="L">T</div><b>Time-bound</b><p>A clear deadline.</p></div>
+    </div>
+    <h3 style="color:var(--navy);margin:16px 0 4px;font-size:1rem">Three flavors of objective</h3>
+    <div class="types">
+      <div class="type"><b>Process</b> — measures the <i>activities</i> you carry out.<div class="ex">e.g., "Distribute 500 flyers at the packing sheds by August 30."</div></div>
+      <div class="type"><b>Impact</b> — measures changes in <i>knowledge, attitudes, or behavior</i>.<div class="ex">e.g., "Increase the share of workers who drink water hourly from 40% to 70% in 6 months."</div></div>
+      <div class="type"><b>Outcome</b> — measures long-term change in <i>health status</i>.<div class="ex">e.g., "Reduce heat-illness ER visits among workers by 20% within two years."</div></div>
+    </div>
+    <h3 style="color:var(--navy);margin:18px 0 4px;font-size:1rem">Which type is it?</h3>
+    <div id="smartQuiz"></div>
+    <h3 style="color:var(--navy);margin:18px 0 4px;font-size:1rem">Self-audit: does YOUR objective pass?</h3>
+    <p class="lead" style="margin-bottom:.5rem">When you draft an objective in class, check it against all five. This is a scaffold — it won't write it for you.</p>
+    <div class="bar"><i id="sfill"></i></div>
+    <div class="barlbl" id="spct">0 of 5 criteria met</div>
+    <ul class="check" id="smartCheck"></ul>
+  </section>
+
+  <!-- Written response tips -->
+  <section>
+    <div class="sec-head"><span class="badge">5</span><h2>How to nail the written responses</h2></div>
+    <p class="lead">The activity's Part 4 has multi-part prompts worth 3 points each. These habits earn full credit — open each tip.</p>
+    <details class="tip"><summary>Answer every numbered part</summary><div class="body">Each prompt has parts (1), (2), (3). Graders look for all of them. Number your answer the same way so nothing gets missed.</div></details>
+    <details class="tip"><summary>Be specific to Rio Lindo</summary><div class="body">Generic answers lose points. Name the packing sheds, the Spanish-speaking families, the bus stops, the heat — tie your answer to this community's real details.</div></details>
+    <details class="tip"><summary>Write in complete sentences</summary><div class="body">Bullet fragments are hard to grade and often incomplete. Full sentences show your reasoning.</div></details>
+    <details class="tip"><summary>When asked to rewrite a message, keep it plain</summary><div class="body">Short sentences, everyday words, one clear action. Picture a tired worker reading it in 5 seconds.</div></details>
+    <details class="tip"><summary>When asked "how would you know it's working?"</summary><div class="body">Name something you could actually <b>observe or measure</b> — attendance, a count, a before/after survey, a teach-back. Avoid vague answers like "people will like it."</div></details>
+  </section>
+
+  <!-- Readiness -->
+  <section>
+    <div class="sec-head"><span class="badge">✓</span><h2>Am I ready?</h2></div>
+    <p class="lead">Check what you can honestly do. Anything unchecked? Revisit that section or your reading.</p>
+    <div class="bar"><i id="rfill"></i></div>
+    <div class="barlbl" id="rpct">0 of 5 ready</div>
+    <ul class="check" id="rlist"></ul>
+    <p class="tiptext">Nothing here is submitted. Bring your questions to class 👋</p>
+  </section>
+
+  <footer>You're prepped. See you in class!</footer>
+</div>
+
+<script>
+/* ---------- Roles ---------- */
+const ROLES=[
+  ["🔍","Epidemiologist","Studies patterns of disease — who is affected, where, when, and whether an increase is real. The data “disease detective.”"],
+  ["🤝","Community health worker (promotora)","A trusted member of the community who connects families to services, often sharing their language and background."],
+  ["🌦️","Environmental health specialist","Focuses on physical conditions that affect health — water, air, sanitation, and workplace or housing hazards."],
+  ["🧭","Medical social worker","Helps patients and families navigate benefits, housing, and psychosocial needs tied to their health."],
+  ["🩺","Public health nurse","Provides clinical care, screening, education, and follow-up at the community level."],
+];
+const rolesEl=document.getElementById('roles');
+ROLES.forEach(([em,t,d])=>{
+  const b=document.createElement('button');b.className='flip';b.setAttribute('aria-pressed','false');
+  b.innerHTML=`<div class="flip-inner">
+      <div class="face front"><div class="emoji">${em}</div><div class="term">${t}</div><div class="hint">▸ tap to flip</div></div>
+      <div class="face back"><div class="lbl">Best at</div><div class="def">${d}</div></div></div>`;
+  b.addEventListener('click',()=>b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')==='true'?'false':'true'));
+  rolesEl.appendChild(b);
+});
+
+/* ---------- Matching (click to place) ---------- */
+const RT=[
+  {em:"🔍",name:"Epidemiologist"},
+  {em:"🤝",name:"Community health worker"},
+  {em:"🌦️",name:"Environmental health specialist"},
+  {em:"🧭",name:"Medical social worker"},
+  {em:"🩺",name:"Public health nurse"},
+];
+const TASKS=[
+  {id:"t0",text:"Analyze 3 years of ER records to see if asthma visits are truly rising in one neighborhood.",role:0},
+  {id:"t1",text:"Visit a family at home, in their own language, to connect them with a new clinic.",role:1},
+  {id:"t2",text:"Inspect an apartment complex for mold and test the drinking water.",role:2},
+  {id:"t3",text:"Help a newly diagnosed patient apply for benefits and find stable housing.",role:3},
+  {id:"t4",text:"Run a blood-pressure screening event and teach follow-up self-care.",role:4},
+];
+const pool=document.getElementById('pool'), targets=document.getElementById('targets');
+let selected=null;
+function makeChip(t){
+  const c=document.createElement('button');c.className='chip';c.dataset.id=t.id;c.dataset.role=t.role;c.textContent=t.text;
+  c.addEventListener('click',e=>{e.stopPropagation();
+    if(selected===c){c.classList.remove('sel');selected=null;armTargets(false);return;}
+    if(selected)selected.classList.remove('sel');
+    selected=c;c.classList.add('sel');armTargets(true);
+  });
+  return c;
+}
+function armTargets(on){targets.querySelectorAll('.target').forEach(t=>t.classList.toggle('armed',on));}
+TASKS.forEach(t=>pool.appendChild(makeChip(t)));
+RT.forEach((r,i)=>{
+  const d=document.createElement('div');d.className='target';d.dataset.role=i;
+  d.innerHTML=`<h3><span class="em">${r.em}</span> ${r.name}</h3><div class="drop"></div>`;
+  d.addEventListener('click',()=>{
+    if(!selected)return;
+    d.querySelector('.drop').appendChild(selected);
+    selected.classList.remove('sel');selected=null;armTargets(false);updatePool();
+  });
+  targets.appendChild(d);
+});
+function updatePool(){pool.classList.toggle('empty',pool.querySelectorAll('.chip').length===0);}
+document.getElementById('check').addEventListener('click',()=>{
+  let right=0,placed=0;
+  targets.querySelectorAll('.target').forEach(t=>{
+    const role=+t.dataset.role;
+    t.querySelectorAll('.chip').forEach(c=>{placed++;c.classList.remove('ok','no');
+      if(+c.dataset.role===role){c.classList.add('ok');right++;}else{c.classList.add('no');}
+    });
+  });
+  const res=document.getElementById('matchResult');
+  if(placed<TASKS.length){res.textContent=`Place all ${TASKS.length} tasks first (${placed} placed).`;}
+  else{res.textContent=`${right} of ${TASKS.length} correct`+(right===TASKS.length?" — perfect! 🎉":" — move the red ones and try again.");}
+});
+document.getElementById('reset').addEventListener('click',()=>{
+  if(selected){selected.classList.remove('sel');selected=null;}
+  TASKS.forEach(t=>{const c=pool.querySelector(`[data-id="${t.id}"]`)||targets.querySelector(`[data-id="${t.id}"]`);});
+  document.querySelectorAll('.chip').forEach(c=>{c.classList.remove('ok','no','sel');pool.appendChild(c);});
+  armTargets(false);updatePool();document.getElementById('matchResult').textContent='';
+});
+
+/* ---------- Reusable quiz ---------- */
+function buildQuiz(mount,data){
+  const host=document.getElementById(mount);
+  data.forEach((item,i)=>{
+    const wrap=document.createElement('div');wrap.className='q';
+    const opts=item.opts.map((o,j)=>`<button class="opt" data-j="${j}"><span class="mk"></span><span>${o}</span></button>`).join('');
+    wrap.innerHTML=`<p class="stem"><span class="n">${i+1}.</span>${item.q}</p><div class="opts">${opts}</div><div class="fb"></div>`;
+    wrap.addEventListener('click',e=>{
+      const btn=e.target.closest('.opt');if(!btn||wrap.dataset.done)return;wrap.dataset.done='1';
+      const j=+btn.dataset.j;
+      wrap.querySelectorAll('.opt').forEach((o,k)=>{o.classList.add('lock');
+        if(k===item.a){o.classList.add('correct');o.querySelector('.mk').textContent='✓';}
+        if(k===j&&j!==item.a){o.classList.add('wrong');o.querySelector('.mk').textContent='✕';}});
+      const fb=wrap.querySelector('.fb');const ok=j===item.a;
+      fb.className='fb show '+(ok?'ok':'no');
+      fb.innerHTML=(ok?'✅ <b>Yes.</b> ':'↪️ <b>Not quite.</b> ')+item.fb;
+    });
+    host.appendChild(wrap);
+  });
+}
+buildQuiz('commQuiz',[
+  {q:"Residents don't speak much English and don't know you yet. Which is the strongest <b>bridge</b> for building trust and getting your message across?",
+   opts:["Send the same English flyer, but in a bigger font","Partner with a trusted bilingual community health worker to share the message in Spanish","Post everything on the county website","Repeat the message louder at meetings"],a:1,
+   fb:"A trusted, bilingual messenger bridges both the language barrier and the trust barrier at once."},
+  {q:"You want to know whether your new bridge is actually working. Which is the best thing to <b>observe or measure</b>?",
+   opts:["Whether you personally feel it went well","Attendance and the number of families who follow up after the message","Whether the flyer looks professional","How many flyers you printed"],a:1,
+   fb:"A bridge is 'working' when you see real, observable change — like more people attending or following up."},
+]);
+buildQuiz('smartQuiz',[
+  {q:"“Hand out 800 water-safety cards at the packing sheds by July 15.” This is a…",
+   opts:["Process objective","Impact objective","Outcome objective"],a:0,
+   fb:"It counts an activity you carry out (handing out cards) — that's a process objective."},
+  {q:"“Within one year, cut heat-illness ER visits among packing-shed workers by 15%.” This is a…",
+   opts:["Process objective","Impact objective","Outcome objective"],a:2,
+   fb:"It targets a long-term change in health status (ER visits) — that's an outcome objective."},
+  {q:"“In 6 months, raise the share of workers who take a shaded water break every hour from 30% to 65%.” This is a…",
+   opts:["Process objective","Impact objective","Outcome objective"],a:1,
+   fb:"It measures a change in behavior — that's an impact objective."},
+]);
+
+/* ---------- checklists ---------- */
+function checklist(mountId,fillId,pctId,items){
+  const list=document.getElementById(mountId),fill=document.getElementById(fillId),pct=document.getElementById(pctId);
+  items.forEach((t,i)=>{const li=document.createElement('li');
+    li.innerHTML=`<input type="checkbox" id="${mountId}${i}"><label for="${mountId}${i}" style="cursor:pointer">${t}</label>`;list.appendChild(li);});
+  list.addEventListener('change',()=>{const b=[...list.querySelectorAll('input')];const d=b.filter(x=>x.checked).length;
+    b.forEach(x=>x.closest('li').classList.toggle('done',x.checked));
+    fill.style.width=(d/b.length*100)+'%';pct.textContent=`${d} of ${b.length} ${pctId==='spct'?'criteria met':'ready'}`;});
+}
+checklist('smartCheck','sfill','spct',[
+  "<b>S</b>pecific — I named exactly who and what.",
+  "<b>M</b>easurable — I included a number I can track.",
+  "<b>A</b>chievable — it's realistic for Rio Lindo's resources.",
+  "<b>R</b>elevant — it clearly serves the heat-safety goal.",
+  "<b>T</b>ime-bound — I set a clear deadline.",
+]);
+checklist('rlist','rfill','rpct',[
+  "I can describe what an epidemiologist, a promotora, and an environmental health specialist each do best.",
+  "I can match a task to the right professional and explain why.",
+  "I can name a communication barrier and a bridge to overcome it.",
+  "I can tell the difference between a process, impact, and outcome objective.",
+  "I can write a SMART objective with all five criteria.",
+]);
+</script>
+</body>
+</html>

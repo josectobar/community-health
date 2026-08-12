@@ -82,6 +82,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/final-project-score-the-samples/](models/final-project-score-the-samples/): practice grading sample final project responses against the rubric.
 - [models/ch2-authority-chain/](models/ch2-authority-chain/): match six health organizations to their funding, authority, and signature activity.
 - [models/hcr231-ch5-organizing-the-community/](models/hcr231-ch5-organizing-the-community/): hCR 231 Chapter 5 pre-class warm-up: organizing the community.
+- [models/hcr231-ch5-roles-and-planning-tools/](models/hcr231-ch5-roles-and-planning-tools/): hCR 231 Chapter 5 pre-class warm-up: roles and planning tools.
 
 ## Embed snippets
 
@@ -148,6 +149,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Score the Samples" src="models/final-project-score-the-samples/"></iframe>
 <iframe title="Trace the Chain: Funding, Authority, Capability" src="models/ch2-authority-chain/"></iframe>
 <iframe title="Chapter 5 Prep — Part 1: Organizing the Community" src="models/hcr231-ch5-organizing-the-community/"></iframe>
+<iframe title="Chapter 5 Prep — Part 2: Roles &amp; Planning Tools" src="models/hcr231-ch5-roles-and-planning-tools/"></iframe>
 ```
 
 ## Files
