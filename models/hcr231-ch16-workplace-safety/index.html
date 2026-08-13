@@ -33,18 +33,39 @@
     padding:12px;display:flex;flex-direction:column;justify-content:center;text-align:center}
   .front{background:var(--panel)}.front b{font-size:15px}
   .front .tap{position:absolute;bottom:7px;left:0;right:0;font-size:11px;color:var(--muted)}
-  .back{background:var(--accent);color:#fff;transform:rotateY(180deg);font-size:12.5px;overflow:auto}
+  .face.back{background:var(--accent);color:#fff;transform:rotateY(180deg);font-size:12.5px;overflow:auto}
 
   /* sorter */
-  .sortbtns{margin:0 0 10px}
-  .sortbtns button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 12px;
-    font-size:13px;cursor:pointer;margin:0 8px 6px 0;font-weight:600}
-  .sortbtns button.a{color:#0a4f4f}.sortbtns button.b{color:#7a4a00}
-  .chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);
-    border-radius:999px;padding:7px 13px;margin:5px 5px 0 0;font-size:13.5px;cursor:pointer;transition:.15s}
-  .chip:hover{border-color:var(--accent)}
-  .chip.injury{background:var(--accent-soft);border-color:var(--accent);color:#0a4f4f;font-weight:600}
-  .chip.illness{background:var(--amber-soft);border-color:var(--amber);color:#7a4a00;font-weight:600}
+  .pool{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:14px;min-height:8px}
+  .item{border:1px solid var(--line);border-radius:11px;background:#fff;padding:9px 11px;
+    display:flex;flex-direction:column;gap:8px;max-width:235px}
+  .item .txt{font-size:13.2px;line-height:1.4}
+  .item .picks{display:flex;gap:7px}
+  .item .picks button{flex:1;border:1px solid var(--line);border-radius:8px;padding:5px 6px;
+    font-size:11.8px;font-weight:600;cursor:pointer;background:#f6f8f9;transition:.15s}
+  .item .picks .pi{color:#0a4f4f}.item .picks .pi:hover{background:var(--accent-soft);border-color:var(--accent)}
+  .item .picks .pl{color:#7a4a00}.item .picks .pl:hover{background:var(--amber-soft);border-color:var(--amber)}
+  .bins{display:flex;gap:12px;flex-wrap:wrap}
+  .bin{flex:1;min-width:225px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .injuryBin{border-color:var(--accent)}.illnessBin{border-color:var(--amber)}
+  .binhead{padding:9px 12px;font-weight:700;font-size:13.5px}
+  .injuryBin .binhead{background:var(--accent-soft);color:#0a4f4f}
+  .illnessBin .binhead{background:var(--amber-soft);color:#7a4a00}
+  .bindrop{padding:10px;display:flex;flex-direction:column;gap:7px;min-height:46px}
+  .bindrop:empty:after{content:"Sort items here";color:#aab2ba;font-size:12px;font-style:italic}
+  .sorted{border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12.8px;
+    display:flex;align-items:center;gap:8px;justify-content:space-between;background:#fff}
+  .sorted .rt{display:flex;gap:8px;align-items:center;flex:0 0 auto}
+  .sorted .back,.psSorted .back{border:none;background:none;cursor:pointer;color:var(--muted);font-size:15px;line-height:1;padding:0}
+  .sorted.ok{background:#e2f0e4;border-color:#2f6d3a}
+  .sorted.no{background:#fbe1e1;border-color:#b23a3a}
+  .mark{font-weight:800}.mark.ok{color:#2f6d3a}.mark.no{color:#b23a3a}
+  .sortactions{margin:14px 0 8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .btnprimary{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 15px;
+    font-size:13px;font-weight:700;cursor:pointer}
+  .btnghost{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 14px;
+    font-size:13px;font-weight:600;cursor:pointer;color:var(--muted)}
+  .score{font-size:13.5px;font-weight:700}
   .legend{font-size:12.5px;color:var(--muted);margin-top:10px}
 
   /* violence tabs */
@@ -57,19 +78,36 @@
   .panel-v h4{margin:0 0 6px;color:var(--violet);font-size:16px}
   .panel-v .who{font-size:13.3px;color:#4a336f;margin:8px 0 0;font-style:italic}
 
-  /* prevention triad */
-  .triad{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:11px}
-  .pcard{border:1px solid var(--line);border-radius:12px;padding:15px;background:#fff}
-  .pcard .tagp{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;
-    letter-spacing:.05em;border-radius:999px;padding:3px 10px;margin-bottom:8px}
-  .pcard.env .tagp{background:var(--green-soft);color:var(--green)}
-  .pcard.adm .tagp{background:var(--accent-soft);color:#0a4f4f}
-  .pcard.beh .tagp{background:var(--violet-soft);color:var(--violet)}
-  .pcard h4{margin:2px 0 6px;font-size:15px}
-  .pcard p{margin:0;font-size:13px;color:var(--muted)}
-  .pcard ul{margin:8px 0 0;padding-left:17px;font-size:12.8px}
-  .pcard li{margin:3px 0}
-  @media print{.flip{height:auto}.flip-inner{transform:none!important}.back{position:static;transform:none;margin-top:8px}.front .tap{display:none}}
+  /* prevention matcher */
+  .pslegend{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;font-size:12.3px}
+  .pschip{border-radius:999px;padding:4px 11px;font-weight:600}
+  .pschip.env{background:var(--green-soft);color:var(--green)}
+  .pschip.adm{background:var(--accent-soft);color:#0a4f4f}
+  .pschip.beh{background:var(--violet-soft);color:var(--violet)}
+  .psPool{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:14px;min-height:8px}
+  .psItem{border:1px solid var(--line);border-radius:11px;background:#fff;padding:9px 11px;
+    display:flex;flex-direction:column;gap:8px;max-width:250px}
+  .psItem .txt{font-size:13px;line-height:1.4}
+  .psItem .picks{display:flex;flex-wrap:wrap;gap:6px}
+  .psItem .picks button{border:1px solid var(--line);border-radius:8px;padding:4px 9px;
+    font-size:11px;font-weight:600;cursor:pointer;background:#f6f8f9;transition:.15s}
+  .psItem .picks .pe{color:var(--green)}.psItem .picks .pe:hover{background:var(--green-soft);border-color:var(--green)}
+  .psItem .picks .pa{color:#0a4f4f}.psItem .picks .pa:hover{background:var(--accent-soft);border-color:var(--accent)}
+  .psItem .picks .pb{color:var(--violet)}.psItem .picks .pb:hover{background:var(--violet-soft);border-color:var(--violet)}
+  .psBins{display:flex;gap:11px;flex-wrap:wrap}
+  .psBin{flex:1;min-width:195px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .psBin.env{border-color:var(--green)}.psBin.adm{border-color:var(--accent)}.psBin.beh{border-color:var(--violet)}
+  .psBin .h{padding:9px 12px;font-weight:700;font-size:12.8px}
+  .psBin.env .h{background:var(--green-soft);color:var(--green)}
+  .psBin.adm .h{background:var(--accent-soft);color:#0a4f4f}
+  .psBin.beh .h{background:var(--violet-soft);color:var(--violet)}
+  .psBin .drop{padding:10px;display:flex;flex-direction:column;gap:7px;min-height:46px}
+  .psBin .drop:empty:after{content:"Sort here";color:#aab2ba;font-size:12px;font-style:italic}
+  .psSorted{border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12.4px;
+    display:flex;align-items:center;gap:8px;justify-content:space-between;background:#fff}
+  .psSorted.ok{background:#e2f0e4;border-color:#2f6d3a}
+  .psSorted.no{background:#fbe1e1;border-color:#b23a3a}
+  @media print{.flip{height:auto}.flip-inner{transform:none!important}.face.back{position:static;transform:none;margin-top:8px}.front .tap{display:none}}
 </style>
 </head>
 <body>
@@ -85,26 +123,40 @@
   <!-- WIDGET 2: INJURY VS ILLNESS -->
   <div class="widget">
     <p class="wtitle"><span class="n">2</span>Injury or Illness? — Sort the Examples</p>
-    <p class="winstr">Click a mode, then click each example to tag it. There's no score — the point is to talk yourself through <i>why</i>.</p>
-    <div class="sortbtns">
-      <button class="a" onclick="mode='injury'">🩹 Mark as Injury</button>
-      <button class="b" onclick="mode='illness'">🌡️ Mark as Illness</button>
-      <button onclick="resetSort()" style="color:var(--muted)">↺ Reset</button>
+    <p class="winstr">For each example, click <b>🩹 Injury</b> or <b>🌡️ Illness</b> to drop it into that bin. When everything is sorted, press <b>Check my sorting</b> to see how you did. (Use ↩ to send one back.)</p>
+    <div id="pool" class="pool"></div>
+    <div class="bins">
+      <div class="bin injuryBin"><div class="binhead">🩹 Occupational Injury</div><div class="bindrop" id="binInjury"></div></div>
+      <div class="bin illnessBin"><div class="binhead">🌡️ Occupational Illness</div><div class="bindrop" id="binIllness"></div></div>
     </div>
-    <div id="chips"></div>
+    <div class="sortactions">
+      <button id="checkBtn" class="btnprimary">✓ Check my sorting</button>
+      <button id="resetBtn" class="btnghost">↺ Reset</button>
+      <span id="score" class="score"></span>
+    </div>
     <div class="legend">Ask yourself: "Did this happen in one moment (injury), or build up from repeated exposure over time (illness)?"</div>
   </div>
 
-  <!-- WIDGET 3: PREVENTION -->
+  <!-- WIDGET 3: PREVENTION MATCHER -->
   <div class="widget">
-    <p class="wtitle"><span class="n">3</span>Three Kinds of Prevention Strategies</p>
-    <p class="winstr">When a scenario asks "what could have prevented this?", name one of these categories and give a <b>specific</b> action.</p>
-    <div class="triad">
-      <div class="pcard env"><span class="tagp">Environmental</span><h4>Change the physical space</h4><p>Design &amp; equipment that reduce risk.</p><ul><li>Better lighting &amp; visibility</li><li>Cameras, alarms</li><li>Locked/limited-access areas</li><li>Barriers or drop safes</li></ul></div>
-      <div class="pcard adm"><span class="tagp">Administrative</span><h4>Change the rules &amp; policies</h4><p>Procedures, staffing, training.</p><ul><li>Zero-tolerance policies</li><li>Reporting &amp; follow-up</li><li>Staffing (never alone at night)</li><li>De-escalation training</li></ul></div>
-      <div class="pcard beh"><span class="tagp">Behavioral</span><h4>Change how people act</h4><p>Individual choices in the moment.</p><ul><li>Recognizing warning signs</li><li>Speaking up / reporting</li><li>Conflict-resolution skills</li><li>Following safety habits</li></ul></div>
+    <p class="wtitle"><span class="n">3</span>Match Each Action to Its Prevention Strategy</p>
+    <p class="winstr">Read each prevention action and click the strategy type it belongs to. When all are sorted, press <b>Check my answers</b>. (Use ↩ to send one back.)</p>
+    <div class="pslegend">
+      <span class="pschip env">🏢 Environmental = the place</span>
+      <span class="pschip adm">📋 Administrative = the policy</span>
+      <span class="pschip beh">🧍 Behavioral = the person</span>
     </div>
-    <div class="hint" style="margin:14px 0 0">💡 Memory hook: <b>Environmental = the place</b>, <b>Administrative = the policy</b>, <b>Behavioral = the person</b>.</div>
+    <div id="psPool" class="psPool"></div>
+    <div class="psBins">
+      <div class="psBin env"><div class="h">🏢 Environmental</div><div class="drop" id="psEnv"></div></div>
+      <div class="psBin adm"><div class="h">📋 Administrative</div><div class="drop" id="psAdm"></div></div>
+      <div class="psBin beh"><div class="h">🧍 Behavioral</div><div class="drop" id="psBeh"></div></div>
+    </div>
+    <div class="sortactions">
+      <button id="psCheck" class="btnprimary">✓ Check my answers</button>
+      <button id="psReset" class="btnghost">↺ Reset</button>
+      <span id="psScore" class="score"></span>
+    </div>
   </div>
 
 <script>
@@ -128,16 +180,128 @@ terms.forEach(([t,d])=>{
   el.onclick=()=>el.classList.toggle('on');cw.appendChild(el);
 });
 
-/* Sorter */
-let mode='injury';
-const examples=["Slips on a wet floor and sprains an ankle","Develops carpal tunnel after years of typing","Cuts hand on broken glass","Hearing loss from constant loud machinery","Back strain from lifting a heavy box once","Chronic lung condition from chemical fumes","Burns arm on hot equipment","Repetitive-stress shoulder pain from patient lifting"];
-const chipBox=document.getElementById('chips');
-function drawChips(){chipBox.innerHTML='';examples.forEach((x,i)=>{
-  const c=document.createElement('span');c.className='chip';c.textContent=x;
-  c.onclick=()=>{c.classList.remove('injury','illness');c.classList.add(mode);};
-  chipBox.appendChild(c);});}
-function resetSort(){drawChips();}
-drawChips();
+/* Sorter — click Injury/Illness to move each item into a bin, then check */
+const examples=[
+  ["Slips on a wet floor and sprains an ankle","injury"],
+  ["Develops carpal tunnel after years of typing","illness"],
+  ["Cuts hand on broken glass","injury"],
+  ["Hearing loss from constant loud machinery","illness"],
+  ["Back strain from lifting a heavy box once","injury"],
+  ["Chronic lung condition from chemical fumes","illness"],
+  ["Burns arm on hot equipment","injury"],
+  ["Repetitive-stress shoulder pain from patient lifting","illness"]
+];
+let place=examples.map(()=>'pool');
+let checking=false;
+const pool=document.getElementById('pool'),binI=document.getElementById('binInjury'),
+  binL=document.getElementById('binIllness'),score=document.getElementById('score');
+function clearScore(){checking=false;score.textContent='';}
+function renderSort(){
+  pool.innerHTML='';binI.innerHTML='';binL.innerHTML='';
+  examples.forEach((ex,i)=>{
+    const where=place[i];
+    if(where==='pool'){
+      const d=document.createElement('div');d.className='item';
+      d.innerHTML=`<span class="txt">${ex[0]}</span>`;
+      const picks=document.createElement('span');picks.className='picks';
+      const bi=document.createElement('button');bi.className='pi';bi.textContent='🩹 Injury';
+      bi.onclick=()=>{place[i]='injury';clearScore();renderSort();};
+      const bl=document.createElement('button');bl.className='pl';bl.textContent='🌡️ Illness';
+      bl.onclick=()=>{place[i]='illness';clearScore();renderSort();};
+      picks.appendChild(bi);picks.appendChild(bl);d.appendChild(picks);
+      pool.appendChild(d);
+    }else{
+      const d=document.createElement('div');d.className='sorted';
+      const left=document.createElement('span');left.textContent=ex[0];
+      const right=document.createElement('span');right.className='rt';
+      if(checking){
+        const ok=place[i]===ex[1];
+        d.classList.add(ok?'ok':'no');
+        const m=document.createElement('span');m.className='mark '+(ok?'ok':'no');m.textContent=ok?'✓':'✗';
+        right.appendChild(m);
+      }
+      const back=document.createElement('button');back.className='back';back.title='Return to pool';back.textContent='↩';
+      back.onclick=()=>{place[i]='pool';clearScore();renderSort();};
+      right.appendChild(back);
+      d.appendChild(left);d.appendChild(right);
+      (where==='injury'?binI:binL).appendChild(d);
+    }
+  });
+}
+document.getElementById('checkBtn').onclick=()=>{
+  const unsorted=place.filter(p=>p==='pool').length;
+  if(unsorted>0){checking=false;renderSort();
+    score.style.color='#7a4a00';score.textContent=`⚠ Sort the ${unsorted} remaining item(s) first.`;return;}
+  checking=true;renderSort();
+  const correct=examples.filter((ex,i)=>place[i]===ex[1]).length;
+  score.style.color=(correct===examples.length)?'#2f6d3a':'#1f2933';
+  score.textContent=`You sorted ${correct} of ${examples.length} correctly.`;
+};
+document.getElementById('resetBtn').onclick=()=>{place=examples.map(()=>'pool');clearScore();renderSort();};
+renderSort();
+
+/* Prevention matcher — classify each action as env / adm / beh */
+const actions=[
+  ["Install brighter lighting in dim areas","env"],
+  ["Add security cameras and alarms","env"],
+  ["Use locked doors to limit who can enter","env"],
+  ["Write a zero-tolerance policy for violence","adm"],
+  ["Require all staff to complete safety training","adm"],
+  ["Schedule so no one works alone at night","adm"],
+  ["Notice and report a coworker's warning signs","beh"],
+  ["Speak up when you see a conflict starting","beh"],
+  ["Stay calm and use de-escalation words in the moment","beh"]
+];
+let pplace=actions.map(()=>'pool');
+let pchecking=false;
+const psPool=document.getElementById('psPool'),psEnv=document.getElementById('psEnv'),
+  psAdm=document.getElementById('psAdm'),psBeh=document.getElementById('psBeh'),
+  psScore=document.getElementById('psScore');
+const psBinOf={env:psEnv,adm:psAdm,beh:psBeh};
+function psClear(){pchecking=false;psScore.textContent='';}
+function renderPS(){
+  psPool.innerHTML='';psEnv.innerHTML='';psAdm.innerHTML='';psBeh.innerHTML='';
+  actions.forEach((a,i)=>{
+    const where=pplace[i];
+    if(where==='pool'){
+      const d=document.createElement('div');d.className='psItem';
+      const t=document.createElement('span');t.className='txt';t.textContent=a[0];d.appendChild(t);
+      const picks=document.createElement('span');picks.className='picks';
+      [['pe','🏢 Environmental','env'],['pa','📋 Administrative','adm'],['pb','🧍 Behavioral','beh']].forEach(([cls,label,cat])=>{
+        const btn=document.createElement('button');btn.className=cls;btn.textContent=label;
+        btn.onclick=()=>{pplace[i]=cat;psClear();renderPS();};
+        picks.appendChild(btn);
+      });
+      d.appendChild(picks);psPool.appendChild(d);
+    }else{
+      const d=document.createElement('div');d.className='psSorted';
+      const left=document.createElement('span');left.textContent=a[0];
+      const right=document.createElement('span');right.className='rt';
+      if(pchecking){
+        const ok=pplace[i]===a[1];
+        d.classList.add(ok?'ok':'no');
+        const m=document.createElement('span');m.className='mark '+(ok?'ok':'no');m.textContent=ok?'✓':'✗';
+        right.appendChild(m);
+      }
+      const back=document.createElement('button');back.className='back';back.title='Return to pool';back.textContent='↩';
+      back.onclick=()=>{pplace[i]='pool';psClear();renderPS();};
+      right.appendChild(back);
+      d.appendChild(left);d.appendChild(right);
+      psBinOf[where].appendChild(d);
+    }
+  });
+}
+document.getElementById('psCheck').onclick=()=>{
+  const unsorted=pplace.filter(p=>p==='pool').length;
+  if(unsorted>0){pchecking=false;renderPS();
+    psScore.style.color='#7a4a00';psScore.textContent=`⚠ Sort the ${unsorted} remaining item(s) first.`;return;}
+  pchecking=true;renderPS();
+  const correct=actions.filter((a,i)=>pplace[i]===a[1]).length;
+  psScore.style.color=(correct===actions.length)?'#2f6d3a':'#1f2933';
+  psScore.textContent=`You got ${correct} of ${actions.length} correct.`;
+};
+document.getElementById('psReset').onclick=()=>{pplace=actions.map(()=>'pool');psClear();renderPS();};
+renderPS();
 
 </script>
 </body>
