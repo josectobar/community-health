@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 16 — Case Scenario Widgets</title>
+<style>
+  :root{
+    color-scheme: light;
+    --ink:#1f2933; --muted:#5b6670; --line:#dfe3e8; --bg:#ffffff;
+    --panel:#f6f8f9; --accent:#0b6b6b; --accent-soft:#e3f0f0;
+    --amber:#b26a00; --amber-soft:#fbeecf; --violet:#5b3d8a; --violet-soft:#ece4f7;
+    --green:#2f6d3a; --green-soft:#e2f0e4;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;font-size:15.5px;padding:14px}
+  .widget{border:1px solid var(--line);border-radius:14px;padding:18px 18px 20px;margin-bottom:18px;background:#fff}
+  .wtitle{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:700;margin:0 0 3px}
+  .wtitle .n{background:var(--violet);color:#fff;border-radius:7px;width:26px;height:26px;
+    display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex:0 0 auto}
+  .winstr{color:var(--muted);font-size:13.5px;margin:0 0 14px}
+
+  /* decision guide */
+  .guide{border:2px solid var(--violet);border-radius:12px;padding:18px;background:var(--violet-soft)}
+  .qtext{font-size:15.5px;font-weight:600;color:#3f2c60;margin-bottom:13px;min-height:1.3em}
+  .gbtns{display:flex;flex-wrap:wrap;gap:10px}
+  .gbtn{border:1px solid var(--violet);background:#fff;color:var(--violet);border-radius:10px;
+    padding:9px 15px;font-size:14px;font-weight:600;cursor:pointer;transition:.15s}
+  .gbtn:hover{background:var(--violet);color:#fff}
+  .gresult{margin-top:15px;background:#fff;border-radius:12px;padding:15px;display:none}
+  .gresult.on{display:block}
+  .gresult .rtype{font-size:16.5px;font-weight:700;color:var(--violet);margin-bottom:6px}
+  .gresult p{margin:0;font-size:13.8px}
+  .greset{margin-top:12px;background:none;border:none;color:var(--violet);font-weight:600;
+    font-size:13.5px;cursor:pointer;text-decoration:underline;padding:0}
+  .path{font-size:12.3px;color:var(--muted);margin-top:9px;font-style:italic}
+
+  /* matcher */
+  .mPool{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:14px;min-height:8px}
+  .mItem{border:1px solid var(--line);border-radius:11px;background:#fff;padding:9px 11px;
+    display:flex;flex-direction:column;gap:8px;max-width:265px}
+  .mItem .txt{font-size:13px;line-height:1.4}
+  .mItem .picks{display:flex;flex-wrap:wrap;gap:6px}
+  .mItem .picks button{border:1px solid var(--line);border-radius:8px;padding:4px 9px;
+    font-size:11.3px;font-weight:700;cursor:pointer;background:#f6f8f9;transition:.15s}
+  .mItem .picks .t1{color:var(--amber)}.mItem .picks .t1:hover{background:var(--amber-soft);border-color:var(--amber)}
+  .mItem .picks .t2{color:#0a4f4f}.mItem .picks .t2:hover{background:var(--accent-soft);border-color:var(--accent)}
+  .mItem .picks .t3{color:var(--violet)}.mItem .picks .t3:hover{background:var(--violet-soft);border-color:var(--violet)}
+  .mItem .picks .t4{color:var(--green)}.mItem .picks .t4:hover{background:var(--green-soft);border-color:var(--green)}
+  .mBins{display:flex;gap:10px;flex-wrap:wrap}
+  .mBin{flex:1;min-width:160px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .mBin.t1{border-color:var(--amber)}.mBin.t2{border-color:var(--accent)}
+  .mBin.t3{border-color:var(--violet)}.mBin.t4{border-color:var(--green)}
+  .mBin .h{padding:9px 11px;font-weight:700;font-size:12.4px;line-height:1.25}
+  .mBin.t1 .h{background:var(--amber-soft);color:#7a4a00}
+  .mBin.t2 .h{background:var(--accent-soft);color:#0a4f4f}
+  .mBin.t3 .h{background:var(--violet-soft);color:var(--violet)}
+  .mBin.t4 .h{background:var(--green-soft);color:var(--green)}
+  .mBin .drop{padding:9px;display:flex;flex-direction:column;gap:7px;min-height:44px}
+  .mBin .drop:empty:after{content:"Sort here";color:#aab2ba;font-size:12px;font-style:italic}
+  .mSorted{border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12.2px;
+    display:flex;align-items:center;gap:6px;justify-content:space-between;background:#fff}
+  .mSorted.ok{background:#e2f0e4;border-color:#2f6d3a}
+  .mSorted.no{background:#fbe1e1;border-color:#b23a3a}
+  .rt{display:flex;gap:7px;align-items:center;flex:0 0 auto}
+  .back{border:none;background:none;cursor:pointer;color:var(--muted);font-size:15px;line-height:1;padding:0}
+  .mark{font-weight:800}.mark.ok{color:#2f6d3a}.mark.no{color:#b23a3a}
+  .actions{margin:14px 0 4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .btnprimary{background:var(--violet);color:#fff;border:none;border-radius:8px;padding:8px 15px;
+    font-size:13px;font-weight:700;cursor:pointer}
+  .btnghost{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 14px;
+    font-size:13px;font-weight:600;cursor:pointer;color:var(--muted)}
+  .score{font-size:13.5px;font-weight:700}
+
+  /* try it yourself */
+  .practice{border:2px dashed var(--green);border-radius:12px;padding:16px 18px;background:var(--green-soft)}
+  .practice h4{margin:0 0 4px;color:var(--green);font-size:15.5px}
+  .practice .sc{background:#fff;border-radius:10px;padding:13px;font-size:13.8px;margin:11px 0}
+  .practice ol{margin:6px 0 0;padding-left:20px;font-size:13.8px}
+  .practice li{margin:7px 0}
+  .revealBtn{margin-top:12px;background:#fff;border:1px solid var(--green);color:var(--green);
+    border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer}
+  .revealBox{margin-top:12px;background:#fff;border-radius:10px;padding:13px 15px;font-size:13.5px;
+    color:#2b5233;display:none}
+  .revealBox.on{display:block}
+
+  /* checklist */
+  .checkhead{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+  .progress{font-size:13.5px;font-weight:700;color:var(--violet)}
+  .checklist{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 18px}
+  .checklist label{display:flex;gap:10px;align-items:flex-start;font-size:14px;margin:9px 0;cursor:pointer}
+  .checklist input{margin-top:3px;width:17px;height:17px;accent-color:var(--violet);flex:0 0 auto}
+  .checklist label.done{color:var(--muted);text-decoration:line-through}
+</style>
+</head>
+<body>
+
+  <!-- WIDGET 1: DECISION GUIDE -->
+  <div class="widget">
+    <p class="wtitle"><span class="n">1</span>Identify the Violence Type — Decision Guide</p>
+    <p class="winstr">Use this on <b>your own</b> scenarios. Answer each question about the perpetrator and it walks you to the right type, with reasoning you can put in your own words.</p>
+    <div class="guide">
+      <div class="qtext" id="qtext"></div>
+      <div class="gbtns" id="gbtns"></div>
+      <div class="gresult" id="gresult">
+        <div class="rtype" id="rtype"></div>
+        <p id="rwhy"></p>
+        <div class="path" id="rpath"></div>
+      </div>
+      <button class="greset" id="greset" style="display:none">↺ Start over</button>
+    </div>
+  </div>
+
+  <!-- WIDGET 2: SCENARIO MATCHER -->
+  <div class="widget">
+    <p class="wtitle"><span class="n">2</span>Match the Scenario to Its Type</p>
+    <p class="winstr">Read each short scenario and click the type it fits. When all are sorted, press <b>Check my answers</b>. These are practice scenarios — not the ones on your activity. (Use ↩ to send one back.)</p>
+    <div id="mPool" class="mPool"></div>
+    <div class="mBins">
+      <div class="mBin t1"><div class="h">Type I<br>Criminal Intent</div><div class="drop" id="mT1"></div></div>
+      <div class="mBin t2"><div class="h">Type II<br>Customer / Client</div><div class="drop" id="mT2"></div></div>
+      <div class="mBin t3"><div class="h">Type III<br>Worker-on-Worker</div><div class="drop" id="mT3"></div></div>
+      <div class="mBin t4"><div class="h">Type IV<br>Personal Relationship</div><div class="drop" id="mT4"></div></div>
+    </div>
+    <div class="actions">
+      <button id="mCheck" class="btnprimary">✓ Check my answers</button>
+      <button id="mReset" class="btnghost">↺ Reset</button>
+      <span id="mScore" class="score"></span>
+    </div>
+  </div>
+
+  <!-- WIDGET 3: TRY IT YOURSELF -->
+  <div class="widget">
+    <p class="wtitle"><span class="n">3</span>Try It Yourself</p>
+    <p class="winstr">Work all three parts on this fresh scenario, then reveal the guiding questions to check your thinking — not your answer.</p>
+    <div class="practice">
+      <h4>Practice: The Retail Floor</h4>
+      <div class="sc">Sam works evenings at an electronics store. A customer becomes angry over a returned item, yells, and throws a display box that hits Sam's shoulder. The store has one associate on the floor at closing and no policy for handling hostile customers.</div>
+      <ol>
+        <li><b>Part (a):</b> Who is the perpetrator, and what is their relationship to the store? Which type does that make it?</li>
+        <li><b>Part (b):</b> Pick one prevention category and name a specific action the store could have taken beforehand.</li>
+        <li><b>Part (c):</b> Is this an injury or an illness? Name two ways it could affect Sam.</li>
+      </ol>
+      <button class="revealBtn" id="revealBtn">💭 Reveal guiding questions</button>
+      <div class="revealBox" id="revealBox">
+        <b>(a)</b> Is the customer served by the store? What category does "someone the organization serves" point to?<br><br>
+        <b>(b)</b> Could a change to the <i>space</i>, the <i>policy</i>, or a <i>person's behavior</i> have reduced the risk? Is your action <i>specific</i> (not just "be safer")?<br><br>
+        <b>(c)</b> Did the harm happen in one moment or build up over time? Beyond the shoulder, could there be emotional or performance effects?
+      </div>
+    </div>
+  </div>
+
+  <!-- WIDGET 4: SELF CHECK -->
+  <div class="widget">
+    <p class="wtitle"><span class="n">4</span>Self-Check Before You Submit</p>
+    <p class="winstr">Run this list for each of your scenarios. Check a box only when you can honestly say yes.</p>
+    <div class="checkhead"><span></span><span class="progress" id="progress">0 of 6 checked</span></div>
+    <div class="checklist" id="checklist">
+      <label><input type="checkbox">I named <b>who</b> the perpetrator is and their <b>relationship</b> to the workplace.</label>
+      <label><input type="checkbox">I identified the violence <b>type (I–IV)</b> and explained <i>why</i> in my own words.</label>
+      <label><input type="checkbox">My prevention answer names <b>one category</b> and a <b>specific action</b> taken <i>before</i> the event.</label>
+      <label><input type="checkbox">I correctly classified the harm as an <b>injury</b> (single event) or <b>illness</b> (exposure over time).</label>
+      <label><input type="checkbox">I gave <b>two real, plausible effects</b> tied to the person in the scenario.</label>
+      <label><input type="checkbox">I wrote in <b>complete sentences</b> using Chapter 16 vocabulary.</label>
+    </div>
+  </div>
+
+<script>
+/* ---- Decision guide ---- */
+const nodes={
+  start:{q:"Does the perpetrator have any legitimate relationship to the workplace at all?",
+    opts:[["No — a stranger","noRel"],["Yes — some connection","hasRel"]]},
+  noRel:{result:["Type I — Criminal Intent",
+    "The perpetrator has no legitimate relationship to the workplace. Violence occurs during another crime (robbery, burglary, etc.). In your answer, note the perpetrator is an outsider committing a crime.",
+    "No relationship → Type I"]},
+  hasRel:{q:"Is the perpetrator someone the organization SERVES (customer, patient, student, client)?",
+    opts:[["Yes — we serve them","served"],["No — not a client","notClient"]]},
+  served:{result:["Type II — Customer / Client",
+    "The perpetrator is a recipient of the organization's service. Explain that the person is a customer/patient/client the workplace serves.",
+    "Has relationship → served by org → Type II"]},
+  notClient:{q:"Is the perpetrator a current or former EMPLOYEE?",
+    opts:[["Yes — a coworker/ex-employee","employee"],["No — not an employee","personal"]]},
+  employee:{result:["Type III — Worker-on-Worker",
+    "The perpetrator is a current or former employee targeting a coworker, supervisor, or subordinate. Note the internal, worker-to-worker relationship.",
+    "Has relationship → not a client → employee → Type III"]},
+  personal:{result:["Type IV — Personal Relationship",
+    "The perpetrator has a personal relationship with an employee (partner, ex, relative) but no direct tie to the workplace itself.",
+    "Has relationship → not a client → not an employee → personal tie → Type IV"]}
+};
+const qt=document.getElementById('qtext'),gb=document.getElementById('gbtns'),
+  gr=document.getElementById('gresult'),rt=document.getElementById('rtype'),
+  rw=document.getElementById('rwhy'),rp=document.getElementById('rpath'),
+  reset=document.getElementById('greset');
+function go(key){
+  const n=nodes[key];gr.classList.remove('on');
+  if(n.result){qt.textContent="";gb.innerHTML="";
+    rt.textContent=n.result[0];rw.textContent=n.result[1];rp.textContent="Your path: "+n.result[2];
+    gr.classList.add('on');reset.style.display='inline';return;}
+  qt.textContent=n.q;gb.innerHTML="";reset.style.display='inline';
+  n.opts.forEach(([label,next])=>{
+    const b=document.createElement('button');b.className='gbtn';b.textContent=label;
+    b.onclick=()=>go(next);gb.appendChild(b);});
+}
+function startGuide(){gr.classList.remove('on');reset.style.display='none';go('start');}
+reset.onclick=startGuide;startGuide();
+
+/* ---- Scenario matcher ---- */
+const scenarios=[
+  ["A masked stranger robs a bank teller at gunpoint.","t1"],
+  ["An intruder breaks into a pharmacy after hours and threatens the pharmacist.","t1"],
+  ["A frustrated patient hits a nurse during treatment.","t2"],
+  ["An angry customer throws an object at a store clerk over a refund.","t2"],
+  ["An employee passed over for promotion threatens their supervisor.","t3"],
+  ["A former employee returns to confront the coworker who reported them.","t3"],
+  ["An employee's ex-partner shows up at the office to confront them.","t4"],
+  ["A worker's estranged relative comes to the job site to threaten them.","t4"]
+];
+const catLabel={t1:"Type I",t2:"Type II",t3:"Type III",t4:"Type IV"};
+let mplace=scenarios.map(()=>'pool');
+let mchecking=false;
+const mPool=document.getElementById('mPool'),mScore=document.getElementById('mScore');
+const mBinOf={t1:document.getElementById('mT1'),t2:document.getElementById('mT2'),
+  t3:document.getElementById('mT3'),t4:document.getElementById('mT4')};
+function mClear(){mchecking=false;mScore.textContent='';}
+function renderM(){
+  mPool.innerHTML='';Object.values(mBinOf).forEach(b=>b.innerHTML='');
+  scenarios.forEach((s,i)=>{
+    const where=mplace[i];
+    if(where==='pool'){
+      const d=document.createElement('div');d.className='mItem';
+      const t=document.createElement('span');t.className='txt';t.textContent=s[0];d.appendChild(t);
+      const picks=document.createElement('span');picks.className='picks';
+      ['t1','t2','t3','t4'].forEach(cat=>{
+        const btn=document.createElement('button');btn.className=cat;btn.textContent=catLabel[cat];
+        btn.onclick=()=>{mplace[i]=cat;mClear();renderM();};
+        picks.appendChild(btn);});
+      d.appendChild(picks);mPool.appendChild(d);
+    }else{
+      const d=document.createElement('div');d.className='mSorted';
+      const left=document.createElement('span');left.textContent=s[0];
+      const right=document.createElement('span');right.className='rt';
+      if(mchecking){const ok=mplace[i]===s[1];d.classList.add(ok?'ok':'no');
+        const m=document.createElement('span');m.className='mark '+(ok?'ok':'no');m.textContent=ok?'✓':'✗';right.appendChild(m);}
+      const back=document.createElement('button');back.className='back';back.title='Return to pool';back.textContent='↩';
+      back.onclick=()=>{mplace[i]='pool';mClear();renderM();};
+      right.appendChild(back);d.appendChild(left);d.appendChild(right);
+      mBinOf[where].appendChild(d);
+    }
+  });
+}
+document.getElementById('mCheck').onclick=()=>{
+  const unsorted=mplace.filter(p=>p==='pool').length;
+  if(unsorted>0){mchecking=false;renderM();
+    mScore.style.color='#7a4a00';mScore.textContent=`⚠ Sort the ${unsorted} remaining item(s) first.`;return;}
+  mchecking=true;renderM();
+  const correct=scenarios.filter((s,i)=>mplace[i]===s[1]).length;
+  mScore.style.color=(correct===scenarios.length)?'#2f6d3a':'#1f2933';
+  mScore.textContent=`You got ${correct} of ${scenarios.length} correct.`;
+};
+document.getElementById('mReset').onclick=()=>{mplace=scenarios.map(()=>'pool');mClear();renderM();};
+renderM();
+
+/* ---- Reveal ---- */
+const rb=document.getElementById('revealBtn'),rbox=document.getElementById('revealBox');
+rb.onclick=()=>{const on=rbox.classList.toggle('on');rb.textContent=on?'🙈 Hide guiding questions':'💭 Reveal guiding questions';};
+
+/* ---- Self-check progress ---- */
+const cl=document.getElementById('checklist'),prog=document.getElementById('progress');
+const boxes=[...cl.querySelectorAll('input')];
+function upd(){const n=boxes.filter(b=>b.checked).length;
+  prog.textContent=`${n} of ${boxes.length} checked`;
+  boxes.forEach(b=>b.parentElement.classList.toggle('done',b.checked));}
+boxes.forEach(b=>b.addEventListener('change',upd));upd();
+</script>
+</body>
+</html>
