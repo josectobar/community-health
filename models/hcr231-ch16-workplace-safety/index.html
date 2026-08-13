@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 16 — Interactive Widgets</title>
+<style>
+  :root{
+    color-scheme: light;
+    --ink:#1f2933; --muted:#5b6670; --line:#dfe3e8; --bg:#ffffff;
+    --panel:#f6f8f9; --accent:#0b6b6b; --accent-soft:#e3f0f0;
+    --amber:#b26a00; --amber-soft:#fbeecf; --violet:#5b3d8a; --violet-soft:#ece4f7;
+    --green:#2f6d3a; --green-soft:#e2f0e4;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;font-size:15.5px;padding:14px}
+  .widget{border:1px solid var(--line);border-radius:14px;padding:18px 18px 20px;margin-bottom:18px;background:#fff}
+  .wtitle{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:700;margin:0 0 3px}
+  .wtitle .n{background:var(--accent);color:#fff;border-radius:7px;width:26px;height:26px;
+    display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex:0 0 auto}
+  .winstr{color:var(--muted);font-size:13.5px;margin:0 0 14px}
+  .hint{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:8px;
+    padding:8px 13px;font-size:13px;color:#0a4f4f;margin:0 0 14px}
+
+  /* flip cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:11px}
+  .flip{perspective:1000px;height:150px;cursor:pointer}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+  .flip.on .flip-inner{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;border:1px solid var(--line);
+    padding:12px;display:flex;flex-direction:column;justify-content:center;text-align:center}
+  .front{background:var(--panel)}.front b{font-size:15px}
+  .front .tap{position:absolute;bottom:7px;left:0;right:0;font-size:11px;color:var(--muted)}
+  .back{background:var(--accent);color:#fff;transform:rotateY(180deg);font-size:12.5px;overflow:auto}
+
+  /* sorter */
+  .sortbtns{margin:0 0 10px}
+  .sortbtns button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 12px;
+    font-size:13px;cursor:pointer;margin:0 8px 6px 0;font-weight:600}
+  .sortbtns button.a{color:#0a4f4f}.sortbtns button.b{color:#7a4a00}
+  .chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);
+    border-radius:999px;padding:7px 13px;margin:5px 5px 0 0;font-size:13.5px;cursor:pointer;transition:.15s}
+  .chip:hover{border-color:var(--accent)}
+  .chip.injury{background:var(--accent-soft);border-color:var(--accent);color:#0a4f4f;font-weight:600}
+  .chip.illness{background:var(--amber-soft);border-color:var(--amber);color:#7a4a00;font-weight:600}
+  .legend{font-size:12.5px;color:var(--muted);margin-top:10px}
+
+  /* violence tabs */
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .tab{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 13px;font-size:13.5px;
+    cursor:pointer;font-weight:600;color:var(--muted)}
+  .tab.on{background:var(--violet);color:#fff;border-color:var(--violet)}
+  .panel-v{background:var(--violet-soft);border:1px solid #d8c9ee;border-radius:12px;padding:15px;display:none}
+  .panel-v.on{display:block}
+  .panel-v h4{margin:0 0 6px;color:var(--violet);font-size:16px}
+  .panel-v .who{font-size:13.3px;color:#4a336f;margin:8px 0 0;font-style:italic}
+
+  /* prevention triad */
+  .triad{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:11px}
+  .pcard{border:1px solid var(--line);border-radius:12px;padding:15px;background:#fff}
+  .pcard .tagp{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;
+    letter-spacing:.05em;border-radius:999px;padding:3px 10px;margin-bottom:8px}
+  .pcard.env .tagp{background:var(--green-soft);color:var(--green)}
+  .pcard.adm .tagp{background:var(--accent-soft);color:#0a4f4f}
+  .pcard.beh .tagp{background:var(--violet-soft);color:var(--violet)}
+  .pcard h4{margin:2px 0 6px;font-size:15px}
+  .pcard p{margin:0;font-size:13px;color:var(--muted)}
+  .pcard ul{margin:8px 0 0;padding-left:17px;font-size:12.8px}
+  .pcard li{margin:3px 0}
+  @media print{.flip{height:auto}.flip-inner{transform:none!important}.back{position:static;transform:none;margin-top:8px}.front .tap{display:none}}
+</style>
+</head>
+<body>
+
+  <!-- WIDGET 1: TERM HOOKS -->
+  <div class="widget">
+    <p class="wtitle"><span class="n">1</span>Key Terms — Flip for a Memory Hook</p>
+    <p class="winstr">Tap each card. The back gives you a hint for telling terms apart — not the textbook definition, so you still do the matching thinking yourself.</p>
+    <div class="hint">💡 Watch the confusable pairs: <b>OSHA vs. NIOSH</b> (enforce vs. research) and <b>injury vs. illness</b> (a single event vs. a condition from exposure over time).</div>
+    <div class="grid" id="cards"></div>
+  </div>
+
+  <!-- WIDGET 2: INJURY VS ILLNESS -->
+  <div class="widget">
+    <p class="wtitle"><span class="n">2</span>Injury or Illness? — Sort the Examples</p>
+    <p class="winstr">Click a mode, then click each example to tag it. There's no score — the point is to talk yourself through <i>why</i>.</p>
+    <div class="sortbtns">
+      <button class="a" onclick="mode='injury'">🩹 Mark as Injury</button>
+      <button class="b" onclick="mode='illness'">🌡️ Mark as Illness</button>
+      <button onclick="resetSort()" style="color:var(--muted)">↺ Reset</button>
+    </div>
+    <div id="chips"></div>
+    <div class="legend">Ask yourself: "Did this happen in one moment (injury), or build up from repeated exposure over time (illness)?"</div>
+  </div>
+
+  <!-- WIDGET 3: VIOLENCE TYPES -->
+  <div class="widget">
+    <p class="wtitle"><span class="n">3</span>The Four Types of Workplace Violence</p>
+    <p class="winstr">Click each type. The key is always the <b>perpetrator's relationship to the workplace</b>. Examples below are new ones, not from your activity.</p>
+    <div class="tabs" id="vtabs"></div>
+    <div id="vpanels"></div>
+  </div>
+
+  <!-- WIDGET 4: PREVENTION -->
+  <div class="widget">
+    <p class="wtitle"><span class="n">4</span>Three Kinds of Prevention Strategies</p>
+    <p class="winstr">When a scenario asks "what could have prevented this?", name one of these categories and give a <b>specific</b> action.</p>
+    <div class="triad">
+      <div class="pcard env"><span class="tagp">Environmental</span><h4>Change the physical space</h4><p>Design &amp; equipment that reduce risk.</p><ul><li>Better lighting &amp; visibility</li><li>Cameras, alarms</li><li>Locked/limited-access areas</li><li>Barriers or drop safes</li></ul></div>
+      <div class="pcard adm"><span class="tagp">Administrative</span><h4>Change the rules &amp; policies</h4><p>Procedures, staffing, training.</p><ul><li>Zero-tolerance policies</li><li>Reporting &amp; follow-up</li><li>Staffing (never alone at night)</li><li>De-escalation training</li></ul></div>
+      <div class="pcard beh"><span class="tagp">Behavioral</span><h4>Change how people act</h4><p>Individual choices in the moment.</p><ul><li>Recognizing warning signs</li><li>Speaking up / reporting</li><li>Conflict-resolution skills</li><li>Following safety habits</li></ul></div>
+    </div>
+    <div class="hint" style="margin:14px 0 0">💡 Memory hook: <b>Environmental = the place</b>, <b>Administrative = the policy</b>, <b>Behavioral = the person</b>.</div>
+  </div>
+
+<script>
+/* Term hooks */
+const terms=[
+  ["OSH Act of 1970","Hook: the <b>law</b> itself (not an agency). The \"rulebook\" that created the duty to keep workplaces safe."],
+  ["OSHA","Hook: the <b>enforcer</b>. \"A\" = Administration — inspects and cites. Who makes sure rules are followed?"],
+  ["NIOSH","Hook: the <b>researcher</b>. \"I\" = Institute — studies hazards and <i>recommends</i>. Who investigates and suggests?"],
+  ["Occupational injury","Hook: a <b>single event</b> — happened in one moment."],
+  ["Occupational illness","Hook: builds up from <b>exposure over time</b> — a condition, not an accident."],
+  ["Workers' compensation","Hook: the word <b>insurance</b> — money &amp; medical care after a work injury/illness."],
+  ["EAP","Hook: a <b>support program</b> for personal struggles (substance abuse, domestic violence) affecting work."],
+  ["Occupational health nurse","Hook: a specific <b>person/role</b> — the RN focused on worker safety."],
+  ["MSD","Hook: <b>muscles, nerves, tendons, joints</b> worn down by repetition. Common in nursing."],
+  ["Worksite health promotion","Hook: <b>wellness activities</b> — screenings, fitness, nutrition, stress management."]
+];
+const cw=document.getElementById('cards');
+terms.forEach(([t,d])=>{
+  const el=document.createElement('div');el.className='flip';
+  el.innerHTML=`<div class="flip-inner"><div class="face front"><b>${t}</b><span class="tap">tap to flip</span></div><div class="face back">${d}</div></div>`;
+  el.onclick=()=>el.classList.toggle('on');cw.appendChild(el);
+});
+
+/* Sorter */
+let mode='injury';
+const examples=["Slips on a wet floor and sprains an ankle","Develops carpal tunnel after years of typing","Cuts hand on broken glass","Hearing loss from constant loud machinery","Back strain from lifting a heavy box once","Chronic lung condition from chemical fumes","Burns arm on hot equipment","Repetitive-stress shoulder pain from patient lifting"];
+const chipBox=document.getElementById('chips');
+function drawChips(){chipBox.innerHTML='';examples.forEach((x,i)=>{
+  const c=document.createElement('span');c.className='chip';c.textContent=x;
+  c.onclick=()=>{c.classList.remove('injury','illness');c.classList.add(mode);};
+  chipBox.appendChild(c);});}
+function resetSort(){drawChips();}
+drawChips();
+
+/* Violence types */
+const vtypes=[
+  ["Type I","Criminal Intent","The perpetrator has <b>no legitimate relationship</b> to the workplace. Violence happens during another crime such as robbery or burglary.","Example: A stranger robs a gas station at gunpoint after closing."],
+  ["Type II","Customer / Client","The perpetrator is someone the organization <b>serves</b> — a patient, customer, student, or client.","Example: An agitated patient strikes an ER nurse during treatment."],
+  ["Type III","Worker-on-Worker","The perpetrator is a <b>current or former employee</b> targeting a coworker, supervisor, or subordinate.","Example: A recently fired employee returns to threaten their old manager."],
+  ["Type IV","Personal Relationship","The perpetrator has a <b>personal relationship with an employee</b> (partner, ex, relative) but no tie to the workplace itself.","Example: An employee's ex-spouse shows up at her office to confront her."]
+];
+const vt=document.getElementById('vtabs'),vp=document.getElementById('vpanels');
+vtypes.forEach(([code,name,desc,ex],i)=>{
+  const b=document.createElement('button');b.className='tab'+(i===0?' on':'');b.textContent=code+' · '+name;
+  b.onclick=()=>{document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+    document.querySelectorAll('.panel-v').forEach(p=>p.classList.remove('on'));
+    b.classList.add('on');document.getElementById('vp'+i).classList.add('on');};
+  vt.appendChild(b);
+  const p=document.createElement('div');p.className='panel-v'+(i===0?' on':'');p.id='vp'+i;
+  p.innerHTML=`<h4>${code} — ${name}</h4><div>${desc}</div><p class="who">${ex}</p>`;
+  vp.appendChild(p);
+});
+</script>
+</body>
+</html>
