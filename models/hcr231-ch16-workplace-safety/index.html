@@ -95,17 +95,9 @@
     <div class="legend">Ask yourself: "Did this happen in one moment (injury), or build up from repeated exposure over time (illness)?"</div>
   </div>
 
-  <!-- WIDGET 3: VIOLENCE TYPES -->
+  <!-- WIDGET 3: PREVENTION -->
   <div class="widget">
-    <p class="wtitle"><span class="n">3</span>The Four Types of Workplace Violence</p>
-    <p class="winstr">Click each type. The key is always the <b>perpetrator's relationship to the workplace</b>. Examples below are new ones, not from your activity.</p>
-    <div class="tabs" id="vtabs"></div>
-    <div id="vpanels"></div>
-  </div>
-
-  <!-- WIDGET 4: PREVENTION -->
-  <div class="widget">
-    <p class="wtitle"><span class="n">4</span>Three Kinds of Prevention Strategies</p>
+    <p class="wtitle"><span class="n">3</span>Three Kinds of Prevention Strategies</p>
     <p class="winstr">When a scenario asks "what could have prevented this?", name one of these categories and give a <b>specific</b> action.</p>
     <div class="triad">
       <div class="pcard env"><span class="tagp">Environmental</span><h4>Change the physical space</h4><p>Design &amp; equipment that reduce risk.</p><ul><li>Better lighting &amp; visibility</li><li>Cameras, alarms</li><li>Locked/limited-access areas</li><li>Barriers or drop safes</li></ul></div>
@@ -147,24 +139,6 @@ function drawChips(){chipBox.innerHTML='';examples.forEach((x,i)=>{
 function resetSort(){drawChips();}
 drawChips();
 
-/* Violence types */
-const vtypes=[
-  ["Type I","Criminal Intent","The perpetrator has <b>no legitimate relationship</b> to the workplace. Violence happens during another crime such as robbery or burglary.","Example: A stranger robs a gas station at gunpoint after closing."],
-  ["Type II","Customer / Client","The perpetrator is someone the organization <b>serves</b> — a patient, customer, student, or client.","Example: An agitated patient strikes an ER nurse during treatment."],
-  ["Type III","Worker-on-Worker","The perpetrator is a <b>current or former employee</b> targeting a coworker, supervisor, or subordinate.","Example: A recently fired employee returns to threaten their old manager."],
-  ["Type IV","Personal Relationship","The perpetrator has a <b>personal relationship with an employee</b> (partner, ex, relative) but no tie to the workplace itself.","Example: An employee's ex-spouse shows up at her office to confront her."]
-];
-const vt=document.getElementById('vtabs'),vp=document.getElementById('vpanels');
-vtypes.forEach(([code,name,desc,ex],i)=>{
-  const b=document.createElement('button');b.className='tab'+(i===0?' on':'');b.textContent=code+' · '+name;
-  b.onclick=()=>{document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
-    document.querySelectorAll('.panel-v').forEach(p=>p.classList.remove('on'));
-    b.classList.add('on');document.getElementById('vp'+i).classList.add('on');};
-  vt.appendChild(b);
-  const p=document.createElement('div');p.className='panel-v'+(i===0?' on':'');p.id='vp'+i;
-  p.innerHTML=`<h4>${code} — ${name}</h4><div>${desc}</div><p class="who">${ex}</p>`;
-  vp.appendChild(p);
-});
 </script>
 </body>
 </html>
