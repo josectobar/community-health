@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Community Readiness Self Check</title>
+<style>
+  :root {
+    color-scheme: light;
+    --teal: #1C7293;
+    --dark: #0E4F5C;
+    --sage: #6E9880;
+    --sagedeep: #4E7A5F;
+    --rose: #B0575F;
+    --rosedeep: #8A3F46;
+    --ochre: #B5822A;
+    --ink: #22333B;
+    --paper: #FFFFFF;
+    --tintteal: #F4F9FA;
+    --tintsage: #F2F6F4;
+    --tintochre: #FAF6EE;
+    --tintrose: #FDF3F3;
+    --line: #C9E0E5;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 20px;
+    font-family: Calibri, "Segoe UI", Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--ink);
+    background: #EFF4F5;
+  }
+  .wrap { max-width: 820px; margin: 0 auto; }
+  header.hero {
+    background: var(--dark);
+    color: #fff;
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-bottom: 18px;
+  }
+  header.hero p.kicker {
+    margin: 0 0 6px 0; font-size: 15px; color: #A8D0D8; letter-spacing: .5px;
+  }
+  header.hero h1 {
+    margin: 0 0 10px 0;
+    font-family: Cambria, Georgia, serif;
+    font-weight: normal;
+    font-size: 28px;
+  }
+  header.hero p.lede { margin: 0; font-size: 16px; color: #E8F1F2; }
+  .progress {
+    display: flex; gap: 8px; margin: 0 0 18px 0; flex-wrap: wrap;
+  }
+  .pip {
+    flex: 1 1 120px;
+    font-size: 14px;
+    text-align: center;
+    padding: 8px 6px;
+    border-radius: 6px;
+    background: #DCE7EA;
+    color: #4A5A62;
+  }
+  .pip.active { background: var(--teal); color: #fff; }
+  .pip.done { background: var(--sage); color: #fff; }
+  section.card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 22px 26px;
+    margin-bottom: 18px;
+  }
+  h2 {
+    font-family: Cambria, Georgia, serif;
+    font-weight: normal;
+    font-size: 22px;
+    color: var(--teal);
+    border-bottom: 3px solid var(--ochre);
+    padding-bottom: 6px;
+    margin: 0 0 10px 0;
+  }
+  .instr { font-size: 15.5px; color: #4A5A62; margin: 0 0 18px 0; }
+  .q { border-top: 1px solid #E4EDEF; padding-top: 16px; margin-top: 16px; }
+  .q:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+  .stem { margin: 0 0 10px 0; }
+  .stem .num { color: var(--ochre); font-weight: bold; margin-right: 6px; }
+  .vignette {
+    background: var(--tintochre);
+    border: 1px solid #E0D6C4;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 0 0 12px 0;
+    font-size: 16px;
+  }
+  .opts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .opts.stack { flex-direction: column; }
+  button.opt {
+    font: inherit;
+    font-size: 15.5px;
+    text-align: left;
+    background: var(--tintteal);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    border-radius: 7px;
+    padding: 9px 14px;
+    cursor: pointer;
+  }
+  button.opt:hover:not(:disabled) { background: #E4F1F4; border-color: var(--teal); }
+  button.opt:focus-visible { outline: 3px solid var(--ochre); outline-offset: 2px; }
+  button.opt:disabled { cursor: default; opacity: 1; }
+  button.opt.right { background: var(--tintsage); border-color: var(--sagedeep); border-width: 2px; }
+  button.opt.wrong { background: var(--tintrose); border-color: var(--rosedeep); border-width: 2px; }
+  button.opt.reveal { border-color: var(--sagedeep); border-width: 2px; }
+  .fb {
+    margin: 12px 0 0 0;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    font-size: 15.5px;
+    display: none;
+  }
+  .fb.show { display: block; }
+  .fb.good { background: var(--tintsage); border-left: 5px solid var(--sage); }
+  .fb.close { background: var(--tintochre); border-left: 5px solid var(--ochre); }
+  .fb.bad { background: var(--tintrose); border-left: 5px solid var(--rose); }
+  .fb strong { color: var(--dark); }
+  .nav { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  button.action {
+    font: inherit;
+    font-size: 16px;
+    background: var(--teal);
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 11px 22px;
+    cursor: pointer;
+  }
+  button.action:hover:not(:disabled) { background: var(--dark); }
+  button.action:disabled { background: #B7C9CE; cursor: default; }
+  button.action.quiet { background: none; color: var(--teal); border: 1px solid var(--teal); }
+  button.action.quiet:hover { background: var(--tintteal); color: var(--dark); }
+  .counter { font-size: 15px; color: #4A5A62; }
+  .hidden { display: none; }
+  .score {
+    font-family: Cambria, Georgia, serif;
+    font-size: 34px;
+    color: var(--dark);
+    margin: 0 0 4px 0;
+  }
+  ul.tips { margin: 6px 0 0 0; padding-left: 22px; font-size: 16px; }
+  ul.tips li { margin-bottom: 6px; }
+  .breakdown { margin: 14px 0 0 0; font-size: 16px; }
+  .breakdown div { padding: 6px 0; border-bottom: 1px solid #E4EDEF; }
+  footer.note { font-size: 14px; color: #5A6A72; text-align: center; margin: 6px 0 0 0; }
+  @media (max-width: 520px) {
+    body { padding: 12px; font-size: 16px; }
+    section.card { padding: 18px 16px; }
+    header.hero { padding: 18px 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <p class="kicker">HCR 303 self check</p>
+    <h1>Community Readiness Self Check</h1>
+    <p class="lede">Three short rounds of practice before you write Part 3. Nothing here is graded and nothing is submitted. Work through it as many times as you like.</p>
+  </header>
+
+  <div class="progress" id="pips">
+    <div class="pip active" id="pip0">1. Name the dimension</div>
+    <div class="pip" id="pip1">2. Place the community</div>
+    <div class="pip" id="pip2">3. Match the step</div>
+    <div class="pip" id="pip3">Results</div>
+  </div>
+
+  <section class="card" id="round0">
+    <h2>Round 1. Name the dimension</h2>
+    <p class="instr">Each statement below is the kind of detail you might find in a community profile. Choose the readiness dimension it speaks to most directly. Take your time. Several look close until you read them carefully.</p>
+    <div id="r0body"></div>
+    <div class="nav">
+      <span class="counter" id="c0">0 of 8 answered</span>
+      <button class="action" id="next0" disabled>Go to round 2</button>
+    </div>
+  </section>
+
+  <section class="card hidden" id="round1">
+    <h2>Round 2. Place the community</h2>
+    <p class="instr">Read each short profile and choose the stage of readiness that fits it best. Remember that you are judging readiness for the named issue only, not for the community in general.</p>
+    <div id="r1body"></div>
+    <div class="nav">
+      <span class="counter" id="c1">0 of 3 answered</span>
+      <button class="action" id="next1" disabled>Go to round 3</button>
+    </div>
+  </section>
+
+  <section class="card hidden" id="round2">
+    <h2>Round 3. Match the step to the stage</h2>
+    <p class="instr">Your assignment asks for one step that moves the community one stage forward. Choose the step that actually fits where each community is standing right now.</p>
+    <div id="r2body"></div>
+    <div class="nav">
+      <span class="counter" id="c2">0 of 3 answered</span>
+      <button class="action" id="next2" disabled>See my results</button>
+    </div>
+  </section>
+
+  <section class="card hidden" id="results">
+    <h2>Your results</h2>
+    <p class="score" id="scoreline">0 of 14</p>
+    <p class="instr" id="scoremsg"></p>
+    <div class="breakdown" id="breakdown"></div>
+    <p style="margin:18px 0 6px 0;"><strong>Before you write Part 3:</strong></p>
+    <ul class="tips">
+      <li>Name your stage by number and by name in your first sentence.</li>
+      <li>Say the name of each dimension you use out loud in the sentence. Do not make your reader guess.</li>
+      <li>Attach one specific detail from the deeper profile to every claim.</li>
+      <li>Check that your step forward moves the community one stage, not several.</li>
+    </ul>
+    <div class="nav">
+      <button class="action quiet" id="restart">Start over</button>
+    </div>
+  </section>
+
+  <footer class="note">Practice activity for HCR 303. Your answers are not recorded.</footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var DIMS = [
+    "Community efforts",
+    "Community knowledge of the efforts",
+    "Leadership",
+    "Community climate",
+    "Community knowledge about the issue",
+    "Resources"
+  ];
+
+  var round1 = [
+    {
+      stem: "The county health department runs a screening event at the community center on the first Saturday of every month.",
+      answer: 0,
+      why: "This is an activity already in place to address the issue, which is exactly what community efforts covers. Notice that the dimension asks only whether something exists and what it is, not whether it works well or whether people know about it."
+    },
+    {
+      stem: "In a resident survey, more than half of the people who live within two miles of the mobile clinic said they had never heard of it.",
+      answer: 1,
+      why: "The clinic exists, so the effort is real. What is missing is awareness of it, which is community knowledge of the efforts. A service nobody knows about scores low here even when the service itself is strong."
+    },
+    {
+      stem: "The school principal, two pastors, and a council member have publicly called the issue a priority and joined a standing working group.",
+      answer: 2,
+      why: "Leadership covers support from local leaders, formal and informal alike. Joining a working group is stronger evidence than a statement of concern, because it shows committed time rather than agreement in principle."
+    },
+    {
+      stem: "In listening sessions, residents repeatedly described the problem as something that has always been this way here and is not really going to change.",
+      answer: 3,
+      why: "This is community climate, the overall attitude and belief in the community. Resignation of this kind lowers readiness even when leaders are willing and services exist."
+    },
+    {
+      stem: "When asked, few residents could name the early warning signs of the condition or say what raises a person's risk for it.",
+      answer: 4,
+      why: "Community knowledge about the issue is about understanding the problem itself. Do not confuse it with knowledge of the efforts, which is about understanding the response."
+    },
+    {
+      stem: "The health center employs one bilingual outreach worker to cover a service area that stretches about forty miles.",
+      answer: 5,
+      why: "Staffing, funding, facilities, transportation, and time all fall under resources. One worker for that distance tells you the capacity to act is thin, which is a resources finding rather than a leadership or effort finding."
+    },
+    {
+      stem: "A grant funded walking program operated for two years, closed when the funding ended, and nothing has replaced it since.",
+      answer: 0,
+      why: "This still belongs to community efforts. The dimension includes what has been tried and what is running now, and a program that ended without a successor tells you the current level of effort is low."
+    },
+    {
+      stem: "Parents told interviewers they avoid the clinic for this issue because they worry that neighbors will find out and talk about them.",
+      answer: 3,
+      why: "Stigma and fear of being seen are attitude and belief, which places this in community climate. It is tempting to file it under knowledge, but the parents are not confused about the issue. They are worried about judgment."
+    }
+  ];
+
+  var STAGES = [
+    "1. No awareness",
+    "2. Denial or resistance",
+    "3. Vague awareness",
+    "4. Preplanning",
+    "5. Preparation",
+    "6. Initiation",
+    "7. Stabilization",
+    "8. Confirmation or expansion",
+    "9. High level of community ownership"
+  ];
+
+  var round2 = [
+    {
+      issue: "Issue: childhood asthma in Ridgeline",
+      stem: "Clinic records show high emergency visit rates for children with asthma. In interviews, most residents said asthma is a problem in the city, not out here, and several added that the dust has never hurt anyone. No program addresses asthma locally, and no leader has raised it in a public meeting.",
+      answer: 1,
+      why: "This is stage 2, denial or resistance. The issue is documented and a few people are aware of it, but the prevailing belief is that it does not happen here. Stage 1 would mean nobody has considered the issue at all, and stage 3 would mean residents accept that the problem exists locally without being motivated to act."
+    },
+    {
+      issue: "Issue: uncontrolled diabetes in Sandstone Flats",
+      stem: "After a local news story, two council members and the clinic director formed a working group. It has met twice and agreed that something must be done, but it has no plan, no budget, and no timeline. A monthly screening event is the only activity in place. Residents say the disease runs in families here and is largely out of their hands.",
+      answer: 3,
+      why: "This is stage 4, preplanning. There is clear recognition and some organizing, but no concrete plan or resources yet. Stage 5, preparation, would require active and specific planning with funding being pursued, which this group has not reached."
+    },
+    {
+      issue: "Issue: prenatal care access in Willow Bend",
+      stem: "A prenatal outreach program has operated at the health center for six years. It is written into the county budget every cycle, the two staff members are experienced, and enrollment is steady. No one has looked at outcome data, and there has been no attempt to reach the outlying communities that the program does not serve.",
+      answer: 6,
+      why: "This is stage 7, stabilization. The effort is routine, supported, and staffed by experienced people. It has not moved to stage 8, confirmation or expansion, because nobody is evaluating results or extending the program to new groups."
+    }
+  ];
+
+  var round3 = [
+    {
+      stem: "A community sits at stage 3, vague awareness. Residents accept that the issue exists but no one has taken responsibility and no group is organizing. What is the most realistic step to move it one stage forward?",
+      opts: [
+        "Launch a twelve week education program with two paid staff members and a monthly evaluation report.",
+        "Hold small group conversations at the two churches and the senior center, and ask the local paper to cover the county data for this community.",
+        "Hand decision making about the issue to a resident led board with its own budget.",
+        "Wait for the next legislative session and see whether new funding appears."
+      ],
+      answer: 1,
+      why: "At vague awareness, the work is turning general concern into commitment, and that happens through conversation, local coverage, and finding people willing to take responsibility. Launching a staffed program skips several stages, handing over ownership is a stage 9 move, and waiting is not a step at all."
+    },
+    {
+      stem: "A community sits at stage 5, preparation. A coalition has a written plan, the clinic has agreed to host, and two leaders are pushing it forward. What is the most realistic step to move it one stage forward?",
+      opts: [
+        "Hold one on one conversations to convince residents that the issue is real.",
+        "Publish an evaluation of program outcomes for the county board.",
+        "Submit the grant application, train the first group of volunteers, and set a launch date.",
+        "Recruit leaders to form a first working group."
+      ],
+      answer: 2,
+      why: "Preparation moves to initiation when the effort actually starts, which means funding, training, and a date on the calendar. The other options belong to earlier stages you have already passed or a later stage you have not reached."
+    },
+    {
+      stem: "A community sits at stage 7, stabilization. One program has run steadily for years with trained staff and stable funding. What is the most realistic step to move it one stage forward?",
+      opts: [
+        "Build initial awareness of the issue through informal gatherings.",
+        "Collect and review outcome data, then use what it shows to improve the program and extend it to the families it is not reaching.",
+        "Close the program and start over with a new model.",
+        "Recruit a first set of leaders willing to speak about the issue."
+      ],
+      answer: 1,
+      why: "Stabilization moves to confirmation and expansion through evaluation and reach. Awareness building and leader recruitment are stage 3 and 4 work that this community finished long ago."
+    }
+  ];
+
+  var state = { r0: [], r1: [], r2: [] };
+  var counts = { r0: 0, r1: 0, r2: 0 };
+
+  function el(id) { return document.getElementById(id); }
+
+  function makeQuestion(cfg) {
+    var wrap = document.createElement("div");
+    wrap.className = "q";
+
+    var stem = document.createElement("p");
+    stem.className = "stem";
+    var num = document.createElement("span");
+    num.className = "num";
+    num.textContent = cfg.number + ".";
+    stem.appendChild(num);
+    stem.appendChild(document.createTextNode(cfg.stem));
+    wrap.appendChild(stem);
+
+    if (cfg.vignette) {
+      var v = document.createElement("div");
+      v.className = "vignette";
+      var lead = document.createElement("strong");
+      lead.textContent = cfg.vignetteLabel;
+      v.appendChild(lead);
+      v.appendChild(document.createElement("br"));
+      v.appendChild(document.createTextNode(cfg.vignette));
+      wrap.appendChild(v);
+    }
+
+    var opts = document.createElement("div");
+    opts.className = "opts" + (cfg.stack ? " stack" : "");
+    var buttons = [];
+    cfg.options.forEach(function (label, i) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "opt";
+      b.textContent = label;
+      b.addEventListener("click", function () { choose(i); });
+      opts.appendChild(b);
+      buttons.push(b);
+    });
+    wrap.appendChild(opts);
+
+    var fb = document.createElement("div");
+    fb.className = "fb";
+    wrap.appendChild(fb);
+
+    function choose(i) {
+      buttons.forEach(function (b) { b.disabled = true; });
+      var correct = i === cfg.answer;
+      buttons[i].className = "opt " + (correct ? "right" : "wrong");
+      if (!correct) { buttons[cfg.answer].className = "opt reveal"; }
+
+      var near = cfg.nearMiss && Math.abs(i - cfg.answer) === 1;
+      var tone = correct ? "good" : (near ? "close" : "bad");
+      var lead = correct ? "That is the one. " : (near ? "Close. The answer is " + cfg.options[cfg.answer] + ". " : "Not quite. The answer is " + cfg.options[cfg.answer] + ". ");
+      fb.className = "fb show " + tone;
+      var s = document.createElement("strong");
+      s.textContent = lead;
+      fb.appendChild(s);
+      fb.appendChild(document.createTextNode(cfg.why));
+
+      cfg.onAnswer(correct);
+    }
+
+    return wrap;
+  }
+
+  function buildRound(bodyId, items, key, counterId, nextId, total, builder) {
+    var body = el(bodyId);
+    items.forEach(function (item, idx) {
+      var cfg = builder(item, idx);
+      cfg.number = idx + 1;
+      cfg.onAnswer = function (correct) {
+        state[key].push(correct);
+        counts[key] += 1;
+        el(counterId).textContent = counts[key] + " of " + total + " answered";
+        if (counts[key] === total) { el(nextId).disabled = false; }
+      };
+      body.appendChild(makeQuestion(cfg));
+    });
+  }
+
+  buildRound("r0body", round1, "r0", "c0", "next0", round1.length, function (item) {
+    return { stem: item.stem, options: DIMS, answer: item.answer, why: item.why, nearMiss: false };
+  });
+
+  buildRound("r1body", round2, "r1", "c1", "next1", round2.length, function (item) {
+    return {
+      stem: "Which stage of readiness fits this community best?",
+      vignetteLabel: item.issue,
+      vignette: item.stem,
+      options: STAGES,
+      answer: item.answer,
+      why: item.why,
+      nearMiss: true
+    };
+  });
+
+  buildRound("r2body", round3, "r2", "c2", "next2", round3.length, function (item) {
+    return { stem: item.stem, options: item.opts, answer: item.answer, why: item.why, stack: true, nearMiss: false };
+  });
+
+  function show(index) {
+    ["round0", "round1", "round2", "results"].forEach(function (id, i) {
+      el(id).classList.toggle("hidden", i !== index);
+      var pip = el("pip" + i);
+      pip.className = "pip" + (i === index ? " active" : (i < index ? " done" : ""));
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  el("next0").addEventListener("click", function () { show(1); });
+  el("next1").addEventListener("click", function () { show(2); });
+  el("next2").addEventListener("click", function () { finish(); });
+  el("restart").addEventListener("click", function () { window.location.reload(); });
+
+  function tally(arr) {
+    return arr.filter(Boolean).length;
+  }
+
+  function finish() {
+    var a = tally(state.r0), b = tally(state.r1), c = tally(state.r2);
+    var total = a + b + c;
+    el("scoreline").textContent = total + " of 14";
+
+    var msg;
+    if (total >= 12) {
+      msg = "You are ready to write Part 3. You can tell the dimensions apart, you are reading the stage from the evidence rather than from a general impression, and your sense of a realistic next step is sound.";
+    } else if (total >= 8) {
+      msg = "A solid start. Reread the round where you lost the most points before you draft, since that is the same reasoning the assignment asks you to show.";
+    } else {
+      msg = "Go back through the Part 3 page before you draft. Read the six dimension definitions side by side and the nine stage descriptions in order, then run this activity again.";
+    }
+    el("scoremsg").textContent = msg;
+
+    var rows = [
+      ["Round 1, naming the dimension", a, round1.length, "If this round cost you points, the usual culprit is the pair of knowledge dimensions. One is about the problem, the other is about the response."],
+      ["Round 2, placing the community", b, round2.length, "If this round cost you points, reread the stage descriptions in order. Neighboring stages differ by one specific thing, such as whether a plan exists or whether results are being tracked."],
+      ["Round 3, matching the step", c, round3.length, "If this round cost you points, remember that your step has to move the community one stage, and it has to be something a health education specialist could actually carry out."]
+    ];
+    var box = el("breakdown");
+    box.innerHTML = "";
+    rows.forEach(function (r) {
+      var d = document.createElement("div");
+      var s = document.createElement("strong");
+      s.textContent = r[0] + ": " + r[1] + " of " + r[2] + ". ";
+      d.appendChild(s);
+      if (r[1] < r[2]) { d.appendChild(document.createTextNode(r[3])); }
+      else { d.appendChild(document.createTextNode("Nothing to review here.")); }
+      box.appendChild(d);
+    });
+
+    show(3);
+  }
+})();
+</script>
+</body>
+</html>

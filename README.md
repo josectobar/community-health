@@ -85,6 +85,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/hcr231-ch5-roles-and-planning-tools/](models/hcr231-ch5-roles-and-planning-tools/): hCR 231 Chapter 5 pre-class warm-up: roles and planning tools.
 - [models/hcr231-ch16-workplace-safety/](models/hcr231-ch16-workplace-safety/): hCR 231 Chapter 16: occupational safety terms, injury vs. illness, violence types, prevention.
 - [models/hcr231-ch16-violence-scenarios/](models/hcr231-ch16-violence-scenarios/): hCR 231 Chapter 16: violence-type decision guide, scenario matcher, practice case, self-check.
+- [models/community-readiness-self-check/](models/community-readiness-self-check/): three-round practice on readiness dimensions, stages, and next steps before writing Part 3.
 
 ## Embed snippets
 
@@ -154,6 +155,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Chapter 5 Prep — Part 2: Roles &amp; Planning Tools" src="models/hcr231-ch5-roles-and-planning-tools/"></iframe>
 <iframe title="Chapter 16 — Workplace Safety Interactive Widgets" src="models/hcr231-ch16-workplace-safety/"></iframe>
 <iframe title="Chapter 16 — Case Scenario Widgets" src="models/hcr231-ch16-violence-scenarios/"></iframe>
+<iframe title="Community Readiness Self Check" src="models/community-readiness-self-check/"></iframe>
 ```
 
 ## Files
