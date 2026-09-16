@@ -91,6 +91,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/sandia-valley-practice-case/](models/sandia-valley-practice-case/): six-prompt practice case on the heart failure transitional care program, mirroring the short paper questions.
 - [models/implementing-coordinated-care/](models/implementing-coordinated-care/): module 7 practice: match the implementation strategy, pair barriers with responses, and build a shared plan of care.
 - [models/arizona-community-resources/](models/arizona-community-resources/): module 7 practice on Area Agency on Aging Region One and AZ Links: match needs to services, judge referrals, and run a real search.
+- [models/mesa-foothills-practice-case/](models/mesa-foothills-practice-case/): module 7 six-prompt practice case on implementing a coordinated care model, mirroring the short paper questions.
 
 ## Embed snippets
 
@@ -166,6 +167,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Sandia Valley Practice Case" src="models/sandia-valley-practice-case/"></iframe>
 <iframe title="Implementing a Coordinated Care Model" src="models/implementing-coordinated-care/"></iframe>
 <iframe title="Connecting Patients to Arizona Resources" src="models/arizona-community-resources/"></iframe>
+<iframe title="Mesa Foothills Practice Case" src="models/mesa-foothills-practice-case/"></iframe>
 ```
 
 ## Files
