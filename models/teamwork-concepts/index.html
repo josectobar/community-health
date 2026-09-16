@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HCR 321 Module 6 Practice: Teamwork Concepts</title>
+<style>
+  :root{
+    color-scheme: light;
+    --teal:#0F6A6B; --teal-dark:#0B4F50; --teal-soft:#F2F8F7; --teal-line:#C9E2DF;
+    --sand:#FBF7F0; --sand-line:#E8DFCE; --gold:#B06B18;
+    --good:#2E6B45; --good-bg:#EDF6F0; --bad:#9B3B52; --bad-bg:#FBF0F2;
+    --ink:#2b2b2b; --muted:#5a5245;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:18px;background:#fff;color:var(--ink);
+       font-family:Lato,'Helvetica Neue',Arial,sans-serif;font-size:16px;line-height:1.55}
+  .wrap{max-width:820px;margin:0 auto}
+  h1{font-family:Georgia,'Times New Roman',serif;font-size:25px;color:var(--teal);margin:0 0 4px}
+  h2{font-family:Georgia,'Times New Roman',serif;font-size:20px;color:var(--teal);margin:0 0 6px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 18px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+  .tab{border:1px solid var(--teal-line);background:var(--teal-soft);color:var(--teal);
+       padding:9px 14px;border-radius:999px;cursor:pointer;font-size:14px;font-weight:700}
+  .tab[aria-selected="true"]{background:var(--teal);color:#fff;border-color:var(--teal)}
+  .panel{border:1px solid var(--teal-line);border-radius:10px;padding:18px;background:#fff}
+  .panel[hidden]{display:none}
+  .intro{background:var(--teal-soft);border:1px solid var(--teal-line);border-radius:8px;
+         padding:12px 14px;margin:0 0 16px;font-size:15px}
+  .card{border:1px solid var(--teal-line);border-radius:8px;padding:14px 16px;margin:0 0 12px}
+  .q{font-weight:700;margin:0 0 10px}
+  .opts{display:flex;flex-direction:column;gap:8px}
+  .opt{text-align:left;border:1px solid var(--teal-line);background:#fff;color:var(--ink);
+       padding:10px 12px;border-radius:8px;cursor:pointer;font-size:15px;font-family:inherit}
+  .opt:hover:not(:disabled){background:var(--teal-soft)}
+  .opt:disabled{cursor:default}
+  .opt.right{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
+  .opt.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .fb{margin:10px 0 0;padding:10px 12px;border-radius:8px;font-size:15px;display:none}
+  .fb.show{display:block}
+  .fb.ok{background:var(--good-bg);border-left:4px solid var(--good)}
+  .fb.no{background:var(--bad-bg);border-left:4px solid var(--bad)}
+  .bar{height:8px;background:var(--teal-soft);border-radius:999px;overflow:hidden;margin:0 0 6px}
+  .bar span{display:block;height:100%;background:var(--teal);width:0;transition:width .3s}
+  .meta{font-size:13px;color:var(--muted);margin:0 0 14px}
+  .btn{border:1px solid var(--teal);background:var(--teal);color:#fff;padding:9px 16px;
+       border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit}
+  .btn.ghost{background:#fff;color:var(--teal)}
+  .btn:disabled{opacity:.45;cursor:default}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+  .item{border:1px solid var(--sand-line);background:var(--sand);border-radius:8px;padding:12px 14px;margin:0 0 10px}
+  .item .txt{margin:0 0 10px}
+  .choices{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{border:1px solid var(--teal-line);background:#fff;color:var(--teal);padding:7px 12px;
+        border-radius:999px;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit}
+  .chip[aria-pressed="true"]{background:var(--teal);color:#fff}
+  .chip.right{background:var(--good-bg);border-color:var(--good);color:var(--good)}
+  .chip.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .why{font-size:15px;margin:10px 0 0;padding:10px 12px;background:#fff;border:1px dashed var(--sand-line);
+       border-radius:8px;display:none}
+  .why.show{display:block}
+  .score{font-weight:700;color:var(--teal)}
+  textarea{width:100%;min-height:90px;border:1px solid var(--teal-line);border-radius:8px;
+           padding:10px;font-family:inherit;font-size:15px}
+  .note{font-size:13px;color:var(--muted);margin-top:8px}
+  .reveal{border:1px solid var(--teal-line);border-radius:8px;margin:0 0 10px;background:#fff}
+  .reveal summary{cursor:pointer;padding:11px 14px;background:var(--teal-soft);color:var(--teal);
+                  font-weight:700;border-radius:8px}
+  .reveal div{padding:12px 14px;border-top:1px solid var(--teal-line)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Practice: Teamwork Concepts From the Video</h1>
+  <p class="sub">HCR 321 Module 6 &nbsp;|&nbsp; Improving Patient Outcomes Through Interprofessional Teamwork &nbsp;|&nbsp; Nothing here is graded or recorded.</p>
+
+  <div class="tabs" role="tablist" aria-label="Practice activities">
+    <button class="tab" role="tab" id="t1" aria-controls="p1" aria-selected="true">1. Name the concept</button>
+    <button class="tab" role="tab" id="t2" aria-controls="p2" aria-selected="false">2. Barrier or not</button>
+    <button class="tab" role="tab" id="t3" aria-controls="p3" aria-selected="false">3. Read the results</button>
+  </div>
+
+  <!-- PANEL 1 -->
+  <section class="panel" id="p1" role="tabpanel" aria-labelledby="t1">
+    <h2>Name the teamwork concept</h2>
+    <p class="intro">Six moments on a hospital unit. Choose the teamwork concept from the video that each one shows. Feedback comes right away, one question at a time.</p>
+    <div class="bar"><span id="b1"></span></div>
+    <p class="meta">Question <span id="n1">1</span> of 6 &nbsp;&middot;&nbsp; Score <span class="score" id="s1">0</span></p>
+    <div id="quizbox" class="card"></div>
+    <div class="row">
+      <button class="btn" id="next1" disabled>Next question</button>
+      <button class="btn ghost" id="again1">Start over</button>
+    </div>
+  </section>
+
+  <!-- PANEL 2 -->
+  <section class="panel" id="p2" role="tabpanel" aria-labelledby="t2" hidden>
+    <h2>Barrier or not a barrier</h2>
+    <p class="intro">The video names three system barriers to teamwork. Label each situation with the barrier it shows, or mark it as something other than a system barrier. Choose for all six, then check your work.</p>
+    <div id="sortbox"></div>
+    <div class="row">
+      <button class="btn" id="check2">Check my answers</button>
+      <button class="btn ghost" id="again2">Clear</button>
+      <span class="score" id="s2" aria-live="polite"></span>
+    </div>
+  </section>
+
+  <!-- PANEL 3 -->
+  <section class="panel" id="p3" role="tabpanel" aria-labelledby="t3" hidden>
+    <h2>Read the results</h2>
+    <p class="intro">Three questions about what the Northwestern team actually found. Write your own answer first, then open the response and compare. Your writing stays in your browser and is not submitted.</p>
+
+    <div class="card">
+      <p class="q">1. Length of stay and cost did not improve. Does that mean the intervention failed?</p>
+      <label class="note" for="a1">Your answer</label>
+      <textarea id="a1" aria-label="Your answer to question one"></textarea>
+      <details class="reveal" style="margin-top:12px"><summary>Compare with a strong response</summary>
+      <div>No. The speaker points out that their length of stay was already good, with an observed to expected ratio at or below 1, so there was little room to move. Meanwhile adverse events fell from 7.2 to 3.9 per 100 patient days and nurse ratings of collaboration rose from the mid thirties to 76 percent. Choosing the right measure for what an intervention can actually change is part of evaluating it fairly.</div></details>
+    </div>
+
+    <div class="card">
+      <p class="q">2. Why does the video keep returning to how nurses rate collaboration, rather than how physicians rate it?</p>
+      <label class="note" for="a2">Your answer</label>
+      <textarea id="a2" aria-label="Your answer to question two"></textarea>
+      <details class="reveal" style="margin-top:12px"><summary>Compare with a strong response</summary>
+      <div>Because that is the rating tied to patient outcomes. Higher collaboration reported by nurses was associated with lower risk adjusted mortality. It is also the rating that moved when the interventions worked, while physician ratings were already high and stayed high on control units. A measure that is high before you start cannot tell you whether anything changed.</div></details>
+    </div>
+
+    <div class="card">
+      <p class="q">3. The nice catch conversations stopped three specific errors. What do all three have in common?</p>
+      <label class="note" for="a3">Your answer</label>
+      <textarea id="a3" aria-label="Your answer to question three"></textarea>
+      <details class="reveal" style="margin-top:12px"><summary>Compare with a strong response</summary>
+      <div>In each one, someone other than the physician held the piece of information that mattered: the nurse knew about the contrast reaction, the pharmacist knew the heparin range had changed, the nurse noticed the patient was off telemetry. The information already existed on the unit. What was missing was a reliable time and place for it to be said out loud, which is exactly what structured rounds created.</div></details>
+    </div>
+
+    <p class="note">If you can answer these three in your own words, you are ready to write about interventions and their results in the short paper.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+  /* ---------- tabs ---------- */
+  var tabs=[].slice.call(document.querySelectorAll('.tab'));
+  tabs.forEach(function(t){
+    t.addEventListener('click',function(){
+      tabs.forEach(function(x){
+        x.setAttribute('aria-selected','false');
+        document.getElementById(x.getAttribute('aria-controls')).hidden=true;
+      });
+      t.setAttribute('aria-selected','true');
+      document.getElementById(t.getAttribute('aria-controls')).hidden=false;
+    });
+  });
+
+  /* ---------- quiz ---------- */
+  var Q=[
+ {q:"The charge nurse assigns roles at the start of the shift, spells out who is covering which rooms, and settles a disagreement about who calls the family.",
+  o:["Team leadership", "Mutual performance monitoring", "Backup behavior", "Adaptability", "Team orientation", "Shared mental model"],a:0,
+  w:"Team leadership. Directing the team, assigning roles and responsibilities, clarifying tasks, and resolving conflict are exactly what the video lists under this component."},
+ {q:"A pharmacist notices the new nurse is behind on her medication passes and takes two of her reconciliations so she can catch up.",
+  o:["Team leadership", "Mutual performance monitoring", "Backup behavior", "Adaptability", "Team orientation", "Shared mental model"],a:2,
+  w:"Backup behavior. Someone needed help and a teammate stepped in. Noticing she was behind in the first place was mutual performance monitoring, so the two often appear together."},
+ {q:"During rounds the team reviews its own fall data, sees the rate climbing, and changes the hourly rounding schedule the same week.",
+  o:["Team leadership", "Mutual performance monitoring", "Backup behavior", "Adaptability", "Team orientation", "Shared mental model"],a:3,
+  w:"Adaptability. The team took in information about its own performance and adjusted strategy to get back on track."},
+ {q:"A resident stays 20 minutes past sign out to finish a discharge summary so the receiving team is not left without it.",
+  o:["Team leadership", "Mutual performance monitoring", "Backup behavior", "Adaptability", "Team orientation", "Shared mental model"],a:4,
+  w:"Team orientation. Putting the team's goals ahead of your own. This is the no I in team component."},
+ {q:"The respiratory therapist keeps an eye on how the whole unit is running and notices the night nurse has three unstable patients at once.",
+  o:["Team leadership", "Mutual performance monitoring", "Backup behavior", "Adaptability", "Team orientation", "Shared mental model"],a:1,
+  w:"Mutual performance monitoring. Watching how the work is going for everyone rather than only for yourself, and anticipating what teammates will need."},
+ {q:"Asked separately, the nurse and the physician give the same answer about why the patient was admitted, what tests are planned, and what changed in the medications.",
+  o:["Team leadership", "Mutual performance monitoring", "Backup behavior", "Adaptability", "Team orientation", "Shared mental model"],a:5,
+  w:"A shared mental model. This is not one of the five components. It is what the five components produce when they are working, and the video measured its absence directly."}
+];
+  var i=0,score=0,answered=false;
+  var box=document.getElementById('quizbox'),next=document.getElementById('next1');
+
+  function draw(){
+    answered=false;next.disabled=true;
+    document.getElementById('n1').textContent=Math.min(i+1,Q.length);
+    document.getElementById('s1').textContent=score;
+    document.getElementById('b1').style.width=(i/Q.length*100)+'%';
+    if(i>=Q.length){
+      box.innerHTML='<p class="q">Done. You scored '+score+' out of '+Q.length+'.</p><p style="margin:0">'+
+        (score===Q.length?'Every action mapped correctly. Move to the sorting activity.':
+         'Reopen the AHRQ chapter for the ones you missed, then run this again.')+'</p>';
+      next.disabled=true;return;
+    }
+    var item=Q[i],h='<p class="q">'+item.q+'</p><div class="opts">';
+    item.o.forEach(function(o,k){h+='<button class="opt" data-k="'+k+'">'+o+'</button>';});
+    h+='</div><p class="fb" id="fb" role="status"></p>';
+    box.innerHTML=h;
+    [].slice.call(box.querySelectorAll('.opt')).forEach(function(b){
+      b.addEventListener('click',function(){
+        if(answered)return;answered=true;
+        var k=+b.dataset.k,ok=(k===item.a),fb=document.getElementById('fb');
+        if(ok)score++;
+        [].slice.call(box.querySelectorAll('.opt')).forEach(function(x){
+          x.disabled=true;
+          if(+x.dataset.k===item.a)x.className='opt right';
+          else if(x===b)x.className='opt wrong';
+        });
+        fb.className='fb show '+(ok?'ok':'no');
+        fb.innerHTML='<strong>'+(ok?'Correct. ':'Not this time. The answer is '+item.o[item.a]+'. ')+'</strong>'+item.w;
+        document.getElementById('s1').textContent=score;
+        next.disabled=false;
+      });
+    });
+  }
+  next.addEventListener('click',function(){i++;draw();});
+  document.getElementById('again1').addEventListener('click',function(){i=0;score=0;draw();});
+  draw();
+
+  /* ---------- sorting ---------- */
+  var CATS=["Team size", "Membership instability", "Dispersion in time and space", "Not a system barrier"];
+  var S=[
+   {t:"A hospitalist has patients on nine different units across five floors.",a:2,
+    w:"Dispersion in time and space. This was his own situation before 2008, and it made collaborating with unit based nurses and social workers nearly impossible."},
+   {t:"Between admission and discharge the patient is cared for by residents rotating on and off service, three shifts of nurses, and a night float team.",a:1,
+    w:"Membership instability. Members join and leave while the work is underway, which is unavoidable when care runs 24 hours a day but still has to be designed around."},
+   {t:"Go back to the picture of one patient surrounded by physicians, students, nurses, technicians, therapists, pharmacy, social work, consulting teams, and family.",a:0,
+    w:"Team size. Sometimes teams are too small, but in health care the problem is usually the opposite."},
+   {t:"A physician believes collaboration with nursing is going very well while the nurses on the same unit strongly disagree.",a:3,
+    w:"Not a system barrier in the video's framework. It is a symptom of the barriers, a missing shared mental model, and the video is careful to say it is not a matter of people not valuing teamwork."},
+   {t:"Interdisciplinary rounds cannot get started because the physicians who would attend are spread across seven units at the same hour.",a:2,
+    w:"Dispersion in time and space. This is also why localization came first at Northwestern. It is the change that makes the other interventions possible."},
+   {t:"A nurse does not feel it is her place to question a physician's plan.",a:3,
+    w:"Not one of the three system barriers, though it is a real culture problem. The video argues that structures such as rounds and co leadership are what shift that culture, rather than telling people to speak up more."}
+  ];
+  var picks={};
+  var sbox=document.getElementById('sortbox');
+  function drawSort(){
+    picks={};sbox.innerHTML='';document.getElementById('s2').textContent='';
+    S.forEach(function(item,idx){
+      var d=document.createElement('div');d.className='item';
+      var h='<p class="txt">'+item.t+'</p><div class="choices" role="group" aria-label="Choose a category">';
+      CATS.forEach(function(c,k){h+='<button class="chip" data-i="'+idx+'" data-k="'+k+'" aria-pressed="false">'+c+'</button>';});
+      h+='</div><p class="why" id="w'+idx+'">'+item.w+(item.alt?' <em>This item can be argued either way.</em>':'')+'</p>';
+      d.innerHTML=h;sbox.appendChild(d);
+    });
+    [].slice.call(sbox.querySelectorAll('.chip')).forEach(function(c){
+      c.addEventListener('click',function(){
+        var idx=+c.dataset.i;
+        [].slice.call(sbox.querySelectorAll('.chip[data-i="'+idx+'"]')).forEach(function(x){
+          x.setAttribute('aria-pressed','false');x.className='chip';
+        });
+        c.setAttribute('aria-pressed','true');picks[idx]=+c.dataset.k;
+      });
+    });
+  }
+  document.getElementById('check2').addEventListener('click',function(){
+    var got=0,done=0;
+    S.forEach(function(item,idx){
+      if(picks[idx]===undefined)return;
+      done++;
+      var chips=[].slice.call(sbox.querySelectorAll('.chip[data-i="'+idx+'"]'));
+      chips.forEach(function(x){
+        var k=+x.dataset.k;
+        if(k===item.a)x.className='chip right';
+        else if(k===picks[idx])x.className='chip wrong';
+        else x.className='chip';
+      });
+      if(picks[idx]===item.a)got++;
+      document.getElementById('w'+idx).className='why show';
+    });
+    document.getElementById('s2').textContent= done===0 ? 'Choose a category for at least one item first.'
+      : got+' of '+done+' answered match the expected label. Read every explanation, including the ones you got right.';
+  });
+  document.getElementById('again2').addEventListener('click',drawSort);
+  drawSort();
+})();
+</script>
+</body>
+</html>
