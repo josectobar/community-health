@@ -93,6 +93,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/arizona-community-resources/](models/arizona-community-resources/): module 7 practice on Area Agency on Aging Region One and AZ Links: match needs to services, judge referrals, and run a real search.
 - [models/mesa-foothills-practice-case/](models/mesa-foothills-practice-case/): module 7 six-prompt practice case on implementing a coordinated care model, mirroring the short paper questions.
 - [models/teamwork-concepts/](models/teamwork-concepts/): module 6 practice on interprofessional teamwork: name the concept, identify system barriers, and read the Northwestern results.
+- [models/four-north-practice-case/](models/four-north-practice-case/): module 6 four-prompt practice case on interprofessional teamwork, mirroring the short paper sections.
 
 ## Embed snippets
 
@@ -170,6 +171,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Connecting Patients to Arizona Resources" src="models/arizona-community-resources/"></iframe>
 <iframe title="Mesa Foothills Practice Case" src="models/mesa-foothills-practice-case/"></iframe>
 <iframe title="Teamwork Concepts From the Video" src="models/teamwork-concepts/"></iframe>
+<iframe title="4 North Practice Case" src="models/four-north-practice-case/"></iframe>
 ```
 
 ## Files

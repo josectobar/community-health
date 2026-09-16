@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HCR 321 Module 6 Practice Case: 4 North</title>
+<style>
+  :root{
+    color-scheme: light;
+    --v:#5B3E90; --v-soft:#F6F2FC; --v-line:#DDD1F0;
+    --good:#2E6B45; --good-bg:#EDF6F0; --bad:#9B3B52; --bad-bg:#FBF0F2;
+    --warn:#B06B18; --warn-bg:#FDF8EF;
+    --sand:#FBF7F0; --sand-line:#E8DFCE; --ink:#2b2b2b; --muted:#5a5245;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:18px;background:#fff;color:var(--ink);
+       font-family:Lato,'Helvetica Neue',Arial,sans-serif;font-size:16px;line-height:1.55}
+  .wrap{max-width:840px;margin:0 auto}
+  h1{font-family:Georgia,'Times New Roman',serif;font-size:25px;color:var(--v);margin:0 0 4px}
+  h2{font-family:Georgia,'Times New Roman',serif;font-size:21px;color:var(--v);margin:0 0 8px}
+  h3{font-size:16px;color:var(--v);margin:16px 0 8px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 16px}
+  .case{background:var(--sand);border:1px solid var(--sand-line);border-radius:10px;padding:16px 18px;margin:0 0 18px}
+  .case p{margin:0 0 10px}
+  .case ul{margin:0 0 10px;padding-left:20px}
+  .case li{margin-bottom:4px}
+  details.case-toggle{border:1px solid var(--sand-line);border-radius:10px;margin:0 0 18px;background:var(--sand)}
+  details.case-toggle summary{cursor:pointer;padding:12px 16px;font-weight:700;color:var(--warn);border-radius:10px}
+  details.case-toggle > div{padding:0 18px 14px}
+  .bar{height:9px;background:var(--v-soft);border:1px solid var(--v-line);border-radius:999px;overflow:hidden;margin:0 0 6px}
+  .bar span{display:block;height:100%;background:var(--v);width:0;transition:width .3s}
+  .meta{font-size:13px;color:var(--muted);margin:0 0 16px}
+  .panel{border:1px solid var(--v-line);border-radius:10px;padding:18px;background:#fff}
+  .tag{display:inline-block;background:var(--v);color:#fff;font-size:12px;padding:3px 10px;border-radius:12px;margin-bottom:8px}
+  .prompt{font-weight:700;margin:0 0 12px}
+  .step{border:1px solid var(--v-line);border-radius:8px;padding:14px 16px;margin:0 0 14px}
+  .step h4{margin:0 0 10px;font-size:14px;color:var(--v);text-transform:uppercase;letter-spacing:.5px}
+  .opts{display:flex;flex-direction:column;gap:8px}
+  .opt{text-align:left;border:1px solid var(--v-line);background:#fff;color:var(--ink);padding:10px 12px;
+       border-radius:8px;cursor:pointer;font-size:15px;font-family:inherit}
+  .opt:hover:not(.locked){background:var(--v-soft)}
+  .opt[aria-pressed="true"]{background:var(--v-soft);border-color:var(--v);font-weight:700}
+  .opt.right{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
+  .opt.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .opt.miss{border-style:dashed;border-color:var(--good);color:var(--good)}
+  textarea{width:100%;min-height:120px;border:1px solid var(--v-line);border-radius:8px;padding:10px;
+           font-family:inherit;font-size:15px}
+  .count{font-size:13px;color:var(--muted);margin-top:6px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+  .btn{border:1px solid var(--v);background:var(--v);color:#fff;padding:9px 16px;border-radius:8px;
+       cursor:pointer;font-size:14px;font-weight:700;font-family:inherit}
+  .btn.ghost{background:#fff;color:var(--v)}
+  .btn:disabled{opacity:.45;cursor:default}
+  .fb{margin-top:12px;padding:12px 14px;border-radius:8px;display:none;font-size:15px}
+  .fb.show{display:block}
+  .fb.ok{background:var(--good-bg);border-left:4px solid var(--good)}
+  .fb.part{background:var(--warn-bg);border-left:4px solid var(--warn)}
+  .fb.no{background:var(--bad-bg);border-left:4px solid var(--bad)}
+  .cov{list-style:none;margin:10px 0 0;padding:0}
+  .cov li{padding:4px 0 4px 26px;position:relative}
+  .cov li.yes:before{content:"\2713";position:absolute;left:4px;color:var(--good);font-weight:700}
+  .cov li.no:before{content:"\2022";position:absolute;left:6px;color:var(--bad);font-weight:700}
+  .model{border:1px solid var(--v-line);border-radius:8px;margin-top:12px;background:#fff}
+  .model summary{cursor:pointer;padding:11px 14px;background:var(--v-soft);color:var(--v);font-weight:700;border-radius:8px}
+  .model > div{padding:12px 14px;border-top:1px solid var(--v-line)}
+  .rub{margin:10px 0 0;padding:0;list-style:none}
+  .rub li{margin-bottom:6px}
+  .rub label{cursor:pointer}
+  .nav{display:flex;justify-content:space-between;gap:8px;margin-top:18px;flex-wrap:wrap}
+  .note{font-size:13px;color:var(--muted);margin-top:10px}
+  .sumrow{border:1px solid var(--v-line);border-radius:8px;padding:12px 14px;margin-bottom:10px}
+  .sumrow .t{font-weight:700;color:var(--v)}
+  .pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:12px;margin-left:8px}
+  .pill.g{background:var(--good-bg);color:var(--good)}
+  .pill.w{background:var(--warn-bg);color:var(--warn)}
+  .pill.r{background:var(--bad-bg);color:var(--bad)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Practice Case: Teamwork on 4 North</h1>
+  <p class="sub">HCR 321 Module 6 &nbsp;|&nbsp; Four short prompts built like the short paper &nbsp;|&nbsp; Feedback is automatic. Nothing is graded, stored, or submitted.</p>
+
+  <details class="case-toggle" open>
+    <summary>The case (open this first, and reopen it any time)</summary>
+    <div>
+      <p>4 North is a 32 bed medical surgical unit at Saguaro General Hospital. Patient outcomes on the unit are slipping, and the quality committee wants to know why.</p>
+      <p><strong>What the unit looks like right now:</strong></p>
+      <ul>
+        <li>The five hospitalists covering 4 North also carry patients on three other units, so they round on 4 North whenever they happen to reach it.</li>
+        <li>Nurses work three twelve hour shifts, residents rotate every four weeks, and night float covers admissions, so the people caring for a patient on Monday are rarely the same on Thursday.</li>
+        <li>There are no daily interdisciplinary rounds. Pharmacy, social work, and case management each round separately.</li>
+        <li>Most nurse to physician communication happens by text page. Nurses say they often wait hours for a reply.</li>
+        <li>A staff survey found that 78 percent of physicians rated collaboration with nursing as high or very high, while 31 percent of nurses said the same about physicians.</li>
+        <li>Two recent safety events involved a medication a patient had reacted to before, which was documented in the nursing note and never discussed out loud.</li>
+        <li>The unit has a nurse manager. There is no physician counterpart.</li>
+        <li>In interviews, staff say they like each other and believe in teamwork. They also say there is no time and no place to talk.</li>
+      </ul>
+      <p>You have been asked to bring recommendations to the quality committee.</p>
+    </div>
+  </details>
+
+  <div class="bar"><span id="prog"></span></div>
+  <p class="meta">Prompt <span id="pn">1</span> of 4</p>
+
+  <div class="panel" id="stage"></div>
+
+  <div class="nav">
+    <button class="btn ghost" id="prev">Back</button>
+    <button class="btn" id="nextb">Next prompt</button>
+  </div>
+  <p class="note">How the written feedback works: the widget checks whether your answer uses the concepts and the case details this prompt requires, and how long it is. It cannot judge how well you wrote it, and listing words alone will not make an answer good. Use the model response and the self check to judge quality.</p>
+</div>
+
+<script>
+(function(){
+var P=[
+{
+ tag:"Prompt 1 of 4 &nbsp;|&nbsp; like the Provider Engagement section",
+ prompt:"How would you get the hospitalists on 4 North to engage with a teamwork change they did not ask for?",
+ pick:{type:"multi",
+   q:"Select the two approaches most likely to bring these physicians on board. There are two.",
+   o:["Show them the collaboration survey results for their own unit", "Put frontline staff on a working group that designs the change before it launches", "Send an email announcing the new process starts Monday", "Add teamwork to the annual performance review", "Require attendance and track who is missing"],
+   a:[0, 1],
+   w:"Physicians who believe collaboration is going well need to see the gap before they will accept a fix, and aggregate data does that without blaming individuals. Designing with a frontline working group turns the change into something staff built rather than something done to them. Announcements, evaluations, and attendance tracking are compliance tools, and compliance is not engagement."},
+ write:{
+   q:"In 4 to 6 sentences, describe one strategy you would use to engage these physicians and explain why it would work with this group in particular.",
+   min:60,
+   need:[{l:"Names one specific strategy",t:["data", "survey", "working group", "design", "co lead", "protected time", "champion", "pilot", "feedback", "show them"]},
+     {l:"Explains why providers respond to it",t:["because", "ownership", "own data", "believe", "buy in", "credib", "trust", "peer", "their own"]},
+     {l:"Uses detail from this unit",t:["78 percent", "31 percent", "hospitalist", "4 north", "three other units", "page", "survey", "safety event"]},
+     {l:"Describes what it would look like in practice",t:["meet", "present", "week", "month", "committee", "session", "group", "invite", "walk through"]}],
+   model:"I would start by showing the hospitalists their own collaboration data, since 78 percent of them rate collaboration as high while only 31 percent of nurses agree. That gap is persuasive precisely because it contradicts what they believe, and presenting it in aggregate keeps it from feeling like an accusation aimed at any one physician. I would then ask two of them to sit on a working group with nurses and pharmacy to design the change, rather than bringing them a finished process. People defend what they helped build, and a physician who helped design rounds can explain them to a skeptical colleague far better than I can.",
+   rub:["I described one strategy rather than listing several", "I explained why providers respond to it", "I used specific detail from this unit", "I said what it would look like in practice"]}
+},
+{
+ tag:"Prompt 2 of 4 &nbsp;|&nbsp; like the Key Concepts section",
+ prompt:"Which teamwork concepts are missing on 4 North?",
+ pick:{type:"multi",
+   q:"Select the three core teamwork concepts most clearly missing on this unit. There are three.",
+   o:["Team leadership", "Mutual performance monitoring", "Backup behavior", "Adaptability", "Team orientation"],
+   a:[0, 1, 3],
+   w:"There is no physician counterpart to the nurse manager, so team leadership has no owner on the medical side. Nobody is watching how the work is going across the unit, which is mutual performance monitoring, and it is why a documented reaction never reached the person prescribing. And two safety events have happened without the unit changing anything, which is a failure of adaptability. Staff say they like each other and believe in teamwork, so team orientation is not the gap."},
+ write:{
+   q:"In 4 to 6 sentences, choose two of those concepts and explain why they matter to you as a health care professional, not only why they matter to this unit.",
+   min:60,
+   need:[{l:"Names specific concepts by their proper terms",t:["team leadership", "mutual performance monitoring", "backup behavior", "adaptability", "team orientation"]},
+     {l:"Speaks from your own role or experience",t:[" i ", " my ", "me ", "in my", "i have", "i would", "as a"]},
+     {l:"Explains the consequence when it is absent",t:["without", "missing", "if no one", "otherwise", "result", "error", "miss", "harm", "fall through"]},
+     {l:"Grounds it in a concrete situation",t:["shift", "patient", "unit", "rounds", "handoff", "night", "medication", "nurse", "pharmac"]}],
+   model:"Mutual performance monitoring matters most to me because I cannot see what I am missing. On 4 North a documented reaction sat in a nursing note and reached no one, and that is not a knowledge failure, it is a failure of anyone watching the whole picture. In my own practice the times I have caught something meaningful were times I was paying attention to how a teammate's assignment was going rather than only my own. Team leadership matters to me for a related reason: when nobody is clearly responsible for setting direction on a unit, the default is that everyone assumes someone else is handling it, and on this unit two safety events happened with no one owning the response.",
+   rub:["I used the concepts by name", "I explained why they matter to me, not only to the unit", "I described what goes wrong when they are absent", "I used a concrete situation"]}
+},
+{
+ tag:"Prompt 3 of 4 &nbsp;|&nbsp; like the Barriers section",
+ prompt:"Name the barriers operating on 4 North.",
+ pick:{type:"multi",
+   q:"Select the system barriers visible in this case. There are three.",
+   o:["Dispersion of team members in time and space", "Team membership instability", "Team size", "Staff who do not value teamwork", "A shortage of qualified nurses"],
+   a:[0, 1, 2],
+   w:"Hospitalists spread across four units is dispersion. Twelve hour shifts, four week resident rotations, and night float are membership instability. The full team around one patient, with pharmacy, social work, case management, nursing, and several physician groups, is large. Staff explicitly say they like each other and believe in teamwork, and nothing in the case points to a staffing shortage."},
+ write:{
+   q:"In 3 to 5 sentences, explain why these count as system barriers rather than attitude problems, and what that distinction changes about the fix.",
+   min:55,
+   need:[{l:"Names at least two of the three barriers",t:["dispersion", "size", "instability", "membership", "spread", "turnover", "rotate"]},
+     {l:"Makes the system versus attitude distinction",t:["system", "structure", "not attitude", "not because", "design", "no one comes to work", "effort", "blame"]},
+     {l:"Says what the distinction changes",t:["fix", "solution", "intervention", "redesign", "schedul", "staffing", "cannot be solved", "training alone", "encourag"]}],
+   model:"All three barriers on 4 North are features of how the work is arranged rather than of how people feel about each other. The hospitalists are spread across four units because of how beds are assigned, the team turns over because care runs around the clock, and the team is large because complex patients require many disciplines. Staff on this unit say plainly that they value teamwork and simply have no time or place to talk. That distinction matters because it rules out the usual responses. Teamwork training and reminders to communicate will not create a shared time and place, so the fix has to change the structure.",
+   rub:["I named at least two barriers accurately", "I explained why they are structural", "I said what that rules out as a solution"]}
+},
+{
+ tag:"Prompt 4 of 4 &nbsp;|&nbsp; like the Intervention section",
+ prompt:"Choose one intervention and say how you would actually put it in place.",
+ pick:{type:"single",
+   q:"Given that hospitalists cover four units at once, which intervention has to come first?",
+   o:["Geographic localization of the hospitalists", "A four hour teamwork training for all staff", "A new secure messaging app", "A poster campaign about speaking up"],
+   a:0,
+   w:"Localization comes first because it is what makes the others possible. Physicians who are never on the unit cannot attend daily rounds, and training people to communicate better does little when they are never in the same place at the same time."},
+ write:{
+   q:"In 5 to 7 sentences, name one intervention for 4 North and describe how you would implement it: who leads it, who attends, when and how long, what tool organizes it, and how you would know it worked.",
+   min:70,
+   need:[{l:"Names a specific intervention",t:["rounds", "interdisciplinary", "localiz", "co leader", "co lead", "checklist", "structured communication", "daily goals", "huddle"]},
+     {l:"Says who leads and who attends",t:["nurse manager", "medical director", "co lead", "lead", "attend", "pharmac", "social work", "case manag", "bedside nurse"]},
+     {l:"Gives timing and duration",t:["daily", "every day", "morning", "minutes", "weekly", "30", "20", "15", "late morning", "same time"]},
+     {l:"Names a tool or structure",t:["tool", "template", "checklist", "form", "script", "agenda", "communication tool"]},
+     {l:"Says how you would know it worked",t:["measure", "survey", "collaboration", "adverse", "rate", "track", "before and after", "audit", "percent"]}],
+   model:"I would implement structured interdisciplinary rounds on 4 North, paired with localizing the hospitalists to the unit so they can attend. The nurse manager and a newly named unit medical director would co lead, with protected time for the physician role. Every bedside nurse, the hospitalists, pharmacy, social work, and case management would attend daily in the late morning, in a conference room, for 30 to 40 minutes, covering every patient on the unit. A structured communication tool would organize the discussion for new admissions and flag safety items such as central lines and prophylaxis. A working group of frontline staff would set the final format before launch rather than receiving it from me. I would know it worked by repeating the collaboration survey at six months and by tracking adverse events on the unit against a comparable unit that has not changed.",
+   rub:["I named one intervention", "I said who leads and who attends", "I gave timing and duration", "I named the tool that organizes it", "I said how I would measure whether it worked"]}
+}];
+
+var i=0, picked={}, locked={}, stage=document.getElementById('stage');
+
+function norm(s){return s.toLowerCase().replace(/[^a-z0-9 ]/g,' ');}
+function words(s){return s.trim().split(/\s+/).filter(Boolean).length;}
+
+function render(){
+  var p=P[i];
+  document.getElementById('pn').textContent=i+1;
+  document.getElementById('prog').style.width=((i)/P.length*100)+'%';
+  document.getElementById('prev').disabled=(i===0);
+  document.getElementById('nextb').textContent=(i===P.length-1)?'See my summary':'Next prompt';
+
+  var h='<p class="tag">'+p.tag+'</p><h2>'+p.prompt+'</h2>';
+  h+='<div class="step"><h4>Step 1. Quick decision</h4><p style="margin:0 0 10px">'+p.pick.q+'</p><div class="opts" id="opts">';
+  p.pick.o.forEach(function(o,k){h+='<button class="opt" data-k="'+k+'" aria-pressed="false">'+o+'</button>';});
+  h+='</div><div class="row"><button class="btn" id="checkpick">Check this step</button></div><div class="fb" id="pfb"></div></div>';
+
+  h+='<div class="step"><h4>Step 2. Write it out</h4><p style="margin:0 0 10px">'+p.write.q+'</p>'+
+     '<textarea id="ta" aria-label="Your written answer"></textarea><p class="count" id="wc">0 words. Aim for at least '+p.write.min+'.</p>'+
+     '<div class="row"><button class="btn" id="checkwrite">Get feedback</button></div><div class="fb" id="wfb"></div>'+
+     '<details class="model"><summary>Open a model response</summary><div><p style="margin:0 0 10px">'+p.write.model+'</p>'+
+     '<p style="margin:0 0 6px"><strong>Self check. Tick what your answer actually does.</strong></p><ul class="rub">';
+  p.write.rub.forEach(function(r,k){h+='<li><label><input type="checkbox"> '+r+'</label></li>';});
+  h+='</ul></div></details></div>';
+  stage.innerHTML=h;
+
+  var multi=(p.pick.type==='multi');
+  var sel=picked[i]||[];
+  var opts=[].slice.call(stage.querySelectorAll('.opt'));
+  opts.forEach(function(b){
+    if(sel.indexOf(+b.dataset.k)>-1)b.setAttribute('aria-pressed','true');
+    b.addEventListener('click',function(){
+      if(locked[i])return;
+      var k=+b.dataset.k,cur=picked[i]||[];
+      if(multi){
+        var at=cur.indexOf(k);
+        if(at>-1)cur.splice(at,1);else cur.push(k);
+        b.setAttribute('aria-pressed',at>-1?'false':'true');
+      }else{
+        cur=[k];opts.forEach(function(x){x.setAttribute('aria-pressed','false');});
+        b.setAttribute('aria-pressed','true');
+      }
+      picked[i]=cur;
+    });
+  });
+
+  document.getElementById('checkpick').addEventListener('click',function(){
+    var cur=picked[i]||[],ans=multi?p.pick.a:[p.pick.a];
+    var fb=document.getElementById('pfb');
+    if(!cur.length){fb.className='fb show part';fb.innerHTML='Make a selection first.';return;}
+    locked[i]=true;
+    var hit=0;
+    opts.forEach(function(x){
+      var k=+x.dataset.k,isAns=ans.indexOf(k)>-1,isSel=cur.indexOf(k)>-1;
+      x.classList.add('locked');
+      if(isAns&&isSel){x.className='opt right locked';hit++;}
+      else if(isSel){x.className='opt wrong locked';}
+      else if(isAns){x.className='opt miss locked';}
+    });
+    var extra=cur.filter(function(k){return ans.indexOf(k)<0;}).length;
+    var perfect=(hit===ans.length&&extra===0);
+    fb.className='fb show '+(perfect?'ok':(hit?'part':'no'));
+    fb.innerHTML='<strong>'+(perfect?'That is the full answer. ':
+      (hit? 'Partly there. You found '+hit+' of '+ans.length+(extra?', and selected '+extra+' that do not belong. ':'. ')
+          : 'Not this one. '))+'</strong>'+p.pick.w+'<p class="note" style="margin-top:8px">Dashed outlines mark answers you missed.</p>';
+  });
+
+  var ta=document.getElementById('ta'),wc=document.getElementById('wc');
+  if(window['draft'+i])ta.value=window['draft'+i];
+  function count(){var n=words(ta.value);wc.textContent=n+' words. Aim for at least '+p.write.min+'.';window['draft'+i]=ta.value;}
+  ta.addEventListener('input',count);count();
+
+  document.getElementById('checkwrite').addEventListener('click',function(){
+    var txt=norm(ta.value),n=words(ta.value),fb=document.getElementById('wfb');
+    if(n<15){fb.className='fb show part';fb.innerHTML='Write a few sentences first, then ask for feedback.';return;}
+    var got=0,list='';
+    p.write.need.forEach(function(c){
+      var hit=c.t.some(function(t){return txt.indexOf(norm(t))>-1;});
+      if(hit)got++;
+      list+='<li class="'+(hit?'yes':'no')+'">'+c.l+(hit?'':' &nbsp;<em>missing</em>')+'</li>';
+    });
+    var all=p.write.need.length,cls=(got===all?'ok':(got>=all-1?'part':'no'));
+    var head;
+    if(got===all&&n>=p.write.min)head='Your answer covers everything this prompt asks for.';
+    else if(got===all)head='All the required ideas are present, but the answer is short. Add the case detail that supports them.';
+    else head='You covered '+got+' of '+all+' required elements.';
+    fb.className='fb show '+cls;
+    fb.innerHTML='<strong>'+head+'</strong><ul class="cov">'+list+'</ul>'+
+      '<p class="note" style="margin-top:8px">This check looks for concepts and case details, not for quality. Open the model response and use the self check to judge how well you made the argument.</p>';
+    window['score'+i]={got:got,all:all,n:n};
+  });
+}
+
+function summary(){
+  document.getElementById('prog').style.width='100%';
+  document.getElementById('pn').textContent=P.length;
+  var h='<h2>Where you stand</h2><p style="margin:0 0 14px">This is your own practice record. It is not sent anywhere and it disappears when you close the page.</p>';
+  P.forEach(function(p,k){
+    var s=window['score'+k],pill,txt;
+    if(!s){pill='<span class="pill r">not attempted</span>';txt='Go back and write this one. It maps to a question on the short paper.';}
+    else if(s.got===s.all&&s.n>=p.write.min){pill='<span class="pill g">full coverage</span>';txt='All required elements present, with enough length to support them.';}
+    else if(s.got===s.all){pill='<span class="pill w">short</span>';txt='The ideas are there. The answer needs more case detail behind them.';}
+    else{pill='<span class="pill w">'+s.got+' of '+s.all+'</span>';txt='Reopen this prompt and add the missing elements.';}
+    h+='<div class="sumrow"><span class="t">Prompt '+(k+1)+'</span>'+pill+'<p style="margin:6px 0 0">'+txt+'</p></div>';
+  });
+  h+='<p style="margin:16px 0 0"><strong>Before you write the graded paper:</strong> the graded paper is not about 4 North, so no answer here transfers word for word. What transfers is the moves you just practiced: describe one engagement strategy in depth, choose teamwork concepts and say why they matter to you, name system barriers rather than attitudes, and describe an intervention all the way down to who leads it and how you would know it worked.</p>';
+  stage.innerHTML=h;
+  document.getElementById('nextb').textContent='Start over';
+}
+
+document.getElementById('nextb').addEventListener('click',function(){
+  if(i>=P.length){i=0;picked={};locked={};render();return;}
+  if(i===P.length-1){i=P.length;summary();return;}
+  i++;render();window.scrollTo(0,0);
+});
+document.getElementById('prev').addEventListener('click',function(){
+  if(i>0){if(i>=P.length)i=P.length-1;else i--;render();window.scrollTo(0,0);}
+});
+render();
+})();
+</script>
+</body>
+</html>
