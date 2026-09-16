@@ -90,6 +90,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/evaluating-the-team/](models/evaluating-the-team/): integrated Team Effectiveness Model practice: sort staff comments by domain, label objective vs subjective measures, and rate a real team.
 - [models/sandia-valley-practice-case/](models/sandia-valley-practice-case/): six-prompt practice case on the heart failure transitional care program, mirroring the short paper questions.
 - [models/implementing-coordinated-care/](models/implementing-coordinated-care/): module 7 practice: match the implementation strategy, pair barriers with responses, and build a shared plan of care.
+- [models/arizona-community-resources/](models/arizona-community-resources/): module 7 practice on Area Agency on Aging Region One and AZ Links: match needs to services, judge referrals, and run a real search.
 
 ## Embed snippets
 
@@ -164,6 +165,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Evaluating the Team Behind the Outcomes" src="models/evaluating-the-team/"></iframe>
 <iframe title="Sandia Valley Practice Case" src="models/sandia-valley-practice-case/"></iframe>
 <iframe title="Implementing a Coordinated Care Model" src="models/implementing-coordinated-care/"></iframe>
+<iframe title="Connecting Patients to Arizona Resources" src="models/arizona-community-resources/"></iframe>
 ```
 
 ## Files

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HCR 321 Module 7 Practice: Arizona Community Resources</title>
+<style>
+  :root{color-scheme:light;--navy:#1F3A5F;--navy-soft:#F3F6FB;--navy-line:#D0DCEB;--sand:#FBF7F0;--sand-line:#E8DFCE;
+        --good:#2E6B45;--good-bg:#EDF6F0;--bad:#9B3B52;--bad-bg:#FBF0F2;--warn:#B06B18;--warn-bg:#FDF8EF;
+        --ink:#2b2b2b;--muted:#5a5245;}
+  *{box-sizing:border-box}
+  body{margin:0;padding:18px;background:#fff;color:var(--ink);font-family:Lato,'Helvetica Neue',Arial,sans-serif;font-size:16px;line-height:1.55}
+  .wrap{max-width:820px;margin:0 auto}
+  h1{font-family:Georgia,'Times New Roman',serif;font-size:25px;color:var(--navy);margin:0 0 4px}
+  h2{font-family:Georgia,'Times New Roman',serif;font-size:20px;color:var(--navy);margin:0 0 6px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 18px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+  .tab{border:1px solid var(--navy-line);background:var(--navy-soft);color:var(--navy);padding:9px 14px;border-radius:999px;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit}
+  .tab[aria-selected="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .panel{border:1px solid var(--navy-line);border-radius:10px;padding:18px;background:#fff}
+  .panel[hidden]{display:none}
+  .intro{background:var(--navy-soft);border:1px solid var(--navy-line);border-radius:8px;padding:12px 14px;margin:0 0 16px;font-size:15px}
+  .card{border:1px solid var(--navy-line);border-radius:8px;padding:14px 16px;margin:0 0 12px}
+  .q{font-weight:700;margin:0 0 10px}
+  .opts{display:flex;flex-direction:column;gap:8px}
+  .opt{text-align:left;border:1px solid var(--navy-line);background:#fff;color:var(--ink);padding:10px 12px;border-radius:8px;cursor:pointer;font-size:15px;font-family:inherit}
+  .opt:hover:not(.locked){background:var(--navy-soft)}
+  .opt.right{background:var(--good-bg);border-color:var(--good);color:var(--good);font-weight:700}
+  .opt.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .fb{margin-top:12px;padding:12px 14px;border-radius:8px;display:none;font-size:15px}
+  .fb.show{display:block}
+  .fb.ok{background:var(--good-bg);border-left:4px solid var(--good)}
+  .fb.part{background:var(--warn-bg);border-left:4px solid var(--warn)}
+  .fb.no{background:var(--bad-bg);border-left:4px solid var(--bad)}
+  .bar{height:8px;background:var(--navy-soft);border-radius:999px;overflow:hidden;margin:0 0 6px}
+  .bar span{display:block;height:100%;background:var(--navy);width:0;transition:width .3s}
+  .meta{font-size:13px;color:var(--muted);margin:0 0 14px}
+  .btn{border:1px solid var(--navy);background:var(--navy);color:#fff;padding:9px 16px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit}
+  .btn.ghost{background:#fff;color:var(--navy)}
+  .btn:disabled{opacity:.45;cursor:default}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+  .item{border:1px solid var(--sand-line);background:var(--sand);border-radius:8px;padding:12px 14px;margin:0 0 10px}
+  .item .txt{margin:0 0 10px}
+  select{font-family:inherit;font-size:15px;padding:8px 10px;border:1px solid var(--navy-line);border-radius:8px;background:#fff;max-width:100%}
+  .why{font-size:15px;margin:10px 0 0;padding:10px 12px;background:#fff;border:1px dashed var(--sand-line);border-radius:8px;display:none}
+  .why.show{display:block}
+  .why.good{border-color:var(--good);background:var(--good-bg)}
+  .why.bad{border-color:var(--bad);background:var(--bad-bg)}
+  .score{font-weight:700;color:var(--navy)}
+  .reveal{border:1px solid var(--navy-line);border-radius:8px;margin:10px 0 0;background:#fff}
+  .reveal summary{cursor:pointer;padding:11px 14px;background:var(--navy-soft);color:var(--navy);font-weight:700;border-radius:8px}
+  .reveal > div{padding:12px 14px;border-top:1px solid var(--navy-line)}
+  textarea{width:100%;min-height:90px;border:1px solid var(--navy-line);border-radius:8px;padding:10px;font-family:inherit;font-size:15px}
+  .note{font-size:13px;color:var(--muted);margin-top:8px}
+  ol.steps{margin:0 0 0 0;padding-left:22px}
+  ol.steps li{margin-bottom:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Practice: Connecting Patients to Arizona Resources</h1>
+  <p class="sub">HCR 321 Module 7 &nbsp;|&nbsp; Area Agency on Aging Region One and AZ Links &nbsp;|&nbsp; Nothing here is graded or recorded.</p>
+
+  <div class="tabs" role="tablist" aria-label="Practice activities">
+    <button class="tab" role="tab" id="t1" aria-controls="p1" aria-selected="true">1. Match the need</button>
+    <button class="tab" role="tab" id="t2" aria-controls="p2" aria-selected="false">2. Judge the referral</button>
+    <button class="tab" role="tab" id="t3" aria-controls="p3" aria-selected="false">3. Run a real search</button>
+  </div>
+
+  <section class="panel" id="p1" role="tabpanel" aria-labelledby="t1">
+    <h2>Match the need to the service</h2>
+    <p class="intro">Six situations from a Maricopa County caseload. Choose the Arizona service that fits best, then check your answers. More than one could help in real life, so read the explanation for the reasoning.</p>
+    <div id="matchbox"></div>
+    <div class="row"><button class="btn" id="check1">Check my answers</button><button class="btn ghost" id="again1">Clear</button><span class="score" id="s1" aria-live="polite"></span></div>
+  </section>
+
+  <section class="panel" id="p2" role="tabpanel" aria-labelledby="t2" hidden>
+    <h2>Judge the referral</h2>
+    <p class="intro">Five referrals written by care coordinators. Decide whether each one would actually reach the patient. Feedback comes right away.</p>
+    <div class="bar"><span id="b2"></span></div>
+    <p class="meta">Question <span id="n2">1</span> of 5 &nbsp;&middot;&nbsp; Score <span class="score" id="s2">0</span></p>
+    <div id="quizbox" class="card"></div>
+    <div class="row"><button class="btn" id="next2" disabled>Next question</button><button class="btn ghost" id="again2">Start over</button></div>
+  </section>
+
+  <section class="panel" id="p3" role="tabpanel" aria-labelledby="t3" hidden>
+    <h2>Run a real search</h2>
+    <p class="intro">This one sends you to the actual sites. Open them in a new tab, do the search, and write down what you find. Your notes stay in your browser.</p>
+
+    <div class="card">
+      <p class="q">Task 1. Find a service in the AZ Links finder.</p>
+      <ol class="steps">
+        <li>Open the <a href="https://azdaars.getcare.com/consumer/search.php" target="_blank" rel="noopener">AZ Links service search</a>.</li>
+        <li>Choose Maricopa County and a topic that would help an older adult who cannot get to appointments.</li>
+        <li>Write the name of one agency, what it provides, and how a patient reaches it.</li>
+      </ol>
+      <textarea id="a1" aria-label="What you found in the AZ Links search"></textarea>
+      <details class="reveal"><summary>What a usable note looks like</summary><div>A usable note has three parts: the agency name, the specific service in plain words, and the contact route with a phone number or intake page. If your note says transportation services, it is still a category. If it names the agency, the service, and how the patient gets in the door, you can put it on a plan of care.</div></details>
+    </div>
+
+    <div class="card">
+      <p class="q">Task 2. Find two programs at the Area Agency on Aging, Region One.</p>
+      <ol class="steps">
+        <li>Open the <a href="https://www.aaaphx.org/area-agency-on-aging-resources/" target="_blank" rel="noopener">Region One resources page</a> and the programs menu.</li>
+        <li>Find one program for a family caregiver who is exhausted, and one for an older adult with depression or anxiety.</li>
+        <li>Write both names and one sentence each on who qualifies or how referral works.</li>
+      </ol>
+      <textarea id="a2" aria-label="What you found at the Area Agency on Aging"></textarea>
+      <details class="reveal"><summary>Compare with a strong response</summary><div>Family Caregiver Support is the program aimed at the caregiver rather than the patient, and ElderVention is the behavioral health program for older adults. A strong note also captures the 24 hour Senior HELP LINE at 602-264-4357, because it is the one number a patient or family can call at any hour when the coordinator is not available.</div></details>
+    </div>
+
+    <div class="card">
+      <p class="q">Task 3. Put it together.</p>
+      <p style="margin:0 0 10px">Pick one of the services you found and write two sentences: what problem it solves for the patient, and how you would make the referral so it does not die in a voicemail.</p>
+      <textarea id="a3" aria-label="Your referral plan"></textarea>
+      <details class="reveal"><summary>Compare with a strong response</summary><div>A strong answer names the problem in the patient's terms, names the service, and describes a warm handoff: the call made while the patient is present, the introduction, the contact written on the plan of care, and a date to check whether the service was actually received. That last step is the one most people skip, and it is the one that tells you whether the referral worked.</div></details>
+      <p class="note">If you can do this for four different needs, you have most of question 3 of the short paper.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  var tabs=[].slice.call(document.querySelectorAll('.tab'));
+  tabs.forEach(function(t){t.addEventListener('click',function(){
+    tabs.forEach(function(x){x.setAttribute('aria-selected','false');document.getElementById(x.getAttribute('aria-controls')).hidden=true;});
+    t.setAttribute('aria-selected','true');document.getElementById(t.getAttribute('aria-controls')).hidden=false;});});
+
+  var SERVICES=[
+   'Area Agency on Aging 24 hour Senior HELP LINE',
+   'Family Caregiver Support program',
+   'ElderVention behavioral health program',
+   'Benefits Assistance Program',
+   'Long Term Care Ombudsman',
+   'DOVES program',
+   'In Home Services',
+   'AZ Links screening tool and options counselor'
+  ];
+  var M=[
+   {t:'A daughter caring for her father is exhausted, missing work, and says she cannot keep doing this alone.',a:1,
+    w:'Family Caregiver Support is aimed at the caregiver rather than the patient. Caregiver strain is a clinical risk factor, since the caregiver leaving is what turns a manageable situation into a placement.'},
+   {t:'A 74 year old patient has stopped leaving the house, sleeps most of the day, and says nothing is worth doing anymore.',a:2,
+    w:'ElderVention is the behavioral health program for older adults at Region One. Screen for safety at the same time and use the crisis numbers if there is any risk of harm.'},
+   {t:'A patient qualifies for programs she is not enrolled in and cannot tell which ones she is eligible for.',a:3,
+    w:'The Benefits Assistance Program helps sort eligibility and enrollment. AZ Links Benefits Check Up is a reasonable second stop.'},
+   {t:'A family reports that their mother in a nursing facility is being ignored and their complaints go nowhere.',a:4,
+    w:'The Long Term Care Ombudsman advocates for residents of long term care facilities and investigates complaints. This is not a clinic problem to solve internally.'},
+   {t:'A patient discloses that her adult son has been taking her money and threatening her.',a:5,
+    w:'DOVES addresses elder abuse and domestic violence for older adults. Follow your mandatory reporting obligations at the same time. A referral does not replace a report.'},
+   {t:'A new patient in Yuma County needs someone to assess her situation and connect her to local services, and you do not know the agencies there.',a:7,
+    w:'The AZ Links screening tool and options counselor route a person to the partner agency for her county. Every Arizona county has an area agency on aging reachable this way, which matters when your patient lives outside Maricopa.'}
+  ];
+  var mbox=document.getElementById('matchbox');
+  function drawMatch(){
+    mbox.innerHTML='';document.getElementById('s1').textContent='';
+    M.forEach(function(item,idx){
+      var d=document.createElement('div');d.className='item';
+      var opts='<option value="">Choose a service</option>';
+      SERVICES.forEach(function(s,k){opts+='<option value="'+k+'">'+s+'</option>';});
+      d.innerHTML='<p class="txt">'+item.t+'</p><label class="note" for="sel'+idx+'">Best fit</label><br><select id="sel'+idx+'" data-i="'+idx+'">'+opts+'</select><p class="why" id="w'+idx+'">'+item.w+'</p>';
+      mbox.appendChild(d);});
+  }
+  document.getElementById('check1').addEventListener('click',function(){
+    var got=0,done=0;
+    M.forEach(function(item,idx){
+      var sel=document.getElementById('sel'+idx),v=sel.value;
+      if(v==='')return;done++;
+      var ok=(+v===item.a),why=document.getElementById('w'+idx);
+      why.className='why show '+(ok?'good':'bad');
+      why.innerHTML='<strong>'+(ok?'Good fit. ':'The stronger fit is '+SERVICES[item.a]+'. ')+'</strong>'+item.w;
+      if(ok)got++;});
+    document.getElementById('s1').textContent=done===0?'Choose a service for at least one situation first.':got+' of '+done+' answered match the expected service.';
+  });
+  document.getElementById('again1').addEventListener('click',drawMatch);
+  drawMatch();
+
+  var Q=[
+   {q:'"Patient was advised to seek transportation assistance in the community."',ok:false,
+    w:'This is a category, not a referral, and the work lands back on the person least able to do it. Name the agency, the service, and who is calling.'},
+   {q:'"Called AZ Links with the patient present, completed the screening tool together, and gave her the partner agency contact. Follow up scheduled in two weeks to confirm she was contacted."',ok:true,
+    w:'This is a warm handoff with a closed loop. The connection was made while the patient was there, and someone will check whether the service actually arrived.'},
+   {q:'"Gave the patient a printed list of twelve community agencies at discharge."',ok:false,
+    w:'A list is not a plan. A patient leaving the hospital, on new medications and short of breath, will not work through twelve phone numbers. Choose one or two and make the call.'},
+   {q:'"Referred the daughter to Family Caregiver Support, added the agency contact to the plan of care, and noted the Senior HELP LINE number for nights and weekends."',ok:true,
+    w:'Specific service, contact recorded where the team can see it, and a route for after hours. This survives the coordinator being off on Friday.'},
+   {q:'"Sent a fax to the home health agency with the care plan attached."',ok:false,
+    w:'Sending is not confirming. Without an acknowledgment or a shared record, no one knows whether the plan arrived or was read. Add a confirmation step.'}
+  ];
+  var i=0,score=0,answered=false,box=document.getElementById('quizbox'),next=document.getElementById('next2');
+  function draw(){
+    answered=false;next.disabled=true;
+    document.getElementById('n2').textContent=Math.min(i+1,Q.length);
+    document.getElementById('s2').textContent=score;
+    document.getElementById('b2').style.width=(i/Q.length*100)+'%';
+    if(i>=Q.length){box.innerHTML='<p class="q">Done. You scored '+score+' out of '+Q.length+'.</p><p style="margin:0">The pattern to carry into the paper: name the service, make the connection, record the contact, and confirm the patient received it.</p>';return;}
+    var item=Q[i];
+    box.innerHTML='<p class="q">'+item.q+'</p><div class="opts">'+
+      '<button class="opt" data-k="1">This referral will likely reach the patient</button>'+
+      '<button class="opt" data-k="0">This referral will likely go nowhere</button></div><p class="fb" id="fb" role="status"></p>';
+    [].slice.call(box.querySelectorAll('.opt')).forEach(function(b){
+      b.addEventListener('click',function(){
+        if(answered)return;answered=true;
+        var say=(b.dataset.k==='1'),ok=(say===item.ok),fb=document.getElementById('fb');
+        if(ok)score++;
+        [].slice.call(box.querySelectorAll('.opt')).forEach(function(x){
+          x.classList.add('locked');
+          var v=(x.dataset.k==='1');
+          if(v===item.ok)x.className='opt right locked';else x.className='opt wrong locked';});
+        fb.className='fb show '+(ok?'ok':'no');
+        fb.innerHTML='<strong>'+(ok?'Correct. ':'Look again. ')+'</strong>'+item.w;
+        document.getElementById('s2').textContent=score;next.disabled=false;});});
+  }
+  next.addEventListener('click',function(){i++;draw();});
+  document.getElementById('again2').addEventListener('click',function(){i=0;score=0;draw();});
+  draw();
+})();
+</script>
+</body>
+</html>
