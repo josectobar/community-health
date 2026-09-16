@@ -86,6 +86,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 - [models/hcr231-ch16-workplace-safety/](models/hcr231-ch16-workplace-safety/): hCR 231 Chapter 16: occupational safety terms, injury vs. illness, violence types, prevention.
 - [models/hcr231-ch16-violence-scenarios/](models/hcr231-ch16-violence-scenarios/): hCR 231 Chapter 16: violence-type decision guide, scenario matcher, practice case, self-check.
 - [models/community-readiness-self-check/](models/community-readiness-self-check/): three-round practice on readiness dimensions, stages, and next steps before writing Part 3.
+- [models/measuring-care-coordination/](models/measuring-care-coordination/): aHRQ Care Coordination Measurement Framework practice: name the activity, sort structure/process/outcome, read the context.
 
 ## Embed snippets
 
@@ -156,6 +157,7 @@ Open any route directly in a browser, or serve the repository with any static fi
 <iframe title="Chapter 16 — Workplace Safety Interactive Widgets" src="models/hcr231-ch16-workplace-safety/"></iframe>
 <iframe title="Chapter 16 — Case Scenario Widgets" src="models/hcr231-ch16-violence-scenarios/"></iframe>
 <iframe title="Community Readiness Self Check" src="models/community-readiness-self-check/"></iframe>
+<iframe title="Measuring Care Coordination" src="models/measuring-care-coordination/"></iframe>
 ```
 
 ## Files
